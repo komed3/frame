@@ -1,6 +1,8 @@
 import { join } from 'node:path';
 import express, { static as serveStatic } from 'express';
 
+const cwd = process.cwd();
+
 // Initialize express app
 const app = express();
 
