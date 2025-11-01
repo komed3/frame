@@ -6,6 +6,10 @@ const cwd = process.cwd();
 // Initialize express app
 const app = express();
 
+// Set view engine
+app.set( 'views', join( cwd, 'views' ) );
+app.set( 'view engine', 'pug' );
+
 // Middlewares
 app.use( express.urlencoded( { extended: true } ) );
 app.use( express.json() );
