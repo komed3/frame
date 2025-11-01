@@ -1,0 +1,25 @@
+{
+  "name": "@komed3/frame",
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Paul Köhler (komed3)",
+    "url": "https://komed3.de",
+    "email": "webmaster@komed3.de"
+  },
+  "homepage": "https://github.com/komed3/frame",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/komed3/frame.git"
+  },
+  "bugs": {
+    "url": "https://github.com/komed3/frame/issues"
+  },
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {}
+}
