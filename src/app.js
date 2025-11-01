@@ -1,3 +1,4 @@
+import { router } from './controller/index.js';
 import { join } from 'node:path';
 import express, { static as serveStatic } from 'express';
 
@@ -19,6 +20,9 @@ app.use( '/fonts', serveStatic( join( cwd, 'public/fonts' ) ) );
 app.use( '/images', serveStatic( join( cwd, 'public/images' ) ) );
 app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
+
+// Mount router
+app.use( router );
 
 // App listen on port
 app.listen( process.env.PORT || 3000, () => console.log( 'Server is running!' ) );
