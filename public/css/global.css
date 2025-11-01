@@ -23,6 +23,8 @@
 :root {
     --text-color: #fff;
     --bg-color: #0a0a0a;
+    --primary: #4fbe9f;
+    --secondary: #09816c;
     --font-sans: 'IBMPlexSans', sans-serif;
     --font-mono: 'IBMPlexMono', monospace;
 }
