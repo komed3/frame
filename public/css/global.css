@@ -15,7 +15,32 @@
 }
 
 @font-face {
-    font-family: 'SUSE Mono';
+    font-family: 'IBMPlexMono';
     font-style: italic;
     src: url( '../fonts/IBMPlexMono-Italic.woff2' ) format( 'woff2' );
+}
+
+:root {
+    --text-color: #fff;
+    --bg-color: #0a0a0a;
+    --font-sans: 'IBMPlexSans', sans-serif;
+    --font-mono: 'IBMPlexMono', monospace;
+}
+
+*, *::after, *::before {
+    box-sizing: border-box;
+}
+
+img, input, select, button, .noselect {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+html, body {
+    margin: 0;
+    font-family: var( --font-sans );
+    color: var( --text-color );
+    background: var( --bg-color );
 }
