@@ -20,4 +20,5 @@ app.use( '/images', serveStatic( join( cwd, 'public/images' ) ) );
 app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
 
+// App listen on port
 app.listen( process.env.PORT || 3000, () => console.log( 'Server is running!' ) );
