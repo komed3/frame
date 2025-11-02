@@ -22,7 +22,7 @@ block main
             div.player-actions
               button( action= "play", title= "Play" )
                 img.icon( src= "/images/icons/play.svg", alt= "Play" )
-              button( action= "pause", title= "Pause" )
+              button( action= "pause", title= "Pause", disabled )
                 img.icon( src= "/images/icons/pause.svg", alt= "Pause" )
               button( action= "skipBack", title= "Rewind (5 sec.)" )
                 img.icon( src= "/images/icons/rewind.svg", alt= "Rewind" )
@@ -33,10 +33,10 @@ block main
               button( action= "nextFrame", title= "Next Frame" )
                 img.icon( src= "/images/icons/skipForward.svg", alt= "Next Frame" )
               div.volume-container
-                button( action= "unmute", title= "Unmute Player" )
-                  img.icon( src= "/images/icons/volume.svg", alt= "Unmute" )
                 button( action= "mute", title= "Mute Player" )
-                  img.icon( src= "/images/icons/mute.svg", alt= "Mute" )
+                  img.icon( src= "/images/icons/volume.svg", alt= "Mute" )
+                button( action= "unmute", title= "Unmute Player", disabled )
+                  img.icon( src= "/images/icons/mute.svg", alt= "Unmute" )
                 div.volume-slider
                   input(
                     type= "range", action= "volumeSlider", title= "Volume",
@@ -50,6 +50,6 @@ block main
                 img.icon( src= "/images/icons/settings.svg", alt= "Settings" )
               button( action= "maximize", title= "Fullscreen" )
                 img.icon( src= "/images/icons/maximize.svg", alt= "Fullscreen" )
-              button( action= "minimize", title= "Exit Fullscreen" )
+              button( action= "minimize", title= "Exit Fullscreen", disabled )
                 img.icon( src= "/images/icons/minimize.svg", alt= "Exit Fullscreen" )
       div.player-overlay

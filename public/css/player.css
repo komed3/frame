@@ -109,7 +109,7 @@
     cursor: pointer;
 }
 
-.main-controls button.hidden {
+.main-controls button:disabled {
     display: none;
 }
 
