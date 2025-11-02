@@ -15,6 +15,7 @@ class VideoPlayer {
 
         this.controlsTimeout = null;
 
+        this.initProgressBar();
         this.initEventHandlers();
         this.initKeyBindings();
 
@@ -29,6 +30,15 @@ class VideoPlayer {
         } );
 
         return controls;
+
+    }
+
+    initProgressBar () {
+
+        this.progress = this.container.querySelector( '.progress-container' );
+        this.progressBar = this.container.querySelector( '.progress-bar' );
+        this.bufferBar = this.container.querySelector( '.buffer-bar' );
+        this.timeDisplay = this.container.querySelector( '.player-time' );
 
     }
 
@@ -56,6 +66,11 @@ class VideoPlayer {
         this.video.addEventListener( 'play', this.updatePlayBtn.bind( this ) );
         this.video.addEventListener( 'pause', this.updatePlayBtn.bind( this ) );
         this.video.addEventListener( 'ended', this.updatePlayBtn.bind( this ) );
+
+        // Time / loading update
+        this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
+        this.video.addEventListener( 'loadedmetadata', this.updateTimeDisplay.bind( this ) );
+        this.video.addEventListener( 'progress', this.updateBuffer.bind( this ) );
 
     }
 
@@ -107,6 +122,36 @@ class VideoPlayer {
     hideLoading () {
 
         this.container.classList.remove( 'show-spinner' );
+
+    }
+
+    updateProgress () {
+
+        const percent = ( this.video.currentTime / this.video.duration ) * 100;
+        this.progressBar.style.setProperty( '--width', percent + '%' );
+
+        this.updateTimeDisplay();
+
+    }
+
+    updateBuffer () {
+
+        if ( this.video.buffered.length > 0 ) {
+
+            const bufferedEnd = this.video.buffered.end( this.video.buffered.length - 1 );
+            const duration = this.video.duration;
+            const percent = ( bufferedEnd / duration ) * 100;
+            this.bufferBar.style.setProperty( '--width', percent + '%' );
+
+        }
+
+    }
+
+    updateTimeDisplay () {
+
+        const current = formatTime( this.video.currentTime );
+        const duration = formatTime( this.video.duration );
+        this.timeDisplay.textContent = `${current} / ${duration}`;
 
     }
 
