@@ -1,8 +1,9 @@
 class VideoPlayer {
 
     bindings = [
-        'F11', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-        'f', 'F', 'k', 'K', 'm', 'M', ' ', ',', '.', 'Home', 'End'
+        'F11', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End',
+        'f', 'F', 'k', 'K', 'm', 'M', 'j', 'J', 'l', 'L', ' ', ',', '.',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     ];
 
     constructor () {
@@ -107,14 +108,20 @@ class VideoPlayer {
                 case 'm': case 'M': this.toggleMute(); break;
                 case 'ArrowUp': this.changeVolume( 0.1 ); break;
                 case 'ArrowDown': this.changeVolume( -0.1 ); break;
+                case 'j': case 'J': this.skip( -10 ); break;
                 case 'ArrowLeft': this.skip( -5 ); break;
                 case 'ArrowRight': this.skip( 5 ); break;
+                case 'l': case 'L': this.skip( 10 ); break;
                 case 'Home': this.begin(); break;
                 case 'End': this.end(); break;
                 case ',': this.skipFrame( -1 ); break;
                 case '.': this.skipFrame( 1 ); break;
                 case 'F11': case 'f': case 'F': this.toggleFullscreen(); break;
                 case 'Escape': this.minimize(); break;
+
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9':
+                    this.seek( Number( e.key ) * 10 ); break;
 
             }
 
@@ -273,6 +280,14 @@ class VideoPlayer {
         this.video.currentTime = Math.max( 0, Math.min(
             this.video.duration,
             this.video.currentTime + ( frameTime * frames )
+        ) );
+
+    }
+
+    seek ( value ) {
+
+        this.video.currentTime = this.video.duration * Math.max( 0, Math.min(
+            1, value > 1 ? value / 100 : value
         ) );
 
     }
