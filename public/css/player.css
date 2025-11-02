@@ -5,6 +5,7 @@
 }
 
 .player-inner {
+    position: relative;
     margin: 0 auto;
     width: auto;
     height: auto;
@@ -13,6 +14,67 @@
 }
 
 .player-inner .player-source {
+    display: block;
+    margin: 0;
     width: 100%;
     height: auto;
+}
+
+.player-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    width: 100%;
+    height: 120px;
+    padding: 40px 20px 20px;
+    background: linear-gradient( to top, rgba( 0 0 0 / 0.9 ), transparent );
+    transition: opacity 0.3s ease;
+    z-index: 99;
+}
+
+.progress-container, .buffer-bar, .progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.progress-container {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background: rgba( 255, 255, 255, 0.2 );
+    cursor: pointer;
+}
+
+.buffer-bar {
+    background: rgba( 255, 255, 255, 0.3 );
+}
+
+.progress-bar {
+    background: var( --primary );
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    background: var( --primary );
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.progress-container:hover .progress-bar::after {
+    opacity: 1;
 }
