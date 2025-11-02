@@ -20,9 +20,17 @@
     height: 100%;
 }
 
+.header-logo {
+    display: block;
+    margin: 0;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+}
+
 .header-logo img {
     width: auto;
-    height: 72px;
+    height: 64px;
 }
 
 .header-search {
