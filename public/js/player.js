@@ -65,6 +65,7 @@ class VideoPlayer {
         this.controls.end.addEventListener( 'click', this.end.bind( this ) );
         this.controls.mute.addEventListener( 'click', this.mute.bind( this ) );
         this.controls.unmute.addEventListener( 'click', this.unmute.bind( this ) );
+        this.controls.volume.addEventListener( 'input', ( e ) => this.changeVolume( e.target.value ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
@@ -201,9 +202,13 @@ class VideoPlayer {
     updateVolume () {
 
         const muted = this.isMuted();
+        const volume = this.video.volume * 100;
 
         this.controls.mute.disabled = muted;
         this.controls.unmute.disabled = ! muted;
+
+        this.controls.volume.value = volume;
+        this.controls.volume.style.setProperty( '--width', volume + '%' );
 
     }
 
@@ -228,6 +233,13 @@ class VideoPlayer {
 
         if ( this.isMuted() ) this.unmute();
         else this.mute();
+
+    }
+
+    changeVolume ( value ) {
+
+        this.video.volume = Math.max( 0, Math.min( 1, value / 100 ) );
+        if ( this.video.volume > 0 ) this.previousVolume = this.video.volume;
 
     }
 
