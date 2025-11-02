@@ -4,6 +4,11 @@
     background: #000;
 }
 
+.player-container:not( .show-controls ),
+.player-container:not( .show-controls ) * {
+    cursor: none !important;
+}
+
 .player-inner {
     position: relative;
     margin: 0 auto;
