@@ -34,15 +34,28 @@ class VideoPlayer {
 
     initEventHandlers () {
 
-        document.addEventListener( 'fullscreenchange', this.toggleFullscreenBtn.bind( this ) );
+        // Document event listener
+        document.addEventListener( 'fullscreenchange', this.updateFullscreenBtn.bind( this ) );
 
+        // Mouse actions
         this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
         this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
 
+        // Controls
         this.controls.play.addEventListener( 'click', this.play.bind( this ) );
         this.controls.pause.addEventListener( 'click', this.pause.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
+
+        // Loading state
+        //this.video.addEventListener( 'waiting', this.showLoading.bind( this ) );
+        //this.video.addEventListener( 'canplay', this.hideLoading.bind( this ) );
+        //this.video.addEventListener( 'playing', this.hideLoading.bind( this ) );
+
+        // Video state
+        this.video.addEventListener( 'play', this.updatePlayBtn.bind( this ) );
+        this.video.addEventListener( 'pause', this.updatePlayBtn.bind( this ) );
+        this.video.addEventListener( 'ended', this.updatePlayBtn.bind( this ) );
 
     }
 
@@ -85,21 +98,22 @@ class VideoPlayer {
 
     }
 
+    updatePlayBtn () {
+
+        this.controls.play.disabled = ! this.video.paused;
+        this.controls.pause.disabled = this.video.paused;
+
+    }
+
     async play () {
 
         await this.video.play();
-
-        this.controls.play.disabled = true;
-        this.controls.pause.disabled = false;
 
     }
 
     pause () {
 
         this.video.pause();
-
-        this.controls.play.disabled = false;
-        this.controls.pause.disabled = true;
 
     }
 
@@ -118,7 +132,7 @@ class VideoPlayer {
 
     }
 
-    toggleFullscreenBtn () {
+    updateFullscreenBtn () {
 
         const fs = !! this.isFullscreen();
 
