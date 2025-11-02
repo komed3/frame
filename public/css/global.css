@@ -22,12 +22,16 @@
 
 :root {
     --content-width: 1400px;
-    --text-color: #fff;
-    --bg-color: #0a0a0a;
-    --primary: #4fbe9f;
-    --secondary: #09816c;
     --font-sans: 'IBMPlexSans', sans-serif;
     --font-mono: 'IBMPlexMono', monospace;
+    --text-color: #fff;
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --bg-tertiary: #2a2a2a;
+    --primary: #4fbe9f;
+    --secondary: #09816c;
+    --border: 1px solid #333333;
+    --border-radius: 4px;
 }
 
 *, *::after, *::before {
@@ -54,5 +58,23 @@ html, body {
     margin: 0;
     font-family: var( --font-sans );
     color: var( --text-color );
-    background: var( --bg-color );
+    background: var( --bg-primary );
+}
+
+input, textarea, select {
+    font-family: var( --font-sans );
+    font-size: 1em;
+    color: var( --text-color );
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: 2px solid var( --primary );
+}
+
+svg.icon {
+    fill: var( --text-color );
+}
+
+img.icon {
+    filter: invert( 1 );
 }

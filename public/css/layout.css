@@ -5,13 +5,51 @@
     right: 0;
     width: 100%;
     height: 72px;
+    overflow: hidden;
 }
 
 .header-inner {
     display: grid;
     grid-template-columns: 1fr 3fr 1fr;
     align-items: center;
-    gap: 72px;
+    gap: 86px;
     margin: 0 auto;
     max-width: var( --content-width );
+}
+
+.header-logo img {
+    width: auto;
+    height: 72px;
+}
+
+.header-search {
+    position: relative;
+}
+
+.header-search input {
+    width: 100%;
+    height: 52px;
+    padding: 0 18px 0 64px;
+    background: var( --bg-secondary );
+    border: var( --border );
+    border-radius: 32px;
+}
+
+.header-search img {
+    position: absolute;
+    top: calc( 50% - 13px );
+    left: 22px;
+    width: 26px;
+    opacity: 0.7;
+}
+
+.header-right {
+    text-align: right;
+}
+
+.header-right .header-nav-opener {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    padding: 6px;
 }
