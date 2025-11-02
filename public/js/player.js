@@ -1,8 +1,8 @@
 class VideoPlayer {
 
     bindings = [
-        ' ', 'F11', 'Escape',
-        'f', 'F', 'k', 'K'
+        'F11', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+        'f', 'F', 'k', 'K', 'm', 'M', ' ', '.', ',', 'Home', 'End'
     ];
 
     constructor () {
@@ -57,6 +57,8 @@ class VideoPlayer {
         // Controls
         this.controls.play.addEventListener( 'click', this.play.bind( this ) );
         this.controls.pause.addEventListener( 'click', this.pause.bind( this ) );
+        this.controls.rewind.addEventListener( 'click', () => this.skip( -5 ) );
+        this.controls.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
@@ -93,6 +95,10 @@ class VideoPlayer {
             switch ( e.key ) {
 
                 case ' ': case 'k': case 'K': this.togglePlay(); break;
+                case 'ArrowLeft': this.skip( -5 ); break;
+                case 'ArrowRight': this.skip( 5 ); break;
+                case 'Home': this.begin(); break;
+                case 'End': this.end(); break;
                 case 'F11': case 'f': case 'F': this.toggleFullscreen(); break;
                 case 'Escape': this.minimize(); break;
 
@@ -168,22 +174,27 @@ class VideoPlayer {
 
     }
 
-    async play () {
+    async play () { await this.video.play() }
 
-        await this.video.play();
-
-    }
-
-    pause () {
-
-        this.video.pause();
-
-    }
+    pause () { this.video.pause() }
 
     async togglePlay () {
 
         if ( this.video.paused ) await this.play();
         else this.pause();
+
+    }
+
+    begin () { this.video.currentTime = 0 }
+
+    end () { this.video.currentTime = this.video.duration }
+
+    skip ( seconds ) {
+
+        this.video.currentTime = Math.max( 0, Math.min(
+            this.video.duration,
+            this.video.currentTime + seconds
+        ) );
 
     }
 
