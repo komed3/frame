@@ -15,4 +15,11 @@ block main
           div.progress-container
             div.buffer-bar
             div.progress-bar
+          div.main-controls
+            div.player-actions
+              button( action= "#play", title= "Play" )
+                img.icon( src= "/images/icons/play.svg", alt= "Play" )
+              button( action= "#pause", title= "Pause" )
+                img.icon( src= "/images/icons/pause.svg", alt= "Pause" )
+            div.player-settings
       div.player-overlay
