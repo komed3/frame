@@ -19,7 +19,7 @@ html( lang= "en" )
           a.header-logo( href= "/", title= "Frame — Video Library" )
             img( src= "/images/favicon.svg", alt= "Logo" )
         div.header-center
-          form( action= "/search", method= "get" ).header-search
+          form( action= "/search", method= "get", autocomplete= "off", spell-check= "off" ).header-search
             img.icon( src= "/images/icons/search.svg", alt= "Search" )
             input( type= "text", name= "q", value= query || '', placeholder= "Search …" )
         div.header-right
