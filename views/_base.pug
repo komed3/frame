@@ -13,6 +13,7 @@ html( lang= "en" )
       link( rel= "stylesheet", href= "css/layout.min.css" )
 
   body#top
+
     header#header.header( role= "banner", aria-label= "Header" )
       div.header-inner
         div.header-left
@@ -25,3 +26,10 @@ html( lang= "en" )
         div.header-right
           a.header-nav-opener( href= "#nav", title= "Menu" )
             img.icon( src= "/images/icons/menu.svg", alt= "Menu" )
+
+    footer#footer.footer( role= "contentinfo", aria-role= "Footer" )
+      p.footer-credits &copy; Copyright 2025 by komed3. All rights reserved.
+      div.legal-links
+        a( href= "https://github.com/komed3/frame", target= "_blank" ) GitHub
+        a( href= "https://github.com/komed3/frame/issues", target= "_blank" ) Bug Report
+        a( href= "https://komed3.de" target= "_blank" ) komed3
