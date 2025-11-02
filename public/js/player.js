@@ -5,11 +5,11 @@ class VideoPlayer {
         this.container = document.getElementById( 'player' );
         this.video = this.container.querySelector( 'video' );
 
-        this.controls = this.#initControls();
+        this.controls = this.initControls();
 
     }
 
-    #initControls () {
+    initControls () {
 
         const controls = {};
 
