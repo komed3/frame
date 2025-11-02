@@ -48,9 +48,9 @@ class VideoPlayer {
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
         // Loading state
-        //this.video.addEventListener( 'waiting', this.showLoading.bind( this ) );
-        //this.video.addEventListener( 'canplay', this.hideLoading.bind( this ) );
-        //this.video.addEventListener( 'playing', this.hideLoading.bind( this ) );
+        this.video.addEventListener( 'waiting', this.showLoading.bind( this ) );
+        this.video.addEventListener( 'canplay', this.hideLoading.bind( this ) );
+        this.video.addEventListener( 'playing', this.hideLoading.bind( this ) );
 
         // Video state
         this.video.addEventListener( 'play', this.updatePlayBtn.bind( this ) );
@@ -95,6 +95,18 @@ class VideoPlayer {
     hideControls() {
 
         if ( ! this.video.paused ) this.container.classList.remove( 'show-controls' );
+
+    }
+
+    showLoading () {
+
+        this.container.classList.add( 'show-spinner' );
+
+    }
+
+    hideLoading () {
+
+        this.container.classList.remove( 'show-spinner' );
 
     }
 
