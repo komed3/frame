@@ -37,11 +37,16 @@
     background: linear-gradient( to top, rgba( 0 0 0 / 0.5 ), transparent );
     opacity: 0;
     transition: opacity 0.2s ease-out;
-    z-index: 99;
+    z-index: 98;
 }
 
 .player-container.show-controls .player-controls {
     opacity: 1;
+}
+
+.player-container.show-controls.show-spinner .player-controls {
+    pointer-events: none;
+    opacity: 0.7;
 }
 
 .action-container {
@@ -211,6 +216,7 @@
     border-radius: 50%;
     opacity: 0;
     animation: spin 0.8s linear infinite;
+    z-index: 99;
     visibility: hidden;
 }
 

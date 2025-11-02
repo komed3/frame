@@ -57,8 +57,10 @@ class VideoPlayer {
         // Controls
         this.controls.play.addEventListener( 'click', this.play.bind( this ) );
         this.controls.pause.addEventListener( 'click', this.pause.bind( this ) );
+        this.controls.begin.addEventListener( 'click', this.begin.bind( this ) );
         this.controls.rewind.addEventListener( 'click', () => this.skip( -5 ) );
         this.controls.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
+        this.controls.end.addEventListener( 'click', this.end.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
