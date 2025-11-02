@@ -44,6 +44,10 @@
     opacity: 1;
 }
 
+.action-container {
+    flex: 1;
+}
+
 .progress-container, .buffer-bar, .progress-bar {
     position: absolute;
     top: 0;

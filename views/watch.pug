@@ -1,7 +1,7 @@
 extends ./_base
 
 append scripts
-  script( src= "/js/player.min.js", type= "text/javascript", defer )
+  script( src= "/js/player.js", type= "text/javascript", defer )
 
 append styles
   link( rel= "stylesheet", href= "/css/player.min.css" )
@@ -12,6 +12,7 @@ block main
       div.player-inner
         video.player-source( src= "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" )
         div.player-controls
+          div.action-container
           div.progress-container
             div.buffer-bar( style= "--width: 0%" )
             div.progress-bar( style= "--width: 0%" )

@@ -11,6 +11,7 @@ class VideoPlayer {
         this.container = document.querySelector( '.player-container' );
         this.videoContainer = this.container.querySelector( '.player-inner' );
         this.video = this.container.querySelector( 'video' );
+        this.actionContainer = this.container.querySelector( '.action-container' );
         this.controls = this.initControls();
 
         this.controlsTimeout = null;
@@ -50,6 +51,8 @@ class VideoPlayer {
         // Mouse actions
         this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
         this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
+        this.actionContainer.addEventListener( 'click', this.togglePlay.bind( this ) );
+        this.actionContainer.addEventListener( 'dblclick', this.toggleFullscreen.bind( this ) );
 
         // Controls
         this.controls.play.addEventListener( 'click', this.play.bind( this ) );
@@ -67,6 +70,9 @@ class VideoPlayer {
         this.video.addEventListener( 'pause', this.updatePlayBtn.bind( this ) );
         this.video.addEventListener( 'ended', this.updatePlayBtn.bind( this ) );
 
+        this.video.addEventListener( 'pause', this.showControls.bind( this ) );
+        this.video.addEventListener( 'ended', this.showControls.bind( this ) );
+
         // Time / loading update
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
         this.video.addEventListener( 'loadedmetadata', this.updateTimeDisplay.bind( this ) );
@@ -76,7 +82,7 @@ class VideoPlayer {
 
     initKeyBindings () {
 
-        document.addEventListener( 'keydown', ( e ) => {
+        document.addEventListener( 'keydown', e => {
 
             if ( e.target.tagName === 'input' || ! this.bindings.includes( e.key ) ) return;
 
