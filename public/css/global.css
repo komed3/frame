@@ -21,6 +21,7 @@
 }
 
 :root {
+    --content-width: 1400px;
     --text-color: #fff;
     --bg-color: #0a0a0a;
     --primary: #4fbe9f;
