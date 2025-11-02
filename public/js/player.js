@@ -14,6 +14,7 @@ class VideoPlayer {
         this.actionContainer = this.container.querySelector( '.action-container' );
         this.controls = this.initControls();
 
+        this.previousVolume = 1;
         this.controlsTimeout = null;
         this.frameRate = 30;
 
@@ -62,6 +63,8 @@ class VideoPlayer {
         this.controls.rewind.addEventListener( 'click', () => this.skip( -5 ) );
         this.controls.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
         this.controls.end.addEventListener( 'click', this.end.bind( this ) );
+        this.controls.mute.addEventListener( 'click', this.mute.bind( this ) );
+        this.controls.unmute.addEventListener( 'click', this.unmute.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
@@ -73,10 +76,12 @@ class VideoPlayer {
         // Video state
         this.video.addEventListener( 'play', this.updatePlayBtn.bind( this ) );
         this.video.addEventListener( 'pause', this.updatePlayBtn.bind( this ) );
-        this.video.addEventListener( 'ended', this.updatePlayBtn.bind( this ) );
-
         this.video.addEventListener( 'pause', this.showControls.bind( this ) );
+        this.video.addEventListener( 'ended', this.updatePlayBtn.bind( this ) );
         this.video.addEventListener( 'ended', this.showControls.bind( this ) );
+
+        // Video events
+        this.video.addEventListener( 'volumechange', this.updateVolume.bind( this ) );
 
         // Time / loading update
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
@@ -98,6 +103,7 @@ class VideoPlayer {
             switch ( e.key ) {
 
                 case ' ': case 'k': case 'K': this.togglePlay(); break;
+                case 'm': case 'M': this.toggleMute(); break;
                 case 'ArrowLeft': this.skip( -5 ); break;
                 case 'ArrowRight': this.skip( 5 ); break;
                 case 'Home': this.begin(); break;
@@ -187,6 +193,41 @@ class VideoPlayer {
 
         if ( this.video.paused ) await this.play();
         else this.pause();
+
+    }
+
+    isMuted () { return ! this.video.volume > 0 }
+
+    updateVolume () {
+
+        const muted = this.isMuted();
+
+        this.controls.mute.disabled = muted;
+        this.controls.unmute.disabled = ! muted;
+
+    }
+
+    mute () {
+
+        if ( this.isMuted() ) return;
+
+        this.previousVolume = this.video.volume;
+        this.video.volume = 0;
+
+    }
+
+    unmute () {
+
+        if ( ! this.isMuted() ) return;
+
+        this.video.volume = this.previousVolume;
+
+    }
+
+    toggleMute () {
+
+        if ( this.isMuted() ) this.unmute();
+        else this.mute();
 
     }
 

@@ -51,6 +51,7 @@
 
 .action-container {
     flex: 1;
+    cursor: pointer;
 }
 
 .progress-container, .buffer-bar, .progress-bar {
