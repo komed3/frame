@@ -1,4 +1,5 @@
 import { home } from './home.js';
+import { watch } from './watch.js';
 import express from 'express';
 
 // Init express router
@@ -6,7 +7,8 @@ const router = express.Router();
 
 // Setup routes
 const routes = [
-    { path: '{/}', get: home }
+    { path: '{/}', get: home },
+    { path: '/watch/:id{/}', get: watch }
 ];
 
 // Routing paths
