@@ -67,6 +67,7 @@ class VideoPlayer {
         this.controls.mute.addEventListener( 'click', this.mute.bind( this ) );
         this.controls.unmute.addEventListener( 'click', this.unmute.bind( this ) );
         this.controls.volume.addEventListener( 'input', ( e ) => this.setVolume( e.target.value ) );
+        this.controls.download.addEventListener( 'click', this.download.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
@@ -335,6 +336,18 @@ class VideoPlayer {
 
         if ( this.isFullscreen() ) await this.minimize();
         else await this.maximize();
+
+    }
+
+    download () {
+
+        const videoSrc = this.video.currentSrc;
+        const anchor = document.createElement( 'a' );
+
+        anchor.href = videoSrc;
+        anchor.download = 'video.mp4';
+        anchor.target = '_blank';
+        anchor.click();
 
     }
 
