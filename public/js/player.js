@@ -44,6 +44,16 @@ class VideoPlayer {
         this.bufferBar = this.container.querySelector( '.buffer-bar' );
         this.timeDisplay = this.container.querySelector( '.player-time' );
 
+        // Seeking
+        this.progress.addEventListener( 'click', ( e ) => {
+
+            const rect = this.progress.getBoundingClientRect();
+            const percent = ( e.clientX - rect.left ) / rect.width;
+
+            this.seek( percent );
+
+        } );
+
     }
 
     initEventHandlers () {
@@ -147,17 +157,9 @@ class VideoPlayer {
 
     }
 
-    showLoading () {
+    showLoading () { this.container.classList.add( 'show-spinner' ) }
 
-        this.container.classList.add( 'show-spinner' );
-
-    }
-
-    hideLoading () {
-
-        this.container.classList.remove( 'show-spinner' );
-
-    }
+    hideLoading () { this.container.classList.remove( 'show-spinner' ) }
 
     updateProgress () {
 
