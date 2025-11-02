@@ -7,10 +7,13 @@ class VideoPlayer {
 
     constructor () {
 
-        this.container = document.getElementById( 'player' );
+        this.player = document.getElementById( 'player' );
+        this.container = document.querySelector( '.player-container' );
         this.videoContainer = this.container.querySelector( '.player-inner' );
         this.video = this.container.querySelector( 'video' );
         this.controls = this.initControls();
+
+        this.controlsTimeout = null;
 
         this.initEventHandlers();
         this.initKeyBindings();
@@ -32,6 +35,9 @@ class VideoPlayer {
     initEventHandlers () {
 
         document.addEventListener( 'fullscreenchange', this.toggleFullscreenBtn.bind( this ) );
+
+        this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
+        this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
 
         this.controls.play.addEventListener( 'click', this.play.bind( this ) );
         this.controls.pause.addEventListener( 'click', this.pause.bind( this ) );
@@ -59,6 +65,23 @@ class VideoPlayer {
             }
 
         } );
+
+    }
+
+    showControls () {
+
+        this.container.classList.add( 'show-controls' );
+        clearTimeout( this.controlsTimeout );
+
+        if ( ! this.video.paused ) this.controlsTimeout = setTimeout(
+            this.hideControls.bind( this ), 3000
+        );
+
+    }
+
+    hideControls() {
+
+        if ( ! this.video.paused ) this.container.classList.remove( 'show-controls' );
 
     }
 
