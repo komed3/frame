@@ -2,7 +2,7 @@ class VideoPlayer {
 
     bindings = [
         'F11', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-        'f', 'F', 'k', 'K', 'm', 'M', ' ', '.', ',', 'Home', 'End'
+        'f', 'F', 'k', 'K', 'm', 'M', ' ', ',', '.', 'Home', 'End'
     ];
 
     constructor () {
@@ -15,6 +15,7 @@ class VideoPlayer {
         this.controls = this.initControls();
 
         this.controlsTimeout = null;
+        this.frameRate = 30;
 
         this.initProgressBar();
         this.initEventHandlers();
@@ -101,6 +102,8 @@ class VideoPlayer {
                 case 'ArrowRight': this.skip( 5 ); break;
                 case 'Home': this.begin(); break;
                 case 'End': this.end(); break;
+                case ',': this.skipFrame( -1 ); break;
+                case '.': this.skipFrame( 1 ); break;
                 case 'F11': case 'f': case 'F': this.toggleFullscreen(); break;
                 case 'Escape': this.minimize(); break;
 
@@ -196,6 +199,18 @@ class VideoPlayer {
         this.video.currentTime = Math.max( 0, Math.min(
             this.video.duration,
             this.video.currentTime + seconds
+        ) );
+
+    }
+
+    skipFrame ( frames ) {
+
+        const frameTime = 1 / this.frameRate;
+
+        this.pause();
+        this.video.currentTime = Math.max( 0, Math.min(
+            this.video.duration,
+            this.video.currentTime + ( frameTime * frames )
         ) );
 
     }
