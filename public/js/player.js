@@ -107,7 +107,7 @@ class VideoPlayer {
 
         document.addEventListener( 'keydown', e => {
 
-            if ( e.target.tagName === 'input' || ! this.bindings.includes( e.key ) ) return;
+            if ( e.target.tagName === 'INPUT' || ! this.bindings.includes( e.key ) ) return;
 
             e.preventDefault();
             e.stopImmediatePropagation();
