@@ -1,7 +1,7 @@
 class VideoPlayer {
 
     bindings = [
-        'F11', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+        'F11', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
         'f', 'F', 'k', 'K', 'm', 'M', ' ', ',', '.', 'Home', 'End'
     ];
 
@@ -65,7 +65,7 @@ class VideoPlayer {
         this.controls.end.addEventListener( 'click', this.end.bind( this ) );
         this.controls.mute.addEventListener( 'click', this.mute.bind( this ) );
         this.controls.unmute.addEventListener( 'click', this.unmute.bind( this ) );
-        this.controls.volume.addEventListener( 'input', ( e ) => this.changeVolume( e.target.value ) );
+        this.controls.volume.addEventListener( 'input', ( e ) => this.setVolume( e.target.value ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
@@ -105,6 +105,8 @@ class VideoPlayer {
 
                 case ' ': case 'k': case 'K': this.togglePlay(); break;
                 case 'm': case 'M': this.toggleMute(); break;
+                case 'ArrowUp': this.changeVolume( 0.1 ); break;
+                case 'ArrowDown': this.changeVolume( -0.1 ); break;
                 case 'ArrowLeft': this.skip( -5 ); break;
                 case 'ArrowRight': this.skip( 5 ); break;
                 case 'Home': this.begin(); break;
@@ -225,7 +227,7 @@ class VideoPlayer {
 
         if ( ! this.isMuted() ) return;
 
-        this.video.volume = this.previousVolume;
+        this.video.volume = this.previousVolume || 1;
 
     }
 
@@ -238,8 +240,15 @@ class VideoPlayer {
 
     changeVolume ( value ) {
 
+        this.video.volume = Math.max( 0, Math.min( 1, this.video.volume + value ) );
+        this.previousVolume = this.video.volume;
+
+    }
+
+    setVolume ( value ) {
+
         this.video.volume = Math.max( 0, Math.min( 1, value / 100 ) );
-        if ( this.video.volume > 0 ) this.previousVolume = this.video.volume;
+        this.previousVolume = this.video.volume;
 
     }
 
