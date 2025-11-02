@@ -1,0 +1,18 @@
+.player-container {
+    width: 100%;
+    height: auto;
+    background: #000;
+}
+
+.player-inner {
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+    max-width: var( --content-width );
+    max-height: 800px;
+}
+
+.player-inner .player-source {
+    width: 100%;
+    height: auto;
+}

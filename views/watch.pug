@@ -1,1 +1,15 @@
 extends ./_base
+
+append styles
+  link( rel= "stylesheet", href= "/css/player.min.css" )
+
+block main
+  div#player.player
+    div.player-container
+      div.player-inner
+        video.player-source(
+          src= "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          autoplay, muted
+        )
+      div.player-controls
+      div.player-overlay
