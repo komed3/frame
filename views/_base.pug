@@ -12,3 +12,15 @@ html( lang= "en" )
       link( rel= "stylesheet", href= "css/global.min.css" )
 
   body#top
+    header#header.header( role= "banner", aria-label= "Header" )
+      div.header-inner
+        div.header-left
+          a( href= "/", title= "Frame — Video Library" )
+            img( src= "/images/favicon.svg", alt= "Logo" )
+        div.header-center
+          form( action= "/search", method= "get" ).header-search
+            img( src= "/images/icons/search.svg", alt= "Search" )
+            input( type= "text", name= "q", value= query || '', placeholder= "Search …" )
+        div.header-right
+          a( href= "#nav", title= "Menu" )
+            img( src= "/images/icons/menu.svg", alt= "Menu" )
