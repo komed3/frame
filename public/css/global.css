@@ -25,6 +25,7 @@
     --font-sans: 'IBMPlexSans', sans-serif;
     --font-mono: 'IBMPlexMono', monospace;
     --text-color: #fff;
+    --text-muted: #808080;
     --bg-primary: #0a0a0a;
     --bg-secondary: #1a1a1a;
     --bg-tertiary: #2a2a2a;
@@ -59,6 +60,15 @@ html, body {
     font-family: var( --font-sans );
     color: var( --text-color );
     background: var( --bg-primary );
+}
+
+a, a:link, a:visited {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover {
+    color: var( --primary );
 }
 
 input, textarea, select {
