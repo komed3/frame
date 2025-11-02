@@ -20,22 +20,22 @@ block main
             div.progress-bar( style= "--width: 0%" )
           div.main-controls
             div.player-actions
-              button( action= "#play", title= "Play" )
+              button( action= "play", title= "Play" )
                 img.icon( src= "/images/icons/play.svg", alt= "Play" )
-              button( action= "#pause", title= "Pause" )
+              button( action= "pause", title= "Pause" )
                 img.icon( src= "/images/icons/pause.svg", alt= "Pause" )
-              button( action= "#skipBack", title= "Rewind (5 sec.)" )
+              button( action= "skipBack", title= "Rewind (5 sec.)" )
                 img.icon( src= "/images/icons/rewind.svg", alt= "Rewind" )
-              button( action= "#skipForward", title= "Fast forward (5 sec.)" )
+              button( action= "skipForward", title= "Fast forward (5 sec.)" )
                 img.icon( src= "/images/icons/fastForward.svg", alt= "Fast Forward" )
-              button( action= "#prevFrame", title= "Previous Frame" )
+              button( action= "prevFrame", title= "Previous Frame" )
                 img.icon( src= "/images/icons/skipBack.svg", alt= "Previous Frame" )
-              button( action= "#nextFrame", title= "Next Frame" )
+              button( action= "nextFrame", title= "Next Frame" )
                 img.icon( src= "/images/icons/skipForward.svg", alt= "Next Frame" )
               div.volume-container
-                button( action= "#unmute", title= "Unmute Player" )
+                button( action= "unmute", title= "Unmute Player" )
                   img.icon( src= "/images/icons/volume.svg", alt= "Unmute" )
-                button( action= "#mute", title= "Mute Player" )
+                button( action= "mute", title= "Mute Player" )
                   img.icon( src= "/images/icons/mute.svg", alt= "Mute" )
                 div.volume-slider
                   input(
@@ -44,12 +44,12 @@ block main
                   )
               span.player-time 00:00 / 00:00
             div.player-settings
-              button( action= "#download", title= "Download Video" )
+              button( action= "download", title= "Download Video" )
                 img.icon( src= "/images/icons/download.svg", alt= "Download Video" )
-              button( action= "#settings", title= "Settings" )
+              button( action= "settings", title= "Settings" )
                 img.icon( src= "/images/icons/settings.svg", alt= "Settings" )
-              button( action= "#maximize", title= "Fullscreen" )
+              button( action= "maximize", title= "Fullscreen" )
                 img.icon( src= "/images/icons/maximize.svg", alt= "Fullscreen" )
-              button( action= "#minimize", title= "Exit Fullscreen" )
+              button( action= "minimize", title= "Exit Fullscreen" )
                 img.icon( src= "/images/icons/minimize.svg", alt= "Exit Fullscreen" )
       div.player-overlay
