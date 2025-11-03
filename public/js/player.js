@@ -20,6 +20,7 @@ class VideoPlayer {
         this.controls = this.initControls();
         this.overlay = this.initOverlay();
 
+        this.speedIndex = 3;
         this.previousVolume = 1;
         this.frameRate = 30;
         this.controlsTimeout = null;
@@ -223,12 +224,17 @@ class VideoPlayer {
                     break;
 
                 case '+':
-                    this.changeSpeed( 0.25 );
+                    this.changeSpeed( 1 );
                     this.speedOverlay();
                     break;
 
                 case '-':
-                    this.changeSpeed( -0.25 );
+                    this.changeSpeed( -1 );
+                    this.speedOverlay();
+                    break;
+
+                case 'F10':
+                    this.setSpeed( 3 );
                     this.speedOverlay();
                     break;
 
@@ -445,13 +451,25 @@ class VideoPlayer {
 
     seekOverlay () { this.showOverlay( 'fastForward', 'Skip to ' + formatTime( this.video.currentTime ) ) }
 
-    changeSpeed ( value ) { this.setSpeed( this.video.playbackRate + value ) }
+    changeSpeed ( value ) {
 
-    setSpeed ( speed ) { this.video.playbackRate = Number( Math.max( 0.25, Math.min( 2, speed ) ).toFixed( 2 ) ) }
+        this.setSpeed( Math.max( 0, Math.min(
+            this.playbackSpeed.length - 1,
+            this.speedIndex + value
+        ) ) );
 
-    updateSpeed () { this.controls.playbackRate.value = this.video.playbackRate }
+    }
 
-    speedOverlay () { this.showOverlay( 'clock', `Playback rate: ${ this.video.playbackRate }x` ) }
+    setSpeed ( index ) {
+
+        this.video.playbackRate = this.playbackSpeed[ index ] || 1;
+        this.speedIndex = this.playbackSpeed.indexOf( this.video.playbackRate );
+
+    }
+
+    updateSpeed () { this.controls.playbackRate.value = this.speedIndex }
+
+    speedOverlay () { this.showOverlay( 'clock', `Playback rate: ${ this.playbackSpeed[ this.speedIndex ] }x` ) }
 
     isFullscreen () {
 
