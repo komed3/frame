@@ -35,7 +35,7 @@ class VideoPlayer {
 
         const controls = {};
 
-        this.container.querySelectorAll( '.player-controls [action]' ).forEach( el => {
+        this.container.querySelectorAll( '[action]' ).forEach( el => {
             controls[ el.getAttribute( 'action' ) ] = el;
         } );
 
@@ -81,8 +81,19 @@ class VideoPlayer {
         // Mouse actions
         this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
         this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
-        this.actionContainer.addEventListener( 'click', this.togglePlay.bind( this ) );
         this.actionContainer.addEventListener( 'dblclick', this.toggleFullscreen.bind( this ) );
+
+        // Toggle dialogs / play/pause
+        this.actionContainer.addEventListener( 'click', () => {
+
+            if (
+                this.container.classList.contains( 'show-settings' ) ||
+                this.container.classList.contains( 'show-help' )
+            ) this.container.classList.remove( 'show-settings', 'show-help' );
+
+            else this.togglePlay();
+
+        } );
 
         // Controls
         this.controls.play.addEventListener( 'click', this.play.bind( this ) );
@@ -97,6 +108,7 @@ class VideoPlayer {
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
         this.controls.settings.addEventListener( 'click', this.toggleSettings.bind( this ) );
+        this.controls.playbackRate.addEventListener( 'change', e => this.setSpeed( e.target.value ) )
         this.controls.help.addEventListener( 'click', this.toggleHelp.bind( this ) );
 
         // Change volume
@@ -121,6 +133,7 @@ class VideoPlayer {
 
         // Video events
         this.video.addEventListener( 'volumechange', this.updateVolume.bind( this ) );
+        this.video.addEventListener( 'ratechange', this.updateSpeed.bind( this ) );
 
         // Time / loading update
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
@@ -435,6 +448,8 @@ class VideoPlayer {
     changeSpeed ( value ) { this.setSpeed( this.video.playbackRate + value ) }
 
     setSpeed ( speed ) { this.video.playbackRate = Number( Math.max( 0.25, Math.min( 2, speed ) ).toFixed( 2 ) ) }
+
+    updateSpeed () { this.controls.playbackRate.value = this.video.playbackRate }
 
     speedOverlay () { this.showOverlay( 'clock', `Playback rate: ${ this.video.playbackRate }x` ) }
 

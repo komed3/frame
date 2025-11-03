@@ -178,8 +178,8 @@
         to right,
         #fff 0%,
         #fff var( --width, 100% ),
-        rgba( 255, 255, 255, 0.3 ) var( --width, 100% ),
-        rgba( 255, 255, 255, 0.3 ) 100%
+        rgba( 255 255 255 / 0.3 ) var( --width, 100% ),
+        rgba( 255 255 255 / 0.3 ) 100%
     );
     border-radius: 3px;
     outline: none;
@@ -283,23 +283,16 @@
     font-size: 1em;
 }
 
-.player-container.show-settings .player-dialog.settings,
-.player-container.show-help .player-dialog.help {
-    pointer-events: unset;
-    opacity: 1;
-    visibility: visible;
-}
-
-.player-dialog.help ul {
+.player-dialog ul {
     display: grid;
-    grid-template-columns: repeat( 2, 1fr );
+    grid-template-columns: 1fr;
     gap: 6px 20px;
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.player-dialog.help ul li {
+.player-dialog ul li {
     break-inside: avoid;
     display: flex;
     flex-flow: row nowrap;
@@ -309,10 +302,33 @@
     font-size: 0.96em;
 }
 
-.player-dialog.help ul li code {
+.player-dialog ul li code {
     padding: 2px 6px;
     font-family: var( --font-mono );
     font-size: 0.86em;
     background: rgba( 255 255 255 / 0.2 );
     border-radius: var( --border-radius );
+}
+
+.player-dialog select {
+    padding: 4px 12px;
+    background: rgba( 255 255 255 / 0.1 );
+    border: 1px solid rgba( 255 255 255 / 0.4 );
+    border-radius: var( --border-radius );
+    cursor: pointer;
+}
+
+.player-dialog select option {
+    color: #000;
+}
+
+.player-container.show-settings .player-dialog.settings,
+.player-container.show-help .player-dialog.help {
+    pointer-events: unset;
+    opacity: 1;
+    visibility: visible;
+}
+
+.player-dialog.help ul {
+    grid-template-columns: repeat( 2, 1fr );
 }
