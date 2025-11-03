@@ -208,6 +208,16 @@ class VideoPlayer {
                     this.skipFrame( 1 );
                     break;
 
+                case '+':
+                    this.changeSpeed( 0.25 );
+                    this.speedOverlay();
+                    break;
+
+                case '-':
+                    this.changeSpeed( -0.25 );
+                    this.speedOverlay();
+                    break;
+
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
                     this.seek( Number( e.key ) * 10 );
@@ -420,6 +430,12 @@ class VideoPlayer {
     }
 
     seekOverlay () { this.showOverlay( 'fastForward', 'Skip to ' + formatTime( this.video.currentTime ) ) }
+
+    changeSpeed ( value ) { this.setSpeed( this.video.playbackRate + value ) }
+
+    setSpeed ( speed ) { this.video.playbackRate = Number( Math.max( 0.25, Math.min( 2, speed ) ).toFixed( 2 ) ) }
+
+    speedOverlay () { this.showOverlay( 'clock', `Playback rate: ${ this.video.playbackRate }x` ) }
 
     isFullscreen () {
 
