@@ -1,9 +1,10 @@
 class VideoPlayer {
 
     bindings = [
-        'F11', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End',
-        'f', 'F', 'k', 'K', 'm', 'M', 'j', 'J', 'l', 'L', ' ', ',', '.',
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        'F11', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+        'PageUp', 'PageDown', 'Home', 'End', 'f', 'F', 'k', 'K', 'm', 'M',
+        'j', 'J', 'l', 'L', ' ', ',', '.', '0', '1', '2', '3', '4', '5', '6',
+        '7', '8', '9'
     ];
 
     constructor () {
@@ -142,6 +143,16 @@ class VideoPlayer {
 
                 case 'm': case 'M':
                     this.toggleMute();
+                    this.volumeOverlay();
+                    break;
+
+                case 'PageUp':
+                    this.changeVolume( 0.4 );
+                    this.volumeOverlay();
+                    break;
+
+                case 'PageDown':
+                    this.changeVolume( -0.4 );
                     this.volumeOverlay();
                     break;
 
