@@ -1,10 +1,9 @@
 class VideoPlayer {
 
     bindings = [
-        'F11', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-        'PageUp', 'PageDown', 'Home', 'End', 'f', 'F', 'k', 'K', 'm', 'M',
-        'j', 'J', 'l', 'L', ' ', ',', '.', '0', '1', '2', '3', '4', '5', '6',
-        '7', '8', '9'
+        'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown',
+        'Home', 'End', 'F6', 'F7', 'F8', 'F9', 'F11', 'f', 'F', 'k', 'K', 'm', 'M', 'j', 'J',
+        'l', 'L', ' ', ',', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     ];
 
     constructor () {
@@ -136,12 +135,12 @@ class VideoPlayer {
 
             switch ( e.key ) {
 
-                case ' ': case 'k': case 'K':
+                case ' ': case 'k': case 'K': case 'F7':
                     this.togglePlay();
                     this.playOverlay();
                     break;
 
-                case 'm': case 'M':
+                case 'm': case 'M': case 'F9':
                     this.toggleMute();
                     this.volumeOverlay();
                     break;
@@ -166,11 +165,12 @@ class VideoPlayer {
                     this.volumeOverlay();
                     break;
 
-                case 'ArrowLeft':
+                case 'ArrowLeft': case 'F6':
                     this.skip( -5 );
                     this.seekOverlay();
                     break;
-                case 'ArrowRight':
+
+                case 'ArrowRight': case 'F8':
                     this.skip( 5 );
                     this.seekOverlay();
                     break;
