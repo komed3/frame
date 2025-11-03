@@ -409,10 +409,8 @@ class VideoPlayer {
 
     volumeOverlay () {
 
-        this.showOverlay(
-            this.isMuted() ? 'mute' : 'volume',
-            Math.round( this.video.volume * 100 ) + '%'
-        );
+        if ( this.isMuted() ) this.showOverlay( 'mute', 'Player muted' );
+        else this.showOverlay( 'volume', Math.round( this.video.volume * 100 ) + '%' );
 
     }
 
