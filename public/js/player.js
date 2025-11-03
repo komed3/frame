@@ -2,10 +2,10 @@ class VideoPlayer {
 
     bindings = [
         'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-        'PageUp', 'PageDown', 'Home', 'End', 'F6', 'F7', 'F8', 'F9',
-        'F10', 'F11', 'f', 'F', 'k', 'K', 'm', 'M', 'j', 'J', 'l',
-        'L', ' ', ',', '.', '+', '-', '0', '1', '2', '3', '4', '5',
-        '6', '7', '8', '9'
+        'PageUp', 'PageDown', 'Home', 'End', 'F1', 'F6', 'F7', 'F8',
+        'F9', 'F10', 'F11', 'f', 'F', 'k', 'K', 'm', 'M', 'j', 'J',
+        'l', 'L', 'h', 'H', ' ', ',', '.', '+', '-', '0', '1', '2',
+        '3', '4', '5', '6', '7', '8', '9'
     ];
 
     playbackSpeed = [ 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 4 ];
@@ -96,6 +96,7 @@ class VideoPlayer {
         this.controls.download.addEventListener( 'click', this.download.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
+        this.controls.help.addEventListener( 'click', this.toggleHelp.bind( this ) );
 
         // Change volume
         this.controls.volume.addEventListener( 'input', e => {
@@ -219,6 +220,10 @@ class VideoPlayer {
 
                 case 'Escape':
                     this.minimize();
+                    break;
+
+                case 'h': case 'H': case 'F1':
+                    this.toggleHelp();
                     break;
 
             }
@@ -464,6 +469,8 @@ class VideoPlayer {
         else await this.maximize();
 
     }
+
+    toggleHelp () { this.container.classList.toggle( 'show-help' ) }
 
     download () {
 
