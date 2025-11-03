@@ -12,6 +12,7 @@ class VideoPlayer {
         this.container = document.querySelector( '.player-container' );
         this.videoContainer = this.container.querySelector( '.player-inner' );
         this.video = this.container.querySelector( 'video' );
+        this.overlay = this.container.querySelector( '.player-overlay' );
         this.actionContainer = this.container.querySelector( '.action-container' );
         this.controls = this.initControls();
 
@@ -160,6 +161,15 @@ class VideoPlayer {
     showLoading () { this.container.classList.add( 'show-spinner' ) }
 
     hideLoading () { this.container.classList.remove( 'show-spinner' ) }
+
+    showOverlay ( text ) {
+
+        this.container.classList.add( 'show-overlay' );
+        this.overlay.textContent = text;
+
+        setTimeout( () => this.container.classList.remove( 'show-overlay' ), 800 );
+
+    }
 
     updateProgress () {
 
