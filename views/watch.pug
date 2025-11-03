@@ -10,11 +10,10 @@ block main
   div#player.player
     div.player-container.show-controls
       div.player-inner
-        video.player-source
+        video.player-source( poster= "https://gcdnb.pbrd.co/images/wWpXqPxgsZeD.png" )
           source(
             src= "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            type= "video/mp4",
-            poster= ""
+            type= "video/mp4"
           )
         div.player-controls
           div.action-container
