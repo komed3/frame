@@ -431,6 +431,9 @@ class VideoPlayer {
         this.controls.maximize.disabled = fs;
         this.controls.minimize.disabled = ! fs;
 
+        if ( fs ) this.showOverlay( 'maximize', 'Video in full screen' );
+        else this.showOverlay( 'minimize', 'Leave full screen' );
+
     }
 
     async maximize () {
