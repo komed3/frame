@@ -58,19 +58,25 @@ class VideoPlayer {
     initProgressBar () {
 
         this.progress = this.container.querySelector( '.progress-container' );
-        this.progressBar = this.container.querySelector( '.progress-bar' );
-        this.bufferBar = this.container.querySelector( '.buffer-bar' );
         this.timeDisplay = this.container.querySelector( '.player-time' );
 
-        // Seeking
-        this.progress.addEventListener( 'click', ( e ) => {
+        const rect = this.progress.getBoundingClientRect();
+        let percent = 0;
 
-            const rect = this.progress.getBoundingClientRect();
-            const percent = ( e.clientX - rect.left ) / rect.width;
+        this.progress.addEventListener( 'mousemove', e => {
 
-            this.seek( percent );
+            percent = ( e.clientX - rect.left ) / rect.width;
+
+            this.progress.style.setProperty( '--hover', percent * 100 + '%' );
+            this.progress.querySelector( '.time-code' ).textContent = formatTime(
+                this.video.duration * percent
+            );
 
         } );
+
+        this.progress.addEventListener( 'mouseleave', () => this.progress.style.removeProperty( '--hover' ) );
+
+        this.progress.addEventListener( 'click', () => this.seek( percent ) );
 
     }
 
@@ -302,7 +308,7 @@ class VideoPlayer {
     updateProgress () {
 
         const percent = ( this.video.currentTime / this.video.duration ) * 100;
-        this.progressBar.style.setProperty( '--width', percent + '%' );
+        this.progress.style.setProperty( '--progress', percent + '%' );
 
         this.updateTimeDisplay();
 
@@ -315,7 +321,8 @@ class VideoPlayer {
             const bufferedEnd = this.video.buffered.end( this.video.buffered.length - 1 );
             const duration = this.video.duration;
             const percent = ( bufferedEnd / duration ) * 100;
-            this.bufferBar.style.setProperty( '--width', percent + '%' );
+
+            this.progress.style.setProperty( '--buffer', percent + '%' );
 
         }
 
