@@ -1,7 +1,7 @@
 extends ./_base
 
 append scripts
-  script( src= "/js/player.js", type= "text/javascript", defer )
+  script( src= "/js/player.min.js", type= "text/javascript", defer )
 
 append styles
   link( rel= "stylesheet", href= "/css/player.min.css" )
@@ -55,6 +55,6 @@ block main
               button( action= "minimize", title= "Exit Fullscreen", disabled )
                 img.icon( src= "/images/icons/minimize.svg", alt= "Exit Fullscreen" )
       div.player-overlay
-        img( src= "", alt= "Overlay" )
+        img.icon( src= "", alt= "Overlay" )
         span
       div.loading-spinner
