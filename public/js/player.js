@@ -148,21 +148,55 @@ class VideoPlayer {
                     this.volumeOverlay();
                     break;
 
-                case 'j': case 'J': this.skip( -10 ); break;
-                case 'ArrowLeft': this.skip( -5 ); break;
-                case 'ArrowRight': this.skip( 5 ); break;
-                case 'l': case 'L': this.skip( 10 ); break;
-                case 'Home': this.begin(); break;
-                case 'End': this.end(); break;
-                case ',': this.skipFrame( -1 ); break;
-                case '.': this.skipFrame( 1 ); break;
-                case 'F11': case 'f': case 'F': this.toggleFullscreen(); break;
-                case 'Escape': this.minimize(); break;
+                case 'ArrowLeft':
+                    this.skip( -5 );
+                    this.seekOverlay();
+                    break;
+                case 'ArrowRight':
+                    this.skip( 5 );
+                    this.seekOverlay();
+                    break;
+
+                case 'j': case 'J':
+                    this.skip( -10 );
+                    this.seekOverlay();
+                    break;
+
+                case 'l': case 'L':
+                    this.skip( 10 );
+                    this.seekOverlay();
+                    break;
+
+                case 'Home':
+                    this.begin();
+                    this.seekOverlay();
+                    break;
+
+                case 'End':
+                    this.end();
+                    this.seekOverlay();
+                    break;
+
+                case ',':
+                    this.skipFrame( -1 );
+                    break;
+
+                case '.':
+                    this.skipFrame( 1 );
+                    break;
 
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
                     this.seek( Number( e.key ) * 10 );
-                    this.showOverlay( 'fastForward', 'Skip to ' + formatTime( this.video.currentTime ) );
+                    this.seekOverlay();
+                    break;
+
+                case 'F11': case 'f': case 'F':
+                    this.toggleFullscreen();
+                    break;
+
+                case 'Escape':
+                    this.minimize();
                     break;
 
             }
@@ -357,6 +391,8 @@ class VideoPlayer {
         ) );
 
     }
+
+    seekOverlay () { this.showOverlay( 'fastForward', 'Skip to ' + formatTime( this.video.currentTime ) ) }
 
     isFullscreen () {
 
