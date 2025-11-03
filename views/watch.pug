@@ -18,8 +18,11 @@ block main
         div.player-controls
           div.action-container
           div.progress-container( action= "seek" )
-            div.buffer-bar( style= "--width: 0%" )
-            div.progress-bar( style= "--width: 0%" )
+            div.wave-container
+            div.progress-bar
+              div.buffer
+              div.progress
+              div.hover
           div.main-controls
             div.player-actions
               button( action= "play", title= "Play" )
