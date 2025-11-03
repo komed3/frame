@@ -42,7 +42,7 @@
     background: linear-gradient( to top, rgba( 0 0 0 / 0.5 ), transparent );
     opacity: 0;
     transition: opacity 0.2s ease-out;
-    z-index: 97;
+    z-index: 96;
 }
 
 .player-container.show-controls .player-controls {
@@ -262,4 +262,54 @@
 
 @keyframes spin {
     100% { transform: rotate( 360deg ); }
+}
+
+.help-dialog {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 520px;
+    padding: 20px;
+    background: rgba( 0 0 0 / 0.8 );
+    border-radius: var( --border-radius );
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 97;
+}
+
+.player-container.show-help .help-dialog {
+    opacity: 1;
+    visibility: visible;
+}
+
+.help-dialog h3 {
+    margin: 0 0 14px;
+    font-size: 1em;
+}
+
+.help-dialog ul {
+    display: grid;
+    grid-template-columns: repeat( 2, 1fr );
+    gap: 6px 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.help-dialog ul li {
+    break-inside: avoid;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.96em;
+}
+
+.help-dialog ul li code {
+    padding: 2px 6px;
+    font-family: var( --font-mono );
+    font-size: 0.86em;
+    background: rgba( 255 255 255 / 0.2 );
+    border-radius: var( --border-radius );
 }
