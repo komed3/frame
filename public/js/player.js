@@ -338,14 +338,14 @@ class VideoPlayer {
 
     changeVolume ( value ) {
 
-        this.video.volume = Math.max( 0, Math.min( 1, this.video.volume + value ) );
+        this.video.volume = Number( Math.max( 0, Math.min( 1, this.video.volume + value ) ).toFixed( 1 ) );
         this.previousVolume = this.video.volume;
 
     }
 
     setVolume ( value ) {
 
-        this.video.volume = Math.max( 0, Math.min( 1, value / 100 ) );
+        this.video.volume = Number( Math.max( 0, Math.min( 1, value / 100 ) ).toFixed( 1 ) );
         this.previousVolume = this.video.volume;
 
     }
