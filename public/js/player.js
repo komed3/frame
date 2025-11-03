@@ -12,9 +12,9 @@ class VideoPlayer {
         this.container = document.querySelector( '.player-container' );
         this.videoContainer = this.container.querySelector( '.player-inner' );
         this.video = this.container.querySelector( 'video' );
-        this.overlay = this.container.querySelector( '.player-overlay' );
         this.actionContainer = this.container.querySelector( '.action-container' );
         this.controls = this.initControls();
+        this.overlay = this.initOverlay();
 
         this.previousVolume = 1;
         this.controlsTimeout = null;
@@ -35,6 +35,17 @@ class VideoPlayer {
         } );
 
         return controls;
+
+    }
+
+    initOverlay () {
+
+        const overlay = this.container.querySelector( '.player-overlay' );
+
+        return {
+            icon: overlay.querySelector( 'img' ),
+            text: overlay.querySelector( 'span' )
+        };
 
     }
 
@@ -162,10 +173,11 @@ class VideoPlayer {
 
     hideLoading () { this.container.classList.remove( 'show-spinner' ) }
 
-    showOverlay ( text ) {
+    showOverlay ( icon, text ) {
 
         this.container.classList.add( 'show-overlay' );
-        this.overlay.textContent = text;
+        this.overlay.icon.src = icon;
+        this.overlay.text.textContent = text;
 
         setTimeout( () => this.container.classList.remove( 'show-overlay' ), 800 );
 
