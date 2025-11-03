@@ -67,6 +67,7 @@ class VideoPlayer {
 
             percent = ( e.clientX - rect.left ) / rect.width;
 
+            this.progress.classList.add( 'hovered' );
             this.progress.style.setProperty( '--hover', percent * 100 + '%' );
             this.progress.querySelector( '.time-code' ).textContent = formatTime(
                 this.video.duration * percent
@@ -74,7 +75,12 @@ class VideoPlayer {
 
         } );
 
-        this.progress.addEventListener( 'mouseleave', () => this.progress.style.removeProperty( '--hover' ) );
+        this.progress.addEventListener( 'mouseleave', () => {
+
+            this.progress.classList.remove( 'hovered' );
+            this.progress.style.removeProperty( '--hover' );
+
+        } );
 
         this.progress.addEventListener( 'click', () => this.seek( percent ) );
 
