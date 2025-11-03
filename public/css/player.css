@@ -59,49 +59,56 @@
     cursor: pointer;
 }
 
-.progress-container, .buffer-bar, .progress-bar {
+.progress-container {
+    cursor: pointer;
+}
+
+.wave-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    gap: 3px;
+    margin-bottom: 6px;
+    height: 48px;
+}
+
+.wave-container .bar {
+    flex: 1;
+    height: var( --v, 100% );
+    background: rgba( 255 255 255 / 0.2 );
+    border-radius: 3px;
+}
+
+.progress-bar, .progress-bar .buffer, .progress-bar .progress {
     position: absolute;
     top: 0;
     left: 0;
     width: 0%;
     height: 100%;
     border-radius: 3px;
-    transition: all 0.2s ease-out;
-}
-
-.progress-container {
-    position: relative;
-    width: 100%;
-    height: 6px;
-    background: rgba( 255 255 255 / 0.2 );
-    cursor: pointer;
-}
-
-.buffer-bar {
-    width: var( --width, 0% );
-    background: rgba( 255 255 255 / 0.3 );
 }
 
 .progress-bar {
-    width: var( --width, 0% );
-    background: var( --primary );
+    position: relative;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(
+        to right,
+        rgba( 255 255 255 / 0.4 ) 0%,
+        rgba( 255 255 255 / 0.4 ) var( --hover, 0% ),
+        rgba( 255 255 255 / 0.2 ) var( --hover, 0% ),
+        rgba( 255 255 255 / 0.2 ) 100%
+    );
 }
 
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    top: -6px;
-    right: -9px;
-    width: 18px;
-    height: 18px;
-    background: var( --primary );
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.2s ease-out;
+.progress-bar .buffer {
+    width: var( --buffer, 0% );
+    background: rgba( 255 255 255 / 0.6 );
 }
 
-.progress-container:hover .progress-bar::after {
-    opacity: 1;
+.progress-bar .progress {
+    width: var( --progress, 0% );
+    background: var( --primary );
 }
 
 .main-controls {
