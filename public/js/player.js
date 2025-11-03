@@ -21,9 +21,9 @@ class VideoPlayer {
         this.overlay = this.initOverlay();
 
         this.previousVolume = 1;
+        this.frameRate = 30;
         this.controlsTimeout = null;
         this.overlayTimeout = null;
-        this.frameRate = 30;
 
         this.initProgressBar();
         this.initEventHandlers();
@@ -96,6 +96,7 @@ class VideoPlayer {
         this.controls.download.addEventListener( 'click', this.download.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
+        this.controls.settings.addEventListener( 'click', this.toggleSettings.bind( this ) );
         this.controls.help.addEventListener( 'click', this.toggleHelp.bind( this ) );
 
         // Change volume
@@ -486,7 +487,19 @@ class VideoPlayer {
 
     }
 
-    toggleHelp () { this.container.classList.toggle( 'show-help' ) }
+    toggleSettings () {
+
+        this.container.classList.remove( 'show-help' );
+        this.container.classList.toggle( 'show-settings' );
+
+    }
+
+    toggleHelp () {
+
+        this.container.classList.remove( 'show-settings' );
+        this.container.classList.toggle( 'show-help' );
+
+    }
 
     download () {
 

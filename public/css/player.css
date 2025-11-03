@@ -264,7 +264,8 @@
     100% { transform: rotate( 360deg ); }
 }
 
-.help-dialog {
+.player-dialog {
+    pointer-events: none;
     position: absolute;
     top: 20px;
     right: 20px;
@@ -277,17 +278,19 @@
     z-index: 97;
 }
 
-.player-container.show-help .help-dialog {
-    opacity: 1;
-    visibility: visible;
-}
-
-.help-dialog h3 {
+.player-dialog h3 {
     margin: 0 0 14px;
     font-size: 1em;
 }
 
-.help-dialog ul {
+.player-container.show-settings .player-dialog.settings,
+.player-container.show-help .player-dialog.help {
+    pointer-events: unset;
+    opacity: 1;
+    visibility: visible;
+}
+
+.player-dialog.help ul {
     display: grid;
     grid-template-columns: repeat( 2, 1fr );
     gap: 6px 20px;
@@ -296,7 +299,7 @@
     padding: 0;
 }
 
-.help-dialog ul li {
+.player-dialog.help ul li {
     break-inside: avoid;
     display: flex;
     flex-flow: row nowrap;
@@ -306,7 +309,7 @@
     font-size: 0.96em;
 }
 
-.help-dialog ul li code {
+.player-dialog.help ul li code {
     padding: 2px 6px;
     font-family: var( --font-mono );
     font-size: 0.86em;
