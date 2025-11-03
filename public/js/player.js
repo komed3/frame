@@ -89,10 +89,17 @@ class VideoPlayer {
         this.controls.end.addEventListener( 'click', this.end.bind( this ) );
         this.controls.mute.addEventListener( 'click', this.mute.bind( this ) );
         this.controls.unmute.addEventListener( 'click', this.unmute.bind( this ) );
-        this.controls.volume.addEventListener( 'input', ( e ) => this.setVolume( e.target.value ) );
         this.controls.download.addEventListener( 'click', this.download.bind( this ) );
         this.controls.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.controls.minimize.addEventListener( 'click', this.minimize.bind( this ) );
+
+        // Change volume
+        this.controls.volume.addEventListener( 'input', e => {
+
+            this.setVolume( e.target.value );
+            setTimeout( () => e.target.blur(), 10 );
+
+        } );
 
         // Loading state
         this.video.addEventListener( 'waiting', this.showLoading.bind( this ) );
