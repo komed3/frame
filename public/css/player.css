@@ -210,6 +210,33 @@
     padding-left: 12px;
 }
 
+.player-overlay {
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate( -50%, -50% );
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 30px;
+    font-size: 18px;
+    background: rgba( 0 0 0 / 0.8 );
+    border-radius: var( --border-radius );
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+.player-container.show-overlay .overlay {
+    opacity: 1;
+}
+
+.player-overlay img {
+    width: 48px;
+    height: 48px;
+}
+
 .loading-spinner {
     pointer-events: none;
     position: absolute;
