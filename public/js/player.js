@@ -18,6 +18,7 @@ class VideoPlayer {
 
         this.previousVolume = 1;
         this.controlsTimeout = null;
+        this.overlayTimeout = null;
         this.frameRate = 30;
 
         this.initProgressBar();
@@ -127,10 +128,26 @@ class VideoPlayer {
 
             switch ( e.key ) {
 
-                case ' ': case 'k': case 'K': this.togglePlay(); break;
-                case 'm': case 'M': this.toggleMute(); break;
-                case 'ArrowUp': this.changeVolume( 0.1 ); break;
-                case 'ArrowDown': this.changeVolume( -0.1 ); break;
+                case ' ': case 'k': case 'K':
+                    this.togglePlay();
+                    this.playOverlay();
+                    break;
+
+                case 'm': case 'M':
+                    this.toggleMute();
+                    this.volumeOverlay();
+                    break;
+
+                case 'ArrowUp':
+                    this.changeVolume( 0.1 );
+                    this.volumeOverlay();
+                    break;
+
+                case 'ArrowDown':
+                    this.changeVolume( -0.1 );
+                    this.volumeOverlay();
+                    break;
+
                 case 'j': case 'J': this.skip( -10 ); break;
                 case 'ArrowLeft': this.skip( -5 ); break;
                 case 'ArrowRight': this.skip( 5 ); break;
@@ -144,7 +161,9 @@ class VideoPlayer {
 
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
-                    this.seek( Number( e.key ) * 10 ); break;
+                    this.seek( Number( e.key ) * 10 );
+                    this.showOverlay( 'fastForward', 'Skip to ' + formatTime( this.video.currentTime ) );
+                    break;
 
             }
 
@@ -165,7 +184,9 @@ class VideoPlayer {
 
     hideControls() {
 
-        if ( ! this.video.paused ) this.container.classList.remove( 'show-controls' );
+        if ( ! this.video.paused ) {
+            this.container.classList.remove( 'show-controls' );
+        }
 
     }
 
@@ -175,11 +196,15 @@ class VideoPlayer {
 
     showOverlay ( icon, text ) {
 
-        this.container.classList.add( 'show-overlay' );
-        this.overlay.icon.src = icon;
+        this.overlay.icon.src = '/images/icons/' + icon + '.svg';
         this.overlay.text.textContent = text;
 
-        setTimeout( () => this.container.classList.remove( 'show-overlay' ), 800 );
+        this.container.classList.add( 'show-overlay' );
+        clearTimeout( this.overlayTimeout );
+
+        this.overlayTimeout = setTimeout(
+            () => this.container.classList.remove( 'show-overlay' ), 800
+        );
 
     }
 
@@ -228,6 +253,13 @@ class VideoPlayer {
 
         if ( this.video.paused ) await this.play();
         else this.pause();
+
+    }
+
+    playOverlay () {
+
+        if ( this.video.paused ) this.showOverlay( 'pause', 'Video paused' );
+        else this.showOverlay( 'play', 'Video started' );
 
     }
 
@@ -281,6 +313,15 @@ class VideoPlayer {
 
         this.video.volume = Math.max( 0, Math.min( 1, value / 100 ) );
         this.previousVolume = this.video.volume;
+
+    }
+
+    volumeOverlay () {
+
+        this.showOverlay(
+            this.isMuted() ? 'mute' : 'volume',
+            Math.round( this.video.volume * 100 ) + '%'
+        );
 
     }
 
