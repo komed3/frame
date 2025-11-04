@@ -30,7 +30,7 @@
 }
 
 .file-drop-area.dragover {
-    border-color: var( --primary );
+    border-color: rgba( 255 255 255 / 0.4 );
     background: rgba( 255 255 255 / 0.05 );
 }
 
