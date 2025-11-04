@@ -1,1 +1,27 @@
 extends ./_base
+
+append scripts
+  script( src= "/js/upload.min.js", type= "text/javascript", defer )
+
+append styles
+  link( rel= "stylesheet", href= "/css/upload.min.css" )
+
+block main
+  h1.page-title Upload Video
+  div.upload-container
+    div.form-section.file-upload
+        div.file-drop-area
+          input( type= "file", name= "video", accept= "video/*", required )
+          div.file-info
+            img.icon( src= "/images/icons/upload.svg", alt= "Upload" )
+            span Drop your video here or click to select
+        div.video-preview.hidden
+          video.preview-player
+          button.change-video Change Video
+
+  div.form-section.upload-progress.hidden
+    div.progress-bar
+    span.status-text
+
+  div.form-section.form-actions
+    button.submit-btn( type= "submit" ) Upload Video
