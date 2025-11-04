@@ -15,22 +15,21 @@
     grid-template-columns: 1fr 3fr 1fr;
     align-items: center;
     gap: 86px;
-    margin: 0 auto;
-    max-width: var( --content-width );
+    margin: 0 20px;
     height: 100%;
 }
 
 .header-logo {
     display: block;
     margin: 0;
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     padding: 0;
 }
 
 .header-logo img {
-    width: auto;
-    height: 64px;
+    width: 100%;
+    height: 100%;
 }
 
 .header-search {

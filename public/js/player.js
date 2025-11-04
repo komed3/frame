@@ -139,6 +139,7 @@ class VideoPlayer {
 
         // Video state
         this.video.addEventListener( 'play', this.updatePlayBtn.bind( this ) );
+        this.video.addEventListener( 'play', this.hideControls.bind( this ) );
         this.video.addEventListener( 'pause', this.updatePlayBtn.bind( this ) );
         this.video.addEventListener( 'pause', this.showControls.bind( this ) );
         this.video.addEventListener( 'ended', this.updatePlayBtn.bind( this ) );
