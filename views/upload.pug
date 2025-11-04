@@ -9,50 +9,52 @@ append styles
 block main
   h1.page-title Upload Video
   form( action= "/api/upload", method= "POST", enctype= "multipart/form-data" ).upload-container
-    div.form-section.file-upload
-      div.file-drop-area
-        input( type= "file", name= "video", accept= "video/*", required )
-        img.icon( src= "/images/icons/upload.svg", alt= "Upload" )
-        span Drop your video here or click to select
-      div.video-preview.hidden
-        video.preview-player
-        button.change-video Change Video
+    div.form-column
+      div.form-section.file-upload
+        div.file-drop-area
+          input( type= "file", name= "video", accept= "video/*", required )
+          img.icon( src= "/images/icons/upload.svg", alt= "Upload" )
+          span Drop your video here or click to select
+        div.video-preview.hidden
+          video.preview-player
+          button.change-video Change Video
 
-    div.form-section.upload-progress.hidden
-      div.progress-bar
-      span.status-text
+      div.form-section.upload-progress.hidden
+        div.progress-bar
+        span.status-text
 
-    div.form-section.form-actions
-      button.submit-btn( type= "submit" ) Upload Video
-      button.abort-btn( onclick= "location.href='/'" ) Upload Video
+      div.form-section.form-actions
+        button.submit-btn( type= "submit" ) Upload Video
+        button( onclick= "location.href='/'" ) Abort
 
-    div.form-section.meta-info
-      div.form-group
-        label( for= "title" ) Video title
-        input#title( type= "text", name= "title", required, placeholder= "Descriptive title" )
-      div.form-group
-        label( for= "author" ) Author / creator
-        input#author( type= "text", name= "author", required, placeholder= "e.g. channel name" )
-      div.form-line
+    div.form-column
+      div.form-section.meta-info
         div.form-group
-          label( for= "source" ) Source / Origin
-          input#source( type= "text", name= "source", placeholder= "e.g. YouTube" )
+          label( for= "title" ) Video title
+          input#title( type= "text", name= "title", required, placeholder= "Descriptive title" )
         div.form-group
-          label( for= "lang" ) Video language
-          input#lang( type= "text", name= "lang", "placeholder"= "e.g. English" )
-      div.form-group
-        label( for= "description" ) Description
-        textarea#description( name= "description", rows= 4, placeholder= "Additional info / describe the video" )
-      div.form-group
-        label( for= "category" ) Category*
-        select#category( name= "category", required )
-          option( disabled, selected ) Select a category …
-          option( value= "education" ) Education
-          option( value= "entertainment" ) Entertainment
-          option( value= "music" ) Music
-          option( value= "sports" ) Sports
-          option( value= "technology" ) Technology
-          option( value= "other" ) Other
-      div.form-group
-        label( for= "tags" ) Tags
-        input#tags( type="text", name= "tags", placeholder= "tag1, tag2, tag3" )
+          label( for= "author" ) Author / creator
+          input#author( type= "text", name= "author", required, placeholder= "e.g. channel name" )
+        div.form-line
+          div.form-group
+            label( for= "source" ) Source / Origin
+            input#source( type= "text", name= "source", placeholder= "e.g. YouTube" )
+          div.form-group
+            label( for= "lang" ) Video language
+            input#lang( type= "text", name= "lang", "placeholder"= "e.g. English" )
+        div.form-group
+          label( for= "description" ) Description
+          textarea#description( name= "description", rows= 4, placeholder= "Additional info / describe the video" )
+        div.form-group
+          label( for= "category" ) Category*
+          select#category( name= "category", required )
+            option( disabled, selected ) Select a category …
+            option( value= "education" ) Education
+            option( value= "entertainment" ) Entertainment
+            option( value= "music" ) Music
+            option( value= "sports" ) Sports
+            option( value= "technology" ) Technology
+            option( value= "other" ) Other
+        div.form-group
+          label( for= "tags" ) Tags
+          input#tags( type="text", name= "tags", placeholder= "tag1, tag2, tag3" )

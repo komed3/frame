@@ -9,7 +9,7 @@
     display: none !important;
 }
 
-.form-section {
+.form-column, .form-section {
     break-inside: avoid;
     margin-bottom: 32px;
 }
@@ -73,13 +73,20 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    padding: 8px 16px;
-    background: rgba( 255 255 255 / 0.3 );
-    border: none;
-    border-radius: var( --border-radius );
-    cursor: pointer;
 }
 
-.video-preview button:hover {
+.form-actions {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2em;
+}
+
+.submit-btn {
     background: var( --primary );
+}
+
+.submit-btn:hover {
+    background: var( --secondary );
 }
