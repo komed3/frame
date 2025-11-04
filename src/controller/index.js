@@ -1,4 +1,5 @@
 import { home } from './home.js';
+import { form } from './upload.js';
 import { watch } from './watch.js';
 import express from 'express';
 
@@ -8,7 +9,8 @@ const router = express.Router();
 // Setup routes
 const routes = [
     { path: '{/}', get: home },
-    { path: '/watch/:id{/}', get: watch }
+    { path: '/watch/:id{/}', get: watch },
+    { path: '/upload{/}', get: form }
 ];
 
 // Routing paths
