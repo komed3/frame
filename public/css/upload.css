@@ -77,7 +77,7 @@
 
 .video-preview .file-name {
     position: absolute;
-    right: 20px;
+    left: 20px;
     bottom: 20px;
     text-shadow: 0 0 10px rgba( 0 0 0 / 0.6 );
     font-size: 0.86em;
