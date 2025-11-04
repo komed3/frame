@@ -87,7 +87,14 @@ class VideoUploader {
 
     }
 
-    async handleUpload () {}
+    async handleUpload () {
+
+        const formData = new FormData( this.container );
+        
+        try {}
+        catch {}
+
+    }
 
 }
 
