@@ -31,6 +31,7 @@ block main
 
     div.form-column
       div.form-section.meta-info
+        h3 Meta Information
         div.form-group
           label( for= "title" ) Video title
           input#title( type= "text", name= "title", required, placeholder= "Descriptive title" )
@@ -48,7 +49,7 @@ block main
           label( for= "description" ) Description
           textarea#description( name= "description", rows= 4, placeholder= "Additional info / describe the video" )
         div.form-group
-          label( for= "category" ) Category*
+          label( for= "category" ) Category
           select#category( name= "category", required )
             option( disabled, selected ) Select a category …
             option( value= "education" ) Education

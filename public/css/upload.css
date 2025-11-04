@@ -110,3 +110,52 @@
 .submit-btn:hover {
     background: var( --secondary );
 }
+
+.meta-info {
+    padding: 20px;
+    background: var( --bg-secondary );
+    border-radius: var( --border-radius );
+}
+
+.meta-info h3 {
+    margin: 0 0 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.86em;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 16px;
+    background: rgba( 255 255 255 / 0.05 );
+    border: var( --border );
+    border-radius: var( --border-radius );
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 2px solid var( --primary );
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: #1a1a1a;
+}
