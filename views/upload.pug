@@ -10,13 +10,13 @@ block main
   h1.page-title Upload Video
   form( action= "/api/upload", method= "POST", enctype= "multipart/form-data" ).upload-container
     div.form-section.file-upload
-        div.file-drop-area
-          input( type= "file", name= "video", accept= "video/*", required )
-          img.icon( src= "/images/icons/upload.svg", alt= "Upload" )
-          span Drop your video here or click to select
-        div.video-preview.hidden
-          video.preview-player
-          button.change-video Change Video
+      div.file-drop-area
+        input( type= "file", name= "video", accept= "video/*", required )
+        img.icon( src= "/images/icons/upload.svg", alt= "Upload" )
+        span Drop your video here or click to select
+      div.video-preview.hidden
+        video.preview-player
+        button.change-video Change Video
 
     div.form-section.upload-progress.hidden
       div.progress-bar

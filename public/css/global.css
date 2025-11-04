@@ -71,7 +71,7 @@ a:hover {
     color: var( --primary );
 }
 
-input, textarea, select {
+input, textarea, select, button {
     font-family: var( --font-sans );
     font-size: 1em;
     color: var( --text-color );
