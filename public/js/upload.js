@@ -7,6 +7,8 @@ class VideoUploader {
         this.fileInput = this.container.querySelector( '[name="video"]' );
         this.preview = this.container.querySelector( '.video-preview' );
         this.previewPlayer = this.preview.querySelector( '.preview-player' );
+        this.progress = this.container.querySelector( '.upload-progress' );
+        this.actions = this.container.querySelector( '.form-actions' );
 
         this.initEventHandlers();
 
@@ -90,7 +92,10 @@ class VideoUploader {
     async handleUpload () {
 
         const formData = new FormData( this.container );
-        
+
+        this.progress.classList.remove( 'hidden' );
+        this.actions.classList.add( 'hidden' );
+
         try {}
         catch {}
 
