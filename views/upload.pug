@@ -8,7 +8,7 @@ append styles
 
 block main
   h1.page-title Upload Video
-  div.upload-container
+  form( action= "/api/upload", method= "POST", enctype= "multipart/form-data" ).upload-container
     div.form-section.file-upload
         div.file-drop-area
           input( type= "file", name= "video", accept= "video/*", required )
