@@ -17,9 +17,11 @@ class VideoUploader {
         // Drag and drop events
         [ 'dragenter', 'dragover', 'dragleave', 'drop' ].forEach( event => {
 
-            this.dropArea.addEventListener( event, e =>
-                e.preventDefault() && e.stopPropagation()
-            );
+            this.dropArea.addEventListener( event, e => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+            } );
 
         } );
 
@@ -58,6 +60,17 @@ class VideoUploader {
 
         } );
 
+        // Form submission
+        this.container.addEventListener( 'submit', e => {
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+
+            this.handleUpload();
+
+        } );
+
     }
 
     handleFileSelect ( file ) {
@@ -73,6 +86,8 @@ class VideoUploader {
         this.preview.classList.remove( 'hidden' );
 
     }
+
+    async handleUpload () {}
 
 }
 
