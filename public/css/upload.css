@@ -75,6 +75,26 @@
     right: 20px;
 }
 
+.upload-progress .progress-bar {
+    margin-bottom: 12px;
+    height: 6px;
+    background: linear-gradient(
+        to right,
+        var( --primary ) 0%,
+        var( --primary ) var( --progress, 0% ),
+        rgba( 255 255 255 / 0.2 ) var( --progress, 0% ),
+        rgba( 255 255 255 / 0.2 ) 100%
+    );
+    border-radius: 3px;
+}
+
+.upload-progress .status-text {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .form-actions {
     display: flex;
     flex-flow: row nowrap;
