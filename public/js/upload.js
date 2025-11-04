@@ -5,6 +5,8 @@ class VideoUploader {
         this.container = document.querySelector( '.upload-container' );
         this.dropArea = this.container.querySelector( '.file-drop-area' );
         this.fileInput = this.container.querySelector( '[name="video"]' );
+        this.preview = this.container.querySelector( '.video-preview' );
+        this.previewPlayer = this.preview.querySelector( '.preview-player' );
 
         this.initEventHandlers();
 
@@ -58,7 +60,19 @@ class VideoUploader {
 
     }
 
-    handleFileSelect ( file ) {}
+    handleFileSelect ( file ) {
+
+        this.preview.querySelector( '.file-name' ).textContent = file.name;
+
+        // Create video preview
+        const videoURL = URL.createObjectURL( file );
+        this.previewPlayer.src = videoURL;
+        this.previewPlayer.load();
+
+        this.dropArea.classList.add( 'hidden' );
+        this.preview.classList.remove( 'hidden' );
+
+    }
 
 }
 
