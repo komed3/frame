@@ -21,6 +21,7 @@ app.use( '/fonts', serveStatic( join( cwd, 'public/fonts' ) ) );
 app.use( '/images', serveStatic( join( cwd, 'public/images' ) ) );
 app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
+app.use( '/media', serveStatic( join( cwd, 'media' ) ) );
 
 // API and Mount router
 app.use( api );
