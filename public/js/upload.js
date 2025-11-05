@@ -77,7 +77,9 @@ class VideoUploader {
 
     handleFileSelect ( file ) {
 
-        this.preview.querySelector( '.file-name' ).textContent = file.name;
+        const info = this.preview.querySelector( '.file-info' );
+        info.querySelector( '.name' ).textContent = file.name;
+        info.querySelector( '.size' ).textContent = formatFileSize( file.size );
 
         // Create video preview
         const videoURL = URL.createObjectURL( file );

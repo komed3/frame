@@ -75,13 +75,26 @@
     right: 20px;
 }
 
-.video-preview .file-name {
+.video-preview .file-info {
     position: absolute;
     left: 20px;
+    right: 20px;
     bottom: 20px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    white-space: nowrap;
     text-shadow: 0 0 10px rgba( 0 0 0 / 0.6 );
     font-size: 0.86em;
     font-weight: bold;
+}
+
+.video-preview .file-info .name {
+    min-width: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .upload-progress .progress-bar {
