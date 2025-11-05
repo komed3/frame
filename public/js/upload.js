@@ -107,6 +107,7 @@ class VideoUploader {
         const formData = new FormData( this.container );
 
         this.progress.classList.remove( 'hidden' );
+        this.error.classList.add( 'hidden' );
         this.actions.classList.add( 'hidden' );
 
         try {}
