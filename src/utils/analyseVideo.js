@@ -144,13 +144,13 @@ export async function createWaveform ( file, meta, targetPoints = 120 ) {
 
 }
 
-export async function createPreview ( file, outDir, baseName, meta ) {
+export async function createPreview ( file, outDir, baseName, meta, n = 100 ) {
 
-    // Create approx. 100 thumbnails to provide video previews
+    // Create approx. n thumbnails to provide video previews
     // Will be used on hovering player scrubber
 
     const duration = meta.duration || 0;
-    const intervalSeconds = Math.round( duration / 100 );
+    const intervalSeconds = Math.round( duration / n );
 
     // First create a high-quality poster thumbnail at 1/4 duration
     await new Promise( ( resolve, reject ) => {
