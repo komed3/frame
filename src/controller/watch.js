@@ -8,9 +8,8 @@ export function watch ( req, res ) {
     const videoId = req.params.id;
     const videoDir = join( process.cwd(), 'media', videoId );
     const data = JSON.parse( readFileSync( join( videoDir, 'data.json' ), 'utf8' ) || '{}' );
-    const stream = '/media/' + videoId + '/' + data.fileName;
 
     if ( ! data || ! data.videoId || ! data.fileId ) return res.redirect( '/' );
-    else res.render( 'watch', { video: data, stream } );
+    else res.render( 'watch', { data } );
 
 }
