@@ -1,6 +1,10 @@
-import { spawn } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
+import { readdir } from 'node:fs';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 import ffmpeg from 'fluent-ffmpeg';
+
+const execFileAsync = promisify( execFile );
 
 export async function extractMeta ( file ) {
 
@@ -51,10 +55,12 @@ export async function extractMeta ( file ) {
 
 }
 
-export async function createWaveform ( file, duration, targetPoints = 150 ) {
+export async function createWaveform ( file, meta, targetPoints = 120 ) {
 
     // Create a very low-sample-rate mono PCM stream so we end up with roughly targetPoints samples
     // First determine duration to compute approximate sample rate
+
+    const duration = meta.duration || 0;
 
     // Target total samples approximate targetPoints
     const sampleRate = Math.max( 1, Math.round( targetPoints / duration ) );
@@ -115,9 +121,9 @@ export async function createWaveform ( file, duration, targetPoints = 150 ) {
 
             }
 
-            // Ensure we return exactly targetPoints (pad or trim)
-            if ( points.length > targetPoints ) points.length = targetPoints;
-            while ( points.length < targetPoints ) points.push( 0 );
+            // Normalize waveform to 0-100
+            const finalMax = Math.max( ...points );
+            points.map( p => Math.round( ( p / finalMax ) * 100 ) );
 
             resolve( points );
 
@@ -127,55 +133,41 @@ export async function createWaveform ( file, duration, targetPoints = 150 ) {
 
 }
 
-export async function createPreview ( file, outDir, baseName, duration, intervalSeconds = 5 ) {
+export async function createPreview ( file, outDir, baseName, meta ) {
 
-    // Create thumbnails every n seconds to provide video previews
+    // Create approx. 100 thumbnails to provide video previews
     // Will be used on hovering player scrubber
 
+    const duration = meta.duration || 0;
+    const intervalSeconds = Math.round( duration / 100 );
     const thumbs = [];
-    const ts = [];
 
-    // Compute timestamps
-	for ( let t = 0; t < duration; t += intervalSeconds ) ts.push(
-        Math.min( Math.floor( t ), Math.floor( duration - 0.1 ) )
-    );
+    // Generate thumbnails using ffmpeg
+    const args = [
+        '-hide_banner',
+        '-loglevel', 'error',
+        '-i', file,
+        '-vf', `fps=1/${intervalSeconds},scale=256:-1`,
+        '-qscale:v', '2',
+        join( outDir, `${baseName}_thumb_%04d.jpg` )
+    ];
 
-    // Limit to reasonable number
-	const maxThumbs = 120;
+    // Execute ffmpeg command
+    await execFileAsync( 'ffmpeg', args );
 
-    if ( ts.length > maxThumbs ) {
+    // Collect generated thumbnail file names
+    readdir( outDir, ( err, files ) => {
 
-		const step = Math.ceil( ts.length / maxThumbs );
-		const reduced = [];
+        if ( err ) throw err;
 
-        for ( let i = 0; i < ts.length; i += step ) reduced.push( ts[ i ] );
+        files.filter(
+            f => f.startsWith( `${baseName}_thumb_` ) &&
+                 f.endsWith( '.jpg' )
+        ).forEach(
+            f => thumbs.push( f )
+        );
 
-        ts.length = 0; ts.push( ...reduced );
-
-    }
-
-    // Generate thumbnails sequentially to avoid heavy parallel ffmpeg load
-    for ( let i = 0; i < ts.length; i++ ) {
-
-        const t = ts[ i ];
-        const outName = `${ baseName }_thumb_${ String( i ).padStart( 4, '0' ) }.jpg`;
-        const outPath = join( outDir, outName );
-
-        // Use ffmpeg to grab frame at time t
-        await new Promise( ( resolve, reject ) => {
-            ffmpeg( file )
-                .outputOptions( [ '-ss', String( t ) ] )
-                .frames( 1 )
-                .outputOptions( '-qscale:v 2' )
-                .size( '1280x?' )
-                .save( outPath )
-                .on( 'end', () => resolve() )
-                .on( 'error', err => reject( err ) );
-        } );
-    
-        thumbs.push( outName );
-
-    }
+    } );
 
     return thumbs;
 
