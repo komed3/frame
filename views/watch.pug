@@ -13,7 +13,7 @@ block main
     div.player-container.show-controls
       div.player-inner
         video.player-source( poster= `/media/${data.videoId}/${data.poster}` )
-          source( src= `/media/${data.videoId}/${data.fileName}`, type= "video/mp4" )
+          source( src= `/media/${data.videoId}/${data.fileName}`, type= data.mimeType )
         div.player-controls
           div.action-container
           div.progress-container( action= "seek" )
