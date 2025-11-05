@@ -62,19 +62,19 @@ api.post( '/api/upload', ( req, res ) => {
 
             // Write file
             await writeFile( filePath, req.file.buffer );
-            sendProgress( { phase: 'saved', progress: 40, message: 'File saved on server' } );
+            sendProgress( { phase: 'saved', progress: 50, message: 'File saved on server' } );
 
             // Extract metadata
             const meta = await extractMeta( filePath );
-            sendProgress( { phase: 'meta', progress: 50, message: 'Metadata extracted' } );
+            sendProgress( { phase: 'meta', progress: 60, message: 'Metadata extracted' } );
 
             // Generate waveform
             const waveform = await createWaveform( filePath, meta.duration || 0, 150 );
-            sendProgress( { phase: 'waveform', progress: 65, message: 'Waveform generated' } );
+            sendProgress( { phase: 'waveform', progress: 75, message: 'Waveform generated' } );
 
             // Generate previews (thumbnails every X seconds)
             const thumbnails = await createPreview( filePath, mediaDir, fileId, meta.duration || 0, 5 );
-            sendProgress( { phase: 'preview', progress: 90, message: 'Thumbnails generated' } );
+            sendProgress( { phase: 'preview', progress: 95, message: 'Thumbnails generated' } );
 
             // Prepare video record
             const videoRecord = {
