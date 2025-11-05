@@ -59,12 +59,11 @@ class VideoPlayer {
 
         this.progress = this.container.querySelector( '.progress-container' );
         this.timeDisplay = this.container.querySelector( '.player-time' );
-
-        const rect = this.progress.getBoundingClientRect();
         let percent = 0;
 
         this.progress.addEventListener( 'mousemove', e => {
 
+            const rect = this.progress.getBoundingClientRect();
             percent = ( e.clientX - rect.left ) / rect.width;
 
             this.progress.classList.add( 'hovered' );
