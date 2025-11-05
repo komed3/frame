@@ -1,7 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const INDEX_FILE = join( process.cwd(), 'media', 'search_index.json' );
+const MEDIA_FOLDER = join( process.cwd(), 'media' );
+const INDEX_FILE = join( MEDIA_FOLDER, 'search_index.json' );
 
 class SearchIndex {
 
@@ -30,7 +31,7 @@ class SearchIndex {
 
     async save () {
 
-        await mkdir( INDEX_FILE, { recursive: true } );
+        await mkdir( MEDIA_FOLDER, { recursive: true } );
         await writeFile( INDEX_FILE, JSON.stringify( this.index, null, 2 ) );
 
     }
