@@ -31,9 +31,9 @@ class VideoUploader {
         } );
 
         // Handle file selection
+        this.container.querySelector( '.change-video' ).addEventListener( 'click', this.resetFileSelect.bind( this ) );
         this.dropArea.addEventListener( 'drop', e => this.handleFileSelect( e.dataTransfer.files[ 0 ] ) );
         this.fileInput.addEventListener( 'change', e => this.handleFileSelect( e.target.files[ 0 ] ) );
-        this.container.querySelector( '.change-video' ).addEventListener( 'click', () => location.reload() );
 
         // Form submission
         this.container.addEventListener( 'submit', e => {
@@ -68,6 +68,20 @@ class VideoUploader {
         this.dropArea.classList.add( 'hidden' );
         this.preview.classList.remove( 'hidden' );
         this.error.classList.add( 'hidden' );
+
+    }
+
+    resetFileSelect () {
+
+        this.fileInput.value = '';
+
+        // Clear video preview
+        this.previewPlayer.src = '';
+        this.previewPlayer.load();
+
+        // Hide preview, show drop area
+        this.dropArea.classList.remove( 'hidden' );
+        this.preview.classList.add( 'hidden' );
 
     }
 
