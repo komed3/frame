@@ -58,8 +58,12 @@ class VideoPlayer {
     initProgressBar () {
 
         this.progress = this.container.querySelector( '.progress-container' );
+        this.waveform = this.progress.querySelector( '.wave-container' );
+        this.preview = this.progress.querySelector( '.hover-card .preview' );
         this.timeDisplay = this.container.querySelector( '.player-time' );
         let percent = 0;
+
+        this.createWaveform();
 
         this.progress.addEventListener( 'mousemove', e => {
 
@@ -82,6 +86,24 @@ class VideoPlayer {
         } );
 
         this.progress.addEventListener( 'click', () => this.seek( percent ) );
+
+    }
+
+    createWaveform () {
+
+        if ( 'waveform' in videoData && videoData.waveform.length ) {
+
+            videoData.waveform.forEach( v => {
+
+                const el = document.createElement( 'div' );
+                el.classList.add( 'bar' );
+                el.style.setProperty( '--v', v + '%' );
+
+                this.waveform.appendChild( el );
+
+            } );
+
+        }
 
     }
 
