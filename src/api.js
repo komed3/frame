@@ -122,7 +122,7 @@ api.post( '/api/upload', ( req, res ) => {
             await searchIndex.addVideo( videoId, {
                 ...searchData, hash, poster,
                 duration: meta.duration,
-                created: videoRecord.created
+                created: now.toISOString()
             } );
 
             // Save JSON
