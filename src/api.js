@@ -80,9 +80,12 @@ api.post( '/api/upload', ( req, res ) => {
             await mkdir( videoDir, { recursive: true } );
 
             // Move temp file to final location
-            const finalPath = join( videoDir, `${fileId}${ fileExt }` );
+            const finalName = `${fileId}${fileExt}`;
+            const finalPath = join( videoDir, finalName );
+
             await writeFile( finalPath, req.file.buffer );
             await rm( tempFile );
+
             sendProgress( { phase: 'saved', progress: 50, message: 'File saved on server' } );
 
             // Extract metadata and analyze video
@@ -108,7 +111,7 @@ api.post( '/api/upload', ( req, res ) => {
 
             const videoRecord = {
                 videoId, fileId, hash,
-                fileName: req.file.originalname,
+                fileName: finalName,
                 created: now.toISOString(),
                 meta, waveform, thumbnails, poster,
                 content: {
