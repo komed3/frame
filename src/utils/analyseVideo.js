@@ -1,10 +1,24 @@
 import { execFile, spawn } from 'node:child_process';
-import { readdir } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { createReadStream, readdir } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import ffmpeg from 'fluent-ffmpeg';
 
-const execFileAsync = promisify( execFile );
+export async function calculateHash ( file ) {
+
+    return new Promise( ( resolve, reject ) => {
+
+        const hash = createHash( 'sha256' );
+        const stream = createReadStream( file );
+
+        stream.on( 'error', err => reject( err ) );
+        stream.on( 'data', chunk => hash.update( chunk ) );
+        stream.on( 'end', () => resolve( hash.digest( 'hex' ) ) );
+
+    } );
+
+}
 
 export async function extractMeta ( file ) {
 
@@ -89,16 +103,10 @@ export async function createWaveform ( file, meta, targetPoints = 120 ) {
             const buffer = Buffer.concat( chunks );
             const sampleCount = Math.floor( buffer.length / 2 ); // 16-bit samples
             const samples = new Array( sampleCount );
-            let max = 1;
-
+            
+            // First pass to collect raw values
             for ( let i = 0; i < sampleCount; i++ ) {
-
-                const val = buffer.readInt16LE( i * 2 );
-                const abs = Math.abs( val );
-                samples[ i ] = abs;
-
-                if ( abs > max ) max = abs;
-
+                samples[ i ] = Math.abs( buffer.readInt16LE( i * 2 ) );
             }
 
             // Reduce to targetPoints by averaging groups
@@ -116,16 +124,19 @@ export async function createWaveform ( file, meta, targetPoints = 120 ) {
 
                 }
 
-                const avg = count ? ( sum / count ) : 0;
-                points.push( Math.round( ( avg / max ) * 100 ) );
+                points.push( count ? sum / count : 0 );
 
             }
 
-            // Normalize waveform to 0-100
-            const finalMax = Math.max( ...points );
-            points.map( p => Math.round( ( p / finalMax ) * 100 ) );
+            // Normalize to 0-100 range
+            const max = Math.max( 1, Math.max( ...points ) );
+            const normalized = points.map( p => Math.round( ( p / max ) * 100 ) );
 
-            resolve( points );
+            // Ensure exactly targetPoints length
+            while ( normalized.length > targetPoints ) normalized.pop();
+            while ( normalized.length < targetPoints ) normalized.push( 0 );
+
+            resolve( normalized );
 
         } );
 
@@ -140,35 +151,42 @@ export async function createPreview ( file, outDir, baseName, meta ) {
 
     const duration = meta.duration || 0;
     const intervalSeconds = Math.round( duration / 100 );
-    const thumbs = [];
 
-    // Generate thumbnails using ffmpeg
+    // First create a high-quality poster thumbnail at 1/4 duration
+    await new Promise( ( resolve, reject ) => {
+        ffmpeg( file )
+            .screenshots( {
+                timestamps: [ Math.floor( duration * 0.25 ) ],
+                filename: `${baseName}_hires.jpg`,
+                folder: outDir,
+                size: '1280x720'
+            } )
+            .on( 'end', () => resolve() )
+            .on( 'error', err => reject( err ) );
+    } );
+
+    // Generate preview thumbnails using ffmpeg
     const args = [
         '-hide_banner',
         '-loglevel', 'error',
         '-i', file,
         '-vf', `fps=1/${intervalSeconds},scale=256:-1`,
         '-qscale:v', '2',
-        join( outDir, `${baseName}_thumb_%04d.jpg` )
+        join( outDir, `${baseName}_%04d.jpg` )
     ];
 
     // Execute ffmpeg command
-    await execFileAsync( 'ffmpeg', args );
+    await promisify( execFile )( 'ffmpeg', args );
 
-    // Collect generated thumbnail file names
-    readdir( outDir, ( err, files ) => {
+    // Collect generated thumbnail file names synchronously
+    const files = await promisify( readdir )( outDir );
+    const thumbNames = files.filter( f =>
+        f.startsWith( `${baseName}_` ) && f.endsWith( '.jpg' ) && ! f.includes( '_hires' )
+    ).sort();
 
-        if ( err ) throw err;
-
-        files.filter(
-            f => f.startsWith( `${baseName}_thumb_` ) &&
-                 f.endsWith( '.jpg' )
-        ).forEach(
-            f => thumbs.push( f )
-        );
-
-    } );
-
-    return thumbs;
+    return {
+        poster: `${baseName}_hires.jpg`,
+        thumbs: thumbNames
+    };
 
 }
