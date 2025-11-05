@@ -9,7 +9,7 @@ class VideoUploader {
         this.previewPlayer = this.preview.querySelector( '.preview-player' );
         this.error = this.container.querySelector( '.upload-error' );
         this.progress = this.container.querySelector( '.upload-progress' );
-        this.actions = this.container.querySelector( '.form-actions' );
+        this.spinner = this.container.querySelector( '.loading-spinner' );
 
         this.initEventHandlers();
 
@@ -84,17 +84,17 @@ class VideoUploader {
         if ( ! obj || typeof obj !== 'object' ) return;
 
         const msg = obj.message || '';
-        const progress = typeof obj.progress === 'number' ? Math.min( 100, Math.max( 0, obj.progress ) ) : null;
+        const pct = typeof obj.progress === 'number' ? Math.min( 100, Math.max( 0, obj.progress ) ) : null;
 
         // Show server-side processing progress and status message
-        if ( progress !== null ) {
+        if ( pct !== null ) {
 
-            this.progress.style.setProperty( '--progress', progress + '%' );
-            this.progress.querySelector( '.status-text .right' ).textContent = Math.round( progress ) + '%';
+            this.progress.style.setProperty( '--progress', pct + '%' );
+            this.progress.querySelector( '.status-text .right' ).textContent = Math.round( pct ) + '%';
 
         }
 
-        if ( msg ) this.statusText.querySelector( '.status-text .left' ).textContent = msg;
+        if ( msg ) this.progress.querySelector( '.status-text .left' ).textContent = msg;
 
         // If processing is done, redirect to video page after short delay
         if ( obj.phase === 'done' && obj.videoId ) setTimeout(
@@ -110,9 +110,10 @@ class VideoUploader {
         let lastIndex = 0;
 
         // Show progress bar, hide errors and actions
-        this.progress.classList.remove( 'hidden' );
+        this.container.classList.add( 'processing' );
         this.error.classList.add( 'hidden' );
-        this.actions.classList.add( 'hidden' );
+        this.progress.classList.remove( 'hidden' );
+        this.spinner.classList.remove( 'hidden' );
 
         // Create XMLHttpRequest
         const xhr = new XMLHttpRequest();
