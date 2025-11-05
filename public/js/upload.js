@@ -45,24 +45,8 @@ class VideoUploader {
         } );
 
         // Handle file selection
-        this.dropArea.addEventListener( 'drop', e => {
-
-            const file = e.dataTransfer.files[ 0 ];
-
-            if ( file && file.type.startsWith( 'video/' ) ) this.handleFileSelect( file );
-            else this.showError( 'Wrong file type! Video formats only.' );
-
-        } );
-
-        this.fileInput.addEventListener( 'change', e => {
-
-            const file = e.target.files[ 0 ];
-
-            if ( file && file.type.startsWith( 'video/' ) ) this.handleFileSelect( file );
-            else this.showError( 'Wrong file type! Video formats only.' );
-
-        } );
-
+        this.dropArea.addEventListener( 'drop', e => this.handleFileSelect( e.dataTransfer.files[ 0 ] ) );
+        this.fileInput.addEventListener( 'change', e => this.handleFileSelect( e.target.files[ 0 ] ) );
         this.container.querySelector( '.change-video' ).addEventListener( 'click', () => location.reload() );
 
         // Form submission
@@ -79,6 +63,11 @@ class VideoUploader {
     }
 
     handleFileSelect ( file ) {
+
+        if ( ! file || ! file.type.startsWith( 'video/' ) ) {
+            this.showError( 'Wrong file type! Video formats only.' );
+            return;
+        }
 
         const info = this.preview.querySelector( '.file-info' );
         info.querySelector( '.name' ).textContent = file.name;
@@ -99,6 +88,31 @@ class VideoUploader {
 
         this.error.classList.remove( 'hidden' );
         this.error.querySelector( '.message' ).textContent = message;
+
+    }
+
+    handleServerLine ( obj ) {
+
+        // obj is parsed JSON from server (NDJSON)
+        if ( ! obj || typeof obj !== 'object' ) return;
+
+        const msg = obj.message || '';
+        const progress = typeof obj.progress === 'number' ? Math.min( 100, Math.max( 0, obj.progress ) ) : null;
+
+        // Show server-side processing progress and status message
+        if ( progress !== null ) {
+
+            this.progress.style.setProperty( '--progress', progress + '%' );
+            this.progress.querySelector( '.status-text .right' ).textContent = Math.round( progress ) + '%';
+
+        }
+
+        if ( msg ) this.statusText.querySelector( '.status-text .left' ).textContent = msg;
+
+        // If processing is done, redirect to video page after short delay
+        if ( obj.phase === 'done' && obj.videoId ) setTimeout(
+            () => location.href = `/watch/${obj.videoId}`, 400
+        );
 
     }
 
