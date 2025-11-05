@@ -1,7 +1,7 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const INDEX_FILE = join( process.cwd(), 'data', 'search_index.json' );
+const INDEX_FILE = join( process.cwd(), 'media', 'search_index.json' );
 
 class SearchIndex {
 
@@ -21,20 +21,19 @@ class SearchIndex {
 
         } catch {
 
-            this.index = {
-                videos: {},
-                hashes: {},
-                tags: {},
-                categories: {}
-            };
-
+            this.index = { videos: {}, hashes: {}, tags: {}, categories: {} };
             await this.save();
 
         }
 
     }
 
-    async save () { await writeFile( INDEX_FILE, JSON.stringify( this.index, null, 2 ) ) }
+    async save () {
+
+        await mkdir( INDEX_FILE, { recursive: true } );
+        await writeFile( INDEX_FILE, JSON.stringify( this.index, null, 2 ) );
+
+    }
 
     async addVideo ( videoId, videoData ) {
 
