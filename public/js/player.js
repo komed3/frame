@@ -76,6 +76,11 @@ class VideoPlayer {
                 this.video.duration * percent
             );
 
+            const src = `${videoData.fileId}_${ Math.floor( percent * 100 ).toString().padStart( 4, '0' ) }.jpg`;
+            if ( videoData.thumbnails && videoData.thumbnails.includes( src ) ) this.preview.style.setProperty(
+                'background-image', `url( '/media/${videoData.videoId}/${src}' )`
+            );
+
         } );
 
         this.progress.addEventListener( 'mouseleave', () => {
