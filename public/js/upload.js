@@ -112,7 +112,7 @@ class VideoUploader {
 
         // If processing is done, redirect to video page after short delay
         if ( obj.phase === 'done' && obj.videoId ) setTimeout(
-            () => location.href = `/watch/${obj.videoId}`, 400
+            () => location.href = `/watch/${obj.videoId}`, 800
         );
 
     }
