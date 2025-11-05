@@ -112,6 +112,7 @@ api.post( '/api/upload', ( req, res ) => {
             const videoRecord = {
                 videoId, fileId, hash,
                 fileName: finalName,
+                mimeType: req.file.mimetype,
                 created: now.toISOString(),
                 meta, waveform, thumbnails, poster,
                 content: {
