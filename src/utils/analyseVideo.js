@@ -180,13 +180,10 @@ export async function createPreview ( file, outDir, baseName, meta, n = 100 ) {
 
     // Collect generated thumbnail file names synchronously
     const files = await promisify( readdir )( outDir );
-    const thumbNames = files.filter( f =>
+    const thumbnails = files.filter( f =>
         f.startsWith( `${baseName}_` ) && f.endsWith( '.jpg' ) && ! f.includes( '_hires' )
     ).sort();
 
-    return {
-        poster: `${baseName}_hires.jpg`,
-        thumbs: thumbNames
-    };
+    return { poster: `${baseName}_hires.jpg`, thumbnails };
 
 }
