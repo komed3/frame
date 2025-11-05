@@ -11,7 +11,10 @@ class VideoUploader {
         this.progress = this.container.querySelector( '.upload-progress' );
         this.spinner = this.container.querySelector( '.loading-spinner' );
 
+        this.isUploading = false;
+
         this.initEventHandlers();
+        this.initPageExitHandler();
 
     }
 
@@ -44,6 +47,14 @@ class VideoUploader {
 
             this.handleUpload();
 
+        } );
+
+    }
+
+    initPageExitHandler () {
+
+        window.addEventListener( 'beforeunload', e => {
+            if ( this.isUploading ) { e.preventDefault(); return; }
         } );
 
     }
@@ -119,6 +130,11 @@ class VideoUploader {
 
     async handleUpload () {
 
+        if ( this.isUploading ) return;
+
+        // Set uploading state
+        this.isUploading = true;
+
         // Prepare form data
         const formData = new FormData( this.container );
         let lastIndex = 0;
@@ -169,6 +185,8 @@ class VideoUploader {
         // Request completed
         xhr.onload = () => {
 
+            this.isUploading = false;
+
             if ( xhr.status >= 200 && xhr.status < 300 ) {
 
                 // In case server didn't send final done line, try parse remaining text
@@ -178,7 +196,22 @@ class VideoUploader {
                 for ( const line of lines ) {
 
                     if ( ! line.trim() ) continue;
-                    try { this.handleServerLine( JSON.parse( line ) ) }
+
+                    try {
+
+                        const data = JSON.parse( line );
+
+                        if ( data.duplicate ) {
+
+                            this.showError( 'This video has already been uploaded.' );
+                            return;
+
+                        }
+
+                        this.handleServerLine( data );
+
+                    }
+
                     catch ( err ) { /* ignore */ }
 
                 }
@@ -186,12 +219,26 @@ class VideoUploader {
             }
 
             // Handle error response
-            else this.showError( 'Upload failed: ' + xhr.status );
+            else {
+
+                this.showError( 'Upload failed: ' + xhr.status );
+                this.container.classList.remove( 'processing' );
+                this.spinner.classList.add( 'hidden' );
+
+            }
 
         };
 
         // Network error
-        xhr.onerror = () => this.showError( 'Network error during upload' );
+        xhr.onerror = () => {
+
+            this.isUploading = false;
+
+            this.showError( 'Network error during upload' );
+            this.container.classList.remove( 'processing' );
+            this.spinner.classList.add( 'hidden' );
+
+        };
 
         // Send the request
         xhr.send( formData );
