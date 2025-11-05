@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ShortUniqueId from 'short-unique-id';
 
 // Init ID generator
-new uid = new ShortUniqueId( {
+const uid = new ShortUniqueId( {
     dictionary: 'alphanum',
     length: 10
 } );
