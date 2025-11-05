@@ -69,7 +69,7 @@ api.post( '/api/upload', ( req, res ) => {
             sendProgress( { phase: 'meta', progress: 50, message: 'Metadata extracted' } );
 
             // Generate waveform
-            const waveform = await createWaveform( filePath, 150 );
+            const waveform = await createWaveform( filePath, meta.duration || 0, 150 );
             sendProgress( { phase: 'waveform', progress: 65, message: 'Waveform generated' } );
 
             // Generate previews (thumbnails every X seconds)
