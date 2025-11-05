@@ -10,7 +10,7 @@ export function watch ( req, res ) {
         const data = JSON.parse( readFileSync( join( videoDir, 'video.json' ), 'utf8' ) || '{}' );
 
         if ( ! data || ! data.videoId || ! data.fileId ) return res.redirect( '/' );
-        else res.render( 'watch', { data } );
+        else res.render( 'watch', { data, title: data.content.title } );
 
     } catch { res.redirect( '/' ) }
 
