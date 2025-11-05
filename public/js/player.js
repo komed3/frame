@@ -67,19 +67,26 @@ class VideoPlayer {
 
         this.progress.addEventListener( 'mousemove', e => {
 
+            // Calculate hover percentage
             const rect = this.progress.getBoundingClientRect();
             percent = ( e.clientX - rect.left ) / rect.width;
 
+            // Show hover state
             this.progress.classList.add( 'hovered' );
             this.progress.style.setProperty( '--hover', percent * 100 + '%' );
             this.progress.querySelector( '.time-code' ).textContent = formatTime(
                 this.video.duration * percent
             );
 
+            // Update preview image
             const src = `${videoData.fileId}_${ Math.floor( percent * 100 ).toString().padStart( 4, '0' ) }.jpg`;
-            if ( videoData.thumbnails && videoData.thumbnails.includes( src ) ) this.preview.style.setProperty(
-                'background-image', `url( '/media/${videoData.videoId}/${src}' )`
-            );
+
+            if ( videoData.thumbnails && videoData.thumbnails.includes( src ) ) {
+
+                this.preview.style.backgroundImage = `url( '/media/${videoData.videoId}/${src}' )`;
+                this.preview.style.visibility = 'visible';
+
+            } else this.preview.style.visibility = 'hidden';
 
         } );
 
