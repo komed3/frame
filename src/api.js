@@ -73,7 +73,7 @@ api.post( '/api/upload', ( req, res ) => {
             sendProgress( { phase: 'waveform', progress: 65, message: 'Waveform generated' } );
 
             // Generate previews (thumbnails every X seconds)
-            const thumbnails = await createPreview( filePath, mediaDir, fileId, 5 );
+            const thumbnails = await createPreview( filePath, mediaDir, fileId, meta.duration || 0, 5 );
             sendProgress( { phase: 'preview', progress: 90, message: 'Thumbnails generated' } );
 
             // Prepare video record

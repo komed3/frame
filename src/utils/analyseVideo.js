@@ -124,4 +124,56 @@ export async function createWaveform ( file, duration, targetPoints = 150 ) {
 
 }
 
-export async function createPreview ( file ) {}
+export async function createPreview ( file, outDir, baseName, duration, intervalSeconds = 5 ) {
+
+    // Create thumbnails every n seconds to provide video previews
+    // Will be used on hovering player scrubber
+
+    const thumbs = [];
+    const ts = [];
+
+    // Compute timestamps
+	for ( let t = 0; t < duration; t += intervalSeconds ) ts.push(
+        Math.min( Math.floor( t ), Math.floor( duration - 0.1 ) )
+    );
+
+    // Limit to reasonable number
+	const maxThumbs = 120;
+
+    if ( ts.length > maxThumbs ) {
+
+		const step = Math.ceil( ts.length / maxThumbs );
+		const reduced = [];
+
+        for ( let i = 0; i < ts.length; i += step ) reduced.push( ts[ i ] );
+
+        ts.length = 0; ts.push( ...reduced );
+
+    }
+
+    // Generate thumbnails sequentially to avoid heavy parallel ffmpeg load
+    for ( let i = 0; i < ts.length; i++ ) {
+
+        const t = ts[ i ];
+        const outName = `${ baseName }_thumb_${ String( i ).padStart( 4, '0' ) }.jpg`;
+        const outPath = join( outDir, outName );
+
+        // Use ffmpeg to grab frame at time t
+        await new Promise( ( resolve, reject ) => {
+            ffmpeg( file )
+                .outputOptions( [ '-ss', String( t ) ] )
+                .frames( 1 )
+                .outputOptions( '-qscale:v 2' )
+                .size( '1280x?' )
+                .save( outPath )
+                .on( 'end', () => resolve() )
+                .on( 'error', err => reject( err ) );
+        } );
+    
+        thumbs.push( outName );
+
+    }
+
+    return thumbs;
+
+}
