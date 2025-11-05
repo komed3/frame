@@ -1,4 +1,4 @@
-import { analyseVideo } from './utils/analyseVideo.js';
+import { createThumbnail, createWaveform, extractMeta } from './utils/analyseVideo.js';
 import { mkdir, writeFile, rename } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import express from 'express';
