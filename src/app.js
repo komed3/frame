@@ -1,3 +1,4 @@
+import { api } from './api.js';
 import { router } from './controller/index.js';
 import { join } from 'node:path';
 import express, { static as serveStatic } from 'express';
@@ -21,7 +22,8 @@ app.use( '/images', serveStatic( join( cwd, 'public/images' ) ) );
 app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
 
-// Mount router
+// API and Mount router
+app.use( api );
 app.use( router );
 
 // App listen on port
