@@ -7,6 +7,7 @@ class VideoUploader {
         this.fileInput = this.container.querySelector( '[name="video"]' );
         this.preview = this.container.querySelector( '.video-preview' );
         this.previewPlayer = this.preview.querySelector( '.preview-player' );
+        this.error = this.container.querySelector( '.upload-error' );
         this.progress = this.container.querySelector( '.upload-progress' );
         this.actions = this.container.querySelector( '.form-actions' );
 
@@ -48,9 +49,8 @@ class VideoUploader {
 
             const file = e.dataTransfer.files[ 0 ];
 
-            if ( file && file.type.startsWith( 'video/' ) ) {
-                this.handleFileSelect( file );
-            }
+            if ( file && file.type.startsWith( 'video/' ) ) this.handleFileSelect( file );
+            else this.showError( 'Wrong file type! Video formats only.' );
 
         } );
 
@@ -58,9 +58,12 @@ class VideoUploader {
 
             const file = e.target.files[ 0 ];
 
-            if ( file ) this.handleFileSelect( file );
+            if ( file && file.type.startsWith( 'video/' ) ) this.handleFileSelect( file );
+            else this.showError( 'Wrong file type! Video formats only.' );
 
         } );
+
+        this.container.querySelector( '.change-video' ).addEventListener( 'click', () => location.reload() );
 
         // Form submission
         this.container.addEventListener( 'submit', e => {
@@ -88,6 +91,14 @@ class VideoUploader {
 
         this.dropArea.classList.add( 'hidden' );
         this.preview.classList.remove( 'hidden' );
+        this.error.classList.add( 'hidden' );
+
+    }
+
+    showError ( message ) {
+
+        this.error.classList.remove( 'hidden' );
+        this.error.querySelector( '.message' ).textContent = message;
 
     }
 
