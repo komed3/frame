@@ -1,5 +1,6 @@
-import { createPreview, createWaveform, extractMeta } from './utils/analyseVideo.js';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { createPreview, createWaveform, extractMeta, calculateHash } from './utils/analyseVideo.js';
+import { searchIndex } from './utils/searchIndex.js';
+import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import express from 'express';
 import multer from 'multer';
@@ -45,54 +46,87 @@ api.post( '/api/upload', ( req, res ) => {
 
         try {
 
-            // Generate ids
+            const now = new Date();
+            const fileExt = extname( req.file.originalname );
+
+            // Create temp directory for hash check
+            const tempDir = join( process.cwd(), 'temp' );
+            const tempFile = join( tempDir, `temp_${ now.getTime() }${fileExt}` );
+
+            await mkdir( tempDir, { recursive: true } );
+            await writeFile( tempFile, req.file.buffer );
+
+            // Calculate hash and check for duplicates
+            const hash = await calculateHash( tempFile );
+            const existingId = await searchIndex.findByHash( hash );
+
+            if ( existingId ) {
+
+                await rm( tempFile );
+                return res.json( {
+                    success: false, duplicate: true,
+                    message: 'Video already exists',
+                    videoId: existingId
+                } );
+
+            }
+
+            // Generate ids and prepare directories
             const videoId = uid.rnd();
             const fileId = uuidv4();
 
-            // Create directories
-            const mediaDir = join( process.cwd(), 'media', videoId );
-            const dataDir = join( process.cwd(), 'data', videoId );
-            await mkdir( mediaDir, { recursive: true } );
-            await mkdir( dataDir, { recursive: true } );
+            // Create video directory (contains all files for this video)
+            const videoDir = join( process.cwd(), 'media', videoId );
+            await mkdir( videoDir, { recursive: true } );
 
-            // Save uploaded file under safe uuid name
-            const ext = extname( req.file.originalname );
-            const fileName = `${ fileId }${ ext }`;
-            const filePath = join( mediaDir, fileName );
-
-            // Write file
-            await writeFile( filePath, req.file.buffer );
+            // Move temp file to final location
+            const finalPath = join( videoDir, `${fileId}${ fileExt }` );
+            await writeFile( finalPath, req.file.buffer );
+            await rm( tempFile );
             sendProgress( { phase: 'saved', progress: 50, message: 'File saved on server' } );
 
-            // Extract metadata
-            const meta = await extractMeta( filePath );
+            // Extract metadata and analyze video
+            const meta = await extractMeta( finalPath );
             sendProgress( { phase: 'meta', progress: 60, message: 'Metadata extracted' } );
 
             // Generate waveform
-            const waveform = await createWaveform( filePath, meta, 150 );
+            const waveform = await createWaveform( finalPath, meta, 150 );
             sendProgress( { phase: 'waveform', progress: 75, message: 'Waveform generated' } );
 
             // Generate previews (thumbnails every X seconds)
-            const thumbnails = await createPreview( filePath, mediaDir, fileId, meta );
+            const { thumbnails, poster } = await createPreview( finalPath, videoDir, fileId, meta );
             sendProgress( { phase: 'preview', progress: 95, message: 'Thumbnails generated' } );
 
-            // Prepare video record
+            // Prepare video record with search-relevant data
+            const searchData = {
+                category: req.body.category || '',
+                title: req.body.title || '',
+                author: req.body.author || '',
+                source: req.body.source || '',
+                tags: req.body.tags ? req.body.tags.split( ',' ).map( t => t.trim() ).filter( Boolean ) : [],
+            };
+
             const videoRecord = {
-                videoId, fileId, fileName,
-                created: new Date().toISOString(),
-                meta, waveform, thumbnails,
+                videoId, fileId, hash,
+                fileName: req.file.originalname,
+                created: now.toISOString(),
+                meta, waveform, thumbnails, poster,
                 content: {
-                    title: req.body.title || '',
-                    author: req.body.author || '',
-                    source: req.body.source || '',
+                    ...searchData,
                     description: req.body.description || '',
-                    category: req.body.category || '',
-                    tags: req.body.tags ? req.body.tags.split( ',' ).map( t => t.trim() ).filter( Boolean ) : [],
+                    lang: req.body.lang || ''
                 }
             };
 
+            // Add to search index
+            await searchIndex.addVideo( videoId, {
+                ...searchData, hash, poster,
+                duration: meta.duration,
+                created: videoRecord.created
+            } );
+
             // Save JSON
-            await writeFile( join( dataDir, 'video.json' ), JSON.stringify( videoRecord, null, 2 ) );
+            await writeFile( join( videoDir, 'video.json' ), JSON.stringify( videoRecord, null, 2 ) );
             sendProgress( { phase: 'done', progress: 100, message: 'Processing complete', videoId } );
 
             // End stream
@@ -100,7 +134,10 @@ api.post( '/api/upload', ( req, res ) => {
 
         } catch ( e ) {
 
-            res.status( 500 ).json( { success: false, message: 'Processing error', e } );
+            res.status( 500 ).json( {
+                success: false, e,
+                message: 'Processing error'
+            } );
 
         }
 
