@@ -19,29 +19,15 @@ class VideoUploader {
 
         // Drag and drop events
         [ 'dragenter', 'dragover', 'dragleave', 'drop' ].forEach( event => {
-
-            this.dropArea.addEventListener( event, e => {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                e.stopPropagation();
-            } );
-
+            this.dropArea.addEventListener( event, e => e.preventDefault() && e.stopPropagation() );
         } );
 
         [ 'dragenter', 'dragover' ].forEach( event => {
-
-            this.dropArea.addEventListener( event, () => {
-                this.dropArea.classList.add( 'dragover' );
-            } );
-
+            this.dropArea.addEventListener( event, () => this.dropArea.classList.add( 'dragover' ) );
         } );
 
         [ 'dragleave', 'drop' ].forEach( event => {
-
-            this.dropArea.addEventListener( event, () => {
-                this.dropArea.classList.remove( 'dragover' );
-            } );
-
+            this.dropArea.addEventListener( event, () => this.dropArea.classList.remove( 'dragover' ) );
         } );
 
         // Handle file selection
@@ -78,6 +64,7 @@ class VideoUploader {
         this.previewPlayer.src = videoURL;
         this.previewPlayer.load();
 
+        // Show preview, hide drop area and error
         this.dropArea.classList.add( 'hidden' );
         this.preview.classList.remove( 'hidden' );
         this.error.classList.add( 'hidden' );
@@ -118,14 +105,81 @@ class VideoUploader {
 
     async handleUpload () {
 
+        // Prepare form data
         const formData = new FormData( this.container );
+        let lastIndex = 0;
 
+        // Show progress bar, hide errors and actions
         this.progress.classList.remove( 'hidden' );
         this.error.classList.add( 'hidden' );
         this.actions.classList.add( 'hidden' );
 
-        try {}
-        catch {}
+        // Create XMLHttpRequest
+        const xhr = new XMLHttpRequest();
+        xhr.open( 'POST', '/api/upload', true );
+
+        // Upload progress (client -> server)
+
+        // Handle upload progress
+        xhr.upload.onprogress = ( e ) => { if ( e.lengthComputable ) {
+
+            const percent = Math.round( ( e.loaded / e.total ) * 50 );
+
+            this.progress.style.setProperty( '--progress', percent + '%' );
+            this.progress.querySelector( '.status-text .left' ).textContent = 'Uploading';
+            this.progress.querySelector( '.status-text .right' ).textContent = percent + '%';
+
+        } };
+
+        // Streaming response parsing (server -> client)
+
+        // Handle incoming data
+        xhr.onprogress = () => {
+
+            const text = xhr.responseText || '';
+            const chunk = text.substring( lastIndex );
+            const lines = chunk.split( '\n' );
+            lastIndex = text.length;
+
+            for ( const line of lines ) {
+
+                if ( ! line.trim() ) continue;
+                try { this.handleServerLine( JSON.parse( line ) ) }
+                catch ( err ) { /* ignore partial JSON */ }
+
+            }
+
+        };
+
+        // Request completed
+        xhr.onload = () => {
+
+            if ( xhr.status >= 200 && xhr.status < 300 ) {
+
+                // In case server didn't send final done line, try parse remaining text
+                const text = xhr.responseText || '';
+                const lines = text.split( '\n' );
+
+                for ( const line of lines ) {
+
+                    if ( ! line.trim() ) continue;
+                    try { this.handleServerLine( JSON.parse( line ) ) }
+                    catch ( err ) { /* ignore */ }
+
+                }
+
+            }
+
+            // Handle error response
+            else this.showError( 'Upload failed: ' + xhr.status );
+
+        };
+
+        // Network error
+        xhr.onerror = () => this.showError( 'Network error during upload' );
+
+        // Send the request
+        xhr.send( formData );
 
     }
 
