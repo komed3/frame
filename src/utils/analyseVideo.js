@@ -4,6 +4,9 @@ import ffmpeg from 'fluent-ffmpeg';
 
 export async function extractMeta ( file ) {
 
+    // Will extract video metadata using ffprobe
+    // This includes format, streams, duration, size, bitrate, video and audio codec info
+
     return new Promise( ( resolve, reject ) => {
         ffmpeg.ffprobe( file, ( err, meta ) => {
 
