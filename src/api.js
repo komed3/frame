@@ -73,23 +73,22 @@ api.post( '/api/upload', ( req, res ) => {
             sendProgress( { phase: 'waveform', progress: 65, message: 'Waveform generated' } );
 
             // Generate previews (thumbnails every X seconds)
-            const thumbs = await createPreview( filePath, mediaDir, fileId, 5 );
+            const thumbnails = await createPreview( filePath, mediaDir, fileId, 5 );
             sendProgress( { phase: 'preview', progress: 90, message: 'Thumbnails generated' } );
 
             // Prepare video record
             const videoRecord = {
-                videoId, fileId,
-                title: req.body.title || '',
-                author: req.body.author || '',
-                source: req.body.source || '',
-                description: req.body.description || '',
-                category: req.body.category || '',
-                tags: req.body.tags ? req.body.tags.split( ',' ).map( t => t.trim() ).filter( Boolean ) : [],
+                videoId, fileId, fileName,
                 created: new Date().toISOString(),
-                file: fileName,
-                thumbnails: thumbs,
-                metadata: meta,
-                waveform
+                meta, waveform, thumbnails,
+                content: {
+                    title: req.body.title || '',
+                    author: req.body.author || '',
+                    source: req.body.source || '',
+                    description: req.body.description || '',
+                    category: req.body.category || '',
+                    tags: req.body.tags ? req.body.tags.split( ',' ).map( t => t.trim() ).filter( Boolean ) : [],
+                }
             };
 
             // Save JSON
