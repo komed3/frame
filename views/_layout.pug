@@ -21,7 +21,10 @@ html( lang= lang )
         img( src= "/images/favicon.svg", alt= "Logo" )
       nav.frame-header--nav( role= "navigation", aria-label= "Menu" )
         each link in [ 'home', 'themes', 'list', 'new' ]
-          a( href= '/' + ( link == home ? '' : link ) )= t( 'header.nav.' + link )
+          a(
+            class= ( link == template ? 'current' : '' ),
+            href= '/' + ( link == home ? '' : link )
+          )= t( 'header.nav.' + link )
       form.frame-header--search(
         action= "/search", method= "get",
         autocomplete= "off", spell-check= "off",
