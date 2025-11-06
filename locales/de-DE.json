@@ -4,7 +4,14 @@
     "title": "Frame"
   },
   "header": {
-    "nav": {},
+    "dasher": {
+      "label": "Einstellungen"
+    },
+    "nav": {
+      "home": "Home",
+      "list": "Meine Liste",
+      "new": "Hochladen"
+    },
     "search": {
       "placeholder": "Durchsuchen …"
     }
