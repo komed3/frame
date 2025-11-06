@@ -5,6 +5,7 @@ const router = express.Router();
 
 // Handle routes
 router.get( '{/}', ( req, res ) => res.render( 'home', { title: req.t( 'views.home.title' ) } ) );
+router.get( '/new{/}', ( req, res ) => res.render( 'new', { title: req.t( 'views.new.title' ) } ) );
 
 // Handle unknown paths
 router.get( '/{*splat}', ( _, res ) => res.redirect( '/' ) );
