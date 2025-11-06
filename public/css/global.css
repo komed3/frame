@@ -9,6 +9,11 @@
     src: url( '../fonts/IBMPlex-Italic.woff2' ) format( 'woff2' );
 }
 
+:root {
+    --text-color: #fff;
+    --bg-color: #0f0f0f;
+}
+
 *, *::before, *::after {
     box-sizing: border-box;
     text-rendering: optimizeLegibility;
@@ -27,4 +32,6 @@
 html, body {
     margin: 0;
     font-size: 1em;
+    color: var( --text-color );
+    background: var( --bg-color );
 }
