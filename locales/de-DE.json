@@ -10,7 +10,8 @@
     "nav": {
       "home": "Home",
       "list": "Meine Liste",
-      "new": "Hochladen"
+      "new": "Hochladen",
+      "themes": "Themen"
     },
     "search": {
       "placeholder": "Durchsuchen …"

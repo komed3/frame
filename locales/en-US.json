@@ -10,7 +10,8 @@
     "nav": {
       "home": "Home",
       "list": "Watchlist",
-      "new": "Upload"
+      "new": "Upload",
+      "themes": "Categories"
     },
     "search": {
       "placeholder": "Search …"
