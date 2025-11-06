@@ -92,10 +92,10 @@ button:hover {
     filter: invert( 1 );
 }
 
-.icon.icon-menu {
-    background-image: url( ../images/icons/menu.svg );
-}
-
 .icon.icon-search {
     background-image: url( ../images/icons/search.svg );
+}
+
+.icon.icon-settings {
+    background-image: url( ../images/icons/settings.svg );
 }
