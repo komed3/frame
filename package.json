@@ -20,5 +20,10 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "i18next": "^25.6.0",
+    "pug": "^3.0.3"
   }
 }
