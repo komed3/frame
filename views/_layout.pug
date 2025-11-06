@@ -5,4 +5,24 @@ html( lang= lang )
     meta( name= "viewport", content= "width=device-width, initial-scale=1.0" )
     title Frame
 
-  body
+  //- Body
+  body#top.frame
+
+    //- Header
+    header#header.frame-header( role= "banner", aria-label= "Header" )
+      div.frame-header--inner
+        a.frame-header--logo( href= "/", aria-label= "Logo" )
+          span Frame
+        nav.frame-header--nav( role= "navigation", aria-label= "Menu" )
+          a( href= "/" ) Home
+          a( href= "/list" ) Watchlist
+          a( href= "/new" ) Upload
+        form.frame-header--search( action= "/search", method= "get", role= "search", aria-label= "Search" )
+          i.icon.icon-search
+          input( type= "text", name= "q", placeholder= "Search …" )
+        div.frame-header--dasher
+          button.frame-header--dasher-opener( title= "Settings" )
+            i.icon.icon-dasher
+
+    main#main.frame-main( role= "main", aria-label= "Content" )
+      block content
