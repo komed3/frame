@@ -3,6 +3,12 @@
     "slogan": "Frame Video Hub",
     "title": "Frame"
   },
+  "header": {
+    "nav": {},
+    "search": {
+      "placeholder": "Search …"
+    }
+  },
   "views": {
     "home": {
       "title": "Home"
