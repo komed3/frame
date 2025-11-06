@@ -21,7 +21,7 @@ html( lang= lang )
         img( src= "/images/favicon.svg", alt= "Logo" )
       nav.frame-header--nav( role= "navigation", aria-label= "Menu" )
         each link in [ 'home', 'themes', 'list', 'new' ]
-          a(
+          a.frame-header--nav-link(
             class= ( link == template ? 'current' : '' ),
             href= '/' + ( link == home ? '' : link )
           )= t( 'header.nav.' + link )

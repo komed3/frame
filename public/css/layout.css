@@ -29,8 +29,12 @@
     font-weight: 500;
 }
 
-.frame-header--nav a:hover {
+.frame-header--nav a:not( .current ):hover {
     opacity: 0.7;
+}
+
+.frame-header--nav a.current {
+    color: var( --primary ) !important;
 }
 
 .frame-header--search {
