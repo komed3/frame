@@ -12,6 +12,12 @@
 :root {
     --text-color: #fff;
     --bg-color: #0f0f0f;
+    --primary: #e02f2f;
+    --secondary: #a91919;
+
+    --light-10: rgba( 255 255 255 / 0.1 );
+
+    --radius: 4px;
 }
 
 *, *::before, *::after {
@@ -31,6 +37,7 @@
 
 html, body {
     margin: 0;
+    line-height: 1;
     font-size: 1em;
     color: var( --text-color );
     background: var( --bg-color );

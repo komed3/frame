@@ -10,25 +10,25 @@ html( lang= lang )
   //- Stylesheets
   block styles
     link( rel= "stylesheet", href= "/css/global.min.css" )
+    link( rel= "stylesheet", href= "/css/layout.min.css" )
 
   //- Body
   body#top.frame
 
     //- Header
     header#header.frame-header( role= "banner", aria-label= "Header" )
-      div.frame-header--inner
-        a.frame-header--logo( href= "/", title= t( 'generic.slogan' ), aria-label= "Logo" )
-          span= t( 'generic.title' )
-        nav.frame-header--nav( role= "navigation", aria-label= "Menu" )
-          a( href= "/" )= t( 'header.nav.home' )
-          a( href= "/list" )= t( 'header.nav.list' )
-          a( href= "/new" )= t( 'header.nav.new' )
-        form.frame-header--search( action= "/search", method= "get", role= "search", aria-label= "Search" )
-          i.icon.icon-search
-          input( type= "text", name= "q", placeholder= t( 'header.search.placeholder' ) )
-        div.frame-header--dasher
-          button.frame-header--dasher-opener( title= t( 'header.dasher.label' ) )
-            i.icon.icon-menu
+      a.frame-header--logo( href= "/", title= t( 'generic.slogan' ) )
+        img( src= "/images/favicon.svg", alt= "Logo" )
+      nav.frame-header--nav( role= "navigation", aria-label= "Menu" )
+        a( href= "/" )= t( 'header.nav.home' )
+        a( href= "/list" )= t( 'header.nav.list' )
+        a( href= "/new" )= t( 'header.nav.new' )
+      form.frame-header--search( action= "/search", method= "get", role= "search", aria-label= "Search" )
+        i.icon.icon-search
+        input( type= "text", name= "q", placeholder= t( 'header.search.placeholder' ) )
+      div.frame-header--dasher
+        button.frame-header--dasher-opener( title= t( 'header.dasher.label' ) )
+          i.icon.icon-menu
 
     //- Content
     main#main.frame-main( role= "main", aria-label= "Content" )
