@@ -35,3 +35,8 @@ html, body {
     color: var( --text-color );
     background: var( --bg-color );
 }
+
+a, a:link, a:visited, a:hover {
+    text-decoration: none;
+    color: inherit;
+}
