@@ -20,10 +20,8 @@ html( lang= lang )
       a.frame-header--logo( href= "/", title= t( 'generic.slogan' ) )
         img( src= "/images/favicon.svg", alt= "Logo" )
       nav.frame-header--nav( role= "navigation", aria-label= "Menu" )
-        a( href= "/" )= t( 'header.nav.home' )
-        a( href= "/themes" )= t( 'header.nav.themes' )
-        a( href= "/list" )= t( 'header.nav.list' )
-        a( href= "/new" )= t( 'header.nav.new' )
+        each link in [ 'home', 'themes', 'list', 'new' ]
+          a( href= '/' + ( link == home ? '' : link ) )= t( 'header.nav.' + link )
       form.frame-header--search(
         action= "/search", method= "get",
         autocomplete= "off", spell-check= "off",
