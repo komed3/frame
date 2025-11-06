@@ -16,6 +16,8 @@
     --secondary: #a91919;
 
     --light-10: rgba( 255 255 255 / 0.1 );
+    --light-20: rgba( 255 255 255 / 0.2 );
+    --light-30: rgba( 255 255 255 / 0.3 );
 
     --dark-20: rgba( 0 0 0 / 0.2 );
 
@@ -48,6 +50,33 @@ html, body {
 a, a:link, a:visited, a:hover {
     text-decoration: none;
     color: inherit;
+}
+
+input, textarea, select, button {
+    height: 42px;
+    padding: 0 16px;
+    font-size: 1em;
+    color: var( --text-color );
+    background: var( --dark-20 );
+    border: 0;
+    border-radius: var( --radius );
+    cursor: text;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: 2px solid var( --primary );
+}
+
+select, button {
+    cursor: pointer;
+}
+
+button {
+    background: var( --light-20 );
+}
+
+button:hover {
+    background: var( --light-30 );
 }
 
 /** Icons */
