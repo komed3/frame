@@ -1,9 +1,15 @@
 doctype html
 html( lang= lang )
+
+  //- Document head
   head
     meta( charset= "UTF-8" )
     meta( name= "viewport", content= "width=device-width, initial-scale=1.0" )
     title= title + ' — ' + t( 'generic.slogan' )
+
+  //- Stylesheets
+  block styles
+    link( rel= "stylesheet", href= "/css/global.min.css" )
 
   //- Body
   body#top.frame
@@ -24,5 +30,6 @@ html( lang= lang )
           button.frame-header--dasher-opener( title= t( 'header.dasher.label' ) )
             i.icon.icon-dasher
 
+    //- Content
     main#main.frame-main( role= "main", aria-label= "Content" )
       block content
