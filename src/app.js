@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import express, { static as serveStatic } from 'express';
+import { router } from './controller/index.js';
 import { cwd } from './utils/config.js';
 
 // Initialize express app
@@ -19,6 +20,9 @@ app.use( '/images', serveStatic( join( cwd, 'public/images' ) ) );
 app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
 app.use( '/media', serveStatic( join( cwd, 'media' ) ) );
+
+// Mount router
+app.use( router );
 
 // App listen on port
 app.listen( process.env.PORT || 3000, () => {
