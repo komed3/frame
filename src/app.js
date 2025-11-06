@@ -23,6 +23,15 @@ app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
 app.use( '/media', serveStatic( join( cwd, 'media' ) ) );
 
+// Pass key data
+app.get( '/', ( req, res, next ) => {
+
+    res.locals.lang = req.language;
+
+    next();
+
+} );
+
 // Mount router
 app.use( router );
 
