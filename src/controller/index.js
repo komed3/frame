@@ -4,8 +4,15 @@ import express from 'express';
 const router = express.Router();
 
 // Handle routes
-router.get( '{/}', ( req, res ) => res.render( 'home', { title: req.t( 'views.home.title' ) } ) );
-router.get( '/new{/}', ( req, res ) => res.render( 'new', { title: req.t( 'views.new.title' ) } ) );
+router.get( '{/}', ( req, res ) => res.render( 'home', {
+    title: req.t( 'views.home.title' ),
+    path: '/', template: 'home'
+} ) );
+
+router.get( '/new{/}', ( req, res ) => res.render( 'new', {
+    title: req.t( 'views.new.title' ),
+    path: '/new', template: 'new'
+} ) );
 
 // Handle unknown paths
 router.get( '/{*splat}', ( _, res ) => res.redirect( '/' ) );
