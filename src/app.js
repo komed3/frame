@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import express, { static as serveStatic } from 'express';
 import { router } from './controller/index.js';
 import { cwd } from './utils/config.js';
+import { i18nHandler } from './utils/i18n.js';
 
 // Initialize express app
 const app = express();
@@ -13,6 +14,7 @@ app.set( 'view engine', 'pug' );
 // Middlewares
 app.use( express.urlencoded( { extended: true } ) );
 app.use( express.json() );
+app.use( i18nHandler );
 
 // Serve static files
 app.use( '/fonts', serveStatic( join( cwd, 'public/fonts' ) ) );
