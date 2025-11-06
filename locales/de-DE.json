@@ -1,1 +1,11 @@
-{}
+{
+  "generic": {
+    "slogan": "Frame Video Hub",
+    "title": "Frame"
+  },
+  "views": {
+    "home": {
+      "title": "Startseite"
+    }
+  }
+}
