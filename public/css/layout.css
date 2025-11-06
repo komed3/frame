@@ -17,6 +17,7 @@
 .frame-header--logo img {
     width: auto;
     height: 48px;
+    filter: drop-shadow( 0 0 10px var( --dark-20 ) );
 }
 
 .frame-header--nav {
