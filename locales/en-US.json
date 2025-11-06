@@ -20,6 +20,9 @@
   "views": {
     "home": {
       "title": "Home"
+    },
+    "new": {
+      "title": "Upload video"
     }
   }
 }
