@@ -1,1 +1,1 @@
-export const home = ( _, res ) => res.render( 'home' );
+export const home = ( req, res ) => res.render( 'home', { title: req.t( 'views.home.title' ) } );
