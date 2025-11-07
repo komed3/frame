@@ -1,1 +1,7 @@
 extends ./_layout
+
+append styles
+  link( rel= "stylesheet", href= "/css/upload-form.min.css" )
+
+block content
+  form.frame-upload( enctype= "multipart/form-data" )
