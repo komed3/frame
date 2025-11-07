@@ -4,7 +4,7 @@ append styles
   link( rel= "stylesheet", href= "/css/upload-form.min.css" )
 
 block content
-  form.frame-upload( enctype= "multipart/form-data" )
+  form.frame-upload( enctype= "multipart/form-data", autocomplete= "off", spell-check= "on" )
     div.frame-upload--meta
       h3= t( 'views.new.form.meta' )
       div.frame-upload--form-group

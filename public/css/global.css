@@ -103,6 +103,10 @@ select, button {
     cursor: pointer;
 }
 
+select option {
+    background: var( --bg-color );
+}
+
 button {
     background: var( --light-20 );
 }
