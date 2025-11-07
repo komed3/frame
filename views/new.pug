@@ -52,3 +52,15 @@ block content
       //- Themes
       div.frame-upload--box
         h3= t( 'views.new.form.themes' )
+        div.frame-upload--form-group
+          label( for= "category" )= t( 'views.new.form.category' )
+          select#category( name= "category", required )
+            option( disabled, selected )= t( 'views.new.form.categoryPlaceholder' )
+            each c in [ 'education', 'entertainment', 'music', 'sports', 'technology', 'other' ]
+              option( value= c )= t( 'category.' + c )
+        div.frame-upload--form-group
+          label( for= "tags" )= t( 'views.new.form.tags' )
+          input#tags(
+            type= "text", name= "tags",
+            placeholder= t( 'views.new.form.tagsPlaceholder' )
+          )
