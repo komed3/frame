@@ -129,6 +129,10 @@ button:hover {
     background: var( --light-30 );
 }
 
+::-webkit-calendar-picker-indicator {
+    filter: invert( 1 );
+}
+
 /** Icons */
 
 .icon {
