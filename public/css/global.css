@@ -93,6 +93,12 @@ input:focus, textarea:focus, select:focus {
     outline: 2px solid var( --primary );
 }
 
+textarea {
+    resize: vertical;
+    height: auto;
+    padding: 16px;
+}
+
 select, button {
     cursor: pointer;
 }
