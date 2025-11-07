@@ -73,6 +73,9 @@
         "title": "Videotitel",
         "titlePlaceholder": "Aussagekräftiger Titel …"
       },
+      "processing": {
+        "label": "Wird verarbeitet …"
+      },
       "title": "Video hochladen"
     }
   }

@@ -73,6 +73,9 @@
         "title": "Video title",
         "titlePlaceholder": "Descriptive title …"
       },
+      "processing": {
+        "label": "Processing …"
+      },
       "title": "Upload video"
     }
   }

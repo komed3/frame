@@ -111,3 +111,14 @@ block content
       div.frame-upload--actions
         button.submit( type= "submit" )= t( 'views.new.form.submit' )
         button( type= "reset" )= t( 'views.new.form.reset' )
+
+    //- Upload processing
+    div.frame-upload--progress
+      div.frame-upload--progress-indicator
+        svg.frame-upload--progress-bar( viewBox= "0 0 120 120" )
+          circle.track( cx= 60, cy= 60, r= 54 )
+          circle.progress( cx= 60, cy= 60, r= 54, pathLength= 100 )
+        strong.frame-upload--progress-label
+      div.frame-upload--progress-info
+        h3= t( 'views.new.processing.label' )
+        p.frame-upload--progress-message
