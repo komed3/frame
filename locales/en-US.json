@@ -1,4 +1,12 @@
 {
+  "category": {
+    "education": "Education",
+    "entertainment": "Entertainment",
+    "music": "Music",
+    "other": "Other",
+    "sports": "Sports",
+    "technology": "Technology"
+  },
   "generic": {
     "slogan": "Frame Video Hub",
     "title": "Frame"
@@ -33,6 +41,8 @@
       "form": {
         "author": "Author / Creator",
         "authorPlaceholder": "Name of channel / video creator",
+        "category": "Category",
+        "categoryPlaceholder": "Select category …",
         "date": "Date recorded",
         "description": "Description",
         "descriptionPlaceholder": "Description of video content …",
@@ -41,6 +51,8 @@
         "meta": "Information",
         "source": "Origin / Platform",
         "sourcePlaceholder": "e.g. YouTube",
+        "tags": "Tags",
+        "tagsPlaceholder": "Comma separated list",
         "themes": "Themes",
         "title": "Video title",
         "titlePlaceholder": "Descriptive title …"
