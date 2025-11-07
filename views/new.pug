@@ -5,3 +5,34 @@ append styles
 
 block content
   form.frame-upload( enctype= "multipart/form-data" )
+    div.frame-upload--meta
+      h3= t( 'views.new.form.meta' )
+      div.form-group
+        label( for= "title" )= t( 'views.new.form.title' )
+        input#title(
+          type= "text", name= "title", required,
+          placeholder= t( 'views.new.form.titlePlaceholder' )
+        )
+      div.form-group
+        label( for= "author" )= t( 'views.new.form.author' )
+        input#author(
+          type= "text", name= "author", required,
+          placeholder= t( 'views.new.form.authorPlaceholder' )
+        )
+      div.form-row
+        div.form-group
+          label( for= "source" )= t( 'views.new.form.source' )
+          input#source(
+            type= "text", name= "source",
+            placeholder= t( 'views.new.form.sourcePlaceholder' )
+          )
+        div.form-group
+          label( for= "lang" )= t( 'views.new.form.lang' )
+          select#lang( name= "lang" )
+            option( disabled, selected )= t( 'views.new.form.langPlaceholder' )
+      div.form-group
+        label( for= "description" )= t( 'views.new.form.description' )
+        textarea#description(
+          name= "description", rows= 4,
+          placeholder= t( 'views.new.form.descriptionPlaceholder' )
+        )
