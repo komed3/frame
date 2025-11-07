@@ -33,15 +33,15 @@
       "form": {
         "author": "Autor / Kreator",
         "authorPlaceholder": "Name des Kanals / Videoerstellers",
-        "classify": "Klassifikation",
         "date": "Aufnahmedatum",
         "description": "Beschreibung",
         "descriptionPlaceholder": "Beschreibung des Videoinhalts …",
         "lang": "Videosprache",
         "langPlaceholder": "Sprache wählen …",
         "meta": "Informationen",
-        "source": "Herkunft",
+        "source": "Herkunft / Plattform",
         "sourcePlaceholder": "z.B. YouTube",
+        "themes": "Themen",
         "title": "Videotitel",
         "titlePlaceholder": "Aussagekräftiger Titel …"
       },
