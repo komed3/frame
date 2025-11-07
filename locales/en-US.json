@@ -63,6 +63,7 @@
         "meta": "Information",
         "pg": "Parental Guidance",
         "pgPlaceholder": "Select parental guidance …",
+        "reset": "Abbort",
         "source": "Origin / Platform",
         "sourcePlaceholder": "e.g. YouTube",
         "special": "Special",
