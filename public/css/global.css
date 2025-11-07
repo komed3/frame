@@ -153,3 +153,7 @@ button:hover {
 .icon.icon-settings {
     background-image: url( ../images/icons/settings.svg );
 }
+
+.icon.icon-upload {
+    background-image: url( ../images/icons/upload.svg );
+}
