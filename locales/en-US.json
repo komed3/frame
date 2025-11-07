@@ -66,6 +66,7 @@
         "source": "Origin / Platform",
         "sourcePlaceholder": "e.g. YouTube",
         "special": "Special",
+        "submit": "Submit Video",
         "tags": "Tags / Themes",
         "tagsPlaceholder": "Comma separated list",
         "title": "Video title",

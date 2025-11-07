@@ -108,6 +108,7 @@
     position: absolute;
     top: 20px;
     right: 20px;
+    box-shadow: 0 0 10px var( --dark-20 );
 }
 
 .frame-upload--file-info {
@@ -136,4 +137,28 @@
     min-width: 0;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.frame-upload--actions {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+.frame-upload--actions button {
+    height: 52px;
+    padding: 0 20px;
+    font-size: 1.1em;
+    box-shadow: 0 0 10px var( --dark-20 );
+}
+
+.frame-upload--actions .submit {
+    background: var( --primary );
+}
+
+.frame-upload--actions .submit:hover {
+    background: var( --secondary );
 }
