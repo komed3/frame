@@ -8,6 +8,8 @@ block content
     enctype= "multipart/form-data", autocomplete= "off", spell-check= "on",
     aria-label= "Video Upload"
   )
+
+    //- Left column
     div.frame-upload--column
 
       //- Video meta
@@ -71,3 +73,32 @@ block content
             type= "text", name= "tags",
             placeholder= t( 'views.new.form.tagsPlaceholder' )
           )
+
+    //- Right column
+    div.frame-upload--column
+
+      //- Video file
+      div.frame-upload--file
+        div.frame-upload--file-drop
+          input( type= "file", name= "video", accept= "video/*", required )
+          i.icon.icon-upload
+          span= t( 'views.new.form.file.drop' )
+        div.frame-upload--file-preview
+          video.preview-player
+          button.change-file= t( 'views.new.form.file.change' )
+        ul.frame-upload--file-info
+          li
+            strong= t( 'views.new.form.file.info.name' ) + ': '
+            span.file-name
+          li
+            strong= t( 'views.new.form.file.info.size' ) + ': '
+            span.file-size
+          li
+            strong= t( 'views.new.form.file.info.type' ) + ': '
+            span.file-type
+          li
+            strong= t( 'views.new.form.file.info.duration' ) + ': '
+            span.file-duration
+          li
+            strong= t( 'views.new.form.file.info.resolution' ) + ': '
+            span.file-resolution
