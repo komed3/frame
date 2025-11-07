@@ -46,6 +46,18 @@
         "date": "Date recorded",
         "description": "Description",
         "descriptionPlaceholder": "Description of video content …",
+        "file": {
+          "change": "Change Video",
+          "drop": "Drop file here or click to select",
+          "info": {
+            "duration": "Duration",
+            "name": "Name",
+            "resolution": "Resolution",
+            "size": "Size",
+            "type": "Type"
+          },
+          "supported": "Supported formats: MP4, MOV, AVI, MKV (max. 5 GB)"
+        },
         "lang": "Video language",
         "langPlaceholder": "Select language …",
         "meta": "Information",

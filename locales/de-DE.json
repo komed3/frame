@@ -46,6 +46,18 @@
         "date": "Aufnahmedatum",
         "description": "Beschreibung",
         "descriptionPlaceholder": "Beschreibung des Videoinhalts …",
+        "file": {
+          "change": "Datei austauschen",
+          "drop": "Datei hier ablegen oder klicken",
+          "info": {
+            "duration": "Dauer",
+            "name": "Dateiname",
+            "resolution": "Auflösung",
+            "size": "Dateigröße",
+            "type": "Format"
+          },
+          "supported": "Unterstützte Formate: MP4, MOV, AVI, MKV (Max. 5 GB)"
+        },
         "lang": "Videosprache",
         "langPlaceholder": "Sprache wählen …",
         "meta": "Informationen",
