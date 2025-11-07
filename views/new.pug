@@ -84,22 +84,24 @@ block content
           i.icon.icon-upload
           strong= t( 'views.new.form.file.drop' )
           span= t( 'views.new.form.file.supported' )
-        div.frame-upload--file-preview
+        div.frame-upload--file-preview.hidden
           video.preview-player
           button.change-file= t( 'views.new.form.file.change' )
+
+      div.frame-upload--box
         ul.frame-upload--file-info
           li
-            strong= t( 'views.new.form.file.info.name' )
-            span.file-name
+            span= t( 'views.new.form.file.info.name' )
+            strong.file-name —
           li
-            strong= t( 'views.new.form.file.info.size' )
-            span.file-size
+            span= t( 'views.new.form.file.info.size' )
+            strong.file-size —
           li
-            strong= t( 'views.new.form.file.info.type' )
-            span.file-type
+            span= t( 'views.new.form.file.info.type' )
+            strong.file-type —
           li
-            strong= t( 'views.new.form.file.info.duration' )
-            span.file-duration
+            span= t( 'views.new.form.file.info.duration' )
+            strong.file-duration —
           li
-            strong= t( 'views.new.form.file.info.resolution' )
-            span.file-resolution
+            span= t( 'views.new.form.file.info.resolution' )
+            strong.file-resolution —
