@@ -34,6 +34,8 @@ block content
           label( for= "lang" )= t( 'views.new.form.lang' )
           select#lang( name= "lang" )
             option( disabled, selected )= t( 'views.new.form.langPlaceholder' )
+            each l in [ 'en', 'de', 'es', 'fr', 'it', 'ru' ]
+              option( value= l )= t( 'lang.' + l )
       div.frame-upload--form-group
         label( for= "description" )= t( 'views.new.form.description' )
         textarea#description(

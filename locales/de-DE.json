@@ -17,6 +17,14 @@
       "placeholder": "Durchsuchen …"
     }
   },
+  "lang": {
+    "de": "Deutsch",
+    "en": "Englisch",
+    "es": "Spanisch",
+    "fr": "Französisch",
+    "it": "Italienisch",
+    "ru": "Russisch"
+  },
   "views": {
     "home": {
       "title": "Startseite"
