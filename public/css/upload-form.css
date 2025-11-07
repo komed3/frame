@@ -1,17 +1,18 @@
 .frame-upload {
     display: grid;
     grid-template-columns: 3fr 2fr;
-    gap: 32px;
-    margin: 16px;
+    gap: 16px;
+    margin: 32px 16px;
 }
 
-.frame-upload--meta {
+.frame-upload--box {
+    margin-bottom: 16px;
     padding: 24px;
     background: var( --light-10 );
     border-radius: var( --radius );
 }
 
-.frame-upload--meta h3 {
+.frame-upload--box h3 {
     margin: 0 0 24px;
     font-size: 1.1em;
 }

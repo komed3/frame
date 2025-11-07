@@ -33,6 +33,7 @@
       "form": {
         "author": "Autor / Kreator",
         "authorPlaceholder": "Name des Kanals / Videoerstellers",
+        "classify": "Klassifikation",
         "date": "Aufnahmedatum",
         "description": "Beschreibung",
         "descriptionPlaceholder": "Beschreibung des Videoinhalts …",

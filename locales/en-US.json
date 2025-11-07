@@ -33,6 +33,7 @@
       "form": {
         "author": "Author / Creator",
         "authorPlaceholder": "Name of channel / video creator",
+        "classify": "Classification",
         "date": "Date recorded",
         "description": "Description",
         "descriptionPlaceholder": "Description of video content …",

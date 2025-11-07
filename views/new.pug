@@ -4,41 +4,51 @@ append styles
   link( rel= "stylesheet", href= "/css/upload-form.min.css" )
 
 block content
-  form.frame-upload( enctype= "multipart/form-data", autocomplete= "off", spell-check= "on" )
-    div.frame-upload--meta
-      h3= t( 'views.new.form.meta' )
-      div.frame-upload--form-group
-        label( for= "title" )= t( 'views.new.form.title' )
-        input#title(
-          type= "text", name= "title", required,
-          placeholder= t( 'views.new.form.titlePlaceholder' )
-        )
-      div.frame-upload--form-row
+  form.frame-upload(
+    enctype= "multipart/form-data", autocomplete= "off", spell-check= "on",
+    aria-label= "Video Upload"
+  )
+    div.frame-upload--column
+
+      //- Video meta
+      div.frame-upload--box
+        h3= t( 'views.new.form.meta' )
         div.frame-upload--form-group
-          label( for= "author" )= t( 'views.new.form.author' )
-          input#author(
-            type= "text", name= "author", required,
-            placeholder= t( 'views.new.form.authorPlaceholder' )
+          label( for= "title" )= t( 'views.new.form.title' )
+          input#title(
+            type= "text", name= "title", required,
+            placeholder= t( 'views.new.form.titlePlaceholder' )
           )
+        div.frame-upload--form-row
+          div.frame-upload--form-group
+            label( for= "author" )= t( 'views.new.form.author' )
+            input#author(
+              type= "text", name= "author", required,
+              placeholder= t( 'views.new.form.authorPlaceholder' )
+            )
+          div.frame-upload--form-group
+            label( for= "source" )= t( 'views.new.form.source' )
+            input#source(
+              type= "text", name= "source",
+              placeholder= t( 'views.new.form.sourcePlaceholder' )
+            )
+        div.frame-upload--form-row
+          div.frame-upload--form-group
+            label( for= "date" )= t( 'views.new.form.date' )
+            input#date( type= "date", name= "date" )
+          div.frame-upload--form-group
+            label( for= "lang" )= t( 'views.new.form.lang' )
+            select#lang( name= "lang" )
+              option( disabled, selected )= t( 'views.new.form.langPlaceholder' )
+              each l in [ 'en', 'de', 'es', 'fr', 'it', 'ru' ]
+                option( value= l )= t( 'lang.' + l )
         div.frame-upload--form-group
-          label( for= "source" )= t( 'views.new.form.source' )
-          input#source(
-            type= "text", name= "source",
-            placeholder= t( 'views.new.form.sourcePlaceholder' )
+          label( for= "description" )= t( 'views.new.form.description' )
+          textarea#description(
+            name= "description", rows= 5,
+            placeholder= t( 'views.new.form.descriptionPlaceholder' )
           )
-      div.frame-upload--form-row
-        div.frame-upload--form-group
-          label( for= "date" )= t( 'views.new.form.date' )
-          input#date( type= "date", name= "date" )
-        div.frame-upload--form-group
-          label( for= "lang" )= t( 'views.new.form.lang' )
-          select#lang( name= "lang" )
-            option( disabled, selected )= t( 'views.new.form.langPlaceholder' )
-            each l in [ 'en', 'de', 'es', 'fr', 'it', 'ru' ]
-              option( value= l )= t( 'lang.' + l )
-      div.frame-upload--form-group
-        label( for= "description" )= t( 'views.new.form.description' )
-        textarea#description(
-          name= "description", rows= 5,
-          placeholder= t( 'views.new.form.descriptionPlaceholder' )
-        )
+
+      //- Classification
+      div.frame-upload--box
+        h3= t( 'views.new.form.classify' )
