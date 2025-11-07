@@ -49,15 +49,22 @@ block content
             placeholder= t( 'views.new.form.descriptionPlaceholder' )
           )
 
-      //- Themes
+      //- Special
       div.frame-upload--box
-        h3= t( 'views.new.form.themes' )
-        div.frame-upload--form-group
-          label( for= "category" )= t( 'views.new.form.category' )
-          select#category( name= "category", required )
-            option( disabled, selected )= t( 'views.new.form.categoryPlaceholder' )
-            each c in [ 'education', 'entertainment', 'music', 'sports', 'technology', 'other' ]
-              option( value= c )= t( 'category.' + c )
+        h3= t( 'views.new.form.special' )
+        div.frame-upload--form-row
+          div.frame-upload--form-group
+            label( for= "category" )= t( 'views.new.form.category' )
+            select#category( name= "category", required )
+              option( disabled, selected )= t( 'views.new.form.categoryPlaceholder' )
+              each c in [ 'education', 'entertainment', 'music', 'sports', 'technology', 'other' ]
+                option( value= c )= t( 'category.' + c )
+          div.frame-upload--form-group
+            label( for= "pg" )= t( 'views.new.form.pg' )
+            select#pg( name= "pg", required )
+              option( disabled, selected )= t( 'views.new.form.pgPlaceholder' )
+              each p in [ 'G', 'PG', 'PG-13', 'R', 'NC-17' ]
+                option( value= p )= p
         div.frame-upload--form-group
           label( for= "tags" )= t( 'views.new.form.tags' )
           input#tags(
