@@ -22,6 +22,20 @@
       "title": "Home"
     },
     "new": {
+      "form": {
+        "author": "Author / Creator",
+        "authorPlaceholder": "Name of channel / video creator",
+        "date": "Date recorded",
+        "description": "Description",
+        "descriptionPlaceholder": "Description of video content …",
+        "lang": "Video language",
+        "langPlaceholder": "Select language …",
+        "meta": "Information",
+        "source": "Origin",
+        "sourcePlaceholder": "e.g. YouTube",
+        "title": "Video title",
+        "titlePlaceholder": "Descriptive title …"
+      },
       "title": "Upload video"
     }
   }

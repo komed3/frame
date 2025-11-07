@@ -22,6 +22,20 @@
       "title": "Startseite"
     },
     "new": {
+      "form": {
+        "author": "Autor / Kreator",
+        "authorPlaceholder": "Name des Kanals / Videoerstellers",
+        "date": "Aufnahmedatum",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "Beschreibung des Videoinhalts …",
+        "lang": "Videosprache",
+        "langPlaceholder": "Sprache wählen …",
+        "meta": "Informationen",
+        "source": "Herkunft",
+        "sourcePlaceholder": "z.B. YouTube",
+        "title": "Videotitel",
+        "titlePlaceholder": "Aussagekräftiger Titel …"
+      },
       "title": "Video hochladen"
     }
   }
