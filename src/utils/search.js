@@ -47,7 +47,11 @@ class SearchIndex {
         if ( ! this.index ) await this.init();
 
         // Store basic video info + searchable text index
-        this.index.videos[ videoId ] = { id: videoId, index: this.textIndex( videoData ), ...videoData };
+        this.index.videos[ videoId ] = {
+            id: videoId, index: this.textIndex( videoData ),
+            year: new Date( videoData.data ).getFullYear(),
+            ...videoData
+        };
 
         // Store hash reference
         if ( videoData.hash ) this.index.hashes[ videoData.hash ] = videoId
