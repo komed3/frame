@@ -1,6 +1,7 @@
 import { execFile, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createReadStream, readdir } from 'node:fs';
+import { join } from 'node:path';
 import { promisify } from 'node:util';
 import ffmpeg from 'fluent-ffmpeg';
 
