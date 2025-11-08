@@ -25,7 +25,7 @@
     },
     "nav": {
       "home": "Home",
-      "list": "Meine Liste",
+      "list": "Wiedergabelisten",
       "new": "Hochladen",
       "themes": "Themen"
     },
@@ -84,7 +84,11 @@
       "processing": {
         "label": "Wird verarbeitet …",
         "msg": {
-          "upload": "Video hochgeladen"
+          "meta": "Metadaten verarbeitet",
+          "preview": "Vorschaubilder erzeugt",
+          "thumbnail": "Hochauflösendes Poster erstellt",
+          "upload": "Video hochgeladen",
+          "waveform": "Audio-Vorschau generiert"
         }
       },
       "title": "Video hochladen"

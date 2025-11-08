@@ -25,9 +25,9 @@
     },
     "nav": {
       "home": "Home",
-      "list": "Watchlist",
+      "list": "Watchlists",
       "new": "Upload",
-      "themes": "Categories"
+      "themes": "Themes"
     },
     "search": {
       "placeholder": "Search …"
@@ -84,7 +84,11 @@
       "processing": {
         "label": "Processing …",
         "msg": {
-          "upload": "Video saved"
+          "meta": "Meta data extracted",
+          "preview": "Preview images generated",
+          "thumbnail": "Video thumbnail generated",
+          "upload": "Video uploaded",
+          "waveform": "Waveform generated"
         }
       },
       "title": "Upload video"
