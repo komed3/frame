@@ -7,6 +7,12 @@
     "sports": "Sport",
     "technology": "Technik"
   },
+  "error": {
+    "upload": {
+      "noFile": "Datei nicht hochgeladen",
+      "upload": "Fehler beim hochladen: {{msg}}"
+    }
+  },
   "generic": {
     "slogan": "Frame Video Hub",
     "title": "Frame"
