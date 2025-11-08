@@ -13,7 +13,21 @@ block content
         video.video-player
           source
 
-    //- Video description / meta
-    div.frame-watch--meta
-      h2.frame-watch--meta-title= video.title
-      a( href= '/search?author=' + encodeURIComponent( video.author ) ).frame-watch--meta-author= video.author
+    //- Video description
+    div.frame-watch--content
+
+      //- Left column
+      div.frame-watch--column
+
+        //- Video description
+        div.frame-box.frame-watch--meta
+          h2.frame-watch--meta-title= video.title
+          div.frame-watch--meta-info
+            a( href= '/search?author=' + encodeURIComponent( video.author ) ).author= video.author
+            a( href= '/themes/' + video.category ).category= t( 'category.' + video.category )
+            a( href= '/search?pg=' + encodeURIComponent( video.pg ) ).pg= video.pg
+            a( href= '/search?year=' + video.year ).year= video.year
+          p.frame-watch--meta-description= video.description
+          div.frame-watch--meta-tags
+            each tag in video.tags
+              a( href= '/search?tag=' + encodeURIComponent( tag ) )= tag

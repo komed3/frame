@@ -1,1 +1,1 @@
-.frame-watch--meta{margin:16px auto;max-width:var(--content);padding:24px;background:var(--light-10);border-radius:var(--radius)}
+.frame-watch--content{display:grid;grid-template-columns:1fr 360px;gap:16px;margin:16px auto;max-width:var(--content)}
