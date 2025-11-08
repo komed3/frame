@@ -10,6 +10,7 @@ class VideoUploader {
         this.fileInfo = this.form.querySelector( '.frame-upload--file-info' );
         this.progress = this.form.querySelector( '.frame-upload--progress' );
 
+        this.isUploading = false;
         this.initEventListener();
 
     }
@@ -23,6 +24,11 @@ class VideoUploader {
         // Form actions
         this.form.addEventListener( 'submit', this.submit.bind( this ) );
         this.form.addEventListener( 'reset', this.reset.bind( this ) );
+
+        // Prevent page exit
+        window.addEventListener( 'beforeunload', e => {
+            if ( this.isUploading ) { e.preventDefault(); return; }
+        } );
 
     }
 
