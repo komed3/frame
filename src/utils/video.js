@@ -20,7 +20,7 @@ export const uploadVideo = multer( {
     }
 } ).single( 'video' );
 
-export async function videoId () {
+export async function generateId () {
 
     let id;
 
@@ -194,7 +194,7 @@ export async function createPreview ( file, outDir, meta, n = 100 ) {
         '-i', file,
         '-vf', `fps=1/${intervalSeconds},scale=256:-1`,
         '-qscale:v', '2',
-        join( outDir, `thumb/%04d.jpg` )
+        join( outDir, `%04d.jpg` )
     ] );
 
     // Collect generated thumbnail file names synchronously
