@@ -26,8 +26,8 @@
     "nav": {
       "home": "Home",
       "list": "Watchlists",
-      "new": "Upload",
-      "themes": "Themes"
+      "themes": "Themes",
+      "upload": "Upload"
     },
     "search": {
       "placeholder": "Search …"
@@ -45,7 +45,7 @@
     "home": {
       "title": "Home"
     },
-    "new": {
+    "upload": {
       "form": {
         "author": "Author / Creator",
         "authorPlaceholder": "Name of channel / video creator",

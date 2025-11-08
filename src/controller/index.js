@@ -15,9 +15,9 @@ router.get( '{/}', ( req, res ) => res.render( 'home', {
     path: '/', template: 'home'
 } ) );
 
-router.get( '/new{/}', ( req, res ) => res.render( 'new', {
-    title: req.t( 'views.new.title' ),
-    path: '/new', template: 'new'
+router.get( '/upload{/}', ( req, res ) => res.render( 'upload', {
+    title: req.t( 'views.upload.title' ),
+    path: '/upload', template: 'new'
 } ) );
 
 // Handle unknown paths

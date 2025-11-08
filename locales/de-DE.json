@@ -26,8 +26,8 @@
     "nav": {
       "home": "Home",
       "list": "Wiedergabelisten",
-      "new": "Hochladen",
-      "themes": "Themen"
+      "themes": "Themen",
+      "upload": "Hochladen"
     },
     "search": {
       "placeholder": "Durchsuchen …"
@@ -45,7 +45,7 @@
     "home": {
       "title": "Startseite"
     },
-    "new": {
+    "upload": {
       "form": {
         "author": "Autor / Kreator",
         "authorPlaceholder": "Name des Kanals / Videoerstellers",

@@ -58,23 +58,23 @@ export async function upload ( req, res ) {
             const finalName = `${fileId}${fileExt}`;
             const finalPath = join( videoDir, finalName );
             await rename( tmpFile, finalPath );
-            sendProgress( { phase: 'saved', progress: 50, msg: req.t( 'views.new.processing.msg.upload' ) } );
+            sendProgress( { phase: 'saved', progress: 50, msg: req.t( 'views.upload.processing.msg.upload' ) } );
 
             // Extract metadata and analyze video
             const meta = await fileMeta( finalPath );
-            sendProgress( { phase: 'meta', progress: 60, msg: req.t( 'views.new.processing.msg.meta' ) } );
+            sendProgress( { phase: 'meta', progress: 60, msg: req.t( 'views.upload.processing.msg.meta' ) } );
 
             // Generate waveform
             const waveform = await getWaveform( finalPath, meta );
-            sendProgress( { phase: 'waveform', progress: 75, msg: req.t( 'views.new.processing.msg.waveform' ) } );
+            sendProgress( { phase: 'waveform', progress: 75, msg: req.t( 'views.upload.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
             const poster = await createThumbnail( finalPath, videoDir, meta );
-            sendProgress( { phase: 'thumbnail', progress: 80, msg: req.t( 'views.new.processing.msg.thumbnail' ) } );
+            sendProgress( { phase: 'thumbnail', progress: 80, msg: req.t( 'views.upload.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
             const preview = await createPreview( finalPath, thumbDir, meta );
-            sendProgress( { phase: 'preview', progress: 95, msg: req.t( 'views.new.processing.msg.preview' ) } );
+            sendProgress( { phase: 'preview', progress: 95, msg: req.t( 'views.upload.processing.msg.preview' ) } );
 
             // Prepare video record with search-relevant data
             const searchData = {
@@ -107,7 +107,7 @@ export async function upload ( req, res ) {
 
             // Save JSON
             await writeFile( join( videoDir, 'video.json' ), JSON.stringify( videoRecord, null, 2 ) );
-            sendProgress( { phase: 'done', progress: 100, msg: req.t( 'views.new.processing.msg.done' ), videoId } );
+            sendProgress( { phase: 'done', progress: 100, msg: req.t( 'views.upload.processing.msg.done' ), videoId } );
 
             // End stream
             res.end();
