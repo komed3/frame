@@ -4,6 +4,22 @@ import { createReadStream, readdir } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import ffmpeg from 'fluent-ffmpeg';
+import ShortUniqueId from 'short-unique-id';
+import { searchIndex } from './search.js';
+
+// Init ID generator
+const uid = new ShortUniqueId( { dictionary: 'alphanum', length: 10 } );
+
+export async function videoId () {
+
+    let id;
+
+    do { id = uid.rnd() }
+    while ( searchIndex.getVideo( id ) );
+
+    return id;
+
+}
 
 export async function fileHash ( file ) {
 
