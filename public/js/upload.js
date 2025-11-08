@@ -20,6 +20,9 @@ class VideoUploader {
         this.fileInput.addEventListener( 'change', this.handleFileSelect.bind( this ) );
         this.preview.querySelector( '.change-file' ).addEventListener( 'click', this.clearFileSelect.bind( this ) );
 
+        // Form actions
+        this.form.querySelector( '[type="reset"]' ).addEventListener( 'click', this.reset.bind( this ) );
+
     }
 
     handleFileSelect ( e ) {
@@ -61,6 +64,13 @@ class VideoUploader {
 
         // Reset file meta
         this.fileInfo.querySelectorAll( 'strong' ).forEach( el => el.textContent = '—' );
+
+    }
+
+    reset () {
+
+        this.clearFileSelect();
+        this.form.reset();
 
     }
 
