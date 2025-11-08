@@ -87,8 +87,9 @@
           "done": "Video erfolgreich verarbeitet",
           "meta": "Metadaten verarbeitet",
           "preview": "Vorschaubilder erzeugt",
+          "save": "Video gespeichert",
           "thumbnail": "Hochauflösendes Poster erstellt",
-          "upload": "Video hochgeladen",
+          "upload": "Video wird hochgeladen",
           "waveform": "Audio-Vorschau generiert"
         }
       },

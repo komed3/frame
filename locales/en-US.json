@@ -87,8 +87,9 @@
           "done": "Video processing complete",
           "meta": "Meta data extracted",
           "preview": "Preview images generated",
+          "save": "Video file saved",
           "thumbnail": "Video thumbnail generated",
-          "upload": "Video uploaded",
+          "upload": "Video uploading",
           "waveform": "Waveform generated"
         }
       },

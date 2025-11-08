@@ -124,4 +124,9 @@ block content
         strong.frame-upload--progress-label
       div.frame-upload--progress-info
         h3= t( 'views.new.processing.label' )
-        p.frame-upload--progress-message
+        p.frame-upload--progress-message= t( 'views.new.processing.upload' )
+
+    //- Upload error
+    div.frame-upload--error
+      i.icon.icon-alert
+      strong.frame-upload--error-message

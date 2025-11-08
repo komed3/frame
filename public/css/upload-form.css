@@ -164,25 +164,28 @@
     background: var( --secondary );
 }
 
-/** Processing */
+/** Processing / error messages */
 
-.frame-upload.processing .frame-upload--column {
+.frame-upload.processing .frame-upload--column,
+.frame-upload.error .frame-upload--column {
     pointer-events: none;
     filter: blur( 2px );
     opacity: 0.3;
 }
 
-.frame-upload.processing .frame-upload--progress {
+.frame-upload.processing .frame-upload--progress,
+.frame-upload.error .frame-upload--error {
     display: grid;
 }
 
-.frame-upload--progress {
+.frame-upload--progress,
+.frame-upload--error {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate( -50%, -50% );
     display: none;
-    grid-template-columns: 120px 320px;
+    grid-template-columns: max-content 320px;
     align-items: center;
     gap: 24px;
     padding: 24px;
@@ -192,6 +195,7 @@
 
 .frame-upload--progress-indicator {
     position: relative;
+    width: 120px;
 }
 
 .frame-upload--progress-bar {
@@ -230,4 +234,16 @@
 .frame-upload--progress-info p {
     margin: 0;
     opacity: 0.7;
+}
+
+.frame-upload--error .icon {
+    width: 56px;
+    height: 56px;
+    opacity: 0.6;
+}
+
+.frame-upload--error-message {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var( --primary );
 }
