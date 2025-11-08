@@ -1,3 +1,6 @@
-const cwd = process.cwd();
+import { join } from 'node:path';
 
-export { cwd };
+const cwd = process.cwd();
+const media = join( cwd, 'media' );
+
+export { cwd, media };
