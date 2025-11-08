@@ -69,7 +69,7 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'waveform', progress: 75, msg: req.t( 'views.upload.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
-            const poster = await createThumbnail( finalPath, videoDir, meta );
+            await createThumbnail( finalPath, videoDir, meta );
             sendProgress( { phase: 'thumbnail', progress: 80, msg: req.t( 'views.upload.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
@@ -95,12 +95,12 @@ export async function upload ( req, res ) {
                 mimeType: req.file.mimetype,
                 created: now.toISOString(),
                 content: searchData,
-                meta, waveform, poster, preview
+                meta, waveform, preview
             };
 
             // Add to search index
             await searchIndex.addVideo( videoId, {
-                ...searchData, hash, poster,
+                ...searchData, hash,
                 duration: meta.duration,
                 created: now.toISOString()
             } );
