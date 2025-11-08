@@ -1,8 +1,15 @@
-export function watch ( req, res ) {
+import { searchIndex } from '../utils/search.js';
 
-    res.render( 'watch', {
-        title: req.t( 'views.watch.title' ),
-        path: '/watch/', template: 'watch'
+export async function watch ( req, res ) {
+
+    const videoId = req.params.id || '';
+    const video = await searchIndex.getVideo( videoId );
+
+    if ( ! video ) res.redirect( '/' );
+    else res.render( 'watch', {
+        title: video.title || videoId,
+        path: '/watch/' + videoId, template: 'watch',
+        videoId, video
     } );
 
 }
