@@ -84,6 +84,7 @@
       "processing": {
         "label": "Wird verarbeitet …",
         "msg": {
+          "done": "Video erfolgreich verarbeitet",
           "meta": "Metadaten verarbeitet",
           "preview": "Vorschaubilder erzeugt",
           "thumbnail": "Hochauflösendes Poster erstellt",

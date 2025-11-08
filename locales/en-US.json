@@ -84,6 +84,7 @@
       "processing": {
         "label": "Processing …",
         "msg": {
+          "done": "Video processing complete",
           "meta": "Meta data extracted",
           "preview": "Preview images generated",
           "thumbnail": "Video thumbnail generated",
