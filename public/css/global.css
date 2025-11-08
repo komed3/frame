@@ -147,6 +147,10 @@ button:hover {
     filter: invert( 1 );
 }
 
+.icon.icon-alert {
+    background-image: url( ../images/icons/alert.svg );
+}
+
 .icon.icon-search {
     background-image: url( ../images/icons/search.svg );
 }
