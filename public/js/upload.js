@@ -9,8 +9,11 @@ class VideoUploader {
         this.video = this.preview.querySelector( 'video' );
         this.fileInfo = this.form.querySelector( '.frame-upload--file-info' );
         this.progress = this.form.querySelector( '.frame-upload--progress' );
+        this.errorMsg = this.form.querySelector( '.frame-upload--error-message' );
 
         this.isUploading = false;
+        this.errorTimeout = null;
+
         this.initEventListener();
 
     }
@@ -74,11 +77,32 @@ class VideoUploader {
 
     }
 
+    showError ( msg ) {
+
+        this.form.classList.remove( 'processing' );
+        this.form.classList.add( 'error' );
+        this.errorMsg.textContent = msg;
+
+        clearTimeout( this.errorTimeout );
+        this.errorTimeout = setTimeout( () => {
+            this.form.classList.remove( 'processing', 'error' );
+            this.isUploading = false;
+        }, 2500 );
+
+    }
+
     submit ( e ) {
 
         e.preventDefault();
 
-        // Submit form
+        // Set uploading state
+        if ( this.isUploading ) return;
+
+        this.isUploading = true;
+        this.form.classList.add( 'processing' );
+
+        // Prepare form data
+        const formData = new FormData( this.form );
 
     }
 
