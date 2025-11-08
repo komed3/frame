@@ -1,4 +1,7 @@
 import express from 'express';
+import { home } from './home.js';
+import { upload } from './upload.js';
+import { watch } from './watch.js';
 
 // Init express router
 const router = express.Router();
@@ -10,15 +13,9 @@ router.get( '/', ( req, res, next ) => {
 } );
 
 // Handle routes
-router.get( '{/}', ( req, res ) => res.render( 'home', {
-    title: req.t( 'views.home.title' ),
-    path: '/', template: 'home'
-} ) );
-
-router.get( '/upload{/}', ( req, res ) => res.render( 'upload', {
-    title: req.t( 'views.upload.title' ),
-    path: '/upload', template: 'new'
-} ) );
+router.get( '{/}', home );
+router.get( '/watch/:id{/}', watch );
+router.get( '/upload{/}', upload );
 
 // Handle unknown paths
 router.get( '/{*splat}', ( _, res ) => res.redirect( '/' ) );
