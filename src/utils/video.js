@@ -147,6 +147,24 @@ export async function getWaveform ( file, meta, targetPoints = 200 ) {
 
 }
 
+export async function createThumbnail ( file, outDir, meta ) {
+
+    // Create a single thumbnail image at specified time (in seconds)
+
+    const duration = meta.duration || 0;
+
+    await promisify( execFile )( 'ffmpeg', [
+        '-hide_banner',
+        '-loglevel', 'error',
+        '-ss', String( duration * 0.25 ),
+        '-i', file,
+        '-vframes', '1',
+        '-qscale:v', '2',
+        join( outDir, `poster.jpg` )
+    ] );
+
+}
+
 export async function createPreview ( file, outDir, meta, n = 100 ) {
 
     // Create approx. n thumbnails to provide video previews
@@ -162,7 +180,7 @@ export async function createPreview ( file, outDir, meta, n = 100 ) {
         '-i', file,
         '-vf', `fps=1/${intervalSeconds},scale=256:-1`,
         '-qscale:v', '2',
-        join( outDir, `thumb_%04d.jpg` )
+        join( outDir, `thumb/%04d.jpg` )
     ] );
 
     // Collect generated thumbnail file names synchronously
