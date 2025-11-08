@@ -146,10 +146,65 @@ class VideoUploader {
             this.setStatus( Math.round( ( e.loaded / e.total ) * 50 ) );
         } };
 
+        // Streaming response parsing (server -> client)
+        // Handle incoming data
+        xhr.onprogress = () => {
+
+            const text = xhr.responseText || '';
+            const chunk = text.substring( lastIndex );
+            const lines = chunk.split( '\n' );
+            lastIndex = text.length;
+
+            for ( const line of lines ) {
+
+                if ( ! line.trim() ) continue;
+                try { this.handleServerLine( JSON.parse( line ) ) }
+                catch { /* ignore partial JSON */ }
+
+            }
+
+        };
+
+        // Request completed
+        xhr.onload = () => {
+
+            this.isUploading = false;
+
+            if ( xhr.status >= 200 && xhr.status < 300 ) {
+
+                // In case server didn't send final done line, try parse remaining text
+                const text = xhr.responseText || '';
+                const lines = text.split( '\n' );
+
+                for ( const line of lines ) {
+
+                    if ( ! line.trim() ) continue;
+                    try { this.handleServerLine( JSON.parse( line ) ) }
+                    catch { /* ignore partial JSON */ }
+
+                }
+
+            }
+
+            // Handle error response
+            else { this.showError( 'Error: ' + xhr.status ) }
+
+        };
+
+        // Network error
+        xhr.onerror = () => {
+            this.isUploading = false;
+            this.showError( 'Network Error' );
+        };
+
+        // Send the request
+        xhr.send( formData );
+
     }
 
     reset () { this.clearFileSelect() }
 
 }
 
+// Initialize uploader when DOM is loaded
 document.addEventListener( 'DOMContentLoaded', () => new VideoUploader() );
