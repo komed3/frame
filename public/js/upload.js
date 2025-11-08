@@ -93,6 +93,15 @@ class VideoUploader {
 
     }
 
+    setStatus ( pct, msg = null ) {
+
+        this.progressIndicator.setProperty( '--progress', pct || 0 );
+        this.progressLabel.textContent = Math.round( pct || 0 ) + '%';
+
+        if ( msg ) this.progressMessage.textContent = msg;
+
+    }
+
     handleServerLine ( obj ) {
 
         // obj is parsed JSON from server (NDJSON)
@@ -101,16 +110,10 @@ class VideoUploader {
         const msg = obj.msg || '';
         const pct = typeof obj.progress === 'number'
             ? Math.min( 100, Math.max( 0, obj.progress ) )
-            : null;
+            : 0;
 
         // Set processing progress
-        if ( pct !== null ) {
-            this.progressIndicator.setProperty( '--progress', pct );
-            this.progressLabel.textContent = Math.round( pct ) + '%';
-        }
-
-        // Set processing message
-        if ( msg ) this.progressMessage.textContent = msg;
+        this.setStatus( pct, msg );
 
         // If processing is done, redirect to video page after short delay
         if ( obj.phase === 'done' && obj.videoId ) setTimeout(
@@ -119,7 +122,7 @@ class VideoUploader {
 
     }
 
-    submit ( e ) {
+    async submit ( e ) {
 
         e.preventDefault();
 
@@ -131,6 +134,17 @@ class VideoUploader {
 
         // Prepare form data
         const formData = new FormData( this.form );
+        let lastIndex = 0;
+
+        // Create XMLHttpRequest
+        const xhr = new XMLHttpRequest();
+        xhr.open( 'POST', '/api/upload', true );
+
+        // Upload progress (client -> server)
+        // Handle upload progress
+        xhr.upload.onprogress = ( e ) => { if ( e.lengthComputable ) {
+            this.setStatus( Math.round( ( e.loaded / e.total ) * 50 ) );
+        } };
 
     }
 
