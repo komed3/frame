@@ -77,12 +77,48 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'waveform', progress: 75, msg: req.r( 'views.new.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
-            const thumbnail = await createThumbnail( finalPath, videoDir, meta );
+            const poster = await createThumbnail( finalPath, videoDir, meta );
             sendProgress( { phase: 'thumbnail', progress: 80, msg: req.r( 'views.new.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
             const preview = await createPreview( finalPath, thumbDir, meta );
             sendProgress( { phase: 'preview', progress: 95, msg: req.r( 'views.new.processing.msg.preview' ) } );
+
+            // Prepare video record with search-relevant data
+            const searchData = {
+                title: req.body.title || '',
+                author: req.body.author || '',
+                source: req.body.source || '',
+                date: req.body.date || '',
+                lang: req.body.lang || '',
+                description: req.body.description || '',
+                category: req.body.category || '',
+                pg: req.body.pg || '',
+                tags: req.body.tags ? req.body.tags.split( ',' ).map( t => t.trim() ).filter( Boolean ) : [],
+            };
+
+            const videoRecord = {
+                videoId, fileId, hash,
+                fileName: finalName,
+                mimeType: req.file.mimetype,
+                created: now.toISOString(),
+                content: searchData,
+                meta, waveform, poster, preview
+            };
+
+            // Add to search index
+            await searchIndex.addVideo( videoId, {
+                ...searchData, hash, poster,
+                duration: meta.duration,
+                created: now.toISOString()
+            } );
+
+            // Save JSON
+            await writeFile( join( videoDir, 'video.json' ), JSON.stringify( videoRecord, null, 2 ) );
+            sendProgress( { phase: 'done', progress: 100, message: req.t( 'views.new.processing.msg.done' ), videoId } );
+
+            // End stream
+            res.end();
 
         }
 
