@@ -8,7 +8,9 @@ class VideoUploader {
         this.preview = this.form.querySelector( '.frame-upload--file-preview' );
         this.video = this.preview.querySelector( 'video' );
         this.fileInfo = this.form.querySelector( '.frame-upload--file-info' );
-        this.progress = this.form.querySelector( '.frame-upload--progress' );
+        this.progressIndicator = this.form.querySelector( '.frame-upload--progress-indicator' );
+        this.progressLabel = this.form.querySelector( '.frame-upload--progress-label' );
+        this.progressMessage = this.form.querySelector( '.frame-upload--progress-message' );
         this.errorMsg = this.form.querySelector( '.frame-upload--error-message' );
 
         this.isUploading = false;
@@ -88,6 +90,32 @@ class VideoUploader {
             this.form.classList.remove( 'processing', 'error' );
             this.isUploading = false;
         }, 2500 );
+
+    }
+
+    handleServerLine ( obj ) {
+
+        // obj is parsed JSON from server (NDJSON)
+        if ( ! obj || typeof obj !== 'object' ) return;
+
+        const msg = obj.msg || '';
+        const pct = typeof obj.progress === 'number'
+            ? Math.min( 100, Math.max( 0, obj.progress ) )
+            : null;
+
+        // Set processing progress
+        if ( pct !== null ) {
+            this.progressIndicator.setProperty( '--progress', pct );
+            this.progressLabel.textContent = Math.round( pct ) + '%';
+        }
+
+        // Set processing message
+        if ( msg ) this.progressMessage.textContent = msg;
+
+        // If processing is done, redirect to video page after short delay
+        if ( obj.phase === 'done' && obj.videoId ) setTimeout(
+            () => location.href = `/watch/${obj.videoId}`, 800
+        );
 
     }
 
