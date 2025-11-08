@@ -1,7 +1,14 @@
 extends ./_layout
 
+append styles
+  link( rel= "stylesheet", href= "/css/watch.min.css" )
+  link( rel= "stylesheet", href= "/css/player.min.css" )
+
 block content
   div.frame-watch
 
     //- Video player
-    div.video-player
+    div.video-wrapper
+      div.video-container
+        video.video-player
+          source
