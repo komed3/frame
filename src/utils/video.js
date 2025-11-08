@@ -12,6 +12,15 @@ import { searchIndex } from './search.js';
 // Init ID generator
 const uid = new ShortUniqueId( { dictionary: 'alphanum', length: 10 } );
 
+export const uploadVideo = multer( {
+    storage: multer.diskStorage( { destination: tmp } ),
+    limits: { fileSize: 5 * 1024 * 1024 * 1024 },
+    fileFilter: ( _, file, cb ) => {
+        if ( file.mimetype && file.mimetype.startsWith( 'video/' ) ) cb( null, true );
+        else cb( new Error( 'Invalid file type' ) );
+    }
+} ).single( 'video' );
+
 export async function videoId () {
 
     let id;
@@ -22,15 +31,6 @@ export async function videoId () {
     return id;
 
 }
-
-export const uploadVideo = multer( {
-    storage: multer.diskStorage( { destination: tmp } ),
-    limits: { fileSize: 5 * 1024 * 1024 * 1024 },
-    fileFilter: ( _, file, cb ) => {
-        if ( file.mimetype && file.mimetype.startsWith( 'video/' ) ) cb( null, true );
-        else cb( new Error( 'Invalid file type' ) );
-    }
-} ).single( 'video' );
 
 export async function fileHash ( file ) {
 
