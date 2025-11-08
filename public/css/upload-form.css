@@ -10,18 +10,6 @@
     display: none;
 }
 
-.frame-upload--box {
-    margin-bottom: 16px;
-    padding: 24px;
-    background: var( --light-10 );
-    border-radius: var( --radius );
-}
-
-.frame-upload--box h3 {
-    margin: 0 0 24px;
-    font-size: 1.2em;
-}
-
 .frame-upload--form-row {
     display: grid;
     grid-template-columns: repeat( 2, 1fr );

@@ -67,3 +67,20 @@
     border-radius: var( --radius );
     cursor: pointer;
 }
+
+.frame-box {
+    margin-bottom: 16px;
+    padding: 24px;
+    background: var( --light-10 );
+    border-radius: var( --radius );
+}
+
+.frame-box h2 {
+    margin: 0 0 24px;
+    font-size: 1.4em;
+}
+
+.frame-box h3 {
+    margin: 0 0 24px;
+    font-size: 1.2em;
+}
