@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import express, { static as serveStatic } from 'express';
+import { api } from './api/index.js';
 import { router } from './controller/index.js';
 import { cwd } from './utils/config.js';
 import { i18nHandler } from './utils/i18n.js';
@@ -23,16 +24,14 @@ app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
 app.use( '/media', serveStatic( join( cwd, 'media' ) ) );
 
-// Pass key data
+// Language
 app.get( '/', ( req, res, next ) => {
-
     res.locals.lang = req.language;
-
     next();
-
 } );
 
-// Mount router
+// Mount API and router
+app.use( api );
 app.use( router );
 
 // App listen on port
