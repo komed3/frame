@@ -38,11 +38,7 @@ class SearchIndex {
 
     textIndex ( obj ) {
 
-        const collect = ( v ) => typeof v === 'string' ? [ v ]
-            : v && typeof v === 'object' ? Object.values( v ).flatMap( collect )
-            : [];
-
-        return collect( obj ).join( ' ' ).trim().toLowerCase();
+        return [ obj.title || '', obj.description || '' ].join( ' ' ).trim().toLowerCase();
 
     }
 
