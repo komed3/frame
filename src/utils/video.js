@@ -1,5 +1,7 @@
+import { execFile, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { createReadStream } from 'node:fs';
+import { createReadStream, readdir } from 'node:fs';
+import { promisify } from 'node:util';
 import ffmpeg from 'fluent-ffmpeg';
 
 export async function fileHash ( file ) {
@@ -78,6 +80,7 @@ export async function getWaveform ( file, meta, targetPoints = 200 ) {
 
     return new Promise ( ( resolve, reject ) => {
 
+        // Spawn ffmpeg to output raw PCM data
         const ff = spawn( 'ffmpeg', [
             '-hide_banner',
             '-loglevel', 'error',
@@ -140,5 +143,31 @@ export async function getWaveform ( file, meta, targetPoints = 200 ) {
         } );
 
     } );
+
+}
+
+export async function createPreview ( file, outDir, meta, n = 100 ) {
+
+    // Create approx. n thumbnails to provide video previews
+    // Will be used on hovering player seekbar
+
+    const duration = meta.duration || 0;
+    const intervalSeconds = Math.round( duration / n );
+
+    // Generate preview thumbnails using ffmpeg
+    await promisify( execFile )( 'ffmpeg', [
+        '-hide_banner',
+        '-loglevel', 'error',
+        '-i', file,
+        '-vf', `fps=1/${intervalSeconds},scale=256:-1`,
+        '-qscale:v', '2',
+        join( outDir, `thumb_%04d.jpg` )
+    ] );
+
+    // Collect generated thumbnail file names synchronously
+    const files = await promisify( readdir )( outDir );
+    const thumbnails = files.filter( f => f.startsWith( `thumb_` ) ).sort();
+
+    return thumbnails;
 
 }
