@@ -21,6 +21,7 @@ class VideoUploader {
         this.preview.querySelector( '.change-file' ).addEventListener( 'click', this.clearFileSelect.bind( this ) );
 
         // Form actions
+        this.form.querySelector( '[type="submit"]' ).addEventListener( 'click', this.submit.bind( this ) );
         this.form.querySelector( '[type="reset"]' ).addEventListener( 'click', this.reset.bind( this ) );
 
     }
@@ -67,7 +68,15 @@ class VideoUploader {
 
     }
 
-    reset () {
+    submit ( e ) {
+
+        e.preventDefault();
+
+    }
+
+    reset ( e ) {
+
+        e.preventDefault();
 
         this.clearFileSelect();
         this.form.reset();
