@@ -1,7 +1,7 @@
 extends ./_layout
 
 append scripts
-  script( src= "/js/upload.min.js", type= "text/javascript", defer ) 
+  script( src= "/js/upload.min.js", type= "text/javascript", defer )
 
 append styles
   link( rel= "stylesheet", href= "/css/upload-form.min.css" )
@@ -96,19 +96,19 @@ block content
         ul.frame-upload--file-info
           li
             span= t( 'views.new.form.file.info.name' )
-            strong.file-name —
+            strong.name —
           li
             span= t( 'views.new.form.file.info.size' )
-            strong.file-size —
+            strong.size —
           li
             span= t( 'views.new.form.file.info.type' )
-            strong.file-type —
+            strong.type —
           li
             span= t( 'views.new.form.file.info.duration' )
-            strong.file-duration —
+            strong.duration —
           li
             span= t( 'views.new.form.file.info.resolution' )
-            strong.file-resolution —
+            strong.resolution —
 
       //- Form actions
       div.frame-upload--actions
