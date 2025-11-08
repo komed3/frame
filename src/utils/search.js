@@ -108,6 +108,13 @@ class SearchIndex {
 
     }
 
+    async getVideo ( videoId ) {
+
+        if ( ! this.index ) await this.init();
+        return this.index.videos[ videoId ];
+
+    }
+
     async findByHash ( hash ) {
 
         if ( ! this.index ) await this.init();
