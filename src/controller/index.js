@@ -3,6 +3,12 @@ import express from 'express';
 // Init express router
 const router = express.Router();
 
+// Global vars
+router.get( '/', ( req, res, next ) => {
+    res.locals.lang = req.language;
+    next();
+} );
+
 // Handle routes
 router.get( '{/}', ( req, res ) => res.render( 'home', {
     title: req.t( 'views.home.title' ),

@@ -95,7 +95,7 @@ class VideoUploader {
 
     setStatus ( pct, msg = null ) {
 
-        this.progressIndicator.setProperty( '--progress', pct || 0 );
+        this.progressIndicator.style.setProperty( '--progress', pct || 0 );
         this.progressLabel.textContent = Math.round( pct || 0 ) + '%';
 
         if ( msg ) this.progressMessage.textContent = msg;
@@ -113,7 +113,8 @@ class VideoUploader {
             : 0;
 
         // Set processing progress
-        this.setStatus( pct, msg );
+        if ( obj.success === false ) this.showError( msg );
+        else this.setStatus( pct, msg );
 
         // If processing is done, redirect to video page after short delay
         if ( obj.phase === 'done' && obj.videoId ) setTimeout(

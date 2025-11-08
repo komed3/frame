@@ -1,5 +1,5 @@
-import { mkdir, rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { media, tmp } from '../utils/config.js';
 import { searchIndex } from '../utils/search.js';
@@ -20,7 +20,7 @@ export async function upload ( req, res ) {
 
         // Send progress
         const sendProgress = ( obj ) => {
-            try { res.write( JSON.stringify( obj ) + '\n' ) }
+            try { res.write( JSON.stringify( { ...{ success: true }, ...obj } ) + '\n' ) }
             catch ( e ) { /* ignore */ }
         };
 
@@ -29,29 +29,24 @@ export async function upload ( req, res ) {
             const now = new Date();
             const fileExt = extname( req.file.originalname );
 
-            // Create temp directory for hash check
-            const tempFile = join( tmp, `temp_${ now.getTime() }${fileExt}` );
+            // Create tmp directory for hash check
+            const tmpFile = join( tmp, `tmp_${ now.getTime() }${fileExt}` );
 
-            await mkdir( tempDir, { recursive: true } );
-            await writeFile( tempFile, req.file.buffer );
+            await mkdir( tmp, { recursive: true } );
+            await writeFile( tmpFile, req.file.buffer );
 
             // Calculate hash and check for duplicates
-            const hash = await fileHash( tempFile );
+            const hash = await fileHash( tmpFile );
             const existingId = await searchIndex.findByHash( hash );
 
             if ( existingId ) {
-
-                await rm( tempFile );
-                return res.json( {
-                    success: false, duplicate: true,
-                    msg: req.t( 'error.upload.duplicate' ),
-                    videoId: existingId
-                } );
-
+                await rm( tmpFile );
+                sendProgress( { success: false, duplicate: true, msg: req.t( 'error.upload.duplicate' ) } );
+                return res.end();
             }
 
             // Generate ids and prepare directories
-            const videoId = generateId();
+            const videoId = await generateId();
             const fileId = uuidv4();
 
             // Create video directory (contains all files for this video)
@@ -59,30 +54,27 @@ export async function upload ( req, res ) {
             const thumbDir = join( videoDir, 'thumb' );
             await mkdir( thumbDir, { recursive: true } );
 
-            // Move temp file to final location
+            // Move tmp file to final location
             const finalName = `${fileId}${fileExt}`;
             const finalPath = join( videoDir, finalName );
-
-            await writeFile( finalPath, req.file.buffer );
-            await rm( tempFile );
-
-            sendProgress( { phase: 'saved', progress: 50, msg: req.r( 'views.new.processing.msg.upload' ) } );
+            await rename( tmpFile, finalPath );
+            sendProgress( { phase: 'saved', progress: 50, msg: req.t( 'views.new.processing.msg.upload' ) } );
 
             // Extract metadata and analyze video
             const meta = await fileMeta( finalPath );
-            sendProgress( { phase: 'meta', progress: 60, msg: req.r( 'views.new.processing.msg.meta' ) } );
+            sendProgress( { phase: 'meta', progress: 60, msg: req.t( 'views.new.processing.msg.meta' ) } );
 
             // Generate waveform
             const waveform = await getWaveform( finalPath, meta );
-            sendProgress( { phase: 'waveform', progress: 75, msg: req.r( 'views.new.processing.msg.waveform' ) } );
+            sendProgress( { phase: 'waveform', progress: 75, msg: req.t( 'views.new.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
             const poster = await createThumbnail( finalPath, videoDir, meta );
-            sendProgress( { phase: 'thumbnail', progress: 80, msg: req.r( 'views.new.processing.msg.thumbnail' ) } );
+            sendProgress( { phase: 'thumbnail', progress: 80, msg: req.t( 'views.new.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
             const preview = await createPreview( finalPath, thumbDir, meta );
-            sendProgress( { phase: 'preview', progress: 95, msg: req.r( 'views.new.processing.msg.preview' ) } );
+            sendProgress( { phase: 'preview', progress: 95, msg: req.t( 'views.new.processing.msg.preview' ) } );
 
             // Prepare video record with search-relevant data
             const searchData = {
@@ -115,14 +107,17 @@ export async function upload ( req, res ) {
 
             // Save JSON
             await writeFile( join( videoDir, 'video.json' ), JSON.stringify( videoRecord, null, 2 ) );
-            sendProgress( { phase: 'done', progress: 100, message: req.t( 'views.new.processing.msg.done' ), videoId } );
+            sendProgress( { phase: 'done', progress: 100, msg: req.t( 'views.new.processing.msg.done' ), videoId } );
 
             // End stream
             res.end();
 
         }
 
-        catch { res.status( 500 ).json( { success: false, msg: req.t( 'error.upload.processing' ) } ) }
+        catch ( error ) {
+            sendProgress( { success: false, msg: req.t( 'error.upload.processing' ) } );
+            res.end();
+        }
 
     } );
 

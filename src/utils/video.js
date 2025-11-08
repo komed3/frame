@@ -25,7 +25,7 @@ export async function generateId () {
     let id;
 
     do { id = uid.rnd() }
-    while ( searchIndex.getVideo( id ) );
+    while ( await searchIndex.getVideo( id ) );
 
     return id;
 
@@ -199,7 +199,7 @@ export async function createPreview ( file, outDir, meta, n = 100 ) {
 
     // Collect generated thumbnail file names synchronously
     const files = await promisify( readdir )( outDir );
-    const thumbnails = files.filter( f => f.startsWith( `thumb_` ) ).sort();
+    const thumbnails = files.filter( f => f.endsWith( `.jpg` ) ).sort();
 
     return thumbnails;
 

@@ -24,12 +24,6 @@ app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
 app.use( '/media', serveStatic( join( cwd, 'media' ) ) );
 
-// Language
-app.get( '/', ( req, res, next ) => {
-    res.locals.lang = req.language;
-    next();
-} );
-
 // Mount API and router
 app.use( api );
 app.use( router );
