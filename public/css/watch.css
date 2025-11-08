@@ -5,3 +5,48 @@
     margin: 16px auto;
     max-width: var( --content );
 }
+
+.frame-watch--meta-title {
+    margin-bottom: 12px !important;
+}
+
+.frame-watch--meta-info {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.05em;
+    font-weight: 500;
+}
+
+.frame-watch--meta-info a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.frame-watch--meta-description {
+    margin: 24px 0;
+    line-height: 1.4;
+    font-size: 1.1em;
+    font-weight: 300;
+    opacity: 0.8;
+}
+
+.frame-watch--meta-tags {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.frame-watch--meta-tags a {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.86em;
+    background: var( --light-10 );
+    border-radius: var( --radius );
+}
+
+.frame-watch--meta-tags a:hover {
+    background: var( --light-20 );
+}
