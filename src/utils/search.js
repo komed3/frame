@@ -80,6 +80,34 @@ class SearchIndex {
 
     }
 
+    async removeVideo ( videoId ) {
+
+        if ( ! this.index ) await this.init();
+
+        const videoData = this.index.videos[ videoId ];
+        if ( ! videoData ) return;
+
+        delete this.index.videos[ videoId ];
+
+        // Remove hash reference
+        if ( videoData.hash ) delete this.index.hashes[ videoData.hash ];
+
+        // Remove category reference
+        if ( videoData.category ) this.index.categories[ videoData.category ] =
+            this.index.categories[ videoData.category ].filter( id => id !== videoId );
+
+        // Remove tag references
+        if ( videoData.tags && videoData.tags.length ) {
+
+            for ( const tag of videoData.tags ) this.index.tags[ tag ] =
+                this.index.tags[ tag ].filter( id => id !== videoId );
+
+        }
+
+        await this.save();
+
+    }
+
     async findByHash ( hash ) {
 
         if ( ! this.index ) await this.init();
@@ -98,6 +126,18 @@ class SearchIndex {
 
         if ( ! this.index ) await this.init();
         return this.index.tags[ tag ] || [];
+
+    }
+
+    async findByField ( field, value ) {
+
+        if ( ! this.index ) await this.init();
+
+        value = value.toLowerCase();
+
+        return Object.values( this.index.videos ).filter(
+            video => video[ field ].toLowerCase() === value
+        );
 
     }
 
