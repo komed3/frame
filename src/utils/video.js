@@ -66,3 +66,79 @@ export async function fileMeta ( file ) {
     } );
 
 }
+
+export async function getWaveform ( file, meta, targetPoints = 200 ) {
+
+    // Create a very low-sample-rate mono PCM stream so we end up with roughly targetPoints samples
+    // This will used to show an audio waveform preview on the video seekbar
+
+    // Target total samples approximate targetPoints
+    const duration = meta.duration || 0;
+    const sampleRate = Math.max( 1, Math.round( targetPoints / duration ) );
+
+    return new Promise ( ( resolve, reject ) => {
+
+        const ff = spawn( 'ffmpeg', [
+            '-hide_banner',
+            '-loglevel', 'error',
+            '-i', file,
+            '-vn',
+            '-ac', '1',
+            '-ar', String( sampleRate ),
+            '-f', 's16le',
+            'pipe:1'
+        ] );
+
+        const chunks = [];
+        ff.stdout.on( 'data', c => chunks.push( c ) );
+        ff.on( 'error', reject );
+
+        ff.on( 'close', code => {
+
+            if ( code !== 0 && code !== null ) return reject(
+                new Error( 'ffmpeg failed to generate waveform' )
+            );
+
+            const buffer = Buffer.concat( chunks );
+            const sampleCount = Math.floor( buffer.length / 2 ); // 16-bit samples
+            const samples = new Array( sampleCount );
+            
+            // First pass to collect raw values
+            for ( let i = 0; i < sampleCount; i++ ) {
+                samples[ i ] = Math.abs( buffer.readInt16LE( i * 2 ) );
+            }
+
+            // Reduce to targetPoints by averaging groups
+            const points = [];
+            const groupSize = Math.max( 1, Math.floor( sampleCount / targetPoints ) );
+
+            for ( let i = 0; i < sampleCount; i += groupSize ) {
+
+                let sum = 0, count = 0;
+
+                for ( let j = i; j < Math.min( i + groupSize, sampleCount ); j++ ) {
+
+                    sum += samples[ j ];
+                    count++;
+
+                }
+
+                points.push( count ? sum / count : 0 );
+
+            }
+
+            // Normalize to 0-100 range
+            const max = Math.max( 1, Math.max( ...points ) );
+            const normalized = points.map( p => Math.round( ( p / max ) * 100 ) );
+
+            // Ensure exactly targetPoints length
+            while ( normalized.length > targetPoints ) normalized.pop();
+            while ( normalized.length < targetPoints ) normalized.push( 0 );
+
+            resolve( normalized );
+
+        } );
+
+    } );
+
+}
