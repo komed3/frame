@@ -113,30 +113,18 @@ export async function getWaveform ( file, meta, targetPoints = 200 ) {
             }
 
             // Reduce to targetPoints by averaging groups
-            const points = [];
             const groupSize = Math.max( 1, Math.floor( sampleCount / targetPoints ) );
+            const points = Array.from( { length: Math.ceil( sampleCount / groupSize ) }, ( _, i ) => {
+                const group = samples.slice( i * groupSize, ( i + 1 ) * groupSize );
+                return group.length ? group.reduce( ( a, b ) => a + b ) / group.length : 0;
+            } );
 
-            for ( let i = 0; i < sampleCount; i += groupSize ) {
-
-                let sum = 0, count = 0;
-
-                for ( let j = i; j < Math.min( i + groupSize, sampleCount ); j++ ) {
-
-                    sum += samples[ j ];
-                    count++;
-
-                }
-
-                points.push( count ? sum / count : 0 );
-
-            }
-
+            
             // Normalize to 0-100 range
-            const max = Math.max( 1, Math.max( ...points ) );
-            const normalized = points.map( p => Math.round( ( p / max ) * 100 ) );
+            const max = Math.max( 1, ...points );
+            const normalized = points.map( p => Math.round( ( p / max ) * 100 ) ).slice( 0, targetPoints );
 
             // Ensure exactly targetPoints length
-            while ( normalized.length > targetPoints ) normalized.pop();
             while ( normalized.length < targetPoints ) normalized.push( 0 );
 
             resolve( normalized );
