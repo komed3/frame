@@ -1,0 +1,7 @@
+.frame-watch--meta {
+    margin: 16px auto;
+    max-width: var( --content );
+    padding: 24px;
+    background: var( --light-10 );
+    border-radius: var( --radius );
+}
