@@ -9,7 +9,9 @@
   },
   "error": {
     "upload": {
+      "duplicate": "Video already exists",
       "noFile": "No file uploaded",
+      "processing": "Processing error",
       "upload": "Error while uploading: {{msg}}"
     }
   },
@@ -80,7 +82,10 @@
         "titlePlaceholder": "Descriptive title …"
       },
       "processing": {
-        "label": "Processing …"
+        "label": "Processing …",
+        "msg": {
+          "upload": "Video saved"
+        }
       },
       "title": "Upload video"
     }

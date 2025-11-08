@@ -9,7 +9,9 @@
   },
   "error": {
     "upload": {
+      "duplicate": "Video existiert bereits",
       "noFile": "Datei nicht hochgeladen",
+      "processing": "Fehler bei Verarbeitung",
       "upload": "Fehler beim hochladen: {{msg}}"
     }
   },
@@ -80,7 +82,10 @@
         "titlePlaceholder": "Aussagekräftiger Titel …"
       },
       "processing": {
-        "label": "Wird verarbeitet …"
+        "label": "Wird verarbeitet …",
+        "msg": {
+          "upload": "Video hochgeladen"
+        }
       },
       "title": "Video hochladen"
     }
