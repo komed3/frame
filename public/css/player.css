@@ -20,12 +20,27 @@
     height: 100%;
 }
 
-.player-controls {
+.player-controls,
+.player-spinner {
+    pointer-events: none;
+    visibility: hidden;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    opacity: 0;
+    transition: all 0.2s ease-out;
+}
+
+.player.controls .player-controls,
+.player.load .player-spinner {
+    pointer-events: unset;
+    visibility: visible;
+    opacity: 1;
+}
+
+.player-controls {
     display: flex;
     flex-flow: column nowrap;
     background: linear-gradient( to top, var( --dark-60 ), transparent );
@@ -227,26 +242,24 @@
 }
 
 .player-spinner {
-    pointer-events: none;
-    position: absolute;
-    top: calc( 50% - 60px );
-    left: calc( 50% - 60px );
-    display: none;
-    width: 120px;
-    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var( --dark-20 );
     z-index: 3;
 }
 
-.player.load .player-spinner {
-    display: block;
+.player-spinner svg {
+    width: 120px;
+    height: 120px;
 }
 
-.player-spinner g {
+.player-spinner svg g {
     transform-origin: center;
     animation: rotate 2s linear infinite;
 }
 
-.player-spinner circle {
+.player-spinner svg g circle {
     stroke-linecap: round;
     animation: spinner 1.5s ease-in-out infinite;
     fill: none;
