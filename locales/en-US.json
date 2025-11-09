@@ -48,7 +48,7 @@
   "player": {
     "action": {
       "download": "Save video",
-      "ff": "Fast forward",
+      "fastForward": "Fast forward",
       "info": "Video information",
       "maximize": "Full screen",
       "minimize": "Exit full screen",

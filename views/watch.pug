@@ -1,7 +1,7 @@
 extends ./_layout
 
 append scripts
-  script( src= "/js/player.js", type= "text/javascript", defer )
+  script( src= "/js/player.min.js", type= "text/javascript", defer )
 
 append styles
   link( rel= "stylesheet", href= "/css/watch.min.css" )
@@ -35,7 +35,7 @@ block content
           //- Control actions
           div.controls
             div.left
-              each btn in [ 'play', 'pause', 'replay', 'rewind', 'ff' ]
+              each btn in [ 'play', 'pause', 'replay', 'rewind', 'fastForward' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )
                   i( class= 'icon icon-' + btn )
             div.right

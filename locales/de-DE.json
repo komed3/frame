@@ -48,7 +48,7 @@
   "player": {
     "action": {
       "download": "Video speichern",
-      "ff": "Vorspulen",
+      "fastForward": "Vorspulen",
       "info": "Videoinformation",
       "maximize": "Vollbild",
       "minimize": "Vollbild beenden",
