@@ -52,11 +52,14 @@
       "info": "Videoinformation",
       "maximize": "Vollbild",
       "minimize": "Vollbild beenden",
+      "mute": "Stummschalten",
       "pause": "Pausieren",
       "play": "Abspielen",
       "replay": "Nochmal abspielen",
       "rewind": "Zurückspulen",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "unmute": "Stummschaltung aufheben",
+      "volume": "Lautstärke"
     }
   },
   "views": {

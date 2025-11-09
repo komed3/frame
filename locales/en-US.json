@@ -52,11 +52,14 @@
       "info": "Video information",
       "maximize": "Full screen",
       "minimize": "Exit full screen",
+      "mute": "Mute player",
       "pause": "Pause",
       "play": "Play",
       "replay": "Replay",
       "rewind": "Rewind",
-      "settings": "Settings"
+      "settings": "Settings",
+      "unmute": "Unmute player",
+      "volume": "Volume"
     }
   },
   "views": {

@@ -38,6 +38,13 @@ block content
               each btn in [ 'play', 'pause', 'replay', 'rewind', 'fastForward' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )
                   i( class= 'icon icon-' + btn )
+              div.volume
+                button( action= "mute", title= t( 'player.action.mute' ) )
+                  i.icon.icon-volume
+                button( action= "unmute", title= t( 'player.action.unmute' ) )
+                  i.icon.icon-mute
+                div.slider( title= t( 'player.action.volume' ) )
+                  input( type= "range", action= "volume", min= 0, max= 1, step= 0.05 )
               div.timecode
                 span.cur 00:00
                 span.div /

@@ -153,6 +153,10 @@
     transform: scale( 1.1 );
 }
 
+.player-controls .controls button:focus {
+    outline: 0 none;
+}
+
 .player-controls .controls .timecode {
     display: flex;
     flex-flow: row nowrap;
