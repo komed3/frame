@@ -94,6 +94,13 @@
         }
       },
       "title": "Upload video"
+    },
+    "watch": {
+      "stats": {
+        "thumbsDown": "Dislike",
+        "thumbsUp": "Like",
+        "views": "{{views}} views"
+      }
     }
   }
 }
