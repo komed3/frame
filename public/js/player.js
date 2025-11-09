@@ -84,7 +84,7 @@ class VideoPlayer {
 
         const canvas = this.controls.querySelector( '.waveform' );
         const ctx = canvas.getContext( '2d', { alpha: true } );
-        const data = this.videoData.waveform;
+        const data = this.videoData.waveform || [];
         const baseColor = 'rgba( 255 255 255 / 0.2 )';
         const progColor = 'rgba( 224 47 47 / 0.6 )';
 
