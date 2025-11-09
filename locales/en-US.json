@@ -45,6 +45,20 @@
     "it": "Italien",
     "ru": "Russian"
   },
+  "player": {
+    "action": {
+      "download": "Save video",
+      "ff": "Fast forward",
+      "info": "Video information",
+      "maximize": "Full screen",
+      "minimize": "Exit full screen",
+      "pause": "Pause",
+      "play": "Play",
+      "replay": "Replay",
+      "rewind": "Rewind",
+      "settings": "Settings"
+    }
+  },
   "views": {
     "home": {
       "title": "Home"

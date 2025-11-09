@@ -45,6 +45,20 @@
     "it": "Italienisch",
     "ru": "Russisch"
   },
+  "player": {
+    "action": {
+      "download": "Video speichern",
+      "ff": "Vorspulen",
+      "info": "Videoinformation",
+      "maximize": "Vollbild",
+      "minimize": "Vollbild beenden",
+      "pause": "Pausieren",
+      "play": "Abspielen",
+      "replay": "Nochmal abspielen",
+      "rewind": "Zurückspulen",
+      "settings": "Einstellungen"
+    }
+  },
   "views": {
     "home": {
       "title": "Startseite"

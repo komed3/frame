@@ -14,10 +14,16 @@ block content
     div.player( videoId= videoId )
       div.player-container
         video.video-player
+
+        //- Player controls
         div.player-controls
           div.action
           div.progress
+
+            //- Waveform
             canvas.waveform
+
+            //- Seekbar (progress)
             div.seekbar
               div.buffered
               div.handle
@@ -25,7 +31,17 @@ block content
                   div.preview
                   div.timecode 00:00
               div.played
+
+          //- Control actions
           div.controls
+            div.left
+              each btn in [ 'play', 'pause', 'replay', 'rewind', 'ff' ]
+                button( action= btn, title= t( 'player.action.' + btn ) )
+                  i( class= 'icon icon-' + btn )
+            div.right
+              each btn in [ 'download', 'settings', 'info', 'maximize', 'minimize' ]
+                button( action= btn, title= t( 'player.action.' + btn ) )
+                  i( class= 'icon icon-' + btn )
 
     //- Video description
     div.frame-watch--content
