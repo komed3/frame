@@ -225,3 +225,35 @@
     padding: 0 12px;
     font-size: 0.92em;
 }
+
+.player-spinner {
+    position: absolute;
+    top: calc( 50% - 60px );
+    left: calc( 50% - 60px );
+    width: 120px;
+    height: 120px;
+    z-index: 3;
+}
+
+.player-spinner g {
+    transform-origin: center;
+    animation: rotate 2s linear infinite;
+}
+
+.player-spinner circle {
+    stroke-linecap: round;
+    animation: spinner 1.5s ease-in-out infinite;
+    fill: none;
+    stroke-width: 4px;
+    stroke: var( --light-30 );
+}
+
+@keyframes rotate {
+    100% { transform: rotate( 360deg ) }
+}
+
+@keyframes spinner {
+    0% { stroke-dasharray: 0 300; stroke-dashoffset: 0; }
+    47.5% { stroke-dasharray: 84 300; stroke-dashoffset: -32; }
+    95%, 100% { stroke-dasharray: 84 300; stroke-dashoffset: -118; }
+}
