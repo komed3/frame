@@ -28,7 +28,6 @@
     bottom: 0;
     display: flex;
     flex-flow: column nowrap;
-    gap: 6px;
     z-index: 1;
 }
 
@@ -117,6 +116,34 @@
 }
 
 .player-controls .controls {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
     height: 64px;
     padding: 12px;
+}
+
+.player-controls .controls .left,
+.player-controls .controls .right {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.player-controls .controls button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    transition: all 0.2s ease-out;
+}
+
+.player-controls .controls button:hover {
+    background: var( --light-20 );
+    transform: scale( 1.1 );
 }
