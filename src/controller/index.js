@@ -6,12 +6,6 @@ import { watch } from './watch.js';
 // Init express router
 const router = express.Router();
 
-// Global vars
-router.get( '/', ( req, res, next ) => {
-    res.locals.lang = req.language;
-    next();
-} );
-
 // Handle routes
 router.get( '{/}', home );
 router.get( '/watch/:id{/}', watch );

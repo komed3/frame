@@ -1,5 +1,5 @@
 doctype html
-html( lang= lang )
+html( lang= language, template = template )
 
   //- Document head
   head
@@ -11,7 +11,10 @@ html( lang= lang )
 
   //- Scripts
   block scripts
-    script( src= "/js/global.min.js", type= "text/javascript" ) 
+    script( src= "/js/global.min.js", type= "text/javascript" )
+    script.
+      const lang = '#{ language }';
+      const template = '#{ template }';
 
   //- Stylesheets
   block styles
