@@ -1,7 +1,7 @@
 extends ./_layout
 
 append scripts
-  script( src= "/js/player.min.js", type= "text/javascript", defer )
+  script( src= "/js/player.js", type= "text/javascript", defer )
 
 append styles
   link( rel= "stylesheet", href= "/css/watch.min.css" )
@@ -11,9 +11,19 @@ block content
   div.frame-watch
 
     //- Video player
-    div.video-wrapper( videoId= videoId )
-      div.video-container
+    div.player( videoId= videoId )
+      div.player-container
         video.video-player
+        div.player-controls
+          div.player-progress
+            canvas.waveform
+            div.seekbar
+              div.seekbar-buffered
+              div.seekbar-handle
+                div.hover-card
+                  div.preview
+                  div.time 00:00
+              div.seekbar-played
 
     //- Video description
     div.frame-watch--content
