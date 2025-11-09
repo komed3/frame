@@ -36,19 +36,14 @@ class SearchIndex {
 
     }
 
-    textIndex ( obj ) {
-
-        return [ obj.title || '', obj.description || '' ].join( ' ' ).trim().toLowerCase();
-
-    }
-
     async addVideo ( videoId, videoData ) {
 
         if ( ! this.index ) await this.init();
 
         // Store basic video info + searchable text index
         this.index.videos[ videoId ] = {
-            id: videoId, index: this.textIndex( videoData ),
+            id: videoId, stats: { views: 0, rating: null },
+            index: [ obj.title || '', obj.description || '' ].join( ' ' ).trim().toLowerCase(),
             year: new Date( videoData.data ).getFullYear(),
             ...videoData
         };
@@ -112,6 +107,14 @@ class SearchIndex {
 
         if ( ! this.index ) await this.init();
         return this.index.videos[ videoId ];
+
+    }
+
+    async addView ( videoId ) {
+
+        if ( ! this.index ) await this.init();
+        if ( this.index.videos[ videoId ] ) this.index.videos[ videoId ].stats.views += 1;
+        await this.save();
 
     }
 

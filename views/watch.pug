@@ -34,3 +34,14 @@ block content
           div.frame-watch--meta-tags
             each tag in video.tags
               a( href= '/search?tag=' + encodeURIComponent( tag ) )= tag
+
+      //- Right column (aside)
+      aside.frame-watch--column
+
+        //- Video stats
+        div.frame-box.frame-watch--stats
+          i.icon.icon-radio
+          strong= t( 'views.watch.stats.views', { views: formatViews( video.stats.views ) } )
+          button( action= "thumbsUp", title= t( 'views.watch.stats.thumbsUp' ) ): i.icon.icon-thumbsUp
+          button( action= "thumbsDown", title= t( 'views.watch.stats.thumbsDown' ) ): i.icon.icon-thumbsDown
+          strong= video.stats.rating.toFixed( 1 )
