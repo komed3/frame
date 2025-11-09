@@ -99,7 +99,7 @@
       "stats": {
         "thumbsDown": "Dislike",
         "thumbsUp": "Like",
-        "views": "{{views}} views"
+        "views": "<views>{{views}}</views> views"
       }
     }
   }
