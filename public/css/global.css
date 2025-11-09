@@ -152,8 +152,44 @@ button:hover {
     background-image: url( ../images/icons/alert.svg );
 }
 
+.icon.icon-download {
+    background-image: url( ../images/icons/download.svg );
+}
+
+.icon.icon-fastForward {
+    background-image: url( ../images/icons/fastForward.svg );
+}
+
+.icon.icon-info {
+    background-image: url( ../images/icons/info.svg );
+}
+
+.icon.icon-maximize {
+    background-image: url( ../images/icons/maximize.svg );
+}
+
+.icon.icon-minimize {
+    background-image: url( ../images/icons/minimize.svg );
+}
+
+.icon.icon-pause {
+    background-image: url( ../images/icons/pause.svg );
+}
+
+.icon.icon-play {
+    background-image: url( ../images/icons/play.svg );
+}
+
 .icon.icon-radio {
     background-image: url( ../images/icons/radio.svg );
+}
+
+.icon.icon-replay {
+    background-image: url( ../images/icons/replay.svg );
+}
+
+.icon.icon-rewind {
+    background-image: url( ../images/icons/rewind.svg );
 }
 
 .icon.icon-search {
