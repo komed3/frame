@@ -75,6 +75,7 @@ class VideoPlayer {
         this.video.load();
 
         this.ready = true;
+        this.hideLoad();
 
     }
 
@@ -144,6 +145,10 @@ class VideoPlayer {
         redraw();
 
     }
+
+    showLoad () { this.player.classList.add( 'load' ) }
+
+    hideLoad () { this.player.classList.remove( 'load' ) }
 
 }
 

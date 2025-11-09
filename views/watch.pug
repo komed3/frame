@@ -11,7 +11,7 @@ block content
   div.frame-watch
 
     //- Video player
-    div.player( videoId= videoId )
+    div.player.load( videoId= videoId )
       div.player-container
         video.video-player
 
@@ -54,8 +54,8 @@ block content
                 button( action= btn, title= t( 'player.action.' + btn ) )
                   i( class= 'icon icon-' + btn )
 
-        //- Spinner
-        div.player-spinner
+        //- Loader
+        div.player-loader
           svg( xmlns= "http://www.w3.org/2000/svg", viewBox= "0 0 48 48" )
             g: circle( cx= 24, cy= 24, r= 19 )
 
