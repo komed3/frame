@@ -143,6 +143,10 @@
     transition: all 0.2s ease-out;
 }
 
+.player-controls .controls button:disabled {
+    display: none;
+}
+
 .player-controls .controls button:hover {
     background: var( --light-20 );
     transform: scale( 1.1 );
