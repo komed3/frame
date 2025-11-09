@@ -29,7 +29,7 @@ block content
               div.handle
                 div.hover
                   div.preview
-                  div.timecode 00:00
+                  div.time 00:00
               div.played
 
           //- Control actions
@@ -38,6 +38,10 @@ block content
               each btn in [ 'play', 'pause', 'replay', 'rewind', 'fastForward' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )
                   i( class= 'icon icon-' + btn )
+              div.timecode
+                span.cur 00:00
+                span.div /
+                span.dur 00:00
             div.right
               each btn in [ 'download', 'settings', 'info', 'maximize', 'minimize' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )
