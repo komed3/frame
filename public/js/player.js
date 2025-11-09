@@ -65,6 +65,8 @@ class VideoPlayer {
         this.video.poster = this.videoDir + 'poster.jpg';
         this.video.load();
 
+        this.ready = true;
+
     }
 
 }
