@@ -134,6 +134,7 @@
 }
 
 .player-controls .controls button {
+    flex: 0 0 40px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -155,6 +156,65 @@
 
 .player-controls .controls button:focus {
     outline: 0 none;
+}
+
+.player-controls .volume {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+}
+
+.player-controls .volume .slider {
+    width: 0%;
+    opacity: 0;
+    transition: all 0.2s ease-out;
+}
+
+.player-controls .volume:hover .slider {
+    width: 100%;
+    opacity: 1;
+}
+
+.player-controls .volume .slider input {
+    -webkit-appearance: none;
+    appearance: none;
+    accent-color: var( --text-color );
+    margin: 0;
+    width: 100%;
+    height: 6px;
+    transform: translateY( -3px );
+    background: linear-gradient(
+        to right,
+        var( --text-color ) 0%,
+        var( --text-color ) var( --width, 100% ),
+        var( --light-20 ) var( --width, 100% ),
+        var( --light-20 ) 100%
+    );
+    border-radius: 3px;
+    outline: 0 none;
+    cursor: pointer;
+}
+
+.player-controls .volume .slider input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var( --text-color );
+    border-radius: 50%;
+    box-shadow: 0 0 6px var( --dark-40 );
+    cursor: pointer;
+}
+
+.player-controls .volume .slider input::-moz-range-thumb {
+    -moz-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var( --text-color );
+    border-radius: 50%;
+    box-shadow: 0 0 6px var( --dark-40 );
+    cursor: pointer;
 }
 
 .player-controls .controls .timecode {
