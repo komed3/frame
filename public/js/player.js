@@ -2,8 +2,9 @@ class VideoPlayer {
 
     constructor () {
 
-        this.player = document.querySelector( '.video-wrapper' );
+        this.player = document.querySelector( '.player' );
         this.video = this.player.querySelector( 'video' );
+        this.controls = this.player.querySelector( '.player-controls' );
 
         this.videoId = this.player.getAttribute( 'videoId' );
         this.videoDir = '/media/' + this.videoId + '/';
@@ -12,7 +13,10 @@ class VideoPlayer {
         this.loaded = false;
         this.ready = false;
 
-        this.loadMeta().then( this.initVideo.bind( this ) );
+        this.loadMeta().then( () => {
+            this.initVideo();
+            this.loadWaveform();
+        } );
 
     }
 
@@ -71,6 +75,73 @@ class VideoPlayer {
         this.video.load();
 
         this.ready = true;
+
+    }
+
+    async loadWaveform () {
+
+        if ( ! this.loaded ) await this.loadMeta();
+
+        const canvas = this.controls.querySelector( '.waveform' );
+        const ctx = canvas.getContext( '2d', { alpha: true } );
+        const data = this.videoData.waveform;
+        const baseColor = 'rgba( 255 255 255 / 0.2 )';
+        const progColor = 'rgba( 224 47 47 / 0.6 )';
+
+        let bars = [], layout;
+
+        const drawRect = ( v, i ) => {
+
+            const { h, barWidth } = layout;
+            const x = i * barWidth;
+            const y = h - v / 100 * h;
+
+            ctx.fillRect( x, y, barWidth * 0.8, v / 100 * h );
+
+        }
+
+        const redraw = () => {
+
+            const dpr = window.devicePixelRatio || 1;
+            const w = canvas.clientWidth * dpr;
+            const h = canvas.clientHeight * dpr;
+
+            if ( canvas.width !== w || canvas.height !== h ) canvas.width = w, canvas.height = h;
+
+            const maxBars = Math.min( data.length, Math.floor( w / 3 ) );
+            const step = data.length / maxBars;
+
+            bars = Array.from( { length: maxBars }, ( _, i ) =>
+                Math.max( ...data.slice( Math.floor( i * step ), Math.floor( ( i + 1 ) * step ) ) )
+            );
+
+            layout = { w, h, barWidth: w / bars.length };
+            drawProgress();
+
+        };
+
+        const drawProgress = () => {
+
+            const { w, h } = layout;
+            const progress = this.video.currentTime / this.video.duration;
+            const cutoff = Math.floor( bars.length * progress );
+
+            ctx.clearRect( 0, 0, w, h );
+
+            // Base waveform
+            ctx.fillStyle = baseColor;
+            bars.forEach( drawRect );
+
+            // Progress
+            ctx.fillStyle = progColor;
+            bars.slice( 0, cutoff ).forEach( drawRect );
+
+        };
+
+        new ResizeObserver( redraw ).observe( canvas );
+        this.video.addEventListener( 'timeupdate', drawProgress );
+
+        redraw();
 
     }
 

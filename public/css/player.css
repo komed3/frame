@@ -1,10 +1,10 @@
-.video-wrapper {
+.player {
     width: 100%;
     height: auto;
     background: var( --dark-60 );
 }
 
-.video-container {
+.player-container {
     position: relative;
     aspect-ratio: 16 / 9;
     margin: 0 auto;
@@ -18,4 +18,15 @@
     margin: 0;
     width: 100%;
     height: 100%;
+}
+
+.player-controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    z-index: 1;
 }
