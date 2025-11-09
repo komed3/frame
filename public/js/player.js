@@ -14,6 +14,8 @@ class VideoPlayer {
         this.ready = false;
 
         this.loadMeta().then( () => {
+            this.loadState();
+            this.saveState();
             this.initVideo();
             this.loadWaveform();
         } );
@@ -36,6 +38,20 @@ class VideoPlayer {
             this.loaded = true;
 
         } catch ( err ) { throw new Error( err ) }
+
+    }
+
+    loadState () {
+
+        this.playerState = JSON.parse( localStorage.getItem( '__player__' ) ?? '{ "volume": 1, "playbackRate": 1 }' );
+        this.videoState = JSON.parse( localStorage.getItem( this.videoId ) ?? '{ "progress": 0 }' );
+
+    }
+
+    saveState () {
+
+        localStorage.setItem( '__player__', JSON.stringify( this.playerState ) );
+        localStorage.setItem( this.videoId, JSON.stringify( this.videoState ) );
 
     }
 
