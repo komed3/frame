@@ -13,6 +13,10 @@
       "noFile": "No file uploaded",
       "processing": "Processing error",
       "upload": "Error while uploading: {{msg}}"
+    },
+    "video": {
+      "data": "Error getting meta data",
+      "notExists": "Cannot get video"
     }
   },
   "generic": {
