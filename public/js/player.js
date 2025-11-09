@@ -7,14 +7,12 @@ class VideoPlayer {
 
         this.videoId = this.player.getAttribute( 'videoId' );
         this.videoDir = '/media/' + this.videoId + '/';
-        this.videoBlob = null;
-        this.videoObjectUrl = null;
         this.videoData = {};
 
         this.loaded = false;
         this.ready = false;
 
-        this.loadMeta().then( this.initPlayer.bind( this ) );
+        this.loadMeta().then( this.initVideo.bind( this ) );
 
     }
 
@@ -37,31 +35,38 @@ class VideoPlayer {
 
     }
 
-    async fetchStream () {
+    async stream () {
 
-        if ( this.videoBlob || this.videoObjectUrl ) return;
+        if ( this.ready ) return;
 
-        try {
+        const chunkSize = 512 * 1024;
+        const res = await fetch( this.videoDir + this.videoData.fileName );
+        const reader = res.body.getReader();
 
-            const res = await fetch( this.videoDir + this.videoData.fileName );
+        const stream = new ReadableStream( { async pull( controller ) {
 
-            if ( ! res.ok ) throw new Error( 'Failed to fetch the video' );
+            let { done, value } = await reader.read();
+            if ( done ) return controller.close();
 
-            this.videoBlob = await res.blob();
-            this.videoObjectUrl = URL.createObjectURL( this.videoBlob );
+            for ( let i = 0; i < value.length; i += chunkSize ) controller.enqueue(
+                value.slice( i, i + chunkSize )
+            );
 
-        } catch ( err ) { throw new Error( err ) }
+        } } );
+
+        const blob = await new Response( stream ).blob();
+        const blobUrl = URL.createObjectURL( blob );
+        this.video.src = blobUrl;
 
     }
 
-    async initPlayer () {
+    async initVideo () {
 
         if ( this.ready ) return;
         if ( ! this.loaded ) await this.loadMeta();
 
-        await this.fetchStream();
+        await this.stream();
 
-        this.video.src = this.videoObjectUrl;
         this.video.poster = this.videoDir + 'poster.jpg';
         this.video.load();
 
