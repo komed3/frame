@@ -152,12 +152,24 @@ button:hover {
     background-image: url( ../images/icons/alert.svg );
 }
 
+.icon.icon-radio {
+    background-image: url( ../images/icons/radio.svg );
+}
+
 .icon.icon-search {
     background-image: url( ../images/icons/search.svg );
 }
 
 .icon.icon-settings {
     background-image: url( ../images/icons/settings.svg );
+}
+
+.icon.icon-thumbsDown {
+    background-image: url( ../images/icons/thumbsDown.svg );
+}
+
+.icon.icon-thumbsUp {
+    background-image: url( ../images/icons/thumbsUp.svg );
 }
 
 .icon.icon-upload {
