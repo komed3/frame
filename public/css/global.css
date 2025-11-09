@@ -172,6 +172,10 @@ button:hover {
     background-image: url( ../images/icons/minimize.svg );
 }
 
+.icon.icon-mute {
+    background-image: url( ../images/icons/mute.svg );
+}
+
 .icon.icon-pause {
     background-image: url( ../images/icons/pause.svg );
 }
@@ -210,4 +214,8 @@ button:hover {
 
 .icon.icon-upload {
     background-image: url( ../images/icons/upload.svg );
+}
+
+.icon.icon-volume {
+    background-image: url( ../images/icons/volume.svg );
 }
