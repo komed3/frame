@@ -1,7 +1,7 @@
 extends ./_layout
 
 append scripts
-  script( src= "/js/player.js", type= "text/javascript", defer )
+  script( src= "/js/player.min.js", type= "text/javascript", defer )
 
 append styles
   link( rel= "stylesheet", href= "/css/watch.min.css" )
@@ -14,7 +14,6 @@ block content
     div.video-wrapper( videoId= videoId )
       div.video-container
         video.video-player
-          source
 
     //- Video description
     div.frame-watch--content

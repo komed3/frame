@@ -6,7 +6,7 @@ import { video } from './video.js';
 const api = express.Router();
 
 // Handle routes
-api.get( '/api/video/:id', video );
+api.post( '/api/video/:id', video );
 api.post( '/api/upload', upload );
 
 export { api };
