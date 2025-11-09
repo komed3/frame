@@ -61,8 +61,9 @@
 }
 
 .frame-watch--stats button {
+    width: 38px;
     height: 38px;
-    padding: 0 8px;
+    padding: 0;
     background: var( --light-10 );
 }
 
