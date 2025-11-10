@@ -65,8 +65,8 @@
       "mute": "Video stummgeschaltet",
       "pause": "Video pausiert",
       "play": "Abspielen",
-      "seek": "Spule zu: ",
-      "volume": "Lautstärke: "
+      "seek": "Springe zu ",
+      "volume": "Lautstärke "
     }
   },
   "views": {
