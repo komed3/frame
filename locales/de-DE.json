@@ -62,6 +62,8 @@
       "volume": "Lautstärke"
     },
     "overlay": {
+      "maximize": "Video im Vollbild",
+      "minimize": "Vollbild verlassen",
       "mute": "Video stummgeschaltet",
       "pause": "Video pausiert",
       "play": "Abspielen",

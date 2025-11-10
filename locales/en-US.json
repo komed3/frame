@@ -62,6 +62,8 @@
       "volume": "Volume"
     },
     "overlay": {
+      "maximize": "Video in full screen",
+      "minimize": "Leave full screen",
       "mute": "Player muted",
       "pause": "Video paused",
       "play": "Play video",

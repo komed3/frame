@@ -634,8 +634,8 @@ class VideoPlayer {
             { fullscreen: fs }
         );
 
-        if ( fs ) this.showOverlay( 'maximize', 'Video in full screen' );
-        else this.showOverlay( 'minimize', 'Leave full screen' );
+        if ( fs ) this.showOverlay( 'maximize', this.i18n.overlay.maximize );
+        else this.showOverlay( 'minimize', this.i18n.overlay.minimize );
 
     }
 
