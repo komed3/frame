@@ -1,6 +1,25 @@
 const lang = document.documentElement.getAttribute( 'lang' );
 const template = document.documentElement.getAttribute( 'template' );
 
+function throttle ( fnc, limit ) {
+
+    let throttled;
+
+    return function ( ...args ) {
+
+        if ( ! throttled ) {
+
+            fnc.apply( this, args );
+            throttled = true;
+
+            setTimeout( () => throttled = false, limit );
+
+        }
+
+    };
+
+}
+
 const formatTime = ( seconds, includeHrs = false ) => {
 
     if ( isNaN( seconds ) ) return '00:00';
