@@ -11,7 +11,7 @@ block content
   div.frame-watch
 
     //- Video player
-    div.player.load.controls( videoId= videoId )
+    div.player.load( videoId= videoId )
       div.player-container
         video.video-player
 
@@ -44,7 +44,11 @@ block content
                 button( action= "unmute", title= t( 'player.action.unmute' ) )
                   i.icon.icon-mute
                 div.slider( title= t( 'player.action.volume' ) )
-                  input( type= "range", action= "volume", min= 0, max= 1, step= 0.05 )
+                  input(
+                    type= "range", action= "volume",
+                    min= 0, max= 1, step= 0.05,
+                    value= 1
+                  )
               div.timecode
                 span.cur 00:00
                 span.div /

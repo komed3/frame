@@ -8,7 +8,10 @@ class VideoPlayer {
         this.controls = this.player.querySelector( '.player-controls' );
 
         this.actions = this.initActions();
-        this.setActionState( { pause: false, replay: false, minimize: false } );
+        this.setActionState( {
+            pause: false, replay: false,
+            minimize: false, unmute: false
+        } );
 
         this.overlay = {
             icon: this.player.querySelector( '.player-overlay .icon' ),
@@ -48,6 +51,11 @@ class VideoPlayer {
 
     initEventHandlers () {
 
+        // Controls
+        this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
+        this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
+
+        // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
         this.actions.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.actions.minimize.addEventListener( 'click', this.minimize.bind( this ) );
