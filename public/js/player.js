@@ -57,6 +57,7 @@ class VideoPlayer {
 
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
+        this.actions.interact.addEventListener( 'dblclick', this.toggleFullscreen.bind( this ) );
         this.actions.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.actions.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
