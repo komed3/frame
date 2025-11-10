@@ -6,7 +6,9 @@ class VideoPlayer {
         this.container = this.player.querySelector( '.player-container' );
         this.video = this.player.querySelector( 'video' );
         this.controls = this.player.querySelector( '.player-controls' );
+
         this.actions = this.initActions();
+        this.setActionState( { pause: false, replay: false, minimize: false } );
 
         this.videoId = this.player.getAttribute( 'videoId' );
         this.videoDir = '/media/' + this.videoId + '/';
@@ -14,6 +16,7 @@ class VideoPlayer {
 
         this.loaded = false;
         this.ready = false;
+        this.controlsTimeout = null;
 
         this.initEventHandlers();
         this.loadMeta().then( () => {
@@ -39,7 +42,9 @@ class VideoPlayer {
 
     initEventHandlers () {
 
-        //
+        document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
+        this.actions.maximize.addEventListener( 'click', this.maximize.bind( this ) );
+        this.actions.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
     }
 
@@ -183,19 +188,34 @@ class VideoPlayer {
 
     }
 
-    showLoad () { this.player.classList.add( 'load' ) }
+    showControls () {
 
-    hideLoad () { this.player.classList.remove( 'load' ) }
+        this.setActionState( {}, { controls: true } );
+        clearTimeout( this.controlsTimeout );
+
+        if ( ! this.video.paused ) this.controlsTimeout = setTimeout(
+            this.hideControls.bind( this ), 3000
+        );
+
+    }
+
+    hideControls() { this.setActionState( {}, { controls: this.video.paused } ) }
+
+    showLoad () { this.setActionState( {}, { load: true } ) }
+
+    hideLoad () { this.setActionState( {}, { load: false } ) }
 
     setActionState ( states, classes = {} ) {
 
-        const { add = [], rmv = [], tgl = [] } = classes;
-        this.player.classList.add( add );
-        this.player.classList.remove( rmv );
-        this.player.classList.toggle( tgl );
-
         for ( const [ action, state ] of Object.entries( states ) ) {
             this.actions[ action ].disabled = ! state;
+        }
+
+        for ( const [ cls, state ] of Object.entries( classes ) ) {
+
+            if ( state ) this.player.classList.add( cls );
+            else this.player.classList.remove( cls );
+
         }
 
     }
@@ -241,13 +261,13 @@ class VideoPlayer {
 
         const fs = this.isFullscreen();
 
-        this.setActionState( { maximize: ! fs, minimize: fs }, {
-            add: fs ? 'fullscreen' : '',
-            rmv: ! fs ? 'fullscreen' : ''
-        } );
+        this.setActionState(
+            { maximize: ! fs, minimize: fs },
+            { fullscreen: fs }
+        );
 
-        /*if ( fs ) this.showOverlay( 'maximize', 'Video in full screen' );
-        else this.showOverlay( 'minimize', 'Leave full screen' );*/
+        if ( fs ) this.showOverlay( 'maximize', 'Video in full screen' );
+        else this.showOverlay( 'minimize', 'Leave full screen' );
 
     }
 
