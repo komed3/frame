@@ -61,6 +61,11 @@ class VideoPlayer {
         this.actions.maximize.addEventListener( 'click', this.maximize.bind( this ) );
         this.actions.minimize.addEventListener( 'click', this.minimize.bind( this ) );
 
+        // Loading
+        this.video.addEventListener( 'waiting', this.showLoad.bind( this ) );
+        this.video.addEventListener( 'canplay', this.hideLoad.bind( this ) );
+        this.video.addEventListener( 'playing', this.hideLoad.bind( this ) );
+
     }
 
     async loadMeta () {
