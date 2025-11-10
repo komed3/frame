@@ -52,9 +52,15 @@ class VideoPlayer {
 
     initEventHandlers () {
 
-        // Controls
+        // Mousemove
         this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
         this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
+
+        // Play
+        this.actions.interact.addEventListener( 'click', this.togglePlay.bind( this ) );
+        this.actions.play.addEventListener( 'click', this.play.bind( this ) );
+        this.actions.pause.addEventListener( 'click', this.pause.bind( this ) );
+        this.actions.replay.addEventListener( 'click', this.play.bind( this ) );
 
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
@@ -66,6 +72,14 @@ class VideoPlayer {
         this.video.addEventListener( 'waiting', this.showLoad.bind( this ) );
         this.video.addEventListener( 'canplay', this.hideLoad.bind( this ) );
         this.video.addEventListener( 'playing', this.hideLoad.bind( this ) );
+
+        // State
+        this.video.addEventListener( 'play', this.updatePlayState.bind( this ) );
+        this.video.addEventListener( 'play', this.hideControls.bind( this ) );
+        this.video.addEventListener( 'pause', this.updatePlayState.bind( this ) );
+        this.video.addEventListener( 'pause', this.showControls.bind( this ) );
+        this.video.addEventListener( 'ended', this.updatePlayState.bind( this ) );
+        this.video.addEventListener( 'ended', this.showControls.bind( this ) );
 
         // Buffering
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
@@ -290,6 +304,33 @@ class VideoPlayer {
         this.timecode.querySelector( '.dur' ).textContent = formatTime( this.video.duration );
 
     }
+
+    // Play
+
+    async play () { await this.video.play() }
+
+    pause () { this.video.pause() }
+
+    async togglePlay () {
+
+        if ( this.video.paused ) await this.play();
+        else this.pause();
+
+    }
+
+    updatePlayState () {
+
+        const paused = this.video.paused;
+        const ended = this.video.ended;
+
+        this.setActionState(
+            { play: paused && ! ended, pause: ! paused && ! ended, replay: ended },
+            { play: ! paused, pause: paused, ended: ended }
+        );
+
+    }
+
+    // Fullscreen
 
     isFullscreen () {
 
