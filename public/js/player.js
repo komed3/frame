@@ -6,6 +6,7 @@ class VideoPlayer {
         this.container = this.player.querySelector( '.player-container' );
         this.video = this.player.querySelector( 'video' );
         this.controls = this.player.querySelector( '.player-controls' );
+        this.timecode = this.controls.querySelector( '.timecode' );
 
         this.actions = this.initActions();
         this.setActionState( {
@@ -65,6 +66,11 @@ class VideoPlayer {
         this.video.addEventListener( 'waiting', this.showLoad.bind( this ) );
         this.video.addEventListener( 'canplay', this.hideLoad.bind( this ) );
         this.video.addEventListener( 'playing', this.hideLoad.bind( this ) );
+
+        // Buffering
+        this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
+        this.video.addEventListener( 'loadedmetadata', this.updateTimeDisplay.bind( this ) );
+        this.video.addEventListener( 'progress', this.updateBuffer.bind( this ) );
 
     }
 
@@ -252,6 +258,36 @@ class VideoPlayer {
         this.overlayTimeout = setTimeout(
             () => this.setActionState( {}, { overlay: false } ), 800
         );
+
+    }
+
+    updateProgress () {
+
+        const pct = ( this.video.currentTime / this.video.duration ) * 100;
+        this.actions.seek.style.setProperty( '--progress', ( isNaN( pct ) ? 0 : pct ) + '%' );
+
+        this.updateTimeDisplay();
+
+    }
+
+    updateBuffer () {
+
+        if ( this.video.buffered.length > 0 ) {
+
+            const bufferedEnd = this.video.buffered.end( this.video.buffered.length - 1 );
+            const duration = this.video.duration;
+            const pct = ( bufferedEnd / duration ) * 100;
+
+            this.actions.seek.style.setProperty( '--buffered', ( isNaN( pct ) ? 0 : pct ) + '%' );
+
+        }
+
+    }
+
+    updateTimeDisplay () {
+
+        this.timecode.querySelector( '.cur' ).textContent = formatTime( this.video.currentTime );
+        this.timecode.querySelector( '.dur' ).textContent = formatTime( this.video.duration );
 
     }
 

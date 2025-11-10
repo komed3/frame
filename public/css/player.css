@@ -129,7 +129,7 @@
 }
 
 .player-controls .progress .seekbar .played {
-    width: var( --handle, 0% );
+    width: var( --progress, 0% );
     background: var( --primary );
 }
 
