@@ -154,6 +154,7 @@ class VideoPlayer {
         await this.stream();
 
         this.video.poster = this.videoDir + 'poster.jpg';
+        this.video.currentTime = this.videoState.progress || 0;
         this.video.load();
 
         this.ready = true;
@@ -276,6 +277,9 @@ class VideoPlayer {
     }
 
     updateProgress () {
+
+        this.videoState.progress = this.video.currentTime || 0;
+        this.saveState();
 
         const pct = ( this.video.currentTime / this.video.duration ) * 100;
         this.actions.seek.style.setProperty( '--progress', ( isNaN( pct ) ? 0 : pct ) + '%' );
