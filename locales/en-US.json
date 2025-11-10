@@ -67,6 +67,7 @@
       "mute": "Player muted",
       "pause": "Video paused",
       "play": "Play video",
+      "playbackRate": "Speed ",
       "seek": "Skip to ",
       "volume": "Volume "
     }

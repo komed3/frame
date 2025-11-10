@@ -144,8 +144,8 @@ class VideoPlayer {
                 case 'End': this.end(); this.seekOverlay(); break;
                 case ',': this.skipFrame( -1 ); break;
                 case '.': this.skipFrame( 1 ); break;
-                case '+': this.changePlaybackRate( 0.25 ); break;
-                case '-': this.changePlaybackRate( -0.25 ); break;
+                case '+': this.changePlaybackRate( 0.25 ); this.playbackRateOverlay(); break;
+                case '-': this.changePlaybackRate( -0.25 ); this.playbackRateOverlay(); break;
                 case 'F11': case 'f': this.toggleFullscreen(); break;
                 case 'Escape': this.minimize(); break;
 
@@ -609,6 +609,8 @@ class VideoPlayer {
         this.saveState();
 
     }
+
+    playbackRateOverlay () { this.showOverlay( 'clock', this.i18n.overlay.playbackRate + this.video.playbackRate + 'x' ) }
 
     // Fullscreen
 
