@@ -35,6 +35,7 @@ class VideoPlayer {
             this.loadState();
             this.saveState();
 
+            this.initSeekbar();
             this.loadWaveform();
             this.initVideo();
 
@@ -106,6 +107,51 @@ class VideoPlayer {
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
         this.video.addEventListener( 'loadedmetadata', this.updateTimeDisplay.bind( this ) );
         this.video.addEventListener( 'progress', this.updateBuffer.bind( this ) );
+
+    }
+
+    initSeekbar () {
+
+        const progress = this.controls.querySelector( '.progress' );
+        const timecode = progress.querySelector( '.time' );
+        let percent = 0;
+
+        const preview = progress.querySelector( '.preview' );
+        const previewImages = this.videoData.preview.length;
+        preview.style.display = 'none';
+
+        progress.addEventListener( 'mousemove', ( e ) => {
+
+            // Calculate hover percentage
+            const rect = this.actions.seek.getBoundingClientRect();
+            percent = Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) );
+
+            // Show hover state
+            progress.classList.add( 'hovered' );
+            this.actions.seek.style.setProperty( '--handle', percent * 100 + '%' );
+            timecode.textContent = formatTime( this.video.duration * percent );
+
+            // Update preview image
+            if ( previewImages ) {
+
+                const src = this.videoData.preview[ Math.min(
+                    Math.floor( this.videoData.preview.length * percent ),
+                    this.videoData.preview.length - 1
+                ) ];
+
+                preview.style.backgroundImage = `url( '/media/${this.videoId}/thumb/${src}' )`;
+                preview.style.display = 'block';
+
+            }
+
+        } );
+
+        progress.addEventListener( 'mouseleave', () => {
+            progress.classList.remove( 'hovered' );
+            this.actions.seek.style.removeProperty( '--hover' );
+        } );
+
+        progress.addEventListener( 'click', () => this.seek( percent ) );
 
     }
 

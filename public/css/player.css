@@ -95,6 +95,11 @@
     display: none;
     width: var( --handle, 0% );
     background: var( --light-30 );
+    transition: none;
+}
+
+.player-controls .progress.hovered .seekbar .handle {
+    display: block;
 }
 
 .player-controls .progress .seekbar .handle .hover {
