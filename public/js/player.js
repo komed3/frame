@@ -27,7 +27,7 @@ class VideoPlayer {
         };
 
         this.videoId = this.player.getAttribute( 'videoId' );
-        this.videoDir = '/media/' + this.videoId + '/';
+        this.videoDir = `/media/${this.videoId}/`;
         this.videoData = {};
 
         this.loaded = false;
@@ -187,7 +187,7 @@ class VideoPlayer {
                     this.videoData.preview.length - 1
                 ) ];
 
-                preview.style.backgroundImage = `url( '/media/${this.videoId}/thumb/${src}' )`;
+                preview.style.backgroundImage = `url( '${this.videoDir}thumb/${src}' )`;
                 preview.style.display = 'block';
 
             }
@@ -644,7 +644,7 @@ class VideoPlayer {
 
     download () {
 
-        const videoSrc = `/media/${this.videoId}/${this.videoData.fileName}`;
+        const videoSrc = this.videoDir + this.videoData.fileName;
         const anchor = document.createElement( 'a' );
 
         anchor.href = videoSrc;
