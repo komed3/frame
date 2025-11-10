@@ -152,6 +152,10 @@ button:hover {
     background-image: url( ../images/icons/alert.svg );
 }
 
+.icon.icon-clock {
+    background-image: url( ../images/icons/clock.svg );
+}
+
 .icon.icon-download {
     background-image: url( ../images/icons/download.svg );
 }
