@@ -39,7 +39,7 @@ class VideoPlayer {
         this.initEventHandlers();
         this.initKeyBindings();
 
-        this.loadMeta().then( () => {
+        this.loadData().then( () => {
 
             this.loadState();
             this.saveState();
@@ -131,10 +131,10 @@ class VideoPlayer {
 
             switch ( e.key ) {
 
-                case ' ': case 'k': case 'F7': this.togglePlay(); break;
-                case 'm': case 'F9': this.toggleMute(); break;
-                case 'ArrowUp': this.changeVolume( 0.1 ); break;
-                case 'ArrowDown': this.changeVolume( -0.1 ); break;
+                case ' ': case 'k': case 'F7': this.togglePlay(); this.playOverlay(); break;
+                case 'm': case 'F9': this.toggleMute(); this.volumeOverlay(); break;
+                case 'ArrowUp': this.changeVolume( 0.1 ); this.volumeOverlay(); break;
+                case 'ArrowDown': this.changeVolume( -0.1 ); this.volumeOverlay(); break;
                 case 'ArrowLeft': case 'j': case 'F6': this.skip( -5 ); break;
                 case 'ArrowRight': case 'l': case 'F8': this.skip( 5 ); break;
                 case 'Home': this.begin(); break;
@@ -199,7 +199,7 @@ class VideoPlayer {
 
     }
 
-    async loadMeta () {
+    async loadData () {
 
         if ( this.loaded ) return;
 
@@ -211,7 +211,9 @@ class VideoPlayer {
 
             if ( ! res.ok ) throw new Error( 'Error fetching video data' );
 
-            this.videoData = await res.json();
+            const data = await res.json();
+            this.videoData = data.data ?? {};
+            this.i18n = data.i18n ?? {};
             this.loaded = true;
 
         } catch ( err ) { throw new Error( err ) }
@@ -446,6 +448,13 @@ class VideoPlayer {
 
     }
 
+    playOverlay () {
+
+        if ( this.video.paused ) this.showOverlay( 'pause', this.i18n.overlay.pause );
+        else this.showOverlay( 'play', this.i18n.overlay.play );
+
+    }
+
     // Volume
 
     isMuted () { return ! this.video.volume > 0 }
@@ -503,6 +512,13 @@ class VideoPlayer {
 
         this.playerState.volume = volume;
         this.saveState();
+
+    }
+
+    volumeOverlay () {
+
+        if ( this.isMuted() ) this.showOverlay( 'mute', this.i18n.overlay.mute );
+        else this.showOverlay( 'volume', this.i18n.overlay.volume + Math.round( this.video.volume * 100 ) + '%' )
 
     }
 

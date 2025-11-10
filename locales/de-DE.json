@@ -60,6 +60,12 @@
       "settings": "Einstellungen",
       "unmute": "Stummschaltung aufheben",
       "volume": "Lautstärke"
+    },
+    "overlay": {
+      "mute": "Video stummgeschaltet",
+      "pause": "Video pausiert",
+      "play": "Abspielen",
+      "volume": "Lautstärke: "
     }
   },
   "views": {
