@@ -72,7 +72,8 @@ class VideoPlayer {
         this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
 
         // Scroll
-        this.container.addEventListener( 'wheel', throttle( this.handleScroll.bind( this ), 100 ) );
+        this.container.addEventListener( 'wheel', ( e ) => e.preventDefault() );
+        this.container.addEventListener( 'wheel', throttle( this.handleScroll.bind( this ), 50 ) );
 
         // Play
         this.actions.interact.addEventListener( 'click', this.togglePlay.bind( this ) );
@@ -514,7 +515,8 @@ class VideoPlayer {
 
     handleScroll ( e ) {
 
-        e.preventDefault();
+        this.changeVolume( e.deltaY < 0 ? 0.05 : -0.05 );
+        this.volumeOverlay();
 
     }
 
