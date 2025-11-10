@@ -1,7 +1,7 @@
 class VideoPlayer {
 
     bindings = [
-        'f', 'j', 'k', 'l', 'm', ' ', ',', '.',
+        'f', 'j', 'k', 'l', 'm', ' ', ',', '.', '+', '-',
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Home', 'End', 'Escape',
         'F6', 'F7', 'F8', 'F9', 'F11'
@@ -48,9 +48,6 @@ class VideoPlayer {
             this.initSeekbar();
             this.loadWaveform();
             this.initVideo();
-
-            this.setVolume( this.playerState.volume );
-            this.setPlaybackRate( this.playerState.playbackRate );
 
         } );
 
@@ -147,6 +144,8 @@ class VideoPlayer {
                 case 'End': this.end(); this.seekOverlay(); break;
                 case ',': this.skipFrame( -1 ); break;
                 case '.': this.skipFrame( 1 ); break;
+                case '+': this.changePlaybackRate( 0.25 ); break;
+                case '-': this.changePlaybackRate( -0.25 ); break;
                 case 'F11': case 'f': this.toggleFullscreen(); break;
                 case 'Escape': this.minimize(); break;
 
@@ -279,6 +278,9 @@ class VideoPlayer {
         this.ready = true;
         this.hideLoad();
         this.showControls();
+
+        this.setVolume( this.playerState.volume );
+        this.setPlaybackRate( this.playerState.playbackRate );
 
     }
 
