@@ -91,6 +91,9 @@ class VideoPlayer {
         this.actions.rewind.addEventListener( 'click', () => this.skip( -5 ) );
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
 
+        // Others
+        this.actions.download.addEventListener( 'click', this.download.bind( this ) );
+
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
         this.container.addEventListener( 'dblclick', this.toggleFullscreen.bind( this ) );
@@ -636,6 +639,18 @@ class VideoPlayer {
 
         if ( fs ) this.showOverlay( 'maximize', this.i18n.overlay.maximize );
         else this.showOverlay( 'minimize', this.i18n.overlay.minimize );
+
+    }
+
+    download () {
+
+        const videoSrc = `/media/${this.videoId}/${this.videoData.fileName}`;
+        const anchor = document.createElement( 'a' );
+
+        anchor.href = videoSrc;
+        anchor.download = 'video.mp4';
+        anchor.target = '_blank';
+        anchor.click();
 
     }
 
