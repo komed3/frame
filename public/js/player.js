@@ -71,10 +71,6 @@ class VideoPlayer {
         this.container.addEventListener( 'mousemove', this.showControls.bind( this ) );
         this.container.addEventListener( 'mouseleave', this.hideControls.bind( this ) );
 
-        // Scroll
-        this.container.addEventListener( 'wheel', ( e ) => e.preventDefault() );
-        this.container.addEventListener( 'wheel', throttle( this.handleScroll.bind( this ), 50 ) );
-
         // Play
         this.actions.interact.addEventListener( 'click', this.togglePlay.bind( this ) );
         this.actions.play.addEventListener( 'click', this.play.bind( this ) );
@@ -82,6 +78,7 @@ class VideoPlayer {
         this.actions.replay.addEventListener( 'click', this.play.bind( this ) );
 
         // Volume
+        this.container.addEventListener( 'wheel', this.handleScroll.bind( this ) );
         this.actions.mute.addEventListener( 'click', this.mute.bind( this ) );
         this.actions.unmute.addEventListener( 'click', this.unmute.bind( this ) );
         this.actions.volume.addEventListener( 'input', ( e ) => {
@@ -515,8 +512,12 @@ class VideoPlayer {
 
     handleScroll ( e ) {
 
-        this.changeVolume( e.deltaY < 0 ? 0.05 : -0.05 );
-        this.volumeOverlay();
+        e.preventDefault();
+
+        throttle( ( ( e ) => {
+            this.changeVolume( e.deltaY < 0 ? 0.05 : -0.05 );
+            this.volumeOverlay();
+        } )( e ), 50 );
 
     }
 
