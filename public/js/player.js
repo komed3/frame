@@ -1,5 +1,11 @@
 class VideoPlayer {
 
+    bindings = [
+        'f', 'j', 'k', 'l', 'm', ' ', ',', '.',
+        'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Home', 'End', 'Escape',
+        'F11'
+    ];
+
     constructor () {
 
         this.player = document.querySelector( '.player' );
@@ -30,6 +36,8 @@ class VideoPlayer {
         this.overlayTimeout = null;
 
         this.initEventHandlers();
+        this.initKeyBindings();
+
         this.loadMeta().then( () => {
 
             this.loadState();
@@ -107,6 +115,37 @@ class VideoPlayer {
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
         this.video.addEventListener( 'loadedmetadata', this.updateTimeDisplay.bind( this ) );
         this.video.addEventListener( 'progress', this.updateBuffer.bind( this ) );
+
+    }
+
+    initKeyBindings () {
+
+        document.addEventListener( 'keydown', ( e ) => {
+
+            if ( e.target.tagName === 'INPUT' || ! this.bindings.includes( e.key ) ) return;
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+
+            switch ( e.key ) {
+
+                case ' ': case 'k': this.togglePlay(); break;
+                case 'm': this.toggleMute(); break;
+                case 'ArrowUp': this.changeVolume( 0.1 ); break;
+                case 'ArrowDown': this.changeVolume( -0.1 ); break;
+                case 'ArrowLeft': case 'j': this.skip( -5 ); break;
+                case 'ArrowRight': case 'l': this.skip( 5 ); break;
+                case 'Home': this.begin(); break;
+                case 'End': this.end(); break;
+                case ',': this.skipFrame( -1 ); break;
+                case '.': this.skipFrame( 1 ); break;
+                case 'F11': case 'f': this.toggleFullscreen(); break;
+                case 'Escape': this.minimize(); break;
+
+            }
+
+        } );
 
     }
 
@@ -479,7 +518,7 @@ class VideoPlayer {
 
     skipFrame ( frames ) {
 
-        const frameTime = 1 / this.frameRate;
+        const frameTime = 1 / ( this.videoData?.meta?.video?.fps ?? 25 );
 
         this.pause();
         this.video.currentTime = Math.max( 0, Math.min(
