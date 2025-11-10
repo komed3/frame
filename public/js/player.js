@@ -32,6 +32,7 @@ class VideoPlayer {
 
         this.loaded = false;
         this.ready = false;
+        this.seekDirection = true;
         this.previousVolume = 0;
         this.controlsTimeout = null;
         this.overlayTimeout = null;
@@ -135,10 +136,10 @@ class VideoPlayer {
                 case 'm': case 'F9': this.toggleMute(); this.volumeOverlay(); break;
                 case 'ArrowUp': this.changeVolume( 0.1 ); this.volumeOverlay(); break;
                 case 'ArrowDown': this.changeVolume( -0.1 ); this.volumeOverlay(); break;
-                case 'ArrowLeft': case 'j': case 'F6': this.skip( -5 ); break;
-                case 'ArrowRight': case 'l': case 'F8': this.skip( 5 ); break;
-                case 'Home': this.begin(); break;
-                case 'End': this.end(); break;
+                case 'ArrowLeft': case 'j': case 'F6': this.skip( -5 ); this.seekOverlay(); break;
+                case 'ArrowRight': case 'l': case 'F8': this.skip( 5 ); this.seekOverlay(); break;
+                case 'Home': this.begin(); this.seekOverlay(); break;
+                case 'End': this.end(); this.seekOverlay(); break;
                 case ',': this.skipFrame( -1 ); break;
                 case '.': this.skipFrame( 1 ); break;
                 case 'F11': case 'f': this.toggleFullscreen(); break;
@@ -146,7 +147,7 @@ class VideoPlayer {
 
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
-                    this.seek( Number( e.key ) * 10 ); break;
+                    this.seek( Number( e.key ) * 10 ); this.seekOverlay(); break;
 
             }
 
@@ -524,36 +525,64 @@ class VideoPlayer {
 
     // Seeking
 
-    begin () { this.video.currentTime = 0 }
+    begin () {
 
-    end () { this.video.currentTime = this.video.duration }
+        this.seekDirection = false;
+        this.video.currentTime = 0;
+
+    }
+
+    end () {
+
+        this.seekDirection = true;
+        this.video.currentTime = this.video.duration;
+
+    }
 
     skip ( seconds ) {
 
-        this.video.currentTime = Math.max( 0, Math.min(
+        const timecode = Math.max( 0, Math.min(
             this.video.duration,
             this.video.currentTime + seconds
         ) );
+
+        this.seekDirection = timecode >= this.video.currentTime;
+        this.video.currentTime = timecode;
 
     }
 
     skipFrame ( frames ) {
 
-        const frameTime = 1 / ( this.videoData?.meta?.video?.fps ?? 25 );
-
         this.pause();
-        this.video.currentTime = Math.max( 0, Math.min(
+
+        const frame = 1 / ( this.videoData?.meta?.video?.fps ?? 25 );
+        const timecode = Math.max( 0, Math.min(
             this.video.duration,
-            this.video.currentTime + ( frameTime * frames )
+            this.video.currentTime + ( frame * frames )
         ) );
+
+        this.seekDirection = timecode >= this.video.currentTime;
+        this.video.currentTime = timecode;
 
     }
 
     seek ( value ) {
 
-        this.video.currentTime = this.video.duration * Math.max( 0, Math.min(
+        const timecode = this.video.duration * Math.max( 0, Math.min(
             1, value > 1 ? value / 100 : value
         ) );
+
+        this.seekDirection = timecode >= this.video.currentTime;
+        this.video.currentTime = timecode;
+
+    }
+
+    seekOverlay () {
+
+        this.showOverlay(
+            this.seekDirection ? 'fastForward' : 'rewind',
+            this.i18n.overlay.seek + formatTime( this.video.currentTime )
+        );
 
     }
 
