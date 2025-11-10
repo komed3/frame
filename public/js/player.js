@@ -347,6 +347,8 @@ class VideoPlayer {
 
     }
 
+    // Controls
+
     setActionState ( states, classes = {} ) {
 
         for ( const [ action, state ] of Object.entries( states ) ) {
@@ -394,9 +396,11 @@ class VideoPlayer {
 
     }
 
+    // Progress
+
     updateProgress () {
 
-        this.videoState.progress = this.video.currentTime || 0;
+        this.videoState.progress = ( this.video.currentTime % this.video.duration ) || 0;
         this.saveState();
 
         const pct = ( this.video.currentTime / this.video.duration ) * 100;
