@@ -76,6 +76,10 @@ class VideoPlayer {
             setTimeout( () => e.target.blur(), 10 );
         } );
 
+        // Seeking
+        this.actions.rewind.addEventListener( 'click', () => this.skip( -5 ) );
+        this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
+
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
         this.container.addEventListener( 'dblclick', this.toggleFullscreen.bind( this ) );
@@ -176,6 +180,7 @@ class VideoPlayer {
 
         this.ready = true;
         this.hideLoad();
+        this.showControls();
 
     }
 
@@ -408,6 +413,41 @@ class VideoPlayer {
 
         this.playerState.volume = volume;
         this.saveState();
+
+    }
+
+    // Seeking
+
+    begin () { this.video.currentTime = 0 }
+
+    end () { this.video.currentTime = this.video.duration }
+
+    skip ( seconds ) {
+
+        this.video.currentTime = Math.max( 0, Math.min(
+            this.video.duration,
+            this.video.currentTime + seconds
+        ) );
+
+    }
+
+    skipFrame ( frames ) {
+
+        const frameTime = 1 / this.frameRate;
+
+        this.pause();
+        this.video.currentTime = Math.max( 0, Math.min(
+            this.video.duration,
+            this.video.currentTime + ( frameTime * frames )
+        ) );
+
+    }
+
+    seek ( value ) {
+
+        this.video.currentTime = this.video.duration * Math.max( 0, Math.min(
+            1, value > 1 ? value / 100 : value
+        ) );
 
     }
 
