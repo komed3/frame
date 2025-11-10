@@ -3,8 +3,10 @@ class VideoPlayer {
     constructor () {
 
         this.player = document.querySelector( '.player' );
+        this.container = this.player.querySelector( '.player-container' );
         this.video = this.player.querySelector( 'video' );
         this.controls = this.player.querySelector( '.player-controls' );
+        this.actions = this.initActions();
 
         this.videoId = this.player.getAttribute( 'videoId' );
         this.videoDir = '/media/' + this.videoId + '/';
@@ -13,12 +15,31 @@ class VideoPlayer {
         this.loaded = false;
         this.ready = false;
 
+        this.initEventHandlers();
         this.loadMeta().then( () => {
             this.loadState();
             this.saveState();
             this.initVideo();
             this.loadWaveform();
         } );
+
+    }
+
+    initActions () {
+
+        const actions = {};
+
+        this.controls.querySelectorAll( '[action]' ).forEach( el => {
+            actions[ el.getAttribute( 'action' ) ] = el;
+        } );
+
+        return actions;
+
+    }
+
+    initEventHandlers () {
+
+        //
 
     }
 
@@ -63,7 +84,7 @@ class VideoPlayer {
         const res = await fetch( this.videoDir + this.videoData.fileName );
         const reader = res.body.getReader();
 
-        const stream = new ReadableStream( { async pull( controller ) {
+        const stream = new ReadableStream( { async pull ( controller ) {
 
             let { done, value } = await reader.read();
             if ( done ) return controller.close();
@@ -165,6 +186,70 @@ class VideoPlayer {
     showLoad () { this.player.classList.add( 'load' ) }
 
     hideLoad () { this.player.classList.remove( 'load' ) }
+
+    setActionState ( states, classes = {} ) {
+
+        const { add = [], rmv = [], tgl = [] } = classes;
+        this.player.classList.add( add );
+        this.player.classList.remove( rmv );
+        this.player.classList.toggle( tgl );
+
+        for ( const [ action, state ] of Object.entries( states ) ) {
+            this.actions[ action ].disabled = ! state;
+        }
+
+    }
+
+    isFullscreen () {
+
+        return !! (
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement
+        );
+
+    }
+
+    async maximize () {
+
+        if ( this.isFullscreen() ) return;
+
+        if ( this.container.requestFullscreen ) await this.container.requestFullscreen();
+        else if ( this.container.webkitRequestFullscreen ) await this.container.webkitRequestFullscreen();
+        else if ( this.container.mozRequestFullScreen ) await this.container.mozRequestFullScreen();
+
+    }
+
+    async minimize () {
+
+        if ( ! this.isFullscreen() ) return;
+
+        if ( document.exitFullscreen ) await document.exitFullscreen();
+        else if ( document.webkitExitFullscreen ) await document.webkitExitFullscreen();
+        else if ( document.mozCancelFullScreen ) await document.mozCancelFullScreen();
+
+    }
+
+    async toggleFullscreen () {
+
+        if ( this.isFullscreen() ) await this.minimize();
+        else await this.maximize();
+
+    }
+
+    updateFullscreenState () {
+
+        const fs = this.isFullscreen();
+
+        this.setActionState( { maximize: ! fs, minimize: fs }, {
+            add: fs ? 'fullscreen' : '',
+            rmv: ! fs ? 'fullscreen' : ''
+        } );
+
+        /*if ( fs ) this.showOverlay( 'maximize', 'Video in full screen' );
+        else this.showOverlay( 'minimize', 'Leave full screen' );*/
+
+    }
 
 }
 
