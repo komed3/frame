@@ -25,15 +25,21 @@ class VideoPlayer {
 
         this.loaded = false;
         this.ready = false;
+        this.previousVolume = 0;
         this.controlsTimeout = null;
         this.overlayTimeout = null;
 
         this.initEventHandlers();
         this.loadMeta().then( () => {
+
             this.loadState();
             this.saveState();
-            this.initVideo();
+
             this.loadWaveform();
+            this.initVideo();
+
+            this.setVolume( this.playerState.volume );
+
         } );
 
     }
@@ -62,6 +68,14 @@ class VideoPlayer {
         this.actions.pause.addEventListener( 'click', this.pause.bind( this ) );
         this.actions.replay.addEventListener( 'click', this.play.bind( this ) );
 
+        // Volume
+        this.actions.mute.addEventListener( 'click', this.mute.bind( this ) );
+        this.actions.unmute.addEventListener( 'click', this.unmute.bind( this ) );
+        this.actions.volume.addEventListener( 'input', ( e ) => {
+            this.setVolume( e.target.value );
+            setTimeout( () => e.target.blur(), 10 );
+        } );
+
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
         this.container.addEventListener( 'dblclick', this.toggleFullscreen.bind( this ) );
@@ -80,6 +94,9 @@ class VideoPlayer {
         this.video.addEventListener( 'pause', this.showControls.bind( this ) );
         this.video.addEventListener( 'ended', this.updatePlayState.bind( this ) );
         this.video.addEventListener( 'ended', this.showControls.bind( this ) );
+
+        // Events
+        this.video.addEventListener( 'volumechange', this.updateVolumeState.bind( this ) );
 
         // Buffering
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
@@ -331,6 +348,66 @@ class VideoPlayer {
             { play: paused && ! ended, pause: ! paused && ! ended, replay: ended },
             { play: ! paused, pause: paused, ended: ended }
         );
+
+    }
+
+    // Volume
+
+    isMuted () { return ! this.video.volume > 0 }
+
+    mute () {
+
+        if ( this.isMuted() ) return;
+
+        this.previousVolume = this.video.volume;
+        this.video.volume = 0;
+
+    }
+
+    unmute () {
+
+        if ( ! this.isMuted() ) return;
+
+        this.video.volume = this.previousVolume || 1;
+
+    }
+
+    toggleMute () {
+
+        if ( this.isMuted() ) this.unmute();
+        else this.mute();
+
+    }
+
+    changeVolume ( value ) {
+
+        this.video.volume = Number( Math.max( 0, Math.min( 1, this.video.volume + value ) ).toFixed( 2 ) );
+        this.previousVolume = this.video.volume;
+
+    }
+
+    setVolume ( value ) {
+
+        this.video.volume = Number( Math.max( 0, Math.min( 1, value ) ).toFixed( 2 ) );
+        this.previousVolume = this.video.volume;
+
+    }
+
+    updateVolumeState () {
+
+        const muted = this.isMuted();
+        const volume = this.video.volume;
+
+        this.setActionState(
+            { mute: ! muted, unmute: muted },
+            { muted: muted }
+        );
+
+        this.actions.volume.value = volume;
+        this.actions.volume.style.setProperty( '--width', ( volume * 100 ) + '%' );
+
+        this.playerState.volume = volume;
+        this.saveState();
 
     }
 
