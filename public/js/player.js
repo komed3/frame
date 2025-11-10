@@ -4,7 +4,7 @@ class VideoPlayer {
         'f', 'j', 'k', 'l', 'm', ' ', ',', '.',
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Home', 'End', 'Escape',
-        'F11'
+        'F6', 'F7', 'F8', 'F9', 'F11'
     ];
 
     constructor () {
@@ -131,12 +131,12 @@ class VideoPlayer {
 
             switch ( e.key ) {
 
-                case ' ': case 'k': this.togglePlay(); break;
-                case 'm': this.toggleMute(); break;
+                case ' ': case 'k': case 'F7': this.togglePlay(); break;
+                case 'm': case 'F9': this.toggleMute(); break;
                 case 'ArrowUp': this.changeVolume( 0.1 ); break;
                 case 'ArrowDown': this.changeVolume( -0.1 ); break;
-                case 'ArrowLeft': case 'j': this.skip( -5 ); break;
-                case 'ArrowRight': case 'l': this.skip( 5 ); break;
+                case 'ArrowLeft': case 'j': case 'F6': this.skip( -5 ); break;
+                case 'ArrowRight': case 'l': case 'F8': this.skip( 5 ); break;
                 case 'Home': this.begin(); break;
                 case 'End': this.end(); break;
                 case ',': this.skipFrame( -1 ); break;
