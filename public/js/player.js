@@ -10,6 +10,11 @@ class VideoPlayer {
         this.actions = this.initActions();
         this.setActionState( { pause: false, replay: false, minimize: false } );
 
+        this.overlay = {
+            icon: this.player.querySelector( '.player-overlay .icon' ),
+            msg: this.player.querySelector( '.player-overlay .msg' )
+        };
+
         this.videoId = this.player.getAttribute( 'videoId' );
         this.videoDir = '/media/' + this.videoId + '/';
         this.videoData = {};
@@ -17,6 +22,7 @@ class VideoPlayer {
         this.loaded = false;
         this.ready = false;
         this.controlsTimeout = null;
+        this.overlayTimeout = null;
 
         this.initEventHandlers();
         this.loadMeta().then( () => {
@@ -188,6 +194,21 @@ class VideoPlayer {
 
     }
 
+    setActionState ( states, classes = {} ) {
+
+        for ( const [ action, state ] of Object.entries( states ) ) {
+            this.actions[ action ].disabled = ! state;
+        }
+
+        for ( const [ cls, state ] of Object.entries( classes ) ) {
+
+            if ( state ) this.player.classList.add( cls );
+            else this.player.classList.remove( cls );
+
+        }
+
+    }
+
     showControls () {
 
         this.setActionState( {}, { controls: true } );
@@ -205,18 +226,18 @@ class VideoPlayer {
 
     hideLoad () { this.setActionState( {}, { load: false } ) }
 
-    setActionState ( states, classes = {} ) {
+    showOverlay ( icon, msg ) {
 
-        for ( const [ action, state ] of Object.entries( states ) ) {
-            this.actions[ action ].disabled = ! state;
-        }
+        this.overlay.msg.textContent = msg;
+        this.overlay.icon.classList.remove( ...this.overlay.icon.classList );
+        this.overlay.icon.classList.add( 'icon', 'icon-' + icon );
 
-        for ( const [ cls, state ] of Object.entries( classes ) ) {
+        this.setActionState( {}, { overlay: true } );
+        clearTimeout( this.overlayTimeout );
 
-            if ( state ) this.player.classList.add( cls );
-            else this.player.classList.remove( cls );
-
-        }
+        this.overlayTimeout = setTimeout(
+            () => this.setActionState( {}, { overlay: false } ), 800
+        );
 
     }
 
