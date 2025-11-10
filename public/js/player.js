@@ -50,6 +50,7 @@ class VideoPlayer {
             this.initVideo();
 
             this.setVolume( this.playerState.volume );
+            this.setPlaybackRate( this.playerState.playbackRate );
 
         } );
 
@@ -115,6 +116,7 @@ class VideoPlayer {
 
         // Events
         this.video.addEventListener( 'volumechange', this.updateVolumeState.bind( this ) );
+        this.video.addEventListener( 'ratechange', this.updatePlaybackRateState.bind( this ) );
 
         // Buffering
         this.video.addEventListener( 'timeupdate', this.updateProgress.bind( this ) );
@@ -590,6 +592,19 @@ class VideoPlayer {
             this.seekDirection ? 'fastForward' : 'rewind',
             this.i18n.overlay.seek + formatTime( this.video.currentTime )
         );
+
+    }
+
+    // Playback rate
+
+    changePlaybackRate ( value ) { this.setPlaybackRate( this.video.playbackRate + value ) }
+
+    setPlaybackRate ( value ) { this.video.playbackRate = Math.max( 0.25, Math.min( 2, value ) ) }
+
+    updatePlaybackRateState () {
+
+        this.playerState.playbackRate = this.video.playbackRate;
+        this.saveState();
 
     }
 
