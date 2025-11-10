@@ -96,7 +96,7 @@ export async function fileMeta ( file ) {
 
 }
 
-export async function getWaveform ( file, meta, targetPoints = 200 ) {
+export async function getWaveform ( file, meta, targetPoints = 400 ) {
 
     // Create a very low-sample-rate mono PCM stream so we end up with roughly targetPoints samples
     // This will used to show an audio waveform preview on the video seekbar
