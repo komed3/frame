@@ -22,7 +22,15 @@ app.use( '/fonts', serveStatic( join( cwd, 'public/fonts' ) ) );
 app.use( '/images', serveStatic( join( cwd, 'public/images' ) ) );
 app.use( '/css', serveStatic( join( cwd, 'public/css' ) ) );
 app.use( '/js', serveStatic( join( cwd, 'public/js' ) ) );
-app.use( '/media', serveStatic( join( cwd, 'media' ) ) );
+
+// Serve media files
+app.use( '/media', serveStatic( join( cwd, 'media' ), {
+    setHeaders ( res, path ) {
+        if ( path.endsWith( '.m3u8' ) ) res.setHeader( 'Content-Type', 'application/vnd.apple.mpegurl' );
+        if ( path.endsWith( '.ts' ) ) res.setHeader( 'Content-Type', 'video/mp2t' );
+        res.setHeader( 'Cache-Control', 'public, max-age=3600' );
+    }
+} ) );
 
 // Mount API and router
 app.use( api );

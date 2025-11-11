@@ -302,24 +302,18 @@ class VideoPlayer {
 
         if ( this.ready ) return;
 
-        const chunkSize = 512 * 1024;
-        const res = await fetch( this.videoDir + this.videoData.fileName );
-        const reader = res.body.getReader();
+        // Use HLS library if supported
+        if ( Hls.isSupported() ) {
 
-        const stream = new ReadableStream( { async pull ( controller ) {
+            const hls = new Hls( { lowLatencyMode: true } );
 
-            let { done, value } = await reader.read();
-            if ( done ) return controller.close();
+            hls.loadSource( this.videoDir + 'stream/output.m3u8' );
+            hls.attachMedia( this.video );
 
-            for ( let i = 0; i < value.length; i += chunkSize ) controller.enqueue(
-                value.slice( i, i + chunkSize )
-            );
+        }
 
-        } } );
-
-        const blob = await new Response( stream ).blob();
-        const blobUrl = URL.createObjectURL( blob );
-        this.video.src = blobUrl;
+        // Direct streaming on Safari browser
+        else this.video.src = this.videoDir + 'stream/output.m3u8';
 
     }
 
