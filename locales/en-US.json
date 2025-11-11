@@ -54,6 +54,10 @@
       "minimize": "Exit full screen",
       "mute": "Mute player",
       "pause": "Pause",
+      "pbr": {
+        "normal": "Normal",
+        "speed": "{{pbr}}x"
+      },
       "play": "Play",
       "replay": "Replay",
       "rewind": "Rewind",

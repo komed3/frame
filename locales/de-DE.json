@@ -54,6 +54,10 @@
       "minimize": "Vollbild beenden",
       "mute": "Stummschalten",
       "pause": "Pausieren",
+      "pbr": {
+        "normal": "Normal",
+        "speed": "{{pbr}}x"
+      },
       "play": "Abspielen",
       "replay": "Nochmal abspielen",
       "rewind": "Zurückspulen",
