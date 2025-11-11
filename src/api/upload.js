@@ -51,7 +51,9 @@ export async function upload ( req, res ) {
 
             // Create video directory (contains all files for this video)
             const videoDir = join( media, videoId );
+            const streamDir = join( videoDir, 'stream' );
             const thumbDir = join( videoDir, 'thumb' );
+            await mkdir( streamDir, { recursive: true } );
             await mkdir( thumbDir, { recursive: true } );
 
             // Move tmp file to final location
@@ -65,7 +67,7 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'meta', progress: 55, msg: req.t( 'views.upload.processing.msg.meta' ) } );
 
             // Create HLS video segments for adaptive streaming
-            await createSegments( finalPath, videoDir, meta );
+            await createSegments( finalPath, streamDir, meta );
             sendProgress( { phase: 'segment', progress: 75, msg: req.t( 'views.upload.processing.msg.segment' ) } );
 
             // Generate waveform

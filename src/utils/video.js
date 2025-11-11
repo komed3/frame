@@ -105,10 +105,9 @@ export async function createSegments ( file, outDir, meta ) {
     const segment = Math.max( 6, Math.min( 30, Math.round( ( duration / 200 ) / 6 ) * 6 ) );
 
     await promisify( execFile )( 'ffmpeg', [
-        '-i', file, '-c:v', 'libx264', '-profile:v', 'main', '-level', '4.0',
-        '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart',
+        '-i', file, '-c:v', 'copy', '-c:a', 'copy', '-movflags', '+faststart',
         '-hls_time', segment, '-hls_playlist_type', 'vod',
-        '-hls_segment_filename', join( outDir, 'segment/%03d.ts' ),
+        '-hls_segment_filename', join( outDir, '%04d.ts' ),
         join( outDir, 'output.m3u8' )
     ] );
 
