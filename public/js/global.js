@@ -5,20 +5,16 @@ function throttle ( fnc, limit ) {
 
     let throttled;
 
-    return function ( ...args ) {
-
-        if ( ! throttled ) {
-
-            fnc.apply( this, args );
-            throttled = true;
-
-            setTimeout( () => throttled = false, limit );
-
-        }
-
-    };
+    return function ( ...args ) { if ( ! throttled ) {
+        fnc.apply( this, args ); throttled = true;
+        setTimeout( () => throttled = false, limit );
+    } };
 
 }
+
+const formatDate = ( dateStr ) => new Intl.DateTimeFormat( lang, {
+    year: 'numeric', month: 'short', day: 'numeric'
+} ).format( new Date( dateStr ) );
 
 const formatTime = ( seconds, includeHrs = false ) => {
 
@@ -50,15 +46,15 @@ const formatFileSize = ( bytes, digits = 1 ) => formatUnit( bytes, digits, 'B', 
 const formatFrequency = ( hz, digits = 1 ) => formatUnit( hz, digits, 'Hz' );
 const formatBitrate = ( rate, digits = 1 ) => formatUnit( rate, digits, 'b/s' );
 
-const formatViews = ( views ) => {
-
-    return new Intl.NumberFormat( 'en-US', {
-        notation: 'compact', compactDisplay: 'short'
-    } ).format( views );
-
-}
+const formatViews = ( views ) => new Intl.NumberFormat( 'en-US', {
+    notation: 'compact', compactDisplay: 'short'
+} ).format( views );
 
 document.addEventListener( 'DOMContentLoaded', function () {
+
+    document.querySelectorAll( 'date' ).forEach(
+        el => el.textContent = formatDate( el.textContent )
+    );
 
     document.querySelectorAll( 'time' ).forEach(
         el => el.textContent = formatTime( el.textContent )
@@ -66,6 +62,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
     document.querySelectorAll( 'filesize' ).forEach(
         el => el.textContent = formatFileSize( el.textContent )
+    );
+
+    document.querySelectorAll( 'frequency' ).forEach(
+        el => el.textContent = formatFrequency( el.textContent )
+    );
+
+    document.querySelectorAll( 'bitrate' ).forEach(
+        el => el.textContent = formatBitrate( el.textContent )
     );
 
     document.querySelectorAll( 'views' ).forEach(
