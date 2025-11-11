@@ -233,8 +233,8 @@ class VideoPlayer {
 
     loadState () {
 
-        this.playerState = JSON.parse( localStorage.getItem( '__player__' ) ?? '{ "volume": 1, "playbackRate": 1 }' );
-        this.videoState = JSON.parse( localStorage.getItem( this.videoId ) ?? '{ "progress": 0 }' );
+        this.playerState = JSON.parse( localStorage.getItem( '__player__' ) ?? '{"volume":1,"playbackRate":1}' );
+        this.videoState = JSON.parse( localStorage.getItem( this.videoId ) ?? '{"progress":0,"resume":0}' );
 
     }
 
@@ -278,7 +278,7 @@ class VideoPlayer {
         await this.stream();
 
         this.video.poster = this.videoDir + 'poster.jpg';
-        this.video.currentTime = this.videoState.progress || 0;
+        this.video.currentTime = this.videoState.resume || 0;
         this.video.load();
 
         this.ready = true;
@@ -418,7 +418,8 @@ class VideoPlayer {
 
     updateProgress () {
 
-        this.videoState.progress = ( this.video.currentTime % this.video.duration ) || 0;
+        this.videoState.progress = this.video.currentTime;
+        this.videoState.resume = ( this.video.currentTime % this.video.duration ) || 0;
         this.saveState();
 
         const pct = ( this.video.currentTime / this.video.duration ) * 100;
