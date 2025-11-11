@@ -91,7 +91,6 @@
     left: 0;
     height: 6px;
     border-radius: 3px;
-    transition: all 0.2s ease-out;
 }
 
 .player-controls .progress .seekbar .buffered {
@@ -103,7 +102,6 @@
     display: none;
     width: var( --handle, 0% );
     background: var( --light-30 );
-    transition: none;
 }
 
 .player-controls .progress.hovered .seekbar .handle {
