@@ -67,7 +67,7 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'meta', progress: 55, msg: req.t( 'views.upload.processing.msg.meta' ) } );
 
             // Create HLS video segments for adaptive streaming
-            await createSegments( finalPath, streamDir, meta );
+            const segments = await createSegments( finalPath, streamDir, meta );
             sendProgress( { phase: 'segment', progress: 75, msg: req.t( 'views.upload.processing.msg.segment' ) } );
 
             // Generate waveform
@@ -75,7 +75,7 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'waveform', progress: 80, msg: req.t( 'views.upload.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
-            await createThumbnail( finalPath, videoDir, meta );
+            const thumbnail = await createThumbnail( finalPath, videoDir, meta );
             sendProgress( { phase: 'thumbnail', progress: 85, msg: req.t( 'views.upload.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
@@ -101,12 +101,13 @@ export async function upload ( req, res ) {
                 mimeType: req.file.mimetype,
                 created: now.toISOString(),
                 content: searchData,
-                meta, waveform, preview
+                meta, segments, waveform,
+                preview, thumbnail
             };
 
             // Add to search index
             await searchIndex.addVideo( videoId, {
-                ...searchData, hash,
+                ...searchData, hash, thumbnail,
                 duration: meta.duration,
                 created: now.toISOString()
             } );

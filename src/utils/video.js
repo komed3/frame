@@ -111,6 +111,12 @@ export async function createSegments ( file, outDir, meta ) {
         join( outDir, 'output.m3u8' )
     ] );
 
+    // Collect generated segment file names synchronously
+    const files = await promisify( readdir )( outDir );
+    const segments = files.filter( f => f.endsWith( `.ts` ) ).sort();
+
+    return segments;
+
 }
 
 export async function getWaveform ( file, meta, targetPoints = 400 ) {
@@ -193,6 +199,8 @@ export async function createThumbnail ( file, outDir, meta ) {
         '-qscale:v', '2',
         join( outDir, `poster.jpg` )
     ] );
+
+    return 'poster.jpg';
 
 }
 
