@@ -255,7 +255,6 @@
     left: unset;
     right: 98px;
     bottom: 64px;
-    transform: translateX( 50% );
     display: flex;
     flex-flow: column nowrap;
     min-width: 120px;
