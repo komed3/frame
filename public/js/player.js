@@ -98,6 +98,7 @@ class VideoPlayer {
         this.actions.interact.addEventListener( 'click', this.hideSettings.bind( this ) );
         this.actions.download.addEventListener( 'click', this.download.bind( this ) );
         this.actions.settings.addEventListener( 'click', this.toggleSettings.bind( this ) );
+        this.actions.info.addEventListener( 'click', this.toggleInfo.bind( this ) );
 
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
@@ -394,7 +395,7 @@ class VideoPlayer {
 
     }
 
-    // Controls
+    // Controls & Overlays
 
     setActionState ( states, classes = {} ) {
 
@@ -431,6 +432,12 @@ class VideoPlayer {
     hideSettings () { this.setActionState( {}, { settings: false } ) }
 
     toggleSettings () { this.setActionState( {}, { settings: 'toggle' } ) }
+
+    showInfo () { this.setActionState( {}, { info: false } ) }
+
+    hideInfo () { this.setActionState( {}, { info: false } ) }
+
+    toggleInfo () { this.setActionState( {}, { info: 'toggle' } ) }
 
     showLoad () { this.setActionState( {}, { load: true } ) }
 
