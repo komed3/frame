@@ -65,6 +65,30 @@
       "unmute": "Unmute player",
       "volume": "Volume"
     },
+    "info": {
+      "audio": {
+        "channels": "Channels",
+        "codec": "Codec",
+        "rate": "Sampling",
+        "title": "Audio"
+      },
+      "info": {
+        "date": "Date",
+        "source": "Source",
+        "title": "Info"
+      },
+      "title": "Video information",
+      "video": {
+        "bitrate": "Bitrate",
+        "codec": "Codec",
+        "duration": "Duration",
+        "fps": "Frames",
+        "format": "Format",
+        "resolution": "Resolution",
+        "size": "Filesize",
+        "title": "Video"
+      }
+    },
     "overlay": {
       "maximize": "Video in full screen",
       "minimize": "Leave full screen",
