@@ -276,13 +276,12 @@
 }
 
 .player-settings button:hover {
-    background: var( --light-10 );
+    background: var( --dark-40 );
 }
 
 .player-settings button.active {
     font-weight: bold;
-    color: var( --primary );
-    background: var( --dark-60 );
+    background: var( --light-10 );
 }
 
 .player-overlay {
