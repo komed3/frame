@@ -4,6 +4,10 @@
     background: var( --dark-60 );
 }
 
+.player button:focus {
+    outline: 0 none;
+}
+
 .player-container {
     position: relative;
     aspect-ratio: 16 / 9;
@@ -178,10 +182,6 @@
     transform: scale( 1.1 );
 }
 
-.player-controls .controls button:focus {
-    outline: 0 none;
-}
-
 .player-controls .volume {
     display: flex;
     flex-flow: row nowrap;
@@ -268,13 +268,13 @@
     border-radius: 0;
 }
 
-.player-settings button.active {
-    font-weight: bold;
-    background: var( --dark-10 );
-}
-
 .player-settings button:hover {
     background: var( --dark-20 );
+}
+
+.player-settings button.active {
+    font-weight: bold;
+    background: var( --light-10 );
 }
 
 .player-overlay {
