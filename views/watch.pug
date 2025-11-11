@@ -11,7 +11,7 @@ block content
   div.frame-watch
 
     //- Video player
-    div.player.load( videoId= videoId )
+    div.player.load.info( videoId= videoId )
       div.player-container
         video.video-player
 
@@ -64,6 +64,20 @@ block content
               button(
                 rate= pbr, class= ( pbr == 1 ? 'active' : '' )
               )= t( 'player.action.pbr.' + ( pbr == 1 ? 'normal' : 'speed' ), { pbr } )
+
+        //- Info
+        div.player-info
+          h3= t( 'player.info.title' )
+          div.player-info--content
+            div.player-info--section
+              h4= t( 'player.info.video.title' )
+              ul.player-info--list.video
+                each k in [ 'resolution', 'fps', 'duration', 'bitrate', 'size', 'format' ]
+                  li( info= k )
+                    span= t( 'player.info.video.' + k )
+                    strong
+            div.player-info--section
+              h4= t( 'player.info.audio.title' )
 
         //- Overlay
         div.player-overlay

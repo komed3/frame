@@ -65,6 +65,21 @@
       "unmute": "Stummschaltung aufheben",
       "volume": "Lautstärke"
     },
+    "info": {
+      "audio": {
+        "title": "Audio"
+      },
+      "title": "Videoinformation",
+      "video": {
+        "bitrate": "Bitrate",
+        "duration": "Dauer",
+        "fps": "Bildrate",
+        "format": "Format",
+        "resolution": "Auflösung",
+        "size": "Dateigröße",
+        "title": "Video"
+      }
+    },
     "overlay": {
       "maximize": "Video im Vollbild",
       "minimize": "Vollbild verlassen",
