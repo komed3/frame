@@ -95,6 +95,7 @@ class VideoPlayer {
 
         // Others
         this.actions.download.addEventListener( 'click', this.download.bind( this ) );
+        this.actions.settings.addEventListener( 'click', this.toggleSettings.bind( this ) );
 
         // Fullscreen
         document.addEventListener( 'fullscreenchange', this.updateFullscreenState.bind( this ) );
@@ -360,12 +361,14 @@ class VideoPlayer {
     setActionState ( states, classes = {} ) {
 
         for ( const [ action, state ] of Object.entries( states ) ) {
-            this.actions[ action ].disabled = ! state;
+            if ( state === 'toggle' ) this.actions[ action ].disabled = ! this.actions[ action ].disabled;
+            else this.actions[ action ].disabled = ! state;
         }
 
         for ( const [ cls, state ] of Object.entries( classes ) ) {
 
-            if ( state ) this.player.classList.add( cls );
+            if ( state === 'toggle' ) this.player.classList.toggle( cls );
+            else if ( state ) this.player.classList.add( cls );
             else this.player.classList.remove( cls );
 
         }
@@ -384,6 +387,12 @@ class VideoPlayer {
     }
 
     hideControls() { this.setActionState( {}, { controls: this.video.paused } ) }
+
+    showSettings () { this.setActionState( {}, { settings: true } ) }
+
+    hideSettings () { this.setActionState( {}, { settings: false } ) }
+
+    toggleSettings () { this.setActionState( {}, { settings: 'toggle' } ) }
 
     showLoad () { this.setActionState( {}, { load: true } ) }
 
