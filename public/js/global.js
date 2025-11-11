@@ -33,18 +33,22 @@ const formatTime = ( seconds, includeHrs = false ) => {
 
 };
 
-const formatFileSize = ( bytes, digits = 1 ) => {
+const formatUnit = ( value, digits = 1, unit = '', f = 1000 ) => {
 
-    const units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
+    const units = [ '', 'k', 'M', 'G', 'T' ];
     let i = 0;
 
-    while ( bytes >= 1024 && i < units.length - 1 ) bytes /= 1024, i++;
+    while ( value >= f && i < units.length - 1 ) value /= f, i++;
 
     return `${ new Intl.NumberFormat( lang, {
         maximumFractionDigits: digits
-    } ).format( bytes ) } ${ units[ i ] }`;
+    } ).format( value ) } ${ units[ i ] }${unit}`;
 
 };
+
+const formatFileSize = ( bytes, digits = 1 ) => formatUnit( bytes, digits, 'B', 1024 );
+const formatFrequency = ( hz, digits = 1 ) => formatUnit( hz, digits, 'Hz' );
+const formatBitrate = ( rate, digits = 1 ) => formatUnit( rate, digits, 'b/s' );
 
 const formatViews = ( views ) => {
 
