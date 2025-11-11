@@ -3,8 +3,8 @@ class VideoPlayer {
     bindings = [
         'f', 'j', 'k', 'l', 'm', ' ', ',', '.', '+', '-',
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Home', 'End', 'Escape',
-        'F6', 'F7', 'F8', 'F9', 'F11'
+        'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Home', 'End',
+        'Escape', 'F6', 'F7', 'F8', 'F9', 'F11'
     ];
 
     constructor () {
@@ -170,6 +170,7 @@ class VideoPlayer {
     initSeekbar () {
 
         const progress = this.controls.querySelector( '.progress' );
+        const hover = progress.querySelector( '.hover' );
         const timecode = progress.querySelector( '.time' );
         let percent = 0;
 
@@ -181,7 +182,21 @@ class VideoPlayer {
 
             // Calculate hover percentage
             const rect = this.actions.seek.getBoundingClientRect();
-            percent = Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) );
+            const mouseX = e.clientX - rect.left;
+            percent = Math.max( 0, Math.min( 1, mouseX / rect.width ) );
+
+            // Calculate hover card position
+            const hoverWidth = hover.getBoundingClientRect().width;
+            const hoverMargin = 12;
+            const viewportWidth = window.innerWidth;
+            let left = mouseX - ( hoverWidth / 2 );
+            const absLeft = rect.left + left;
+            const absRight = absLeft + hoverWidth;
+
+            // Positioning hover card within screen
+            if ( absLeft < hoverMargin ) left += hoverMargin - absLeft;
+            else if ( absRight > viewportWidth - hoverMargin ) left -= absRight - ( viewportWidth - hoverMargin );
+            hover.style.left = left + 'px';
 
             // Show hover state
             progress.classList.add( 'hovered' );

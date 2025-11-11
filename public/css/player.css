@@ -112,14 +112,12 @@
 
 .player-controls .progress .seekbar .handle .hover {
     position: absolute;
-    right: 0;
     bottom: 100px;
-    transform: translateX( 50% );
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
     gap: 6px;
-    width: max-content;
+    width: 240px;
     height: auto;
 }
 
@@ -131,7 +129,7 @@
 
 .player-controls .progress .seekbar .handle .hover .preview {
     aspect-ratio: 16 / 9;
-    width: 240px;
+    width: 100%;
     height: auto;
 }
 
