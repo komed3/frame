@@ -3,7 +3,7 @@ import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { media, tmp } from '../utils/config.js';
 import { searchIndex } from '../utils/search.js';
-import { createPreview, createThumbnail, fileHash, fileMeta, generateId, getWaveform, uploadVideo } from '../utils/video.js';
+import { createPreview, createSegments, createThumbnail, fileHash, fileMeta, generateId, getWaveform, uploadVideo } from '../utils/video.js';
 
 export async function upload ( req, res ) {
 
@@ -62,15 +62,19 @@ export async function upload ( req, res ) {
 
             // Extract metadata and analyze video
             const meta = await fileMeta( finalPath );
-            sendProgress( { phase: 'meta', progress: 60, msg: req.t( 'views.upload.processing.msg.meta' ) } );
+            sendProgress( { phase: 'meta', progress: 55, msg: req.t( 'views.upload.processing.msg.meta' ) } );
+
+            // Create HLS video segments for adaptive streaming
+            await createSegments( finalPath, videoDir, meta );
+            sendProgress( { phase: 'segment', progress: 75, msg: req.t( 'views.upload.processing.msg.segment' ) } );
 
             // Generate waveform
             const waveform = await getWaveform( finalPath, meta );
-            sendProgress( { phase: 'waveform', progress: 75, msg: req.t( 'views.upload.processing.msg.waveform' ) } );
+            sendProgress( { phase: 'waveform', progress: 80, msg: req.t( 'views.upload.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
             await createThumbnail( finalPath, videoDir, meta );
-            sendProgress( { phase: 'thumbnail', progress: 80, msg: req.t( 'views.upload.processing.msg.thumbnail' ) } );
+            sendProgress( { phase: 'thumbnail', progress: 85, msg: req.t( 'views.upload.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
             const preview = await createPreview( finalPath, thumbDir, meta );

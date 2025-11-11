@@ -96,6 +96,24 @@ export async function fileMeta ( file ) {
 
 }
 
+export async function createSegments ( file, outDir, meta ) {
+
+    // Create HLS video segments for adaptive streaming
+    // Will create .m3u8 playlist and .ts segment files in outDir
+
+    const duration = meta.duration || 0;
+    const segment = Math.max( 6, Math.min( 30, Math.round( ( duration / 200 ) / 6 ) * 6 ) );
+
+    await promisify( execFile )( 'ffmpeg', [
+        '-i', file, '-c:v', 'libx264', '-profile:v', 'main', '-level', '4.0',
+        '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart',
+        '-hls_time', segment, '-hls_playlist_type', 'vod',
+        '-hls_segment_filename', join( outDir, 'segment/%03d.ts' ),
+        join( outDir, 'output.m3u8' )
+    ] );
+
+}
+
 export async function getWaveform ( file, meta, targetPoints = 400 ) {
 
     // Create a very low-sample-rate mono PCM stream so we end up with roughly targetPoints samples
