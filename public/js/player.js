@@ -86,6 +86,9 @@ class VideoPlayer {
             setTimeout( () => e.target.blur(), 10 );
         } );
 
+        // Playback rate
+        this.actions.pbr.addEventListener( 'click', ( e ) => this.setPlaybackRate( e.target.getAttribute( 'rate' ) ) );
+
         // Seeking
         this.actions.rewind.addEventListener( 'click', () => this.skip( -5 ) );
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
