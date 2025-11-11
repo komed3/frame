@@ -72,9 +72,15 @@
         "rate": "Abtastrate",
         "title": "Audio"
       },
+      "info": {
+        "date": "Datum",
+        "source": "Herkunft",
+        "title": "Information"
+      },
       "title": "Videoinformation",
       "video": {
         "bitrate": "Bitrate",
+        "codec": "Codec",
         "duration": "Dauer",
         "fps": "Bildrate",
         "format": "Format",

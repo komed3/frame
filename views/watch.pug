@@ -72,16 +72,23 @@ block content
             div.player-info--section
               h4= t( 'player.info.video.title' )
               ul.player-info--list.video
-                each k in [ 'resolution', 'fps', 'duration', 'bitrate', 'size', 'format' ]
+                each k in [ 'duration', 'resolution', 'size', 'fps', 'bitrate', 'format', 'codec' ]
                   li( info= k )
                     span= t( 'player.info.video.' + k )
                     strong
             div.player-info--section
               h4= t( 'player.info.audio.title' )
               ul.player-info--list.audio
-                each k in [ 'codec', 'channels', 'rate' ]
+                each k in [ 'codec', 'rate', 'channels' ]
                   li( info= k )
                     span= t( 'player.info.audio.' + k )
+                    strong
+            div.player-info--section
+              h4= t( 'player.info.info.title' )
+              ul.player-info--list.info
+                each k in [ 'source', 'date' ]
+                  li( info= k )
+                    span= t( 'player.info.info.' + k )
                     strong
 
         //- Overlay

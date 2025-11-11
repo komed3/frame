@@ -45,6 +45,7 @@ class VideoPlayer {
             this.loadState();
             this.saveState();
 
+            this.getInfo();
             this.initSeekbar();
             this.loadWaveform();
             this.initVideo();
@@ -242,6 +243,42 @@ class VideoPlayer {
 
         localStorage.setItem( '__player__', JSON.stringify( this.playerState ) );
         localStorage.setItem( this.videoId, JSON.stringify( this.videoState ) );
+
+    }
+
+    getInfo () {
+
+        const { meta: { video, audio, bitrate, size, duration }, mimeType, content } = this.videoData;
+        const info = {
+            video: {
+                duration: formatTime( duration ),
+                resolution: `${video.width} × ${video.height}px`,
+                size: formatFileSize( size ),
+                fps: video.fps + ' fps',
+                bitrate: formatBitrate( bitrate ),
+                format: mimeType,
+                codec: ( video.codec || '—' ).toUpperCase()
+            },
+            audio: {
+                codec: ( audio.codec || '—' ).toUpperCase(),
+                rate: formatFrequency( audio.sample_rate ),
+                channels: [ '—', 'Mono', 'Stereo' ][ audio.channels ]
+            },
+            info: {
+                source: content.source || '—',
+                date: formatDate( content.date )
+            }
+        };
+
+        for ( const [ section, data ] of Object.entries( info ) ) {
+
+            const container = this.player.querySelector( '.player-info--list.' + section );
+
+            for ( const [ k, v ] of Object.entries( data ) ) {
+                container.querySelector( `[info="${k}"] strong` ).textContent = v;
+            }
+
+        }
 
     }
 
