@@ -78,6 +78,11 @@ block content
                     strong
             div.player-info--section
               h4= t( 'player.info.audio.title' )
+              ul.player-info--list.audio
+                each k in [ 'codec', 'channels', 'rate' ]
+                  li( info= k )
+                    span= t( 'player.info.audio.' + k )
+                    strong
 
         //- Overlay
         div.player-overlay

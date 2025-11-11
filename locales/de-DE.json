@@ -67,6 +67,9 @@
     },
     "info": {
       "audio": {
+        "channels": "Kanäle",
+        "codec": "Codec",
+        "rate": "Abtastrate",
         "title": "Audio"
       },
       "title": "Videoinformation",
