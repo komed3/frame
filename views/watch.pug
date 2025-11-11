@@ -61,7 +61,9 @@ block content
                   i( class= 'icon icon-' + btn )
           div.player-settings( action= "pbr" )
             each pbr in [ 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2 ]
-              button( rate= pbr )= t( 'player.action.pbr.' + ( pbr == 1 ? 'normal' : 'speed' ), { pbr } )
+              button(
+                rate= pbr, class= ( pbr == 1 ? 'active' : '' )
+              )= t( 'player.action.pbr.' + ( pbr == 1 ? 'normal' : 'speed' ), { pbr } )
 
         //- Overlay
         div.player-overlay

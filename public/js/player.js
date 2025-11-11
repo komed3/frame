@@ -94,6 +94,7 @@ class VideoPlayer {
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
 
         // Others
+        this.actions.interact.addEventListener( 'click', this.hideSettings.bind( this ) );
         this.actions.download.addEventListener( 'click', this.download.bind( this ) );
         this.actions.settings.addEventListener( 'click', this.toggleSettings.bind( this ) );
 
@@ -628,6 +629,11 @@ class VideoPlayer {
     setPlaybackRate ( value ) { this.video.playbackRate = Math.max( 0.25, Math.min( 2, value ) ) }
 
     updatePlaybackRateState () {
+
+        this.actions.pbr.querySelectorAll( '[rate]' ).forEach( el => {
+            if ( el.getAttribute( 'rate' ) == this.video.playbackRate ) el.classList.add( 'active' );
+            else el.classList.remove( 'active' );
+        } );
 
         this.playerState.playbackRate = this.video.playbackRate;
         this.saveState();
