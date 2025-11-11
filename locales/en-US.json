@@ -147,6 +147,7 @@
           "meta": "Meta data extracted",
           "preview": "Preview images generated",
           "save": "Video file saved",
+          "segment": "Optimized for web streaming",
           "thumbnail": "Video thumbnail generated",
           "upload": "Video uploading",
           "waveform": "Waveform generated"

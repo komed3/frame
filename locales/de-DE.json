@@ -147,6 +147,7 @@
           "meta": "Metadaten verarbeitet",
           "preview": "Vorschaubilder erzeugt",
           "save": "Video gespeichert",
+          "segment": "Optimiert für Web-Streaming",
           "thumbnail": "Hochauflösendes Poster erstellt",
           "upload": "Video wird hochgeladen",
           "waveform": "Audio-Vorschau generiert"
