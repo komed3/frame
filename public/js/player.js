@@ -51,6 +51,8 @@ class VideoPlayer {
             this.loadWaveform();
             this.initVideo();
 
+            this.loadPlaylist();
+
         } );
 
     }
@@ -697,6 +699,38 @@ class VideoPlayer {
 
     playbackRateOverlay () { this.showOverlay( 'clock', this.i18n.overlay.playbackRate + this.video.playbackRate + 'x' ) }
 
+    // Playlist
+
+    async loadPlaylist () {
+
+        try {
+
+            const params = new URLSearchParams( location.search );
+            const listId = params.get( 'list' );
+            if ( ! listId ) return;
+
+            // Fetch playlist
+            const res = await fetch( '/api/list/' + encodeURIComponent( listId ) );
+            if ( ! res.ok ) return;
+
+            const json = await res.json();
+            this.playlist = json.data || null;
+            if ( ! this.playlist ) return;
+
+            // Find current index
+            this.playlistIndex = this.playlist.videos.indexOf( this.videoId );
+            if ( this.playlistIndex === -1 ) this.playlistIndex = 0;
+
+            // Show playlist controls
+            this.setActionState( {
+                prev: this.playlistIndex > 0,
+                next: this.playlistIndex < this.playlist.length - 1
+            } );
+
+        } catch { /* ignore */ }
+
+    }
+
     // Fullscreen
 
     isFullscreen () {
@@ -749,6 +783,8 @@ class VideoPlayer {
         else this.showOverlay( 'minimize', this.i18n.overlay.minimize );
 
     }
+
+    // Special
 
     download () {
 

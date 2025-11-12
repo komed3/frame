@@ -41,7 +41,7 @@ block content
           //- Control actions
           div.controls
             div.left
-              each btn in [ 'play', 'pause', 'replay', 'rewind', 'fastForward' ]
+              each btn in [ 'play', 'pause', 'replay', 'prev', 'next', 'rewind', 'fastForward' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )
                   i( class= 'icon icon-' + btn )
               div.volume
