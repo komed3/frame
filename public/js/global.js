@@ -76,4 +76,13 @@ document.addEventListener( 'DOMContentLoaded', function () {
         el => el.textContent = formatViews( el.textContent )
     );
 
+    document.querySelectorAll( '[video]' ).forEach( el => {
+
+        const videoId = el.getAttribute( 'video' );
+        const { progress } = JSON.parse( localStorage.getItem( videoId ) ?? '{"progress":0}' );
+
+        el.style.setProperty( '--progress', progress + '%' );
+
+    } );
+
 } );
