@@ -1,5 +1,6 @@
 extends ./_layout
 include ./mixin/videogrid
+include ./mixin/videolist
 
 append scripts
   script( src= "https://cdn.jsdelivr.net/npm/hls.js@latest", type= "text/javascript" )
@@ -154,4 +155,4 @@ block content
               i.icon.icon-playlist
               a( href= '/list/' + list.id )= list.name
             div.frame-watch--playlist-list
-              +videogrid( list.videos, 1 )
+              +videolist( list.videos )
