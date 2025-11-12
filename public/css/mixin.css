@@ -59,3 +59,14 @@
     background: var( --light-20 );
     z-index: 2;
 }
+
+.frame-videogrid--item-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var( --progress, 0 );
+    height: 4px;
+    background: var( --primary );
+}
