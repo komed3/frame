@@ -324,7 +324,7 @@ class VideoPlayer {
 
         await this.stream();
 
-        this.video.poster = this.videoDir + 'poster.jpg';
+        this.video.poster = this.videoDir + this.videoData.thumbnail;
         this.video.currentTime = this.videoState.resume || 0;
         this.video.load();
 
