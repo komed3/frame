@@ -9,6 +9,7 @@ append scripts
 append styles
   link( rel= "stylesheet", href= "/css/watch.min.css" )
   link( rel= "stylesheet", href= "/css/player.min.css" )
+  link( rel= "stylesheet", href= "/css/mixin.min.css" )
 
 block content
   div.frame-watch
@@ -128,7 +129,7 @@ block content
 
         //- Video suggestions
         div.frame-watch--suggested
-          +videogrid( suggestions )
+          +videogrid( suggestions, 2 )
 
       //- Right column (aside)
       aside.frame-watch--column

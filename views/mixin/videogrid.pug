@@ -1,6 +1,6 @@
-mixin videogrid( videos )
+mixin videogrid( videos, cols = 4 )
   if videos && videos.length > 0
-    div.frame-videogrid
+    div.frame-videogrid( style= '--cols:' + cols )
       each video in videos
         a.frame-videogrid--item(
           href= '/watch/' + video.id,
@@ -12,6 +12,6 @@ mixin videogrid( videos )
             alt= "Thumbnail"
           )
           div.frame-videogrid--item-overlay
-            span.title= video.title
-            duration= video.duration
+            span= video.title
+            time= video.duration
           div.frame-videogrid--item-progress
