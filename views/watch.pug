@@ -15,7 +15,7 @@ block content
   div.frame-watch
 
     //- Video player
-    div.player.load( videoId= videoId )
+    div.player.load( videoId= videoId, playlist= list && list.id || undefined )
       div.player-container
         video.video-player
 
@@ -133,7 +133,8 @@ block content
 
         //- Video suggestions
         div.frame-watch--suggested
-          +videogrid( suggestions, 'suggested', 2 )
+          h3= t( 'mixin.videogrid.suggested' )
+          +videogrid( suggestions, 2 )
 
       //- Right column (aside)
       aside.frame-watch--column
@@ -145,3 +146,12 @@ block content
           button( action= "thumbsUp", title= t( 'views.watch.stats.thumbsUp' ) ): i.icon.icon-thumbsUp
           button( action= "thumbsDown", title= t( 'views.watch.stats.thumbsDown' ) ): i.icon.icon-thumbsDown
           strong.rating= ( video.stats.rating || 0 ).toFixed( 1 )
+
+        //- Playlist
+        if list && list.videos.length > 0
+          div.frame-box.frame-watch--playlist
+            div.frame-watch--playlist-header
+              i.icon.icon-playlist
+              a( href= '/list/' + list.id )= list.name
+            div.frame-watch--playlist-list
+              +videogrid( list.videos, 1 )
