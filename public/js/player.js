@@ -3,7 +3,7 @@ class VideoPlayer {
     bindings = [
         'f', 'j', 'k', 'l', 'm', ' ', ',', '.', '+', '-',
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Home', 'End',
+        'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Tab', 'Home', 'End',
         'Escape', 'F6', 'F7', 'F8', 'F9', 'F11'
     ];
 
@@ -97,6 +97,10 @@ class VideoPlayer {
         this.actions.rewind.addEventListener( 'click', () => this.skip( -5 ) );
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
 
+        // Playlist
+        this.actions.prev.addEventListener( 'click', this.prevPlaylistItem.bind( this ) );
+        this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
+
         // Others
         this.actions.interact.addEventListener( 'click', this.hideSettings.bind( this ) );
         this.actions.download.addEventListener( 'click', this.download.bind( this ) );
@@ -147,6 +151,7 @@ class VideoPlayer {
 
                 case ' ': case 'k': case 'F7': this.togglePlay(); this.playOverlay(); break;
                 case 'm': case 'F9': this.toggleMute(); this.volumeOverlay(); break;
+                case 'Tab': this.nextPlaylistItem(); break;
                 case 'ArrowUp': this.changeVolume( 0.1 ); this.volumeOverlay(); break;
                 case 'ArrowDown': this.changeVolume( -0.1 ); this.volumeOverlay(); break;
                 case 'ArrowLeft': case 'j': case 'F6': this.skip( -5 ); this.seekOverlay(); break;
@@ -710,11 +715,11 @@ class VideoPlayer {
             if ( ! listId ) return;
 
             // Fetch playlist
-            const res = await fetch( '/api/list/' + encodeURIComponent( listId ) );
+            const res = await fetch( '/api/list/' + encodeURIComponent( listId ), { method: 'post' } );
             if ( ! res.ok ) return;
 
             const json = await res.json();
-            this.playlist = json.data || null;
+            this.playlist = json.list || null;
             if ( ! this.playlist ) return;
 
             // Find current index
@@ -724,12 +729,28 @@ class VideoPlayer {
             // Show playlist controls
             this.setActionState( {
                 prev: this.playlistIndex > 0,
-                next: this.playlistIndex < this.playlist.length - 1
+                next: this.playlistIndex < this.playlist.videos.length - 1
             } );
 
         } catch { /* ignore */ }
 
     }
+
+    playlistItem ( idx ) {
+
+        if ( ! this.playlist || this.playlist.videos.length == 0 ) return;
+
+        const vid = this.playlist.videos[ Math.max( 0, Math.min(
+            this.playlist.videos.length - 1, idx
+        ) ) ];
+
+        if ( vid ) location.href = `/watch/${vid}?list=${this.playlist.id}`;
+
+    }
+
+    prevPlaylistItem () { this.playlistItem( this.playlistIndex - 1 ) }
+
+    nextPlaylistItem () { this.playlistItem( this.playlistIndex + 1 ) }
 
     // Fullscreen
 
