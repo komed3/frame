@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { media } from './config.js';
+import { searchIndex } from './search.js';
 
 const LIST_FILE = join( media, 'list.json' );
 
@@ -36,10 +37,16 @@ class Playlist {
 
     }
 
-    async getList ( listId ) {
+    async getList ( listId, videoData = false ) {
 
         if ( ! this.lists ) await this.init();
-        return this.lists.lists[ listId ];
+        const list = this.lists.lists[ listId ];
+
+        if ( list && videoData ) list.videos = await Promise.all( list.videos.map(
+            async ( v ) => await searchIndex.getVideo( v )
+        ) );
+
+        return list;
 
     }
 
