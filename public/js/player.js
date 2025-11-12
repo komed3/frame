@@ -734,6 +734,7 @@ class VideoPlayer {
 
             // Show playlist name
             this.controls.querySelector( '.playlist .name' ).textContent = this.playlist.name;
+            this.controls.querySelector( '.playlist' ).style.display = 'flex';
             this.controls.querySelector( '.playlist' ).href = '/list/' + this.playlist.id;
 
         } catch { /* ignore */ }
