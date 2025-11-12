@@ -1,18 +1,18 @@
-mixin videogrid( videos, label, cols = 4 )
+mixin videogrid( videos, cols = 4 )
   if videos && videos.length > 0
-    h3= t( 'mixin.videogrid.' + label )
     div.frame-videogrid( style= '--cols:' + cols )
       each video in videos
-        a.frame-videogrid--item(
-          href= '/watch/' + video.id,
-          title= video.title,
-          video= video.id
-        )
-          img.frame-videogrid--item-preview(
-            src= '/media/' + video.id + '/' + video.thumbnail,
-            alt= "Thumbnail"
+        if video
+          a.frame-videogrid--item(
+            href= '/watch/' + video.id,
+            title= video.title,
+            video= video.id
           )
-          div.frame-videogrid--item-overlay
-            span= video.title
-            time= video.duration
-          div.frame-videogrid--item-progress
+            img.frame-videogrid--item-preview(
+              src= '/media/' + video.id + '/' + video.thumbnail,
+              alt= "Thumbnail"
+            )
+            div.frame-videogrid--item-overlay
+              span= video.title
+              time= video.duration
+            div.frame-videogrid--item-progress
