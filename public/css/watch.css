@@ -1,6 +1,6 @@
 .frame-watch--content {
     display: grid;
-    grid-template-columns: 1fr 360px;
+    grid-template-columns: 1fr 420px;
     gap: 16px;
     margin: 16px auto;
     max-width: var( --content );
@@ -96,7 +96,6 @@
     overflow: hidden;
 }
 
-.frame-watch--playlist-header a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+.frame-watch--playlist-list {
+    margin: 12px 0 -12px;
 }

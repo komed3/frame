@@ -80,9 +80,14 @@
 
 .frame-videolist--item {
     display: grid;
-    grid-template-columns: 100px 1fr;
+    grid-template-columns: 64px 1fr;
     align-items: center;
     gap: 20px;
+    padding: 12px 0;
+}
+
+.frame-videolist--item:not( :last-child ) {
+    border-bottom: 1px dashed var( --light-20 );
 }
 
 .frame-videolist--item-preview {
@@ -90,4 +95,11 @@
     width: 100%;
     height: auto;
     object-fit: cover;
+}
+
+.frame-videolist--item-info {
+    display: flex;
+    flex-flow: column nowrap;
+    line-height: 1.2;
+    font-size: 0.92em;
 }
