@@ -186,12 +186,20 @@ button:hover {
     background-image: url( ../images/icons/mute.svg );
 }
 
+.icon.icon-next {
+    background-image: url( ../images/icons/next.svg );
+}
+
 .icon.icon-pause {
     background-image: url( ../images/icons/pause.svg );
 }
 
 .icon.icon-play {
     background-image: url( ../images/icons/play.svg );
+}
+
+.icon.icon-prev {
+    background-image: url( ../images/icons/prev.svg );
 }
 
 .icon.icon-radio {
