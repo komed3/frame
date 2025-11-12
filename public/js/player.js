@@ -471,7 +471,7 @@ class VideoPlayer {
 
     updateProgress () {
 
-        this.videoState.progress = this.video.currentTime;
+        this.videoState.progress = this.video.currentTime / this.video.duration * 100 || 0;
         this.videoState.resume = ( this.video.currentTime % this.video.duration ) || 0;
         this.saveState();
 
