@@ -81,3 +81,22 @@
 .frame-watch--stats .rating {
     padding-left: 6px;
 }
+
+.frame-watch--playlist-header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.frame-watch--playlist-header a {
+    min-width: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.frame-watch--playlist-header a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
