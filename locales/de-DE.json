@@ -65,6 +65,7 @@
         "speed": "{{pbr}}x"
       },
       "play": "Abspielen",
+      "playlist": "Wiedergabeliste",
       "prev": "Vorheriges Video",
       "replay": "Nochmal abspielen",
       "rewind": "Zurückspulen",

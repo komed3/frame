@@ -65,6 +65,7 @@
         "speed": "{{pbr}}x"
       },
       "play": "Play",
+      "playlist": "Playlist",
       "prev": "Previous video",
       "replay": "Replay",
       "rewind": "Rewind",
