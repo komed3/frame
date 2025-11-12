@@ -56,6 +56,8 @@ class VideoPlayer {
 
     }
 
+    // Initialization
+
     initActions () {
 
         const actions = {};
@@ -101,6 +103,7 @@ class VideoPlayer {
         this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
 
         // Others
+        this.actions.timecode.addEventListener( 'click', this.toggleTimeDisplay.bind( this ) );
         this.actions.interact.addEventListener( 'click', this.hideSettings.bind( this ) );
         this.actions.download.addEventListener( 'click', this.download.bind( this ) );
         this.actions.settings.addEventListener( 'click', this.toggleSettings.bind( this ) );
@@ -234,6 +237,8 @@ class VideoPlayer {
 
     }
 
+    // Load data
+
     async loadData () {
 
         if ( this.loaded ) return;
@@ -257,7 +262,7 @@ class VideoPlayer {
 
     loadState () {
 
-        this.playerState = JSON.parse( localStorage.getItem( '__player__' ) ?? '{"volume":1,"playbackRate":1}' );
+        this.playerState = JSON.parse( localStorage.getItem( '__player__' ) ?? '{"volume":1,"playbackRate":1,"timeReverse":0}' );
         this.videoState = JSON.parse( localStorage.getItem( this.videoId ) ?? '{"progress":0,"resume":0}' );
 
     }
@@ -305,6 +310,8 @@ class VideoPlayer {
 
     }
 
+    // Streaming
+
     async stream () {
 
         if ( this.ready ) return;
@@ -343,6 +350,8 @@ class VideoPlayer {
         this.setPlaybackRate( this.playerState.playbackRate );
 
     }
+
+    // Waveform
 
     async loadWaveform () {
 
@@ -505,8 +514,20 @@ class VideoPlayer {
 
     updateTimeDisplay () {
 
-        this.timecode.querySelector( '.cur' ).textContent = formatTime( this.video.currentTime );
+        const cur = this.timecode.querySelector( '.cur' );
+
+        if ( ! this.playerState.timeReverse ) cur.textContent = formatTime( this.video.currentTime );
+        else cur.textContent = '-' + formatTime( this.video.duration - this.video.currentTime );
+
         this.timecode.querySelector( '.dur' ).textContent = formatTime( this.video.duration );
+
+    }
+
+    toggleTimeDisplay () {
+
+        this.playerState.timeReverse = ! this.playerState.timeReverse;
+        this.saveState();
+        this.updateTimeDisplay();
 
     }
 
