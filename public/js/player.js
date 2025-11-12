@@ -98,6 +98,7 @@ class VideoPlayer {
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
 
         // Playlist
+        this.actions.playlist.addEventListener( 'click', () => location.href = '/list/' + this.playlist.id );
         this.actions.prev.addEventListener( 'click', this.prevPlaylistItem.bind( this ) );
         this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
 
