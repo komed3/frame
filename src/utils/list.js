@@ -36,6 +36,13 @@ class Playlist {
 
     }
 
+    async getList ( listId ) {
+
+        if ( ! this.lists ) await this.init();
+        return this.lists.lists[ listId ];
+
+    }
+
 }
 
 export const playlist = new Playlist();
