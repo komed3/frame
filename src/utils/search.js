@@ -169,6 +169,16 @@ class SearchIndex {
         if ( ! this.index ) await this.init();
         if ( ! video || ! video.id ) return [];
 
+        const time = new Date().getTime();
+        const expire = time + 1.2e9;
+
+        // Check if video has stored suggestions
+        if ( 'suggested' in video && video.suggested.expire > time && video.suggested.items.length >= n ) {
+            return await Promise.all( video.suggested.items.slice( 0, n ).map(
+                async ( id ) => await this.getVideo( id )
+            ) );
+        }
+
         const candidates = Object.values( this.index.videos ).filter( v => v.id !== video.id );
 
         // Helper: tokenize text into unique words
@@ -224,9 +234,14 @@ class SearchIndex {
 
         } );
 
-        return scored.sort( ( a, b ) => (
+        const items = scored.sort( ( a, b ) => (
             b.score - a.score || ( ( b.video.stats?.views || 0 ) - ( a.video.stats?.views || 0 ) )
         ) ).slice( 0, n ).map( s => s.video );
+
+        this.index.videos[ video.id ].suggested = { expire, items: items.map( i => i.id ) };
+        await this.save();
+
+        return items;
 
     }
 
