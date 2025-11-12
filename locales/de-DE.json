@@ -58,12 +58,14 @@
       "maximize": "Vollbild",
       "minimize": "Vollbild beenden",
       "mute": "Stummschalten",
+      "next": "Nächstes Video",
       "pause": "Pausieren",
       "pbr": {
         "normal": "Normal",
         "speed": "{{pbr}}x"
       },
       "play": "Abspielen",
+      "prev": "Vorheriges Video",
       "replay": "Nochmal abspielen",
       "rewind": "Zurückspulen",
       "settings": "Einstellungen",

@@ -58,12 +58,14 @@
       "maximize": "Full screen",
       "minimize": "Exit full screen",
       "mute": "Mute player",
+      "next": "Next video",
       "pause": "Pause",
       "pbr": {
         "normal": "Normal",
         "speed": "{{pbr}}x"
       },
       "play": "Play",
+      "prev": "Previous video",
       "replay": "Replay",
       "rewind": "Rewind",
       "settings": "Settings",

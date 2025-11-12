@@ -18,6 +18,7 @@ class VideoPlayer {
         this.actions = this.initActions();
         this.setActionState( {
             pause: false, replay: false,
+            prev: false, next: false,
             minimize: false, unmute: false
         } );
 
