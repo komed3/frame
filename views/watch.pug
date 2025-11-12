@@ -59,6 +59,11 @@ block content
                 span.cur 00:00
                 span.div /
                 span.dur 00:00
+              div.playlist
+                button( action= "playlist", title= t( 'player.action.playlist' ) )
+                  i.icon.icon-layers
+                span.name
+
             div.right
               each btn in [ 'download', 'settings', 'info', 'maximize', 'minimize' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )

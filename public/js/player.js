@@ -18,7 +18,7 @@ class VideoPlayer {
         this.actions = this.initActions();
         this.setActionState( {
             pause: false, replay: false,
-            prev: false, next: false,
+            prev: false, next: false, playlist: false,
             minimize: false, unmute: false
         } );
 
@@ -729,8 +729,14 @@ class VideoPlayer {
             // Show playlist controls
             this.setActionState( {
                 prev: this.playlistIndex > 0,
-                next: this.playlistIndex < this.playlist.videos.length - 1
+                next: this.playlistIndex < this.playlist.videos.length - 1,
+                playlist: true
+            }, {
+                playlist: true
             } );
+
+            // Show playlist name
+            this.controls.querySelector( '.playlist .name' ).textContent = this.playlist.name;
 
         } catch { /* ignore */ }
 
