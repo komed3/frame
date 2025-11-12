@@ -40,11 +40,11 @@ class Playlist {
     async getList ( listId, videoData = false ) {
 
         if ( ! this.lists ) await this.init();
-        const list = this.lists.lists[ listId ];
+        const list = structuredClone( this.lists.lists[ listId ] );
 
-        if ( list && videoData ) list.videos = await Promise.all( list.videos.map(
-            async ( v ) => await searchIndex.getVideo( v )
-        ) );
+        if ( list && videoData ) for ( const [ i, v ] of Object.entries( list.videos ) ) {
+            list.videos[ i ] = await searchIndex.getVideo( v );
+        }
 
         return list;
 
