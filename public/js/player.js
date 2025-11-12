@@ -98,7 +98,6 @@ class VideoPlayer {
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
 
         // Playlist
-        this.actions.playlist.addEventListener( 'click', () => location.href = '/list/' + this.playlist.id );
         this.actions.prev.addEventListener( 'click', this.prevPlaylistItem.bind( this ) );
         this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
 
@@ -738,6 +737,7 @@ class VideoPlayer {
 
             // Show playlist name
             this.controls.querySelector( '.playlist .name' ).textContent = this.playlist.name;
+            this.controls.querySelector( '.playlist' ).href = '/list/' + this.playlist.id;
 
         } catch { /* ignore */ }
 

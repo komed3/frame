@@ -59,13 +59,12 @@ block content
                 span.cur 00:00
                 span.div /
                 span.dur 00:00
-              div.playlist
-                button( action= "playlist", title= t( 'player.action.playlist' ) )
-                  i.icon.icon-layers
+              a.playlist
+                i.icon.icon-link
                 span.name
 
             div.right
-              each btn in [ 'download', 'settings', 'info', 'maximize', 'minimize' ]
+              each btn in [ 'playlist', 'download', 'settings', 'info', 'maximize', 'minimize' ]
                 button( action= btn, title= t( 'player.action.' + btn ) )
                   i( class= 'icon icon-' + btn )
           div.player-settings( action= "pbr" )
