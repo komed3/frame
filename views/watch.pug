@@ -156,4 +156,4 @@ block content
               i.icon.icon-playlist
               a( href= '/list/' + list.id )= list.name
             div.frame-watch--playlist-list
-              +videolist( list.videos )
+              +videolist( list.videos, '?list=' + list.id )

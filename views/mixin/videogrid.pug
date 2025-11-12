@@ -1,10 +1,10 @@
-mixin videogrid( videos, cols = 3 )
+mixin videogrid( videos, cols = 3, query = '' )
   if videos && videos.length > 0
     div.frame-videogrid( style= '--cols:' + cols )
       each video in videos
         if video
           a.frame-videogrid--item(
-            href= '/watch/' + video.id,
+            href= '/watch/' + video.id + query,
             title= video.title,
             video= video.id
           )
