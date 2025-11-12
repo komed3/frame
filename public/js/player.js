@@ -18,7 +18,7 @@ class VideoPlayer {
         this.actions = this.initActions();
         this.setActionState( {
             pause: false, replay: false,
-            prev: false, next: false, playlist: false,
+            prev: false, next: false,
             minimize: false, unmute: false
         } );
 
@@ -729,10 +729,7 @@ class VideoPlayer {
             // Show playlist controls
             this.setActionState( {
                 prev: this.playlistIndex > 0,
-                next: this.playlistIndex < this.playlist.videos.length - 1,
-                playlist: true
-            }, {
-                playlist: true
+                next: this.playlistIndex < this.playlist.videos.length - 1
             } );
 
             // Show playlist name
