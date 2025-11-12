@@ -1,0 +1,13 @@
+mixin videolist( videos )
+  if videos && videos.length > 0
+    div.frame-videolist
+      each video in videos
+        if video
+          a.frame-videolist--item( href= '/watch/' + video.id )
+            img.frame-videolist--item-preview(
+              src= '/media/' + video.id + '/' + video.thumbnail,
+              alt= "Thumbnail"
+            )
+            div.frame-videolist--item-info
+              span= video.title
+              time= video.duration
