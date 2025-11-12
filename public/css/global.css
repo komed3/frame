@@ -89,6 +89,12 @@ body {
     z-index: 1;
 }
 
+h3 {
+    margin: 32px 0 16px;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
 a, a:link, a:visited, a:hover {
     text-decoration: none;
     color: inherit;
