@@ -49,9 +49,8 @@ class VideoPlayer {
             this.getInfo();
             this.initSeekbar();
             this.loadWaveform();
-            this.initVideo();
-
             this.loadPlaylist();
+            this.initVideo();
 
         } );
 
@@ -710,8 +709,7 @@ class VideoPlayer {
 
         try {
 
-            const params = new URLSearchParams( location.search );
-            const listId = params.get( 'list' );
+            const listId = this.player.getAttribute( 'playlist' );
             if ( ! listId ) return;
 
             // Fetch playlist
@@ -731,11 +729,6 @@ class VideoPlayer {
                 prev: this.playlistIndex > 0,
                 next: this.playlistIndex < this.playlist.videos.length - 1
             } );
-
-            // Show playlist name
-            this.controls.querySelector( '.playlist .name' ).textContent = this.playlist.name;
-            this.controls.querySelector( '.playlist' ).style.display = 'flex';
-            this.controls.querySelector( '.playlist' ).href = '/list/' + this.playlist.id;
 
         } catch { /* ignore */ }
 

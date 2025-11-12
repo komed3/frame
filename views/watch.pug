@@ -60,9 +60,10 @@ block content
                 span.cur 00:00
                 span.div /
                 span.dur 00:00
-              a.playlist
-                i.icon.icon-link
-                span.name
+              if list
+                a.playlist( href= '/list/' + list.id )
+                  i.icon.icon-link
+                  span.name= list.name
 
             div.right
               each btn in [ 'playlist', 'download', 'settings', 'info', 'maximize', 'minimize' ]
