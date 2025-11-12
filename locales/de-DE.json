@@ -45,6 +45,11 @@
     "it": "Italienisch",
     "ru": "Russisch"
   },
+  "mixin": {
+    "videogrid": {
+      "suggested": "Vorgeschlagene Videos"
+    }
+  },
   "player": {
     "action": {
       "download": "Video speichern",

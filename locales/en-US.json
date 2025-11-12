@@ -45,6 +45,11 @@
     "it": "Italien",
     "ru": "Russian"
   },
+  "mixin": {
+    "videogrid": {
+      "suggested": "Suggested Videos"
+    }
+  },
   "player": {
     "action": {
       "download": "Save video",
