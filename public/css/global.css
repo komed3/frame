@@ -174,8 +174,8 @@ button:hover {
     background-image: url( ../images/icons/info.svg );
 }
 
-.icon.icon-layers {
-    background-image: url( ../images/icons/layers.svg );
+.icon.icon-link {
+    background-image: url( ../images/icons/link.svg );
 }
 
 .icon.icon-maximize {
@@ -200,6 +200,10 @@ button:hover {
 
 .icon.icon-play {
     background-image: url( ../images/icons/play.svg );
+}
+
+.icon.icon-playlist {
+    background-image: url( ../images/icons/playlist.svg );
 }
 
 .icon.icon-prev {
