@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { v4 as uuidv4 } from 'uuid';
 import { media } from './config.js';
 import { searchIndex } from './search.js';
 
