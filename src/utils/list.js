@@ -51,17 +51,59 @@ class Playlist {
 
     }
 
-    async getList ( listId, videoData = false ) {
+    async getList ( id, videoData = false ) {
 
         if ( ! this.lists ) await this.init();
 
-        const list = structuredClone( this.lists.lists[ listId ] );
+        const list = structuredClone( this.lists.lists[ id ] );
 
         if ( list && videoData ) for ( const [ i, v ] of Object.entries( list.videos ) ) {
             list.videos[ i ] = await searchIndex.getVideo( v );
         }
 
         return list;
+
+    }
+
+    async createList ( name = 'Untitled', videos = [] ) {
+
+        if ( ! this.lists ) await this.init();
+
+        const id = uuidv4();
+        const list = {
+            id, name: String( name ),
+            created: new Date().toISOString(),
+            videos: videos
+        };
+
+        this.lists.lists[ id ] = list;
+        await this.save();
+
+        return { id, list };
+
+    }
+
+    async deleteList ( id ) {
+
+        if ( ! this.lists ) await this.init();
+
+    }
+
+    async renameList ( id, name ) {
+
+        if ( ! this.lists ) await this.init();
+
+    }
+
+    async addToList( id, videos ) {
+
+        if ( ! this.lists ) await this.init();
+
+    }
+
+    async removeFromList( id, videos ) {
+
+        if ( ! this.lists ) await this.init();
 
     }
 
