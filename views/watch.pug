@@ -74,6 +74,19 @@ block content
               button(
                 rate= pbr, class= ( pbr == 1 ? 'active' : '' )
               )= t( 'player.action.pbr.' + ( pbr == 1 ? 'normal' : 'speed' ), { pbr } )
+          div.player-playlists
+            div.player-playlists--new
+              input( name= "playlist", placeholder= t( 'player.action.pl.new' ) )
+              button( pl= "new", add, title= t( 'player.action.pl.add' ) )
+                i.icon.icon-plus
+            div.player-playlists--list
+            each list in playlists
+              div.player-playlists--list-item( class= list.selected ? 'selected' : '' )
+                span= list.name
+                button( pl= list.id, add, title= t( 'player.action.pl.add' ) )
+                  i.icon.icon-plus
+                button( pl= list.id, rmv, title= t( 'player.action.pl.remove' ) )
+                  i.icon.icon-minus
 
         //- Info
         div.player-info
