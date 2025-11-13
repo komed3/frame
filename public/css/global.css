@@ -186,6 +186,10 @@ button:hover {
     background-image: url( ../images/icons/minimize.svg );
 }
 
+.icon.icon-minus {
+    background-image: url( ../images/icons/minus.svg );
+}
+
 .icon.icon-mute {
     background-image: url( ../images/icons/mute.svg );
 }
@@ -204,6 +208,10 @@ button:hover {
 
 .icon.icon-playlist {
     background-image: url( ../images/icons/playlist.svg );
+}
+
+.icon.icon-plus {
+    background-image: url( ../images/icons/plus.svg );
 }
 
 .icon.icon-prev {
