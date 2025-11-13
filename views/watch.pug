@@ -81,11 +81,11 @@ block content
                 i.icon.icon-plus
             div.player-playlists--list
             each list in playlists
-              div.player-playlists--list-item( class= list.selected ? 'selected' : '' )
+              div.player-playlists--list-item( class= list.selected ? 'selected' : '', list= list.id )
                 span= list.name
-                button( pl= "add", list= list.id, title= t( 'player.action.pl.add' ) )
+                button( pl= "add", title= t( 'player.action.pl.add' ) )
                   i.icon.icon-plus
-                button( pl= "rmv", list= list.id, title= t( 'player.action.pl.remove' ) )
+                button( pl= "rmv", title= t( 'player.action.pl.remove' ) )
                   i.icon.icon-minus
 
         //- Info
