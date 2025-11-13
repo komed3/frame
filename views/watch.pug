@@ -76,7 +76,7 @@ block content
               )= t( 'player.action.pbr.' + ( pbr == 1 ? 'normal' : 'speed' ), { pbr } )
           div.player-playlists
             div.player-playlists--new
-              input( name= "playlist", placeholder= t( 'player.action.pl.new' ) )
+              input( type= "text", name= "playlist", placeholder= t( 'player.action.pl.new' ) )
               button( pl= "new", add, title= t( 'player.action.pl.add' ) )
                 i.icon.icon-plus
             div.player-playlists--list
