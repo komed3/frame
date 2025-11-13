@@ -812,7 +812,7 @@ class VideoPlayer {
 
     async addToPlaylist ( id ) {
 
-        await fetch( '/api/list/' + encodeURIComponent( id ) + '/add', {
+        const res = await fetch( '/api/list/' + encodeURIComponent( id ) + '/add', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify( { videos: [ this.videoId ] } )
@@ -826,7 +826,7 @@ class VideoPlayer {
 
     async rmvFormPlaylist ( id ) {
 
-        await fetch( '/api/list/' + encodeURIComponent( id ) + '/rmv', {
+        const res = await fetch( '/api/list/' + encodeURIComponent( id ) + '/rmv', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify( { videos: [ this.videoId ] } )
