@@ -37,9 +37,24 @@ class Playlist {
 
     }
 
+    async listIndex ( videoId = null ) {
+
+        if ( ! this.lists ) await this.init();
+
+        const lists = [];
+
+        for ( const [ id, { name, videos } ] of Object.entries( this.lists.lists ) ) {
+            lists.push( { id: id, name: name, selected: videoId && videos.includes( videoId ) } );
+        }
+
+        return lists;
+
+    }
+
     async getList ( listId, videoData = false ) {
 
         if ( ! this.lists ) await this.init();
+
         const list = structuredClone( this.lists.lists[ listId ] );
 
         if ( list && videoData ) for ( const [ i, v ] of Object.entries( list.videos ) ) {
