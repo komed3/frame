@@ -99,6 +99,7 @@ class VideoPlayer {
         this.actions.fastForward.addEventListener( 'click', () => this.skip( 5 ) );
 
         // Playlist
+        this.actions.playlist.addEventListener( 'click', this.togglePlaylists.bind( this ) );
         this.actions.prev.addEventListener( 'click', this.prevPlaylistItem.bind( this ) );
         this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
 
@@ -452,17 +453,23 @@ class VideoPlayer {
 
     hideControls() { this.setActionState( {}, { controls: this.video.paused } ) }
 
-    showSettings () { this.setActionState( {}, { settings: true } ) }
+    showPlaylists () { this.setActionState( {}, { playlist: true, settings: false, info: false } ) }
+
+    hidePlaylists () { this.setActionState( {}, { playlist: false } ) }
+
+    togglePlaylists () { this.setActionState( {}, { playlist: 'toggle', settings: false, info: false } ) }
+
+    showSettings () { this.setActionState( {}, { playlist: false, settings: true, info: false } ) }
 
     hideSettings () { this.setActionState( {}, { settings: false } ) }
 
-    toggleSettings () { this.setActionState( {}, { settings: 'toggle' } ) }
+    toggleSettings () { this.setActionState( {}, { playlist: false, settings: 'toggle', info: false } ) }
 
-    showInfo () { this.setActionState( {}, { info: false } ) }
+    showInfo () { this.setActionState( {}, { playlist: false, settings: false, info: false } ) }
 
     hideInfo () { this.setActionState( {}, { info: false } ) }
 
-    toggleInfo () { this.setActionState( {}, { info: 'toggle' } ) }
+    toggleInfo () { this.setActionState( {}, { playlist: false, settings: false, info: 'toggle' } ) }
 
     showLoad () { this.setActionState( {}, { load: true } ) }
 
