@@ -13,6 +13,7 @@ class VideoPlayer {
         this.container = this.player.querySelector( '.player-container' );
         this.video = this.player.querySelector( 'video' );
         this.controls = this.player.querySelector( '.player-controls' );
+        this.playlists = this.controls.querySelector( '.player-playlists' );
         this.timecode = this.controls.querySelector( '.timecode' );
 
         this.actions = this.initActions();
@@ -105,7 +106,7 @@ class VideoPlayer {
         this.actions.prev.addEventListener( 'click', this.prevPlaylistItem.bind( this ) );
         this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
 
-        this.controls.querySelectorAll( '[pl]' ).forEach( ( el ) =>
+        this.playlists.querySelectorAll( '[pl]' ).forEach( ( el ) =>
             el.addEventListener( 'click', this.handlePlaylist.bind( this ) )
         );
 
@@ -786,20 +787,22 @@ class VideoPlayer {
 
     async createPlaylist ( name ) {
 
-        const res = await fetch( '/api/list/create', {
+        const res = await fetch( '/api/list/new', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify( { name, videos: [ this.videoId ] } )
         } );
 
         if ( ! res.ok ) return;
-
         const { id, list } = await res.json();
-        this.controls.querySelector( `.player-playlists--list` ).insertAdjacentHTML( 'beforeend',
-            `<div class="player-playlists--list-item selected" list="${id}">` +
-                `<span class="name">${list.name}</span>` +
-            `</div>`
-        );
+
+        const node = this.playlist.querySelector( '.player-playlists--list' );
+        const item = node.firstChild.cloneNode( true );
+
+        item.querySelector( 'span' ).textContent = list.name;
+        item.setAttribute( 'list', id );
+        item.classList.add( 'selected' );
+        node.appendChild( item );
 
     }
 
@@ -811,7 +814,9 @@ class VideoPlayer {
             body: JSON.stringify( { videos: [ this.videoId ] } )
         } );
 
-        this.controls.querySelector( `[list="${id}"]` ).classList.add( 'selected' );
+        if ( ! res.ok ) return;
+
+        this.playlists.querySelector( `[list="${id}"]` ).classList.add( 'selected' );
 
     }
 
@@ -823,16 +828,18 @@ class VideoPlayer {
             body: JSON.stringify( { videos: [ this.videoId ] } )
         } );
 
+        if ( ! res.ok ) return;
+
         if ( this.playlist && this.playlist.id === id ) location.href = '/watch/' + this.videoId;
-        else this.controls.querySelector( `[list="${id}"]` ).classList.remove( 'selected' );
+        else this.playlists.querySelector( `[list="${id}"]` ).classList.remove( 'selected' );
 
     }
 
     async handlePlaylist ( e ) {
 
         const btn = e.target.closest( '[pl]' );
-        const id = btn.closest( '[list]' ).getAttribute( 'list' );
-        const name = this.controls.querySelector( '.player-playlists--new [name="playlist"]' ).value;
+        const id = ( btn.closest( '[list]' ) || e.target ).getAttribute( 'list' );
+        const name = this.playlists.querySelector( 'input[name="playlist"]' ).value;
 
         switch ( btn.getAttribute( 'pl' ) ) {
             case 'new': await this.createPlaylist( name ); break;
