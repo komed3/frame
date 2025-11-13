@@ -784,14 +784,35 @@ class VideoPlayer {
 
     nextPlaylistItem () { this.playlistItem( this.playlistIndex + 1 ) }
 
-    async addToPlaylist( id ) {}
+    async addToPlaylist( id ) {
 
-    async rmvFormPlaylist( id ) {}
+        await fetch( '/api/list/' + encodeURIComponent( id ) + '/add', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { videoId: this.videoId } )
+        } );
+
+        this.controls.querySelector( `[list="${id}"]` ).classList.add( 'selected' );
+
+    }
+
+    async rmvFormPlaylist( id ) {
+
+        await fetch( '/api/list/' + encodeURIComponent( id ) + '/rmv', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { videoId: this.videoId } )
+        } );
+
+        if ( this.playlist && this.playlist.id === id ) location.href = '/watch/' + this.videoId;
+        else this.controls.querySelector( `[list="${id}"]` ).classList.remove( 'selected' );
+
+    }
 
     async handlePlaylist ( e ) {
 
         const btn = e.target.closest( '[pl]' );
-        const id = btn.getAttribute( 'list' ) || undefined;
+        const id = btn.closest( '[list]' ).getAttribute( 'list' ) || undefined;
 
         switch ( btn.getAttribute( 'pl' ) ) {
             case 'add': await this.addToPlaylist( id ); break;
