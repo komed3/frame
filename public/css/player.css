@@ -336,8 +336,8 @@
     overflow-y: scroll;
 }
 
-.player-playlists--list-item:not( .selected ) button[rmv],
-.player-playlists--list-item.selected button[add] {
+.player-playlists--list-item:not( .selected ) button[pl="rmv"],
+.player-playlists--list-item.selected button[pl="add"] {
     display: none;
 }
 
