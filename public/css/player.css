@@ -25,6 +25,7 @@
 }
 
 .player-controls,
+.player-playlists,
 .player-settings,
 .player-info,
 .player-overlay,
@@ -41,6 +42,7 @@
 }
 
 .player.controls .player-controls,
+.player.playlist .player-playlists,
 .player.settings .player-settings,
 .player.info .player-info,
 .player.overlay .player-overlay,
@@ -266,15 +268,16 @@
     height: 18px;
 }
 
+.player.playlist .player-controls button[action="playlist"],
 .player.settings .player-controls button[action="settings"],
 .player.info .player-controls button[action="info"] {
     background: var( --dark-60 );
 }
 
+.player-playlists,
 .player-settings {
     top: unset;
     left: unset;
-    right: 98px;
     bottom: 64px;
     display: flex;
     flex-flow: column nowrap;
@@ -283,6 +286,14 @@
     background: var( --dark-60 );
     border-radius: var( --radius );
     overflow: hidden;
+}
+
+.player-playlists {
+    right: 186px;
+}
+
+.player-settings {
+    right: 98px;
 }
 
 .player-settings button {
