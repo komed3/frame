@@ -83,7 +83,7 @@ class VideoPlayer {
         this.actions.replay.addEventListener( 'click', this.play.bind( this ) );
 
         // Volume
-        this.container.addEventListener( 'wheel', this.handleScroll.bind( this ) );
+        this.actions.interact.addEventListener( 'wheel', this.handleScroll.bind( this ) );
         this.actions.mute.addEventListener( 'click', this.mute.bind( this ) );
         this.actions.unmute.addEventListener( 'click', this.unmute.bind( this ) );
         this.actions.volume.addEventListener( 'input', ( e ) => {
