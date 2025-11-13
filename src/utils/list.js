@@ -87,11 +87,21 @@ class Playlist {
 
         if ( ! this.lists ) await this.init();
 
+        delete this.lists.lists[ id ];
+        await this.save();
+
     }
 
     async renameList ( id, name ) {
 
         if ( ! this.lists ) await this.init();
+
+        if ( id in this.lists.lists ) {
+
+            this.lists.lists[ id ].name = String( name );
+            await this.save();
+
+        }
 
     }
 
@@ -99,11 +109,25 @@ class Playlist {
 
         if ( ! this.lists ) await this.init();
 
+        if ( id in this.lists.lists ) {
+
+            this.lists.lists[ id ].videos.push( ...videos );
+            await this.save();
+
+        }
+
     }
 
     async removeFromList( id, videos ) {
 
         if ( ! this.lists ) await this.init();
+
+        if ( id in this.lists.lists ) {
+
+            this.lists.lists[ id ].videos = this.lists.lists[ id ].videos.filter( v => ! videos.includes( v ) );
+            await this.save();
+
+        }
 
     }
 
