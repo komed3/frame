@@ -9,3 +9,13 @@ export async function getPlaylist ( req, res ) {
     return res.status( 200 ).json( { list } );
 
 }
+
+export async function createList ( req, res ) {}
+
+export async function deleteList ( req, res ) {}
+
+export async function renameList ( req, res ) {}
+
+export async function addToList ( req, res ) {}
+
+export async function removeFromList ( req, res ) {}
