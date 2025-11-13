@@ -292,6 +292,54 @@
     right: 186px;
 }
 
+.player-playlists button {
+    flex: 0 0 40px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var( --light-10 );
+}
+
+.player-playlists--new,
+.player-playlists--list-item {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+}
+
+.player-playlists--new input {
+    width: 200px;
+    height: 40px;
+    background: var( --light-10 );
+}
+
+.player-playlists--list-item span {
+    min-width: 0;
+    max-width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.player-playlists--list {
+    margin-top: 6px;
+    max-height: 240px;
+    padding-top: 6px;
+    border-top: 1px solid var( --light-10 );
+    overflow-y: scroll;
+}
+
+.player-playlists--list-item:not( .selected ) button[rmv],
+.player-playlists--list-item.selected button[add] {
+    display: none;
+}
+
 .player-settings {
     right: 98px;
 }
