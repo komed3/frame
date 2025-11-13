@@ -64,8 +64,13 @@
         "normal": "Normal",
         "speed": "{{pbr}}x"
       },
+      "pl": {
+        "add": "Add to playlist",
+        "new": "New playlist",
+        "remove": "Remove from playlist"
+      },
       "play": "Play",
-      "playlist": "Playlist",
+      "playlist": "Playlists",
       "prev": "Previous video",
       "replay": "Replay",
       "rewind": "Rewind",

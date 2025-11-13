@@ -64,8 +64,13 @@
         "normal": "Normal",
         "speed": "{{pbr}}x"
       },
+      "pl": {
+        "add": "Zu Wiedergabeliste hinzufügen",
+        "new": "Neue Wiedergabeliste",
+        "remove": "Aus Wiedergabeliste entfernen"
+      },
       "play": "Abspielen",
-      "playlist": "Wiedergabeliste",
+      "playlist": "Wiedergabelisten",
       "prev": "Vorheriges Video",
       "replay": "Nochmal abspielen",
       "rewind": "Zurückspulen",
