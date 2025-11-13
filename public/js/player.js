@@ -92,7 +92,9 @@ class VideoPlayer {
         } );
 
         // Playback rate
-        this.actions.pbr.addEventListener( 'click', ( e ) => this.setPlaybackRate( e.target.getAttribute( 'rate' ) ) );
+        this.actions.pbr.addEventListener( 'click', ( e ) =>
+            this.setPlaybackRate( e.target.getAttribute( 'rate' ) )
+        );
 
         // Seeking
         this.actions.rewind.addEventListener( 'click', () => this.skip( -5 ) );
@@ -102,6 +104,10 @@ class VideoPlayer {
         this.actions.playlist.addEventListener( 'click', this.togglePlaylists.bind( this ) );
         this.actions.prev.addEventListener( 'click', this.prevPlaylistItem.bind( this ) );
         this.actions.next.addEventListener( 'click', this.nextPlaylistItem.bind( this ) );
+
+        this.controls.querySelectorAll( '[pl]' ).forEach( ( el ) =>
+            el.addEventListener( 'click', this.handlePlaylist.bind( this ) )
+        );
 
         // Others
         this.actions.timecode.addEventListener( 'click', this.toggleTimeDisplay.bind( this ) );
@@ -777,6 +783,23 @@ class VideoPlayer {
     prevPlaylistItem () { this.playlistItem( this.playlistIndex - 1 ) }
 
     nextPlaylistItem () { this.playlistItem( this.playlistIndex + 1 ) }
+
+    async addToPlaylist( id ) {}
+
+    async rmvFormPlaylist( id ) {}
+
+    async handlePlaylist ( e ) {
+
+        const btn = e.target.closest( '[pl]' );
+        const id = btn.getAttribute( 'list' ) || undefined;
+
+        switch ( btn.getAttribute( 'pl' ) ) {
+            case 'add': await this.addToPlaylist( id ); break;
+            case 'rmv': await this.rmvFormPlaylist( id ); break;
+            default: break;
+        }
+
+    }
 
     // Fullscreen
 
