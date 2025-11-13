@@ -796,17 +796,17 @@ class VideoPlayer {
         if ( ! res.ok ) return;
         const { id, list } = await res.json();
 
-        this.playlists.querySelector( '.player-playlists--list' ).insertAdjacentHTML( 'beforeend', `
-            <div class="player-playlists--list-item selected" list="${id}">
-                <span>${list.name}</span>
-                <button pl="add" title="${this.i18n.action.pl.add}">
-                    <i class="icon icon-plus"></i>
-                </button>
-                <button pl="rmv" title="${this.i18n.action.pl.remove}">
-                    <i class="icon icon-minus"></i>
-                </button>
-            </div>
-        ` );
+        this.playlists.querySelector( '.player-playlists--list' ).insertAdjacentHTML( 'beforeend',
+            `<div class="player-playlists--list-item selected" list="${id}">` +
+                `<span>${list.name}</span>` +
+                `<button pl="add" title="${this.i18n.action.pl.add}">` +
+                    `<i class="icon icon-plus"></i>` +
+                `</button>` +
+                `<button pl="rmv" title="${this.i18n.action.pl.remove}">` +
+                    `<i class="icon icon-minus"></i>` +
+                `</button>` +
+            `</div>`
+        );
 
     }
 
@@ -843,7 +843,8 @@ class VideoPlayer {
 
         const btn = e.target.closest( '[pl]' );
         const id = ( btn.closest( '[list]' ) || e.target ).getAttribute( 'list' );
-        const name = this.playlists.querySelector( 'input[name="playlist"]' ).value;
+        const txt = this.playlists.querySelector( 'input[name="playlist"]' );
+        const name = txt.value; txt.value = '';
 
         switch ( btn.getAttribute( 'pl' ) ) {
             case 'new': await this.createPlaylist( name ); break;
