@@ -784,24 +784,43 @@ class VideoPlayer {
 
     nextPlaylistItem () { this.playlistItem( this.playlistIndex + 1 ) }
 
-    async addToPlaylist( id ) {
+    async createPlaylist ( name ) {
+
+        const res = await fetch( '/api/list/create', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( { name, videos: [ this.videoId ] } )
+        } );
+
+        if ( ! res.ok ) return;
+
+        const { id, list } = await res.json();
+        this.controls.querySelector( `.player-playlists--list` ).insertAdjacentHTML( 'beforeend',
+            `<div class="player-playlists--list-item selected" list="${id}">` +
+                `<span class="name">${list.name}</span>` +
+            `</div>`
+        );
+
+    }
+
+    async addToPlaylist ( id ) {
 
         await fetch( '/api/list/' + encodeURIComponent( id ) + '/add', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify( { videoId: this.videoId } )
+            body: JSON.stringify( { videos: [ this.videoId ] } )
         } );
 
         this.controls.querySelector( `[list="${id}"]` ).classList.add( 'selected' );
 
     }
 
-    async rmvFormPlaylist( id ) {
+    async rmvFormPlaylist ( id ) {
 
         await fetch( '/api/list/' + encodeURIComponent( id ) + '/rmv', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify( { videoId: this.videoId } )
+            body: JSON.stringify( { videos: [ this.videoId ] } )
         } );
 
         if ( this.playlist && this.playlist.id === id ) location.href = '/watch/' + this.videoId;
@@ -812,9 +831,11 @@ class VideoPlayer {
     async handlePlaylist ( e ) {
 
         const btn = e.target.closest( '[pl]' );
-        const id = btn.closest( '[list]' ).getAttribute( 'list' ) || undefined;
+        const id = btn.closest( '[list]' ).getAttribute( 'list' );
+        const name = this.controls.querySelector( '.player-playlists--new [name="playlist"]' ).value;
 
         switch ( btn.getAttribute( 'pl' ) ) {
+            case 'new': await this.createPlaylist( name ); break;
             case 'add': await this.addToPlaylist( id ); break;
             case 'rmv': await this.rmvFormPlaylist( id ); break;
             default: break;
