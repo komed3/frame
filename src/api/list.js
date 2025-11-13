@@ -12,49 +12,60 @@ export async function getPlaylist ( req, res ) {
 
 export async function createList ( req, res ) {
 
-    const name = req.headers.name || 'Untitled';
-    const videos = req.headers.videos.split( ',' ) || [];
-    const { id, list } = await playlist.createList( name, videos );
+    try {
 
-    return res.status( 200 ).json( { id, list } );
+        const name = req.body.name || 'Untitled';
+        const videos = req.body.videos || [];
+        const { id, list } = playlist.createList( name, videos );
+
+        return res.status( 200 ).json( { id, list } );
+
+    }
+
+    catch { return res.sendStatus( 500 ) }
 
 }
 
 export async function deleteList ( req, res ) {
 
-    const listId = req.params.id;
-    await playlist.deleteList( listId );
+    try {
+        await playlist.deleteList( req.params.id );
+        return res.sendStatus( 200 );
+    }
 
-    return res.sendStatus( 200 );
+    catch { return res.sendStatus( 500 ) }
 
 }
 
 export async function renameList ( req, res ) {
 
-    const listId = req.params.id;
-    const name = req.headers.name || 'Untitled';
-    await playlist.renameList( listId, name );
+    try {
+        await playlist.renameList( req.params.id, req.body.name || 'Untitled' );
+        return res.sendStatus( 200 );
+    }
 
-    return res.sendStatus( 200 );
+    catch { return res.sendStatus( 500 ) }
 
 }
 
 export async function addToList ( req, res ) {
 
-    const listId = req.params.id;
-    const videos = req.headers.videos.split( ',' ) || [];
-    await playlist.addToList( listId, videos );
+    try {
+        await playlist.addToList( req.params.id, req.body.videos || [] );
+        return res.sendStatus( 200 );
+    }
 
-    return res.sendStatus( 200 );
+    catch { return res.sendStatus( 500 ) }
 
 }
 
 export async function removeFromList ( req, res ) {
 
-    const listId = req.params.id;
-    const videos = req.headers.videos.split( ',' ) || [];
-    await playlist.removeFromList( listId, videos );
+    try {
+        await playlist.removeFromList( req.params.id, req.body.videos || [] );
+        return res.sendStatus( 200 );
+    }
 
-    return res.sendStatus( 200 );
+    catch { return res.sendStatus( 500 ) }
 
 }
