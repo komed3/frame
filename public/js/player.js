@@ -796,13 +796,17 @@ class VideoPlayer {
         if ( ! res.ok ) return;
         const { id, list } = await res.json();
 
-        const node = this.playlist.querySelector( '.player-playlists--list' );
-        const item = node.firstChild.cloneNode( true );
-
-        item.querySelector( 'span' ).textContent = list.name;
-        item.setAttribute( 'list', id );
-        item.classList.add( 'selected' );
-        node.appendChild( item );
+        this.playlists.querySelector( '.player-playlists--list' ).insertAdjacentHTML( 'beforeend', `
+            <div class="player-playlists--list-item selected" list="${id}">
+                <span>${list.name}</span>
+                <button pl="add" title="${this.i18n.action.pl.add}">
+                    <i class="icon icon-plus"></i>
+                </button>
+                <button pl="rmv" title="${this.i18n.action.pl.remove}">
+                    <i class="icon icon-minus"></i>
+                </button>
+            </div>
+        ` );
 
     }
 
