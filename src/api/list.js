@@ -16,7 +16,7 @@ export async function createList ( req, res ) {
 
         const name = req.body.name || 'Untitled';
         const videos = req.body.videos || [];
-        const { id, list } = playlist.createList( name, videos );
+        const { id, list } = await playlist.createList( name, videos );
 
         return res.status( 200 ).json( { id, list } );
 
