@@ -1,5 +1,6 @@
 import express from 'express';
 import { home } from './home.js';
+import { search } from './search.js';
 import { upload } from './upload.js';
 import { watch } from './watch.js';
 
@@ -8,6 +9,7 @@ const router = express.Router();
 
 // Handle routes
 router.get( '{/}', home );
+router.get( '/search{/}', search );
 router.get( '/watch/:id{/}', watch );
 router.get( '/upload{/}', upload );
 
