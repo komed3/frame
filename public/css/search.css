@@ -12,11 +12,23 @@
     border-radius: var( --radius );
 }
 
+.frame-search--form label {
+    font-size: 0.82em;
+    font-weight: 500;
+}
+
 .frame-search--form-line {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: flex-end;
+    gap: 12px;
+}
+
+.frame-search--form-sort {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
     gap: 12px;
 }
 
@@ -29,8 +41,6 @@
 .frame-search--form-filter-item label {
     display: block;
     margin-bottom: 8px;
-    font-size: 0.82em;
-    font-weight: 500;
 }
 
 .frame-search--form-submit button {
