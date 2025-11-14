@@ -35,6 +35,14 @@ block content
         //- Filters
         div.frame-search--form-filter
 
+          //- Channel
+          div.frame-search--form-filter-item
+            label( for= "channel" )= t( 'views.search.form.channel' )
+            select#channel( name= "channel" )
+              option( value= "" )= t( 'views.search.form.all' )
+              each c in channel
+                option( value= c, selected= ( filters.channel === c ) )= c
+
           //- Category
           div.frame-search--form-filter-item
             label( for= "category" )= t( 'views.search.form.category' )
