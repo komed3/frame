@@ -10,55 +10,58 @@ block content
 
     //- Search form
     form.frame-search--form
+      div.frame-search--form-line
 
-      //- Search query
-      div.frame-search--form-query
-        i.icon.icon-search
-        input(
-          type= "text", name= "q", value= query,
-          placeholder= t( 'views.search.form.query' )
-        )
+        //- Search query
+        div.frame-search--form-query
+          i.icon.icon-search
+          input(
+            type= "text", name= "q", value= query,
+            placeholder= t( 'views.search.form.query' )
+          )
 
-      //- Sort results
-      div.fram-search--form-sort
-        label( for= "sort" )= t( 'views.search.form.sort.label' )
-        select#sort( name= "sort" )
-          each opt in [ 'date', 'title', 'views', 'rating', 'duration' ]
-            option( value= opt, selected= ( sort === opt ) )= t( 'views.search.form.sort.' + opt )
-        select#order( name= "order" )
-          option( value= "desc", selected= ( order === 'desc' ) )= t( 'views.search.form.order.desc' )
-          option( value= "asc", selected= ( order === 'asc' ) )= t( 'views.search.form.order.asc' )
+        //- Sort results
+        div.fram-search--form-sort
+          label( for= "sort" )= t( 'views.search.form.sort.label' )
+          select#sort( name= "sort" )
+            each opt in [ 'date', 'title', 'views', 'rating', 'duration' ]
+              option( value= opt, selected= ( sort === opt ) )= t( 'views.search.form.sort.' + opt )
+          select#order( name= "order" )
+            option( value= "desc", selected= ( order === 'desc' ) )= t( 'views.search.form.order.desc' )
+            option( value= "asc", selected= ( order === 'asc' ) )= t( 'views.search.form.order.asc' )
 
-      //- Filters
-      div.frame-search--form-filter
+      div.frame-search--form-line
 
-        //- Category
-        div.frame-search--form-filter-item
-          label( for= "category" )= t( 'views.search.form.category' )
-          select#category( name= "category" )
+        //- Filters
+        div.frame-search--form-filter
+
+          //- Category
+          div.frame-search--form-filter-item
+            label( for= "category" )= t( 'views.search.form.category' )
+            select#category( name= "category" )
+              option( value= "" )= t( 'views.search.form.all' )
+              each c in categories
+                option( value= c, selected= ( filters.category === c ) )= t( 'category.' + c )
+
+          //- Tag
+          div.frame-search--form-filter-item
+            label( for= "tag" )= t( 'views.search.form.tag' )
+            select#tag( name= "tag" )
+              option( value= "" )= t( 'views.search.form.all' )
+              each t in tags
+                option( value= t, selected= ( filters.tag == t ) )= t
+
+          //- Year
+          div.frame-search--form-filter-item
+          label( for= "year" )= t( 'views.search.form.year' )
+          select#year( name= "year" )
             option( value= "" )= t( 'views.search.form.all' )
-            each c in categories
-              option( value= c, selected= ( filters.category === c ) )= t( 'category.' + c )
+            each y in years
+              option( value= y, selected= ( filters.year == y ) )= y
 
-        //- Tag
-        div.frame-search--form-filter-item
-          label( for= "tag" )= t( 'views.search.form.tag' )
-          select#tag( name= "tag" )
-            option( value= "" )= t( 'views.search.form.all' )
-            each t in tags
-              option( value= t, selected= ( filters.tag == t ) )= t
-
-        //- Year
-        div.frame-search--form-filter-item
-        label( for= "year" )= t( 'views.search.form.year' )
-        select#year( name= "year" )
-          option( value= "" )= t( 'views.search.form.all' )
-          each y in years
-            option( value= y, selected= ( filters.year == y ) )= y
-
-      //- Submit
-      div.frame-search--form-submit
-        button( type= "submit" )= t( 'views.search.form.submit' )
+        //- Submit
+        div.frame-search--form-submit
+          button( type= "submit" )= t( 'views.search.form.submit' )
 
     //- Search results
     div.frame-search--results
