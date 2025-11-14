@@ -37,7 +37,10 @@ html( lang= language, template = template )
         role= "search", aria-label= "Search"
       )
         i.icon.icon-search
-        input( type= "text", name= "q", placeholder= t( 'header.search.placeholder' ) )
+        input(
+          type= "text", name= "q", value= query || '',
+          placeholder= t( 'header.search.placeholder' )
+        )
       div.frame-header--dasher
         div.frame-header--dasher-opener( title= t( 'header.dasher.label' ) )
           i.icon.icon-settings
