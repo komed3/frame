@@ -30,13 +30,21 @@ block content
             each c in categories
               option( value= c, selected= ( filters.category === c ) )= t( 'category.' + c )
 
-        //- Tags
+        //- Tag
         div.frame-search--form-filter-item
           label( for= "tag" )= t( 'views.search.form.tag' )
           select#tag( name= "tag" )
             option( value= "" )= t( 'views.search.form.all' )
             each t in tags
               option( value= t, selected= ( filters.tag == t ) )= t
+
+        //- Year
+        div.frame-search--form-filter-item
+        label( for= "year" )= t( 'views.search.form.year' )
+        select#year( name= "year" )
+          option( value= "" )= t( 'views.search.form.all' )
+          each y in years
+            option( value= y, selected= ( filters.year == y ) )= y
 
     //- Search results
     div.frame-search--results
