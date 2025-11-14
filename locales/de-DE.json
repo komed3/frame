@@ -121,7 +121,20 @@
       "form": {
         "all": "Alle",
         "category": "Kategorie",
+        "order": {
+          "asc": "Aufsteigend",
+          "desc": "Absteigend"
+        },
         "query": "Suche nach …",
+        "sort": {
+          "date": "Datum",
+          "duration": "Dauer",
+          "label": "Sortieren",
+          "rating": "Bewertung",
+          "title": "Alphabetisch",
+          "views": "Aufrufe"
+        },
+        "submit": "Suchen",
         "tag": "Schlagwort",
         "year": "Jahr"
       },

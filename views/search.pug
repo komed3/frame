@@ -56,6 +56,10 @@ block content
           each y in years
             option( value= y, selected= ( filters.year == y ) )= y
 
+      //- Submit
+      div.frame-search--form-submit
+        button( type= "submit" )= t( 'views.search.form.submit' )
+
     //- Search results
     div.frame-search--results
       h3!= t( 'views.search.results', { total, query } )
