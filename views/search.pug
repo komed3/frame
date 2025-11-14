@@ -35,13 +35,13 @@ block content
         //- Filters
         div.frame-search--form-filter
 
-          //- Channel
+          //- Author (channel)
           div.frame-search--form-filter-item
-            label( for= "channel" )= t( 'views.search.form.channel' )
-            select#channel( name= "channel" )
+            label( for= "author" )= t( 'views.search.form.author' )
+            select#author( name= "author" )
               option( value= "" )= t( 'views.search.form.all' )
-              each c in channel
-                option( value= c, selected= ( filters.channel === c ) )= c
+              each a in authors
+                option( value= a, selected= ( filters.author === a ) )= a
 
           //- Category
           div.frame-search--form-filter-item
