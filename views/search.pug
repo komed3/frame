@@ -19,6 +19,16 @@ block content
           placeholder= t( 'views.search.form.query' )
         )
 
+      //- Sort results
+      div.fram-search--form-sort
+        label( for= "sort" )= t( 'views.search.form.sort.label' )
+        select#sort( name= "sort" )
+          each opt in [ 'date', 'title', 'views', 'rating', 'duration' ]
+            option( value= opt, selected= ( sort === opt ) )= t( 'views.search.form.sort.' + opt )
+        select#order( name= "order" )
+          option( value= "desc", selected= ( order === 'desc' ) )= t( 'views.search.form.order.desc' )
+          option( value= "asc", selected= ( order === 'asc' ) )= t( 'views.search.form.order.asc' )
+
       //- Filters
       div.frame-search--form-filter
 
