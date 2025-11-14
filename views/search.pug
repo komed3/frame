@@ -48,3 +48,5 @@ block content
 
     //- Search results
     div.frame-search--results
+      h3!= t( 'views.search.results', { total, query } )
+      +videogrid( videos )
