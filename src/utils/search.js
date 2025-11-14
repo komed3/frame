@@ -227,18 +227,38 @@ class SearchIndex {
 
     }
 
-    async search ( query ) {
+    async getChannels () {
 
         if ( ! this.index ) await this.init();
-        if ( ! query ) return Object.values( this.index.videos );
-
-        query = query.toLowerCase();
-
-        return Object.values( this.index.videos ).filter(
-            video => video.index.includes( query )
-        );
+        return [];
 
     }
+
+    async getCategories () {
+
+        if ( ! this.index ) await this.init();
+        return Object.keys( this.index.categories || {} ).sort();
+
+    }
+
+    async getTags () {
+
+        if ( ! this.index ) await this.init();
+        return Object.keys( this.index.tags || {} ).sort();
+
+    }
+
+    async getYears () {
+
+        if ( ! this.index ) await this.init();
+        return [ ...new Set(
+            Object.values( searchIndex.index?.videos || {} )
+                  .map( v => v.year ).filter( Boolean )
+        ) ].sort().reverse();
+
+    }
+
+    async search ( query, filter, sort = 'date', dir = 'desc' ) {}
 
     async suggested ( video, n = 4 ) {
 
