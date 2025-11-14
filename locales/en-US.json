@@ -117,6 +117,29 @@
     "home": {
       "title": "Home"
     },
+    "search": {
+      "form": {
+        "all": "All",
+        "category": "Category",
+        "order": {
+          "asc": "Ascending",
+          "desc": "Descending"
+        },
+        "query": "Search for …",
+        "sort": {
+          "date": "Date",
+          "duration": "Duration",
+          "label": "Sort by",
+          "rating": "Rating",
+          "title": "Alphabetical",
+          "views": "Viewcount"
+        },
+        "submit": "Search",
+        "tag": "Tag",
+        "year": "Year"
+      },
+      "results": "{{total}} Results for <q>{{query}}</q>"
+    },
     "upload": {
       "form": {
         "author": "Author / Creator",
