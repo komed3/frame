@@ -42,7 +42,7 @@ class SearchIndex {
 
         // Store basic video info + searchable text index
         this.index.videos[ videoId ] = {
-            id: videoId, stats: { views: 0, rating: null },
+            id: videoId, stats: { views: 0, likes: 0, dislikes: 0, rating: null },
             index: [ videoData.title || '', videoData.description || '' ].join( ' ' ).trim().toLowerCase(),
             year: new Date( videoData.date ).getFullYear(),
             ...videoData
@@ -114,6 +114,33 @@ class SearchIndex {
 
         if ( ! this.index ) await this.init();
         if ( this.index.videos[ videoId ] ) this.index.videos[ videoId ].stats.views += 1;
+        await this.save();
+
+    }
+
+    #getRating ( video ) {
+
+        const { likes = 0, dislikes = 0 } = video.stats ?? {};
+        return Number( ( likes / Math.max( 1, likes + dislikes ) * 5 ).toFixed( 3 ) );
+
+    }
+
+    async like ( videoId ) {
+
+        if ( ! this.index ) await this.init();
+
+        const video = this.index.videos[ videoId ];
+        if ( video ) video.stats.likes += 1, video.stats.rating = this.#getRating( video );
+        await this.save();
+
+    }
+
+    async dislike ( videoId ) {
+
+        if ( ! this.index ) await this.init();
+
+        const video = this.index.videos[ videoId ];
+        if ( video ) video.stats.dislikes += 1, video.stats.rating = this.#getRating( video );
         await this.save();
 
     }
