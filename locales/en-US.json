@@ -121,6 +121,7 @@
       "form": {
         "all": "All",
         "category": "Category",
+        "channel": "Channel",
         "order": {
           "asc": "Ascending",
           "desc": "Descending"

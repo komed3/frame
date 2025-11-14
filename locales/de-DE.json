@@ -121,6 +121,7 @@
       "form": {
         "all": "Alle",
         "category": "Kategorie",
+        "channel": "Kanal",
         "order": {
           "asc": "Aufsteigend",
           "desc": "Absteigend"
