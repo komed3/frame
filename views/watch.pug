@@ -158,9 +158,9 @@ block content
         div.frame-box.frame-watch--stats
           i.icon.icon-radio
           strong.views!= t( 'views.watch.stats.views', { views: video.stats.views } )
-          button( action= "thumbsUp", title= t( 'views.watch.stats.thumbsUp' ) ): i.icon.icon-thumbsUp
-          button( action= "thumbsDown", title= t( 'views.watch.stats.thumbsDown' ) ): i.icon.icon-thumbsDown
-          strong.rating= ( video.stats.rating || 0 ).toFixed( 1 )
+          button( action= "like", id= videoId, title= t( 'views.watch.stats.thumbsUp' ) ): i.icon.icon-thumbsUp
+          button( action= "dislike", id= videoId, title= t( 'views.watch.stats.thumbsDown' ) ): i.icon.icon-thumbsDown
+          strong.rating( id= videoId )= ( video.stats.rating || 0 ).toFixed( 1 )
 
         //- Playlist
         if list && list.videos.length > 0
