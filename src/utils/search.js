@@ -3,12 +3,14 @@ import { join } from 'node:path';
 import { media } from './config.js';
 
 const INDEX_FILE = join( media, 'index.json' );
+const HISTORY_FILE = join( media, 'history.json' );
 
 class SearchIndex {
 
     constructor () {
 
         this.index = null;
+        this.history = null;
         this.init();
 
     }
@@ -16,15 +18,19 @@ class SearchIndex {
     async init () {
 
         try {
-
             const data = await readFile( INDEX_FILE, 'utf8' );
             this.index = JSON.parse( data );
-
         } catch {
-
             this.index = { videos: {}, hashes: {}, tags: {}, categories: {} };
             await this.save();
+        }
 
+        try {
+            const data = await readFile( HISTORY_FILE, 'utf8' );
+            this.history = JSON.parse( data );
+        } catch {
+            this.history = { videos: [] };
+            await this.save();
         }
 
     }
@@ -33,6 +39,29 @@ class SearchIndex {
 
         await mkdir( media, { recursive: true } );
         await writeFile( INDEX_FILE, JSON.stringify( this.index, null, 2 ) );
+        await writeFile( HISTORY_FILE, JSON.stringify( this.history, null, 2 ) );
+
+    }
+
+    async addHistory ( videoId ) {
+
+        if ( ! this.history ) await this.init();
+        if ( await this.getLastVideo() != videoId ) this.history.videos.push( videoId );
+        await this.save();
+
+    }
+
+    async getHistory ( n = 10 ) {
+
+        if ( ! this.history ) await this.init();
+        return this.history.videos.reverse.slice( 0, n );
+
+    }
+
+    async getLastVideo () {
+
+        if ( ! this.history ) await this.init();
+        return this.history.videos.at( -1 );
 
     }
 
@@ -113,7 +142,8 @@ class SearchIndex {
     async addView ( videoId ) {
 
         if ( ! this.index ) await this.init();
-        if ( this.index.videos[ videoId ] ) this.index.videos[ videoId ].stats.views += 1;
+        const last = await this.getLastVideo();
+        if ( this.index.videos[ videoId ] && last != videoId ) this.index.videos[ videoId ].stats.views += 1;
         await this.save();
 
     }
