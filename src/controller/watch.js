@@ -8,7 +8,7 @@ export async function watch ( req, res ) {
 
     if ( ! video ) { res.redirect( '/' ) } else {
 
-        await playlist.addView( videoId );
+        await searchIndex.addView( videoId );
 
         const list = await playlist.getList( req.query.list || '', true );
         const playlists = await playlist.listIndex( videoId );
