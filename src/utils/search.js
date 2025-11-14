@@ -118,7 +118,7 @@ class SearchIndex {
 
     }
 
-    #getRating ( video ) {
+    #rating ( video ) {
 
         const { likes = 0, dislikes = 0 } = video.stats ?? {};
         return Number( ( likes / Math.max( 1, likes + dislikes ) * 5 ).toFixed( 3 ) );
@@ -130,8 +130,14 @@ class SearchIndex {
         if ( ! this.index ) await this.init();
 
         const video = this.index.videos[ videoId ];
-        if ( video ) video.stats.likes += 1, video.stats.rating = this.#getRating( video );
+
+        if ( ! video ) return false;
+
+        video.stats.likes += 1;
+        video.stats.rating = this.#rating( video );
         await this.save();
+
+        return video.stats.rating;
 
     }
 
@@ -140,8 +146,21 @@ class SearchIndex {
         if ( ! this.index ) await this.init();
 
         const video = this.index.videos[ videoId ];
-        if ( video ) video.stats.dislikes += 1, video.stats.rating = this.#getRating( video );
+
+        if ( ! video ) return false;
+
+        video.stats.dislikes += 1;
+        video.stats.rating = this.#rating( video );
         await this.save();
+
+        return video.stats.rating;
+
+    }
+
+    async getRating ( videoId ) {
+
+        if ( ! this.index ) await this.init();
+        return this.index.videos[ videoId ]?.stats.rating || null;
 
     }
 
