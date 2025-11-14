@@ -798,7 +798,7 @@ class VideoPlayer {
 
         this.playlists.querySelector( '.player-playlists--list' ).insertAdjacentHTML( 'beforeend',
             `<div class="player-playlists--list-item selected" list="${id}">` +
-                `<span>${list.name}</span>` +
+                `<a href="/list/${id}" class="name">${list.name}</a>` +
                 `<button pl="add" title="${this.i18n.action.pl.add}">` +
                     `<i class="icon icon-plus"></i>` +
                 `</button>` +

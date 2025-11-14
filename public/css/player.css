@@ -320,7 +320,7 @@
     background: var( --light-10 );
 }
 
-.player-playlists--list-item span {
+.player-playlists--list-item .name {
     min-width: 0;
     max-width: 200px;
     white-space: nowrap;

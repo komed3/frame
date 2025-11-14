@@ -82,7 +82,7 @@ block content
             div.player-playlists--list
             each list in playlists
               div.player-playlists--list-item( class= list.selected ? 'selected' : '', list= list.id )
-                span= list.name
+                a.name( href= '/list/' + list.id )= list.name
                 button( pl= "add", title= t( 'player.action.pl.add' ) )
                   i.icon.icon-plus
                 button( pl= "rmv", title= t( 'player.action.pl.remove' ) )
