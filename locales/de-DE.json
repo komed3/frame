@@ -120,8 +120,8 @@
     "search": {
       "form": {
         "all": "Alle",
+        "author": "Kanal",
         "category": "Kategorie",
-        "channel": "Kanal",
         "order": {
           "asc": "Aufsteigend",
           "desc": "Absteigend"

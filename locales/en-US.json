@@ -120,8 +120,8 @@
     "search": {
       "form": {
         "all": "All",
+        "author": "Channel",
         "category": "Category",
-        "channel": "Channel",
         "order": {
           "asc": "Ascending",
           "desc": "Descending"
