@@ -21,7 +21,7 @@ class SearchIndex {
             const data = await readFile( INDEX_FILE, 'utf8' );
             this.index = JSON.parse( data );
         } catch {
-            this.index = { videos: {}, hashes: {}, tags: {}, categories: {} };
+            this.index = { videos: {}, hashes: {}, authors: {}, categories: {}, tags: {} };
             await this.save();
         }
 
@@ -80,22 +80,24 @@ class SearchIndex {
         // Store hash reference
         if ( videoData.hash ) this.index.hashes[ videoData.hash ] = videoId
 
+        // Store author reference
+        if ( videoData.author ) {
+            if ( ! this.index.authors[ videoData.author ] ) this.index.authors[ videoData.author ] = [];
+            this.index.authors[ videoData.author ].push( videoId );
+        }
+
         // Store category reference
         if ( videoData.category ) {
-
             if ( ! this.index.categories[ videoData.category ] ) this.index.categories[ videoData.category ] = [];
             this.index.categories[ videoData.category ].push( videoId );
-
         }
 
         // Store tag references
         if ( videoData.tags && videoData.tags.length ) {
 
             for ( const tag of videoData.tags ) {
-
                 if ( !this.index.tags[ tag ] ) this.index.tags[ tag ] = [];
                 this.index.tags[ tag ].push( videoId );
-
             }
 
         }
@@ -115,6 +117,10 @@ class SearchIndex {
 
         // Remove hash reference
         if ( videoData.hash ) delete this.index.hashes[ videoData.hash ];
+
+        // Remove author reference
+        if ( videoData.author ) this.index.authors[ videoData.author ] =
+            this.index.authors[ videoData.author ].filter( id => id !== videoId );
 
         // Remove category reference
         if ( videoData.category ) this.index.categories[ videoData.category ] =
@@ -201,6 +207,13 @@ class SearchIndex {
 
     }
 
+    async findByAuthor ( author ) {
+
+        if ( ! this.index ) await this.init();
+        return this.index.authors[ author ] || [];
+
+    }
+
     async findByCategory ( cat ) {
 
         if ( ! this.index ) await this.init();
@@ -227,10 +240,10 @@ class SearchIndex {
 
     }
 
-    async getChannels () {
+    async getAuthors () {
 
         if ( ! this.index ) await this.init();
-        return [];
+        return Object.keys( this.index.authors || {} ).sort();
 
     }
 
@@ -281,6 +294,7 @@ class SearchIndex {
         const tokenize = s => ( ( s || '' ).toLowerCase().match( /[\p{L}\p{N}]+/gu ) || [] ).map( t => t.trim() ).filter( Boolean );
 
         const srcTags = new Set( ( video.tags || video.content?.tags || [] ) );
+        const srcAuthor = video.author || video.content?.author || null;
         const srcCategory = video.category || video.content?.category || null;
         const srcIndexText = video.index || [ video.title || '', video.description || '' ].join( ' ' ).toLowerCase();
         const srcTokens = new Set( tokenize( srcIndexText ) );
@@ -296,6 +310,9 @@ class SearchIndex {
             let tagOverlap = 0;
             for ( const t of candTags ) if ( srcTags.has( t ) ) tagOverlap++;
             score += tagOverlap * 40;
+
+            // Author (channel)
+            if ( srcAuthor && c.author === srcAuthor ) score += 15;
 
             // Category
             if ( srcCategory && c.category === srcCategory ) score += 25;
