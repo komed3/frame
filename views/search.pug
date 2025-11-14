@@ -7,3 +7,36 @@ append styles
 
 block content
   div.frame-search
+
+    //- Search form
+    form.frame-search--form
+
+      //- Search query
+      div.frame-search--form-query
+        i.icon.icon-search
+        input(
+          type= "text", name= "q", value= query,
+          placeholder= t( 'views.search.form.query' )
+        )
+
+      //- Filters
+      div.frame-search--form-filter
+
+        //- Category
+        div.frame-search--form-filter-item
+          label( for= "category" )= t( 'views.search.form.category' )
+          select#category( name= "category" )
+            option( value= "" )= t( 'views.search.form.all' )
+            each c in categories
+              option( value= c, selected= ( filters.category === c ) )= t( 'category.' + c )
+
+        //- Tags
+        div.frame-search--form-filter-item
+          label( for= "tag" )= t( 'views.search.form.tag' )
+          select#tag( name= "tag" )
+            option( value= "" )= t( 'views.search.form.all' )
+            each t in tags
+              option( value= t, selected= ( filters.tag == t ) )= t
+
+    //- Search results
+    div.frame-search--results
