@@ -53,11 +53,11 @@ block content
 
           //- Year
           div.frame-search--form-filter-item
-          label( for= "year" )= t( 'views.search.form.year' )
-          select#year( name= "year" )
-            option( value= "" )= t( 'views.search.form.all' )
-            each y in years
-              option( value= y, selected= ( filters.year == y ) )= y
+            label( for= "year" )= t( 'views.search.form.year' )
+            select#year( name= "year" )
+              option( value= "" )= t( 'views.search.form.all' )
+              each y in years
+                option( value= y, selected= ( filters.year == y ) )= y
 
         //- Submit
         div.frame-search--form-submit

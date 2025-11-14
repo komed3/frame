@@ -16,6 +16,27 @@
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     gap: 12px;
+}
+
+.frame-search--form-filter {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 12px;
+}
+
+.frame-search--form-filter-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.82em;
+    font-weight: 500;
+}
+
+.frame-search--form-submit button {
+    background: var( --primary );
+}
+
+.frame-search--form-submit button:hover {
+    background: var( --secondary );
 }
