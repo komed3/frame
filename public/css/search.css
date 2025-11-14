@@ -6,7 +6,7 @@
 .frame-search--form {
     display: flex;
     flex-flow: column nowrap;
-    gap: 12px;
+    gap: 20px;
     padding: 20px;
     background: var( --light-10 );
     border-radius: var( --radius );
@@ -22,7 +22,25 @@
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: flex-end;
-    gap: 12px;
+    gap: 48px;
+}
+
+.frame-search--form-query {
+    position: relative;
+    flex: 1;
+}
+
+.frame-search--form-query .icon {
+    pointer-events: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: .7;
+}
+
+.frame-search--form-query input {
+    width: 100%;
+    padding-left: 42px;
 }
 
 .frame-search--form-sort {
