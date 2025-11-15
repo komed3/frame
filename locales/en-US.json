@@ -118,6 +118,7 @@
       "title": "Home"
     },
     "search": {
+      "empty": "No results found",
       "form": {
         "all": "All",
         "author": "Channel",

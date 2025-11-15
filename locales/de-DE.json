@@ -118,6 +118,7 @@
       "title": "Startseite"
     },
     "search": {
+      "empty": "Keine Ergebnisse gefunden",
       "form": {
         "all": "Alle",
         "author": "Kanal",
