@@ -24,11 +24,36 @@ class VideoSearch {
 
     }
 
+    addVideo ( video ) {
+
+        if ( ! video || ! video.id ) return;
+
+        const el = document.createElement( 'a' );
+        el.classList.add( 'frame-videogrid--item' );
+        el.href = '/watch/' + video.id;
+        el.setAttribute( 'title', video.title );
+        el.setAttribute( 'video', video.id );
+
+        const { progress } = JSON.parse( localStorage.getItem( video.id ) ?? '{"progress":0}' );
+        el.style.setProperty( '--progress', progress + '%' );
+
+        el.innerHTML =
+            `<img class="frame-videogrid--item-preview" src="/media/${video.id}/${video.thumbnail}" alt= "Thumbnail" />` +
+            `<div class="frame-videogrid--item-overlay">` +
+                `<span>${video.title}</span>` +
+                `<time>${ formatTime( video.duration ) }</time>` +
+            `</div>` +
+            `<div class="frame-videogrid--item-progress"></div>`;
+
+        this.results.appendChild( el );
+
+    }
+
     async submit ( e ) {
 
         e.preventDefault();
 
-        const formData = { ...Object.fromEntries( new FormData( this.form ) ), ...{ offset: this.offset } };
+        const formData = Object.fromEntries( new FormData( this.form ) );
         if ( JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
 
         this.query = formData;
@@ -47,9 +72,9 @@ class VideoSearch {
         this.loader.classList.add( 'hidden' );
         this.empty.classList[ total === 0 ? 'remove' : 'add' ]( 'hidden' );
         this.more.classList[ total > offset + limit ? 'remove' : 'add' ]( 'hidden' );
-        this.offset += limit;
 
-        //
+        this.results.innerHTML = '';
+        results.forEach( v => this.addVideo( v ) );
 
     }
 
