@@ -69,3 +69,24 @@
 .frame-search--form-submit button:hover {
     background: var( --secondary );
 }
+
+.frame-search--empty {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin: 80px 0;
+}
+
+.frame-search--empty .icon {
+    width: 56px;
+    height: 56px;
+    opacity: 0.6;
+}
+
+.frame-search--empty p {
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 300;
+}
