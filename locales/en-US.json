@@ -139,7 +139,8 @@
         "tag": "Tag",
         "year": "Year"
       },
-      "results": "{{total}} Results for <q>{{query}}</q>"
+      "results": "{{total}} Results for <q>{{query}}</q>",
+      "title": "Search"
     },
     "upload": {
       "form": {

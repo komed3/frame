@@ -139,7 +139,8 @@
         "tag": "Schlagwort",
         "year": "Jahr"
       },
-      "results": "{{total}} Ergebnisse für <q>{{query}}</q>"
+      "results": "{{total}} Ergebnisse für <q>{{query}}</q>",
+      "title": "Suchen"
     },
     "upload": {
       "form": {
