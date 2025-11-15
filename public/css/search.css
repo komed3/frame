@@ -70,6 +70,10 @@
     background: var( --secondary );
 }
 
+.frame-search--results {
+    min-height: 400px;
+}
+
 .frame-search--empty {
     display: flex;
     flex-flow: column nowrap;
@@ -89,6 +93,41 @@
     margin: 0;
     font-size: 1.4em;
     font-weight: 300;
+}
+
+.frame-search--loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 80px 0;
+}
+
+.frame-search--loader svg {
+    width: 120px;
+    height: 120px;
+}
+
+.frame-search--loader svg g {
+    transform-origin: center;
+    animation: rotate 2s linear infinite;
+}
+
+.frame-search--loader svg g circle {
+    stroke-linecap: round;
+    animation: loader 1.5s ease-in-out infinite;
+    fill: none;
+    stroke-width: 4px;
+    stroke: var( --light-30 );
+}
+
+@keyframes rotate {
+    100% { transform: rotate( 360deg ) }
+}
+
+@keyframes loader {
+    0% { stroke-dasharray: 0 300; stroke-dashoffset: 0; }
+    47.5% { stroke-dasharray: 84 300; stroke-dashoffset: -32; }
+    95%, 100% { stroke-dasharray: 84 300; stroke-dashoffset: -118; }
 }
 
 .frame-search--more {

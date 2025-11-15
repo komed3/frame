@@ -91,6 +91,11 @@ block content
         i.icon.icon-info
         p= t( 'views.search.empty' )
 
+      //- Result loader
+      div.frame-search--loader
+        svg( xmlns= "http://www.w3.org/2000/svg", viewBox= "0 0 48 48" )
+          g: circle( cx= 24, cy= 24, r= 19 )
+
       //- Show results
       div.frame-search--results-grid
         +videogrid( results )

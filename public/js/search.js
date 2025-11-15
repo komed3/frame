@@ -3,8 +3,8 @@ class VideoSearch {
     constructor () {
 
         this.form = document.querySelector( '.frame-search--form' );
-        this.results = document.querySelector( '.frame-search--results-grid' );
         this.empty = document.querySelector( '.frame-search--empty' );
+        this.results = document.querySelector( '.frame-search--results-grid' );
         this.more = document.querySelector( '.frame-search--more' );
 
     }
