@@ -12,6 +12,7 @@ class VideoSearch {
         this.offset = 0;
 
         this.initEventHandlers();
+        this.loadFromUrl();
 
     }
 
@@ -28,6 +29,12 @@ class VideoSearch {
             this.query.offset = this.offset;
             this.search();
         } );
+
+    }
+
+    async loadFromUrl () {
+
+        //
 
     }
 
