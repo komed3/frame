@@ -21,7 +21,7 @@ class SearchIndex {
             const data = await readFile( INDEX_FILE, 'utf8' );
             this.index = JSON.parse( data );
         } catch {
-            this.index = { videos: {}, hashes: {}, authors: {}, categories: {}, tags: {} };
+            this.index = { videos: {}, hashes: {}, authors: {}, categories: {}, tags: {}, pgs: {}, langs: {} };
             await this.save();
         }
 
@@ -102,6 +102,18 @@ class SearchIndex {
 
         }
 
+        // Store PG reference
+        if ( videoData.pg ) {
+            if ( ! this.index.pgs[ videoData.pg ] ) this.index.pgs[ videoData.pg ] = [];
+            this.index.pgs[ videoData.pg ].push( videoId );
+        }
+
+        // Store lang reference
+        if ( videoData.lang ) {
+            if ( ! this.index.langs[ videoData.lang ] ) this.index.langs[ videoData.lang ] = [];
+            this.index.langs[ videoData.lang ].push( videoId );
+        }
+
         await this.save();
 
     }
@@ -118,20 +130,25 @@ class SearchIndex {
         // Remove hash reference
         if ( videoData.hash ) delete this.index.hashes[ videoData.hash ];
 
-        // Remove author reference
-        if ( videoData.author ) this.index.authors[ videoData.author ] =
-            this.index.authors[ videoData.author ].filter( id => id !== videoId );
+        // Revome references for author, category, PG and language
+        const refs = { author: 'authors', category: 'categories', pg: 'pgs', lang: 'langs' };
 
-        // Remove category reference
-        if ( videoData.category ) this.index.categories[ videoData.category ] =
-            this.index.categories[ videoData.category ].filter( id => id !== videoId );
+        for ( const key in refs ) {
 
-        // Remove tag references
-        if ( videoData.tags && videoData.tags.length ) {
+            const table = refs[ key ];
+            const value = videoData[ key ];
 
-            for ( const tag of videoData.tags ) this.index.tags[ tag ] =
-                this.index.tags[ tag ].filter( id => id !== videoId );
+            if ( value && this.index[ table ]?.[ value ] ) {
+                this.index[ table ][ value ] = this.index[ table ][ value ].filter( id => id !== videoId );
+            }
 
+        }
+
+        // Remove lang reference
+        if ( Array.isArray( videoData.tags ) ) {
+            for ( const tag of videoData.tags ) if ( this.index.tags?.[ tag ] ) {
+                this.index.tags[ tag ] = this.index.tags[ tag ].filter( id => id !== videoId );
+            }
         }
 
         await this.save();
@@ -228,6 +245,20 @@ class SearchIndex {
 
     }
 
+    async findByPG ( pg ) {
+
+        if ( ! this.index ) await this.init();
+        return this.index.pgs[ pg ] || [];
+
+    }
+
+    async findByLang ( lang ) {
+
+        if ( ! this.index ) await this.init();
+        return this.index.langs[ lang ] || [];
+
+    }
+
     async findByField ( field, value ) {
 
         if ( ! this.index ) await this.init();
@@ -271,6 +302,20 @@ class SearchIndex {
 
     }
 
+    async getPGs () {
+
+        if ( ! this.index ) await this.init();
+        return Object.keys( this.index.pgs || {} ).sort();
+
+    }
+
+    async getLangs () {
+
+        if ( ! this.index ) await this.init();
+        return Object.keys( this.index.langs || {} ).sort();
+
+    }
+
     #sortFn ( sort, order ) {
 
         const dir = order === 'asc' ? 1 : -1;
@@ -305,6 +350,8 @@ class SearchIndex {
         if ( filters.category ) results = results.filter( v => v.category === filters.category );
         if ( filters.tag ) results = results.filter( v => v.tags.includes( filters.tag ) );
         if ( filters.year ) results = results.filter( v => v.year === parseInt( filters.year ) );
+        if ( filters.pg ) results = results.filter( v => v.pg === filters.pg );
+        if ( filters.lang ) results = results.filter( v => v.lang === filters.lang );
 
         // Sorting
         results.sort( this.#sortFn( sort, order ) );
@@ -339,7 +386,8 @@ class SearchIndex {
             author: video.author,
             category: video.category,
             tokens: new Set( tokenize( video.index ) ),
-            year: video.year || ( video.date && new Date( video.date ).getFullYear() )
+            year: video.year || ( video.date && new Date( video.date ).getFullYear() ),
+            lang: video.lang
         };
 
         // Score candidates
@@ -364,6 +412,9 @@ class SearchIndex {
                 const diff = Math.abs( src.year - cYear );
                 score += diff === 0 ? 6 : diff <= 2 ? 3 : 0;
             }
+
+            // Same language
+            if ( c.lang === src.lang ) score += 20;
 
             // Popularity
             score += Math.log1p( c.stats?.views || 0 ) * 0.5;
