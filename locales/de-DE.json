@@ -142,6 +142,7 @@
         "tag": "Schlagwort",
         "year": "Jahr"
       },
+      "more": "Weitere Ergebnisse",
       "results": "{{total}} Ergebnisse für <q>{{query}}</q>",
       "title": "Suchen"
     },
