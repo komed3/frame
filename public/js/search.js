@@ -8,21 +8,38 @@ class VideoSearch {
         this.results = document.querySelector( '.frame-search--results-grid' );
         this.more = document.querySelector( '.frame-search--more' );
 
+        this.query = null;
+
         this.initEventHandlers();
 
     }
 
     initEventHandlers () {
 
-        this.form.addEventListener( 'submit', this.handleSubmit.bind( this ) );
+        this.form.addEventListener( 'submit', this.submit.bind( this ) );
+        this.form.querySelectorAll( 'select' ).forEach( ( el ) =>
+            el.addEventListener( 'change', this.submit.bind( this ) )
+        );
 
     }
 
-    async handleSubmit ( e ) {
+    async submit ( e ) {
 
         e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
+
+        const formData = Object.fromEntries( Array.from( new FormData( this.form ) ) );
+        if ( JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
+
+        this.query = formData;
+
+        const res = await fetch( '/api/search', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( this.query )
+        } );
+
+        if ( ! res.ok ) return;
+        const {} = await res.json();
 
     }
 
