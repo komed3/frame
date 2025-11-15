@@ -1,6 +1,9 @@
 extends ./_layout
 include ./mixin/videogrid
 
+append scripts
+  script( src= "/js/search.min.js", type= "text/javascript", defer )
+
 append styles
   link( rel= "stylesheet", href= "/css/search.min.css" )
   link( rel= "stylesheet", href= "/css/mixin.min.css" )
