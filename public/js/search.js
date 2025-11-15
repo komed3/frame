@@ -17,10 +17,17 @@ class VideoSearch {
 
     initEventHandlers () {
 
+        // Form actions
         this.form.addEventListener( 'submit', this.submit.bind( this ) );
         this.form.querySelectorAll( 'select' ).forEach( ( el ) =>
             el.addEventListener( 'change', this.submit.bind( this ) )
         );
+
+        // Load more
+        this.more.querySelector( 'button' ).addEventListener( 'click', () => {
+            this.query.offset = this.offset;
+            this.search();
+        } );
 
     }
 
@@ -49,14 +56,8 @@ class VideoSearch {
 
     }
 
-    async submit ( e ) {
+    async search () {
 
-        e.preventDefault();
-
-        const formData = Object.fromEntries( new FormData( this.form ) );
-        if ( JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
-
-        this.query = formData;
         this.loader.classList.remove( 'hidden' );
         this.more.classList.add( 'hidden' );
 
@@ -73,8 +74,21 @@ class VideoSearch {
         this.empty.classList[ total === 0 ? 'remove' : 'add' ]( 'hidden' );
         this.more.classList[ total > offset + limit ? 'remove' : 'add' ]( 'hidden' );
 
-        this.results.innerHTML = '';
+        this.offset = offset + limit;
+        if ( offset === 0 ) this.results.innerHTML = '';
         results.forEach( v => this.addVideo( v ) );
+
+    }
+
+    async submit ( e ) {
+
+        e.preventDefault();
+
+        const formData = Object.fromEntries( new FormData( this.form ) );
+        if ( JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
+
+        this.query = formData;
+        this.search();
 
     }
 
