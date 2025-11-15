@@ -8,6 +8,7 @@ class VideoSearch {
         this.empty = document.querySelector( '.frame-search--empty' );
         this.more = document.querySelector( '.frame-search--more' );
 
+        this.wait = false;
         this.query = null;
         this.offset = 0;
 
@@ -25,16 +26,36 @@ class VideoSearch {
         );
 
         // Load more
-        this.more.querySelector( 'button' ).addEventListener( 'click', () => {
+        this.more.querySelector( 'button' ).addEventListener( 'click', async () => {
             this.query.offset = this.offset;
-            this.search();
+            await this.search();
         } );
 
     }
 
     async loadFromUrl () {
 
-        //
+        this.query = Object.fromEntries( new URLSearchParams( window.location.search ) );
+
+        if ( ! this.query || ! this.query.q ) location.href = '/';
+        else {
+
+            this.wait = true;
+            this.form.querySelector( '[name="q"]' ).value = this.query.q;
+            this.form.querySelector( '[name="sort"]' ).value = this.query.sort || 'date';
+            this.form.querySelector( '[name="order"]' ).value = this.query.order || 'desc';
+            this.form.querySelector( '[name="author"]' ).value = this.query.author || '';
+            this.form.querySelector( '[name="category"]' ).value = this.query.category || '';
+            this.form.querySelector( '[name="tag"]' ).value = this.query.tag || '';
+            this.form.querySelector( '[name="year"]' ).value = this.query.year || '';
+            this.form.querySelector( '[name="lang"]' ).value = this.query.lang || '';
+            this.wait = false;
+
+            delete this.query.offset;
+            delete this.query.limit;
+            await this.search();
+
+        }
 
     }
 
@@ -65,8 +86,8 @@ class VideoSearch {
 
     async search () {
 
-        this.queryUrl = new URLSearchParams( this.query ).toString();
-        window.history.pushState( '', '', '/search/?' + this.queryUrl );
+        if ( this.wait ) return;
+        this.wait = true;
 
         this.loader.classList.remove( 'hidden' );
         this.more.classList.add( 'hidden' );
@@ -84,9 +105,14 @@ class VideoSearch {
         this.empty.classList[ total === 0 ? 'remove' : 'add' ]( 'hidden' );
         this.more.classList[ total > offset + limit ? 'remove' : 'add' ]( 'hidden' );
 
-        this.offset = offset + limit;
         if ( offset === 0 ) this.results.innerHTML = '';
         results.forEach( v => this.addVideo( v ) );
+
+        this.queryUrl = new URLSearchParams( this.query ).toString();
+        window.history.pushState( '', '', '/search/?' + this.queryUrl );
+
+        this.offset = offset + limit;
+        this.wait = false;
 
     }
 
@@ -95,10 +121,10 @@ class VideoSearch {
         e.preventDefault();
 
         const formData = Object.fromEntries( new FormData( this.form ) );
-        if ( JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
+        if ( this.wait || JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
 
         this.query = formData;
-        this.search();
+        await this.search();
 
     }
 
