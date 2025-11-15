@@ -122,10 +122,12 @@
         "all": "Alle",
         "author": "Kanal",
         "category": "Kategorie",
+        "lang": "Sprache",
         "order": {
           "asc": "Aufsteigend",
           "desc": "Absteigend"
         },
+        "pg": "Altersfreigabe",
         "query": "Suche nach …",
         "sort": {
           "date": "Datum",

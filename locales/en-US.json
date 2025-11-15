@@ -122,10 +122,12 @@
         "all": "All",
         "author": "Channel",
         "category": "Category",
+        "lang": "Language",
         "order": {
           "asc": "Ascending",
           "desc": "Descending"
         },
+        "pg":"Parental Guidance",
         "query": "Search for …",
         "sort": {
           "date": "Date",

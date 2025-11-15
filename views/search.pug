@@ -67,6 +67,14 @@ block content
               each y in years
                 option( value= y, selected= ( filters.year == y ) )= y
 
+          //- Language
+          div.frame-search--form-filter-item
+            label( for= "lang" )= t( 'views.search.form.lang' )
+            select#lang( name= "lang" )
+              option( value= "" )= t( 'views.search.form.all' )
+              each l in langs
+                option( value= l, selected= ( filters.lang == l ) )= t( 'lang.' + l )
+
         //- Submit
         div.frame-search--form-submit
           button( type= "submit" )= t( 'views.search.form.submit' )
@@ -74,4 +82,4 @@ block content
     //- Search results
     div.frame-search--results
       h3!= t( 'views.search.results', { total, query } )
-      +videogrid( videos )
+      +videogrid( results )
