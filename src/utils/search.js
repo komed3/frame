@@ -280,81 +280,64 @@ class SearchIndex {
     async suggested ( video, n = 4 ) {
 
         if ( ! this.index ) await this.init();
-        if ( ! video || ! video.id ) return [];
+        if ( ! video?.id ) return [];
 
-        const time = new Date().getTime();
+        const time = Date.now();
         const expire = time + 1.2e9;
 
-        // Check if video has stored suggestions
-        if ( 'suggested' in video && video.suggested.expire > time && video.suggested.items.length >= n ) {
-            return await Promise.all( video.suggested.items.slice( 0, n ).map(
-                async ( id ) => await this.getVideo( id )
-            ) );
+        // Return cached suggestions if valid
+        if ( video.suggested?.expire > time && video.suggested.items.length >= n ) {
+            return Promise.all( video.suggested.items.slice( 0, n ).map( id => this.getVideo( id ) ) );
         }
 
         const candidates = Object.values( this.index.videos ).filter( v => v.id !== video.id );
+        const tokenize = s => ( ( s || '' ).toLowerCase().match( /[\p{L}\p{N}]+/gu ) || [] );
 
-        // Helper: tokenize text into unique words
-        const tokenize = s => ( ( s || '' ).toLowerCase().match( /[\p{L}\p{N}]+/gu ) || [] ).map( t => t.trim() ).filter( Boolean );
+        // Extract source video features
+        const src = {
+            tags: new Set( video.tags || [] ),
+            author: video.author,
+            category: video.category,
+            tokens: new Set( tokenize( video.index || `${ video.title || '' } ${ video.description || '' }` ) ),
+            year: video.year || ( video.date && new Date( video.date ).getFullYear() )
+        };
 
-        const srcTags = new Set( ( video.tags || video.content?.tags || [] ) );
-        const srcAuthor = video.author || video.content?.author || null;
-        const srcCategory = video.category || video.content?.category || null;
-        const srcIndexText = video.index || [ video.title || '', video.description || '' ].join( ' ' ).toLowerCase();
-        const srcTokens = new Set( tokenize( srcIndexText ) );
-        const srcYear = video.year || video.date ? ( new Date( video.date || video.created || '' ).getFullYear() || video.year ) : null;
-        const srcDuration = video.duration || video.meta?.duration || null;
-
+        // Score candidates
         const scored = candidates.map( c => {
 
             let score = 0;
 
-            // Tags: strong signal
-            const candTags = new Set( c.tags || c.content?.tags || [] );
-            let tagOverlap = 0;
-            for ( const t of candTags ) if ( srcTags.has( t ) ) tagOverlap++;
-            score += tagOverlap * 40;
+            // Tags overlap
+            score += [ ...new Set( c.tags || [] ) ].filter( t => src.tags.has( t ) ).length * 40;
 
-            // Author (channel)
-            if ( srcAuthor && c.author === srcAuthor ) score += 15;
+            // Author, Category
+            if ( src.author && c.author === src.author ) score += 15;
+            if ( src.category && c.category === src.category ) score += 25;
 
-            // Category
-            if ( srcCategory && c.category === srcCategory ) score += 25;
+            // Text overlap
+            const cTokens = new Set( tokenize( c.index || `${ c.title || '' } ${ c.description || '' }` ) );
+            score += Math.min( 10, [ ...src.tokens ].filter( t => cTokens.has( t ) ).length ) * 6;
 
-            // Text token overlap (title/description/index)
-            const candTokens = new Set( tokenize( c.index || [ c.title || '', c.description || '' ].join( ' ' ) ) );
-            let textOverlap = 0;
-            for ( const t of srcTokens ) if ( candTokens.has( t ) ) textOverlap++;
-            score += Math.min( 10, textOverlap ) * 6; // cap contribution
-
-            // Year proximity (small bonus for close years)
-            const candYear = c.year || c.date ? ( new Date( c.date || c.created || '' ).getFullYear() || c.year ) : null;
-            if ( srcYear && candYear ) {
-                const diff = Math.abs( srcYear - candYear );
-                if ( diff === 0 ) score += 6;
-                else if ( diff <= 2 ) score += 3;
+            // Year proximity
+            const cYear = c.year || ( c.date && new Date( c.date ).getFullYear() );
+            if ( src.year && cYear ) {
+                const diff = Math.abs( src.year - cYear );
+                score += diff === 0 ? 6 : diff <= 2 ? 3 : 0;
             }
 
-            // Duration similarity (small bonus if within 20%)
-            const candDuration = c.duration || c.meta?.duration || null;
-            if ( srcDuration && candDuration ) {
-                const ratio = Math.max( srcDuration, candDuration ) / Math.min( srcDuration, candDuration );
-                if ( ratio <= 1.2 ) score += 5;
-                else if ( ratio <= 1.5 ) score += 2;
-            }
-
-            // Popularity tie-breaker (small)
-            const views = c.stats?.views || 0;
-            score += Math.log1p( views ) * 0.5;
+            // Popularity
+            score += Math.log1p( c.stats?.views || 0 ) * 0.5;
 
             return { video: c, score };
 
         } );
 
-        const items = scored.sort( ( a, b ) => (
-            b.score - a.score || ( ( b.video.stats?.views || 0 ) - ( a.video.stats?.views || 0 ) )
-        ) ).slice( 0, n ).map( s => s.video );
+        // Get suggested items from candidates
+        const items = scored
+            .sort( ( a, b ) => b.score - a.score || ( b.video.stats?.views || 0 ) - ( a.video.stats?.views || 0 ) )
+            .slice( 0, n ).map( s => s.video );
 
+        // Store suggested videos
         this.index.videos[ video.id ].suggested = { expire, items: items.map( i => i.id ) };
         await this.save();
 
