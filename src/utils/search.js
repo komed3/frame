@@ -271,7 +271,11 @@ class SearchIndex {
 
     }
 
-    async search ( query, filter, sort = 'date', dir = 'desc' ) {}
+    async search ( query, filter ) {
+
+        return { results: [], total: 0, offset: 0, limit: 24 };
+
+    }
 
     async suggested ( video, n = 4 ) {
 
