@@ -1,5 +1,4 @@
 extends ./_layout
-include ./mixin/videogrid
 
 append scripts
   script( src= "/js/search.min.js", type= "text/javascript", defer )
@@ -18,20 +17,17 @@ block content
         //- Search query
         div.frame-search--form-query
           i.icon.icon-search
-          input(
-            type= "text", name= "q", value= query,
-            placeholder= t( 'views.search.form.query' )
-          )
+          input( type= "text", name= "q", placeholder= t( 'views.search.form.query' ) )
 
         //- Sort results
         div.frame-search--form-sort
           label( for= "sort" )= t( 'views.search.form.sort.label' )
           select#sort( name= "sort" )
             each opt in [ 'date', 'title', 'views', 'rating', 'duration' ]
-              option( value= opt, selected= ( sort === opt ) )= t( 'views.search.form.sort.' + opt )
+              option( value= opt )= t( 'views.search.form.sort.' + opt )
           select#order( name= "order" )
-            option( value= "desc", selected= ( order === 'desc' ) )= t( 'views.search.form.order.desc' )
-            option( value= "asc", selected= ( order === 'asc' ) )= t( 'views.search.form.order.asc' )
+            option( value= "desc" )= t( 'views.search.form.order.desc' )
+            option( value= "asc" )= t( 'views.search.form.order.asc' )
 
       div.frame-search--form-line
 
@@ -44,7 +40,7 @@ block content
             select#author( name= "author" )
               option( value= "" )= t( 'views.search.form.all' )
               each a in authors
-                option( value= a, selected= ( filters.author === a ) )= a
+                option( value= a )= a
 
           //- Category
           div.frame-search--form-filter-item
@@ -52,7 +48,7 @@ block content
             select#category( name= "category" )
               option( value= "" )= t( 'views.search.form.all' )
               each c in categories
-                option( value= c, selected= ( filters.category === c ) )= t( 'category.' + c )
+                option( value= c )= t( 'category.' + c )
 
           //- Tag
           div.frame-search--form-filter-item
@@ -60,7 +56,7 @@ block content
             select#tag( name= "tag" )
               option( value= "" )= t( 'views.search.form.all' )
               each t in tags
-                option( value= t, selected= ( filters.tag == t ) )= t
+                option( value= t )= t
 
           //- Year
           div.frame-search--form-filter-item
@@ -68,7 +64,7 @@ block content
             select#year( name= "year" )
               option( value= "" )= t( 'views.search.form.all' )
               each y in years
-                option( value= y, selected= ( filters.year == y ) )= y
+                option( value= y )= y
 
           //- Language
           div.frame-search--form-filter-item
@@ -76,7 +72,7 @@ block content
             select#lang( name= "lang" )
               option( value= "" )= t( 'views.search.form.all' )
               each l in langs
-                option( value= l, selected= ( filters.lang == l ) )= t( 'lang.' + l )
+                option( value= l )= t( 'lang.' + l )
 
         //- Submit
         div.frame-search--form-submit
@@ -84,7 +80,6 @@ block content
 
     //- Search results
     div.frame-search--results
-      h3!= t( 'views.search.results', { total, query } )
 
       //- Empty results
       div.frame-search--empty
@@ -98,7 +93,6 @@ block content
 
       //- Show results
       div.frame-search--results-grid
-        +videogrid( results )
 
       //- Load more results
       div.frame-search--more
