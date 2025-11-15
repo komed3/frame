@@ -143,7 +143,6 @@
         "year": "Year"
       },
       "more": "Load more",
-      "results": "{{total}} Results for <q>{{query}}</q>",
       "title": "Search"
     },
     "upload": {
