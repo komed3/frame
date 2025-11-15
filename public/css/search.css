@@ -3,6 +3,10 @@
     max-width: var( --content );
 }
 
+.frame-search .hidden {
+    display: none;
+}
+
 .frame-search--form {
     display: flex;
     flex-flow: column nowrap;

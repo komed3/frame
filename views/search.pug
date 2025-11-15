@@ -86,14 +86,14 @@ block content
         i.icon.icon-info
         p= t( 'views.search.empty' )
 
+      //- Show results
+      div.frame-search--results-grid.hidden
+
       //- Result loader
-      div.frame-search--loader
+      div.frame-search--loader.hidden
         svg( xmlns= "http://www.w3.org/2000/svg", viewBox= "0 0 48 48" )
           g: circle( cx= 24, cy= 24, r= 19 )
 
-      //- Show results
-      div.frame-search--results-grid
-
       //- Load more results
-      div.frame-search--more
+      div.frame-search--more.hidden
         button( load )= t( 'views.search.more' )

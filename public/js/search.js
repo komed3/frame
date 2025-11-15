@@ -18,7 +18,13 @@ class VideoSearch {
 
     }
 
-    async handleSubmit () {}
+    async handleSubmit ( e ) {
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+
+    }
 
 }
 
