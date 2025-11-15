@@ -58,6 +58,9 @@ class VideoSearch {
 
     async search () {
 
+        this.queryUrl = new URLSearchParams( this.query ).toString();
+        window.history.pushState( '', '', '/search/?' + this.queryUrl );
+
         this.loader.classList.remove( 'hidden' );
         this.more.classList.add( 'hidden' );
 
