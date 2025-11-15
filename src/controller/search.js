@@ -21,6 +21,8 @@ export async function search ( req, res ) {
         const categories = await searchIndex.getCategories();
         const tags = await searchIndex.getTags();
         const years = await searchIndex.getYears();
+        const pgs = await searchIndex.getPGs();
+        const langs = await searchIndex.getLangs();
 
         const result = await searchIndex.search( query, {
             filters, sort, order, offset, limit
@@ -29,12 +31,8 @@ export async function search ( req, res ) {
         res.render( 'search', {
             title: req.t( 'views.search.title' ),
             path: '/search', template: 'search',
-            query, filters, sort, order,
-            videos: result.results,
-            total: result.total,
-            offset: result.offset,
-            limit: result.limit,
-            authors, categories, tags, years
+            query, filters, sort, order, ...result,
+            authors, categories, tags, years, pgs, langs
         } );
 
     }
