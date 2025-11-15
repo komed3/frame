@@ -82,4 +82,9 @@ block content
     //- Search results
     div.frame-search--results
       h3!= t( 'views.search.results', { total, query } )
-      +videogrid( results )
+      if total == 0
+        div.frame-search--empty
+          i.icon.icon-info
+          p= t( 'views.search.empty' )
+      else
+        +videogrid( results )
