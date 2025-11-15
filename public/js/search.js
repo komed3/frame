@@ -27,7 +27,7 @@ class VideoSearch {
 
         e.preventDefault();
 
-        const formData = Object.fromEntries( Array.from( new FormData( this.form ) ) );
+        const formData = Object.fromEntries( new FormData( this.form ) );
         if ( JSON.stringify( formData ) === JSON.stringify( this.query ) ) return;
 
         this.query = formData;
@@ -39,7 +39,9 @@ class VideoSearch {
         } );
 
         if ( ! res.ok ) return;
-        const {} = await res.json();
+        const { results, total, offset, limit } = await res.json();
+
+        //
 
     }
 
