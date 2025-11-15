@@ -72,46 +72,33 @@ class SearchIndex {
         // Store basic video info + searchable text index
         this.index.videos[ videoId ] = {
             id: videoId, stats: { views: 0, likes: 0, dislikes: 0, rating: null },
-            index: [ videoData.title || '', videoData.description || '' ].join( ' ' ).trim().toLowerCase(),
-            year: new Date( videoData.date ).getFullYear(),
-            ...videoData
+            index: [ videoData.title || '', videoData.description || '' ].join(' ').trim().toLowerCase(),
+            year: new Date( videoData.date ).getFullYear(), ...videoData
         };
 
         // Store hash reference
-        if ( videoData.hash ) this.index.hashes[ videoData.hash ] = videoId
+        if ( videoData.hash ) this.index.hashes[ videoData.hash ] = videoId;
 
-        // Store author reference
-        if ( videoData.author ) {
-            if ( ! this.index.authors[ videoData.author ] ) this.index.authors[ videoData.author ] = [];
-            this.index.authors[ videoData.author ].push( videoId );
-        }
+        // Store references for author, category, PG and language
+        const refs = { author: 'authors', category: 'categories', pg: 'pgs', lang: 'langs' };
 
-        // Store category reference
-        if ( videoData.category ) {
-            if ( ! this.index.categories[ videoData.category ] ) this.index.categories[ videoData.category ] = [];
-            this.index.categories[ videoData.category ].push( videoId );
+        for ( const key in refs ) {
+
+            const table = refs[ key ];
+            const value = videoData[ key ];
+            if ( ! value ) continue;
+
+            if ( ! this.index[ table ][ value ] ) this.index[ table ][ value ] = [];
+            this.index[ table ][ value ].push( videoId );
+
         }
 
         // Store tag references
-        if ( videoData.tags && videoData.tags.length ) {
-
+        if ( Array.isArray( videoData.tags ) ) {
             for ( const tag of videoData.tags ) {
-                if ( !this.index.tags[ tag ] ) this.index.tags[ tag ] = [];
+                if ( ! this.index.tags[ tag ] ) this.index.tags[ tag ] = [];
                 this.index.tags[ tag ].push( videoId );
             }
-
-        }
-
-        // Store PG reference
-        if ( videoData.pg ) {
-            if ( ! this.index.pgs[ videoData.pg ] ) this.index.pgs[ videoData.pg ] = [];
-            this.index.pgs[ videoData.pg ].push( videoId );
-        }
-
-        // Store lang reference
-        if ( videoData.lang ) {
-            if ( ! this.index.langs[ videoData.lang ] ) this.index.langs[ videoData.lang ] = [];
-            this.index.langs[ videoData.lang ].push( videoId );
         }
 
         await this.save();
