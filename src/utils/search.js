@@ -271,9 +271,49 @@ class SearchIndex {
 
     }
 
-    async search ( query, filter ) {
+    #sortFn ( sort, order ) {
 
-        return { results: [], total: 0, offset: 0, limit: 24 };
+        const dir = order === 'asc' ? 1 : -1;
+
+        const sortFunctions = {
+            date: ( a, b ) => ( new Date( b.date || b.created || 0 ).getTime() - new Date( a.date || a.created || 0 ).getTime() ) * dir,
+            views: ( a, b ) => ( ( b.stats.views || 0 ) - ( a.stats.views || 0 ) ) * dir,
+            rating: ( a, b ) => ( ( b.stats.rating || 0 ) - ( a.stats.rating || 0 ) ) * dir,
+            duration: ( a, b ) => ( ( b.duration || 0 ) - ( a.duration || 0 ) ) * dir,
+            title: ( a, b ) => ( a.title || '' ).toLowerCase().localeCompare( ( b.title || '' ).toLowerCase() ) * dir
+        };
+
+        return sortFunctions[ sort ] || sortFunctions.date;
+
+    }
+
+    async search ( query, options ) {
+
+        if ( ! this.index ) await this.init();
+
+        const { filters = {}, sort = 'date', order = 'desc', offset = 0, limit = 24 } = options;
+        let results = Object.values( this.index.videos );
+
+        // Text search
+        if ( query ) {
+            query = query.toLowerCase();
+            results = results.filter( v => v.index.includes( query ) );
+        }
+
+        // Apply filters
+        if ( filters.author ) results = results.filter( v => v.author === filters.author );
+        if ( filters.category ) results = results.filter( v => v.category === filters.category );
+        if ( filters.tag ) results = results.filter( v => v.tags.includes( filters.tag ) );
+        if ( filters.year ) results = results.filter( v => v.year === parseInt( filters.year ) );
+
+        // Sorting
+        results.sort( this.#sortFn( sort, order ) );
+
+        // Pagination
+        const total = results.length;
+        const paged = results.slice( offset, offset + limit );
+
+        return { results: paged, total: total, offset, limit };
 
     }
 
@@ -298,7 +338,7 @@ class SearchIndex {
             tags: new Set( video.tags || [] ),
             author: video.author,
             category: video.category,
-            tokens: new Set( tokenize( video.index || `${ video.title || '' } ${ video.description || '' }` ) ),
+            tokens: new Set( tokenize( video.index ) ),
             year: video.year || ( video.date && new Date( video.date ).getFullYear() )
         };
 
@@ -315,7 +355,7 @@ class SearchIndex {
             if ( src.category && c.category === src.category ) score += 25;
 
             // Text overlap
-            const cTokens = new Set( tokenize( c.index || `${ c.title || '' } ${ c.description || '' }` ) );
+            const cTokens = new Set( tokenize( c.index ) );
             score += Math.min( 10, [ ...src.tokens ].filter( t => cTokens.has( t ) ).length ) * 6;
 
             // Year proximity
