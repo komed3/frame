@@ -149,6 +149,13 @@ class SearchIndex {
 
     }
 
+    async getVideos ( videoIds ) {
+
+        if ( ! this.index ) await this.init();
+        return videoIds.map( id => structuredClone( this.index.videos[ id ] ) ).filter( Boolean );
+
+    }
+
     async addView ( videoId ) {
 
         if ( ! this.index ) await this.init();
