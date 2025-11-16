@@ -275,6 +275,10 @@ button:hover {
     background-image: url( ../images/icons/upload.svg );
 }
 
+.icon.icon-user {
+    background-image: url( ../images/icons/user.svg );
+}
+
 .icon.icon-volume {
     background-image: url( ../images/icons/volume.svg );
 }
