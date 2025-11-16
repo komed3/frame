@@ -6,14 +6,9 @@ export async function themes ( req, res ) {
     const videos = {};
 
     for ( const c of categories ) {
-
-        const ids = await searchIndex.findByCategory( c );
-        videos[ c ] = [];
-
-        for( const v of ids.slice( 0, 12 ) ) {
-            videos[ c ].push( await searchIndex.getVideo( v ) );
-        }
-
+        videos[ c ] = await searchIndex.getVideos(
+            ( await searchIndex.findByCategory( c ) ).slice( 0, 6 )
+        );
     }
 
     res.render( 'themes', {
@@ -27,13 +22,11 @@ export async function themes ( req, res ) {
 export async function theme ( req, res ) {
 
     const category = req.params.cat || '';
-    const videos = await searchIndex.findByCategory( category );
+    const ids = await searchIndex.findByCategory( category );
 
-    if ( ! videos ) { res.redirect( '/themes' ) } else {
+    if ( ! ids ) { res.redirect( '/themes' ) } else {
 
-        for( const [ i, v ] of Object.entries( videos.slice( 0, 48 ) ) ) {
-            videos[ i ] = await searchIndex.getVideo( v );
-        }
+        const videos = await searchIndex.getVideos( ids );
 
         res.render( 'theme', {
             title: req.t( 'category.' + category ),
