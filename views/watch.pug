@@ -158,9 +158,11 @@ block content
         div.frame-box.frame-watch--stats
           i.icon.icon-radio
           strong.views!= t( 'views.watch.stats.views', { views: video.stats.views } )
-          button( action= "like", id= videoId, title= t( 'views.watch.stats.thumbsUp' ) ): i.icon.icon-thumbsUp
-          button( action= "dislike", id= videoId, title= t( 'views.watch.stats.thumbsDown' ) ): i.icon.icon-thumbsDown
-          strong.rating( id= videoId )= ( video.stats.rating || 0 ).toFixed( 1 )
+          each i in [ 1, 2, 3, 4, 5 ]
+            i.icon(
+              class= 'icon-star' + ( i <= video.stats.rating ? '-full' : '' ),
+              video= videoId, rating= i
+            )
 
         //- Playlist
         if list && list.videos.length > 0
