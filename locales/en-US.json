@@ -153,6 +153,9 @@
       "more": "Load more",
       "title": "Search"
     },
+    "themes": {
+      "title": "Themes"
+    },
     "upload": {
       "form": {
         "author": "Author / Creator",

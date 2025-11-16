@@ -153,6 +153,9 @@
       "more": "Weitere Ergebnisse",
       "title": "Suchen"
     },
+    "themes": {
+      "title": "Themen"
+    },
     "upload": {
       "form": {
         "author": "Autor / Kreator",
