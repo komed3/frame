@@ -8,5 +8,7 @@ append styles
 block content
   div.frame-themes.frame-content
     each c in categories
-      h3= t( 'category.' + c )
+      h3.frame-icon-heading
+        i( class= "icon icon-" + c )
+        a( href= '/theme/' + c )= t( 'category.' + c )
       +videogrid( videos[ c ] )
