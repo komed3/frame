@@ -166,6 +166,14 @@ button:hover {
     background-image: url( ../images/icons/download.svg );
 }
 
+.icon.icon-education {
+    background-image: url( ../images/icons/education.svg );
+}
+
+.icon.icon-entertainment {
+    background-image: url( ../images/icons/entertainment.svg );
+}
+
 .icon.icon-fastForward {
     background-image: url( ../images/icons/fastForward.svg );
 }
@@ -190,12 +198,20 @@ button:hover {
     background-image: url( ../images/icons/minus.svg );
 }
 
+.icon.icon-music {
+    background-image: url( ../images/icons/music.svg );
+}
+
 .icon.icon-mute {
     background-image: url( ../images/icons/mute.svg );
 }
 
 .icon.icon-next {
     background-image: url( ../images/icons/next.svg );
+}
+
+.icon.icon-other {
+    background-image: url( ../images/icons/other.svg );
 }
 
 .icon.icon-pause {
@@ -232,6 +248,14 @@ button:hover {
 
 .icon.icon-search {
     background-image: url( ../images/icons/search.svg );
+}
+
+.icon.icon-sports {
+    background-image: url( ../images/icons/sports.svg );
+}
+
+.icon.icon-technology {
+    background-image: url( ../images/icons/technology.svg );
 }
 
 .icon.icon-settings {
