@@ -1,0 +1,12 @@
+extends ./_layout
+include ./mixin/videogrid
+
+append styles
+  link( rel= "stylesheet", href= "/css/mixin.min.css" )
+
+block content
+  div.frame-theme.frame-content
+    h3.frame-icon-heading
+      i( class= "icon icon-" + category )
+      span= t( 'category.' + category )
+      +videogrid( videos )
