@@ -6,7 +6,7 @@ append styles
   link( rel= "stylesheet", href= "/css/themes.min.css" )
 
 block content
-  div.frame-themes
+  div.frame-themes.frame-content
     each c in categories
       h3= t( 'category.' + c )
       +videogrid( videos[ c ] )

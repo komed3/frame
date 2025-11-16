@@ -90,6 +90,11 @@
     font-size: 0.86em;
 }
 
+.frame-content {
+    margin: 16px auto;
+    max-width: var( --content );
+}
+
 .frame-box {
     margin-bottom: 16px;
     padding: 24px;
