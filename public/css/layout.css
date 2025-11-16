@@ -1,4 +1,5 @@
-.frame-header {
+.frame-header,
+.frame-footer {
     display: grid;
     grid-template-columns: max-content 1fr 360px 48px;
     align-items: center;
@@ -10,17 +11,26 @@
     border-radius: var( --radius );
 }
 
-.frame-header--logo {
+.frame-footer {
+    grid-template-columns: max-content 1fr max-content;
+    margin: 16px auto;
+    max-width: var( --content );
+}
+
+.frame-header--logo,
+.frame-footer--logo {
     padding: 0 24px 0 12px;
 }
 
-.frame-header--logo img {
+.frame-header--logo img,
+.frame-footer--logo img {
     width: auto;
     height: 42px;
     filter: drop-shadow( 0 0 10px var( --dark-20 ) );
 }
 
-.frame-header--nav {
+.frame-header--nav,
+.frame-footer--nav {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -29,7 +39,15 @@
     font-weight: 500;
 }
 
-.frame-header--nav a:not( .current ):hover {
+.frame-footer--nav {
+    margin-right: 12px;
+    gap: 12px;
+    font-size: 0.86em;
+    font-weight: 400;
+}
+
+.frame-header--nav a:not( .current ):hover,
+.frame-footer--nav a:not( .current ):hover {
     opacity: 0.7;
 }
 
@@ -66,6 +84,10 @@
     background: var( --dark-20 );
     border-radius: var( --radius );
     cursor: pointer;
+}
+
+.frame-footer--credits {
+    font-size: 0.86em;
 }
 
 .frame-box {
