@@ -19,6 +19,14 @@
       "notExists": "Video existiert nicht"
     }
   },
+  "footer": {
+    "credits": "© Copyright {{year}} komed3 — Version 1.0",
+    "nav": {
+      "bug": "Fehler melden",
+      "github": "Code auf GitHub.com",
+      "komed3": "Entwickelt von komed3"
+    }
+  },
   "generic": {
     "slogan": "Frame Video Hub",
     "title": "Frame"
