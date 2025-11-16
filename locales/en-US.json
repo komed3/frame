@@ -122,6 +122,9 @@
     }
   },
   "views": {
+    "author": {
+      "title": "Content by {{author}}"
+    },
     "home": {
       "title": "Home"
     },
@@ -152,6 +155,9 @@
       },
       "more": "Load more",
       "title": "Search"
+    },
+    "tag": {
+      "title": "Tagged with {{tag}}"
     },
     "themes": {
       "title": "Themes"
