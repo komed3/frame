@@ -48,3 +48,13 @@ html( lang= language, template = template )
     //- Content
     main#main.frame-main( role= "main", aria-label= "Content" )
       block content
+
+    //- Footer
+    footer#footer.frame-footer( role= "contentinfo", aria-label= "Footer" )
+      a.frame-footer--logo( href= "/", title= t( 'generic.slogan' ) )
+        img( src= "/images/favicon.svg", alt= "Logo" )
+      p.frame-footer--credits= t( 'footer.credits', { year: new Date().getFullYear() } )
+      nav.frame-footer--nav( role= "navigation", aria-label= "Legal" )
+        a.frame-header--nav-link( href= "https://komed3.de" )= t( 'footer.nav.komed3' )
+        a.frame-header--nav-link( href= "https://github.com/komed3/frame" )= t( 'footer.nav.github' )
+        a.frame-header--nav-link( href= "https://github.com/komed3/frame/issues" )= t( 'footer.nav.bug' )
