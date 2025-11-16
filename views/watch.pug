@@ -134,17 +134,17 @@ block content
         div.frame-box.frame-watch--meta
           h2.frame-watch--meta-title= video.title
           div.frame-watch--meta-info
-            a( href= '/search?author=' + encodeURIComponent( video.author ) ).author= video.author
+            a( href= '/author/' + encodeURIComponent( video.author ) ).author= video.author
             span •
-            a( href= '/themes/' + video.category ).category= t( 'category.' + video.category )
+            a( href= '/theme/' + video.category ).category= t( 'category.' + video.category )
             span •
-            a( href= '/search?pg=' + encodeURIComponent( video.pg ) ).pg= video.pg
+            span.pg= video.pg
             span •
-            a( href= '/search?year=' + video.year ).year= video.year
+            span.year= video.year
           p.frame-watch--meta-description= video.description
           div.frame-watch--meta-tags
             each tag in video.tags
-              a( href= '/search?tag=' + encodeURIComponent( tag ) )= tag
+              a( href= '/tag/' + encodeURIComponent( tag ) )= tag
 
         //- Video suggestions
         div.frame-watch--suggested
