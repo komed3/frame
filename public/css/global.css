@@ -255,6 +255,18 @@ button:hover {
     background-image: url( ../images/icons/sports.svg );
 }
 
+.icon.icon-star {
+    background-image: url( ../images/icons/star.svg );
+}
+
+.icon.icon-star-full {
+    background-image: url( ../images/icons/starFull.svg );
+}
+
+.icon.icon-star-half {
+    background-image: url( ../images/icons/starHalf.svg );
+}
+
 .icon.icon-tag {
     background-image: url( ../images/icons/tag.svg );
 }
