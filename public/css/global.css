@@ -263,10 +263,6 @@ button:hover {
     background-image: url( ../images/icons/starFull.svg );
 }
 
-.icon.icon-star-half {
-    background-image: url( ../images/icons/starHalf.svg );
-}
-
 .icon.icon-tag {
     background-image: url( ../images/icons/tag.svg );
 }
@@ -277,14 +273,6 @@ button:hover {
 
 .icon.icon-settings {
     background-image: url( ../images/icons/settings.svg );
-}
-
-.icon.icon-thumbsDown {
-    background-image: url( ../images/icons/thumbsDown.svg );
-}
-
-.icon.icon-thumbsUp {
-    background-image: url( ../images/icons/thumbsUp.svg );
 }
 
 .icon.icon-upload {
