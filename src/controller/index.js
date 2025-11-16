@@ -1,7 +1,7 @@
 import express from 'express';
 import { home } from './home.js';
 import { search } from './search.js';
-import { themes } from './themes.js';
+import { theme, themes } from './themes.js';
 import { upload } from './upload.js';
 import { watch } from './watch.js';
 
@@ -11,7 +11,8 @@ const router = express.Router();
 // Handle routes
 router.get( '{/}', home );
 router.get( '/search{/}', search );
-router.get( '/themes', themes );
+router.get( '/themes{/}', themes );
+router.get( '/theme/:cat{/}', theme );
 router.get( '/watch/:id{/}', watch );
 router.get( '/upload{/}', upload );
 

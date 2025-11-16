@@ -23,3 +23,24 @@ export async function themes ( req, res ) {
     } );
 
 }
+
+export async function theme ( req, res ) {
+
+    const category = req.params.cat || '';
+    const videos = await searchIndex.findByCategory( category );
+
+    if ( ! videos ) { res.redirect( '/themes' ) } else {
+
+        for( const [ i, v ] of Object.entries( videos.slice( 0, 48 ) ) ) {
+            videos[ i ] = await searchIndex.getVideo( v );
+        }
+
+        res.render( 'theme', {
+            title: req.t( 'category.' + category ),
+            path: '/theme/' + category, template: 'theme',
+            category, videos
+        } );
+
+    }
+
+}
