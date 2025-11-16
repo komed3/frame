@@ -1,4 +1,5 @@
 import express from 'express';
+import { author } from './author.js';
 import { home } from './home.js';
 import { search } from './search.js';
 import { theme, themes } from './themes.js';
@@ -13,6 +14,7 @@ router.get( '{/}', home );
 router.get( '/search{/}', search );
 router.get( '/themes{/}', themes );
 router.get( '/theme/:cat{/}', theme );
+router.get( '/author/:author{/}', author );
 router.get( '/watch/:id{/}', watch );
 router.get( '/upload{/}', upload );
 
