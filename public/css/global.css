@@ -255,6 +255,10 @@ button:hover {
     background-image: url( ../images/icons/sports.svg );
 }
 
+.icon.icon-tag {
+    background-image: url( ../images/icons/tag.svg );
+}
+
 .icon.icon-technology {
     background-image: url( ../images/icons/technology.svg );
 }
