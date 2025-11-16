@@ -145,7 +145,7 @@ class SearchIndex {
     async getVideo ( videoId ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.videos[ videoId ];
+        return structuredClone( this.index.videos[ videoId ] );
 
     }
 
@@ -207,42 +207,42 @@ class SearchIndex {
     async findByHash ( hash ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.hashes[ hash ];
+        return structuredClone( this.index.hashes[ hash ] );
 
     }
 
     async findByAuthor ( author ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.authors[ author ] || [];
+        return structuredClone( this.index.authors[ author ] || [] );
 
     }
 
     async findByCategory ( cat ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.categories[ cat ] || [];
+        return structuredClone( this.index.categories[ cat ] || [] );
 
     }
 
     async findByTag ( tag ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.tags[ tag ] || [];
+        return structuredClone( this.index.tags[ tag ] || [] );
 
     }
 
     async findByPG ( pg ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.pgs[ pg ] || [];
+        return structuredClone( this.index.pgs[ pg ] || [] );
 
     }
 
     async findByLang ( lang ) {
 
         if ( ! this.index ) await this.init();
-        return this.index.langs[ lang ] || [];
+        return structuredClone( this.index.langs[ lang ] || [] );
 
     }
 
@@ -252,9 +252,9 @@ class SearchIndex {
 
         value = value.toLowerCase();
 
-        return Object.values( this.index.videos ).filter(
+        return structuredClone( Object.values( this.index.videos ).filter(
             video => video[ field ].toLowerCase() === value
-        );
+        ) );
 
     }
 
