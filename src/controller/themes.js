@@ -30,7 +30,7 @@ export async function theme ( req, res ) {
 
         res.render( 'theme', {
             title: req.t( 'category.' + category ),
-            path: '/theme/' + category, template: 'theme',
+            path: '/theme/' + category, template: 'themes',
             category, videos
         } );
 

@@ -20,7 +20,7 @@ export async function list ( req, res ) {
         res.render( 'list', {
             title: list.name,
             path: '/list/' + listId,
-            template: 'list',
+            template: 'lists',
             listId, list
         } );
 
