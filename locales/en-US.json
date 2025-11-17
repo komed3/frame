@@ -8,6 +8,7 @@
     "technology": "Technology"
   },
   "error": {
+    "search": "Error while searching",
     "upload": {
       "duplicate": "Video already exists",
       "noFile": "No file uploaded",
@@ -16,7 +17,8 @@
     },
     "video": {
       "data": "Error getting meta data",
-      "notExists": "Cannot get video"
+      "notExists": "Cannot get video",
+      "rating": "Cannot rate video"
     }
   },
   "footer": {

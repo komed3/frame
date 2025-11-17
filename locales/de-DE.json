@@ -8,6 +8,7 @@
     "technology": "Technik"
   },
   "error": {
+    "search": "Suche ist fehlgeschlagen",
     "upload": {
       "duplicate": "Video existiert bereits",
       "noFile": "Datei nicht hochgeladen",
@@ -16,7 +17,8 @@
     },
     "video": {
       "data": "Fehler beim auslesen der Metadaten",
-      "notExists": "Video existiert nicht"
+      "notExists": "Video existiert nicht",
+      "rating": "Video konnte nicht bewertet werden"
     }
   },
   "footer": {

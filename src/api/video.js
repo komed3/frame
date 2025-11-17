@@ -31,9 +31,7 @@ export async function rate ( req, res ) {
 
     try {
         await searchIndex.rateVideo( videoId, rating );
-        res.status( 200 ).json( {
-            rating: await searchIndex.getRating( videoId )
-        } );
+        res.status( 200 ).json( { rating: await searchIndex.getRating( videoId ) } );
     }
 
     catch ( err ) { res.status( 500 ).json( {
