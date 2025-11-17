@@ -125,3 +125,16 @@
     opacity: 0.5;
     filter: blur( 3px );
 }
+
+.frame-videolist--item-info .title {
+    margin: 0 0 6px;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.frame-videolist--item-info .meta {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+}
