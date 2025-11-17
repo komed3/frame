@@ -2,17 +2,21 @@ mixin stats( stats )
   div.frame-stats
     div.frame-stats--item.frame-box
       i.icon.icon-info
-      strong: views= stats && stats.count || 0
-      span= t( 'stats.count' )
+      div.frame-stats--item-info
+        strong: views= stats && stats.count || 0
+        span= t( 'stats.count' )
     div.frame-stats--item.frame-box
       i.icon.icon-radio
-      strong: views= stats && stats.views || 0
-      span= t( 'stats.views' )
+      div.frame-stats--item-info
+        strong: views= stats && stats.views || 0
+        span= t( 'stats.views' )
     div.frame-stats--item.frame-box
       i.icon.icon-server
-      strong: filesize= stats && stats.size || 0
-      span= t( 'stats.size' )
+      div.frame-stats--item-info
+        strong: filesize= stats && stats.size || 0
+        span= t( 'stats.size' )
     div.frame-stats--item.frame-box
       i.icon.icon-watch
-      strong: duration= stats && stats.duration || 0
-      span= t( 'stats.duration' )
+      div.frame-stats--item-info
+        strong: duration= stats && stats.duration || 0
+        span= t( 'stats.duration' )

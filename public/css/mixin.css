@@ -198,9 +198,10 @@
 
 .frame-stats--item {
     display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
     align-items: center;
+    gap: 20px;
 }
 
 .frame-stats--item .icon {
@@ -210,7 +211,8 @@
 }
 
 .frame-stats--item strong {
-    margin: 14px 0 4px;
+    display: block;
+    margin: 0 0 4px;
     font-size: 1.6em;
     font-weight: 500;
 }
