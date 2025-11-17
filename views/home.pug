@@ -1,5 +1,6 @@
 extends ./_layout
 include ./mixin/videogrid
+include ./mixin/playlists
 
 append styles
   link( rel= "stylesheet", href= "/css/mixin.min.css" )
@@ -10,6 +11,10 @@ block content
       i.icon.icon-clock
       span= t( 'views.home.history' )
     +videogrid( history )
+    h3.frame-icon-heading
+      i.icon.icon-playlist
+      span= t( 'views.home.playlists' )
+    +playlists( lists )
     h3.frame-icon-heading
       i.icon.icon-video
       span= t( 'views.home.newest' )
