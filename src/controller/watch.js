@@ -13,12 +13,14 @@ export async function watch ( req, res ) {
 
         const list = await playlist.getList( req.query.list || '', true );
         const playlists = await playlist.listIndex( videoId );
+        const isInPlaylist = playlists.some( p => p.selected );
         const suggestions = await searchIndex.suggested( video );
 
         res.render( 'watch', {
             title: video.title || videoId,
             path: '/watch/' + videoId, template: 'watch',
-            videoId, video, list, playlists, suggestions
+            videoId, video, list, suggestions,
+            playlists, isInPlaylist
         } );
 
     }
