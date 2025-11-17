@@ -13,7 +13,9 @@ block content
     h3.frame-icon-heading
       i.icon.icon-video
       span= list.name
-    +videolist( list.videos, { list: listId } )
     div.frame-list--actions
-      button( list= listId, action= "delete" )= t( 'views.playlists.delete' )
+      if list && list.videos && list.videos.length > 0
+        button( list= listId, action= "play", at= list.videos[ 0 ].id )= t( 'views.playlists.play' )
       button( list= listId, action= "rename" )= t( 'views.playlists.rename' )
+      button( list= listId, action= "delete" )= t( 'views.playlists.delete' )
+    +videolist( list.videos, { list: listId } )

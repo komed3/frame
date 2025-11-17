@@ -136,6 +136,7 @@
     "playlists": {
       "count": "{{count}} Videos",
       "delete": "Löschen",
+      "play": "Abspielen",
       "rename": "Umbenennen",
       "title": "Wiedergabelisten"
     },
