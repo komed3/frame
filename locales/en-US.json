@@ -123,6 +123,12 @@
       "volume": "Volume "
     }
   },
+  "stats": {
+    "count": "Videos",
+    "duration": "Duration",
+    "size": "Filesize",
+    "views": "Views"
+  },
   "views": {
     "author": {
       "title": "Content by {{author}}"
@@ -226,11 +232,7 @@
       "title": "Upload video"
     },
     "watch": {
-      "stats": {
-        "thumbsDown": "Dislike",
-        "thumbsUp": "Like",
-        "views": "<views>{{views}}</views> views"
-      }
+      "views": "<views>{{views}}</views> views"
     }
   }
 }

@@ -123,6 +123,12 @@
       "volume": "Lautstärke: "
     }
   },
+  "stats": {
+    "count": "Videos",
+    "duration": "Dauer",
+    "size": "Dateigröße",
+    "views": "Aufrufe"
+  },
   "views": {
     "author": {
       "title": "Inhalte von {{author}}"
@@ -226,11 +232,7 @@
       "title": "Video hochladen"
     },
     "watch": {
-      "stats": {
-        "thumbsDown": "Mag ich nicht",
-        "thumbsUp": "Mag ich",
-        "views": "<views>{{views}}</views> Aufrufe"
-      }
+      "views": "<views>{{views}}</views> Aufrufe"
     }
   }
 }
