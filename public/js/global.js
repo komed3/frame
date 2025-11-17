@@ -104,4 +104,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
     } );
 
+    document.querySelector( '.frame-header--lang-opener' ).addEventListener( 'click', () =>
+        document.querySelector( '.frame-header--lang-selector' ).classList.toggle( 'open' )
+    );
+
 } );
