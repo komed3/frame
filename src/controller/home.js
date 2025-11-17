@@ -3,6 +3,7 @@ import { searchIndex } from '../utils/search.js';
 
 export async function home ( req, res ) {
 
+    const stats = await searchIndex.getStats();
     const history = await searchIndex.getVideos( await searchIndex.getHistory( 6, true ) );
     const lists = ( await playlist.listIndex() ).slice( 0, 6 );
     const { results: newest } = await searchIndex.search( '', { limit: 6 } );
@@ -10,7 +11,7 @@ export async function home ( req, res ) {
     res.render( 'home', {
         title: req.t( 'views.home.title' ),
         path: '/', template: 'home',
-        history, lists, newest
+        stats, history, lists, newest
     } );
 
 }
