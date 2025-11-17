@@ -55,10 +55,10 @@ class SearchIndex {
 
         if ( ! this.history ) await this.init();
 
-        let history = structuredClone( this.history.videos );
+        let history = structuredClone( this.history.videos ).reverse();
         if ( unique ) history = [ ...new Set( history ) ];
 
-        return history.reverse().slice( 0, n );
+        return history.slice( 0, n );
 
     }
 
