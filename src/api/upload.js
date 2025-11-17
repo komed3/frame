@@ -108,6 +108,7 @@ export async function upload ( req, res ) {
             // Add to search index
             await searchIndex.addVideo( videoId, {
                 ...searchData, hash, thumbnail,
+                size: meta.size,
                 duration: meta.duration,
                 created: now.toISOString()
             } );

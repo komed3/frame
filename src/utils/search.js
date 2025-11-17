@@ -89,14 +89,15 @@ class SearchIndex {
 
     }
 
-    async updateState () {
+    async updateStats () {
 
         if ( ! this.index ) await this.init();
 
         this.index.stats.count = Object.keys( this.index.videos ).length;
-        this.index.stats.size = Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.size || 0 ), 0 );
-        this.index.stats.duration = Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.duration || 0 ), 0 );
-        this.index.stats.views = Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.stats?.views || 0 ), 0 );
+        this.index.stats.size = Math.round( Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.size || 0 ), 0 ) );
+        this.index.stats.duration = Math.round( Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.duration || 0 ), 0 ) );
+        this.index.stats.views = Math.round( Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.stats?.views || 0 ), 0 ) );
+
         await this.save();
 
     }
@@ -137,7 +138,7 @@ class SearchIndex {
             }
         }
 
-        this.updateState();
+        this.updateStats();
         await this.save();
 
     }
@@ -175,7 +176,7 @@ class SearchIndex {
             }
         }
 
-        this.updateState();
+        this.updateStats();
         await this.save();
 
     }
