@@ -158,7 +158,7 @@ block content
         div.frame-box.frame-watch--stats
           h3.frame-icon-heading.frame-watch--stats-views
             i.icon.icon-radio
-            span.views!= t( 'views.watch.stats.views', { views: video.stats.views } )
+            span.views!= t( 'views.watch.views', { views: video.stats.views } )
           div.frame-watch--stats-rating
             each i in [ 1, 2, 3, 4, 5 ]
               i.icon(
