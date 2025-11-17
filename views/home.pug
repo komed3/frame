@@ -1,12 +1,14 @@
 extends ./_layout
 include ./mixin/videogrid
 include ./mixin/playlists
+include ./mixin/stats
 
 append styles
   link( rel= "stylesheet", href= "/css/mixin.min.css" )
 
 block content
   div.frame-home.frame-content
+    +stats( stats )
     h3.frame-icon-heading
       i.icon.icon-clock
       span= t( 'views.home.history' )

@@ -1,0 +1,18 @@
+mixin stats( stats )
+  div.frame-stats
+    div.frame-stats--item
+      i.icon.icon-
+      strong: views= stats && stats.count || 0
+      span= t( 'stats.count' )
+    div.frame-stats--item
+      i.icon.icon-
+      strong: views= stats && stats.views || 0
+      span= t( 'stats.views' )
+    div.frame-stats--item
+      i.icon.icon-
+      strong: filesize= stats && stats.size || 0
+      span= t( 'stats.size' )
+    div.frame-stats--item
+      i.icon.icon-
+      strong: duration= stats && stats.duration || 0
+      span= t( 'stats.duration' )
