@@ -5,6 +5,7 @@ append scripts
   script( src= "/js/playlist.min.js", type= "text/javascript" )
 
 append styles
+  link( rel= "stylesheet", href= "/css/playlist.min.css" )
   link( rel= "stylesheet", href= "/css/mixin.min.css" )
 
 block content
@@ -13,4 +14,6 @@ block content
       i.icon.icon-video
       span= list.name
     +videolist( list.videos, { list: listId } )
-    p: button( list= listId, action= "delete" )= t( 'views.playlists.delete' )
+    div.frame-list--actions
+      button( list= listId, action= "delete" )= t( 'views.playlists.delete' )
+      button( list= listId, action= "rename" )= t( 'views.playlists.rename' )

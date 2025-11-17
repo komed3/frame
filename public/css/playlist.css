@@ -1,0 +1,6 @@
+.frame-list--actions {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 12px;
+    margin: 20px 0;
+}
