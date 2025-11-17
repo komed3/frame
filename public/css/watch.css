@@ -56,10 +56,21 @@
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
+    gap: 32px;
 }
 
-.frame-watch--stats i[v][r] {
+.frame-watch--stats-views {
+    margin-bottom: 0 !important;
+}
+
+.frame-watch--stats-rating {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.frame-watch--stats-rating .icon {
     cursor: pointer;
 }
 

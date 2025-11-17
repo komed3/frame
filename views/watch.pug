@@ -156,13 +156,15 @@ block content
 
         //- Video stats
         div.frame-box.frame-watch--stats
-          i.icon.icon-radio
-          strong.views!= t( 'views.watch.stats.views', { views: video.stats.views } )
-          each i in [ 1, 2, 3, 4, 5 ]
-            i.icon(
-              class= 'icon-star' + ( i <= video.stats.rating ? '-full' : '' ),
-              v= videoId, r= i
-            )
+          h3.frame-icon-heading.frame-watch--stats-views
+            i.icon.icon-radio
+            span.views!= t( 'views.watch.stats.views', { views: video.stats.views } )
+          div.frame-watch--stats-rating
+            each i in [ 1, 2, 3, 4, 5 ]
+              i.icon(
+                class= 'icon-star' + ( i <= video.stats.rating ? '-full' : '' ),
+                v= videoId, r= i
+              )
 
         //- (Active) playlist
         if list && list.videos.length > 0
