@@ -1,1 +1,16 @@
 extends ./_layout
+include ./mixin/videogrid
+
+append styles
+  link( rel= "stylesheet", href= "/css/mixin.min.css" )
+
+block content
+  div.frame-home.frame-content
+    h3.frame-icon-heading
+      i.icon.icon-clock
+      span= t( 'views.home.history' )
+    +videogrid( history )
+    h3.frame-icon-heading
+      i.icon.icon-video
+      span= t( 'views.home.newest' )
+    +videogrid( newest )

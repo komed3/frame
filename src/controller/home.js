@@ -1,8 +1,14 @@
-export function home ( req, res ) {
+import { searchIndex } from '../utils/search.js';
+
+export async function home ( req, res ) {
+
+    const history = await searchIndex.getVideos( await searchIndex.getHistory( 6, true ) );
+    const { results: newest } = await searchIndex.search( '', { limit: 6 } );
 
     res.render( 'home', {
         title: req.t( 'views.home.title' ),
-        path: '/', template: 'home'
+        path: '/', template: 'home',
+        history, newest
     } );
 
 }
