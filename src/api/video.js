@@ -19,23 +19,23 @@ export async function video ( req, res ) {
     } ) }
 
     catch ( err ) { res.status( 500 ).json( {
-        msg: req.t( 'error.video.data' )
+        msg: req.t( 'error.video.data' ), err
     } ) }
 
 }
 
-export async function like ( req, res ) {
+export async function rate ( req, res ) {
 
-    const rating = await searchIndex.like( req.params.id || '' );
-    if ( rating ) res.status( 200 ).json( { rating } );
-    else res.sendStatus( 400 );
+    const videoId = req.params.id || '';
+    const rating = req.body.rating || null;
 
-}
+    try {
+        await searchIndex.rateVideo( videoId, rating );
+        res.status( 200 ).json( { rating: await searchIndex.getRating( videoId ) } );
+    }
 
-export async function dislike ( req, res ) {
-
-    const rating = await searchIndex.dislike( req.params.id || '' );
-    if ( rating ) res.status( 200 ).json( { rating } );
-    else res.sendStatus( 400 );
+    catch ( err ) { res.status( 500 ).json( {
+        msg: req.t( 'error.video.rating' ), err
+    } ) }
 
 }
