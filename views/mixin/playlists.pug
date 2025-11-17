@@ -1,0 +1,10 @@
+mixin playlists( lists )
+  if lists && lists.length
+    each list in lists
+      a.frame-lists--grid-item( href= '/list/' + list.id )
+        img.frame-lists--grid-item-preview(
+          src= '/media/' + list.poster
+        )
+        div.frame-lists--grid-item-overlay
+          span.name= list.name
+          span.count= t( 'views.playlists.count', { count: list.count } )
