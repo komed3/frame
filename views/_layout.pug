@@ -41,9 +41,15 @@ html( lang= language, template = template )
           type= "text", name= "q", value= query || '',
           placeholder= t( 'header.search.placeholder' )
         )
-      div.frame-header--dasher
-        div.frame-header--dasher-opener( title= t( 'header.dasher.label' ) )
+      div.frame-header--lang
+        div.frame-header--lang-opener( title= t( 'header.dasher.label' ) )
           i.icon.icon-globe
+        div.frame-header--lang-selector
+          each c, l in { en: 'en-US', de: 'de-DE' }
+            a.frame-header--lang-link(
+              href= '/api/lang/' + c,
+              class= ( language == c ? 'active' : '' )
+            )= t( 'lang.' + l )
 
     //- Content
     main#main.frame-main( role= "main", aria-label= "Content" )
