@@ -131,9 +131,7 @@
       "title": "Startseite"
     },
     "playlists": {
-      "list": {
-        "count": "{{count}} Videos"
-      },
+      "count": "{{count}} Videos",
       "title": "Wiedergabelisten"
     },
     "search": {

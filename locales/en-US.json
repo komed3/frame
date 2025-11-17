@@ -131,9 +131,7 @@
       "title": "Home"
     },
     "playlists": {
-      "list": {
-        "count": "{{count}} Videos"
-      },
+      "count": "{{count}} Videos",
       "title": "Playlists"
     },
     "search": {

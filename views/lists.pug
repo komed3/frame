@@ -1,4 +1,16 @@
 extends ./_layout
 
 block content
-  div.frame-lists
+  div.frame-lists.frame-content
+    h3.frame-icon-heading
+      i.icon.icon-playlist
+      span= t( 'views.playlists.title' )
+    div.frame-lists--grid
+      each list in lists
+        a.frame-lists--grid-item( href= '/list/' + list.id )
+          img.frame-lists--grid-item-preview(
+            src= '/media/' + list.poster
+          )
+          div.frame-lists--grid-item-overlay
+            span.name= list.name
+            span.count= t( 'views.playlists.count', { count: list.count } )

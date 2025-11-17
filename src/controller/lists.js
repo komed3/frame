@@ -4,7 +4,7 @@ export async function lists ( req, res ) {
 
     res.render( 'lists', {
         title: req.t( 'views.playlists.title' ),
-        path: '/lists', template: 'list',
+        path: '/lists', template: 'lists',
         lists: await playlist.listIndex()
     } );
 
