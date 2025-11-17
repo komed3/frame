@@ -41,11 +41,16 @@ class Playlist {
     async listIndex ( videoId = null ) {
 
         if ( ! this.lists ) await this.init();
-
         const lists = [];
 
         for ( const [ id, { name, videos } ] of Object.entries( this.lists.lists ) ) {
-            lists.push( { id: id, name: name, selected: videoId && videos.includes( videoId ) } );
+
+            lists.push( {
+                id: id, name: name, count: videos.length,
+                selected: videoId && videos.includes( videoId ),
+                poster: videos[ 0 ] + '/poster.jpg'
+            } );
+
         }
 
         return lists;
