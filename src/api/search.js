@@ -14,14 +14,12 @@ export async function search ( req, res ) {
     if ( req.body.tag ) filters.tag = req.body.tag;
     if ( req.body.year ) filters.year = req.body.year;
 
-    try {
+    try { res.status( 200 ).json( await searchIndex.search( query, {
+        filters, sort, order, offset, limit
+    } ) ) }
 
-        const result = await searchIndex.search( query, {
-            filters, sort, order, offset, limit
-        } );
-
-        res.status( 200 ).json( result );
-
-    } catch { res.sendStatus( 500 ) }
+    catch ( err ) { res.status( 500 ).json( {
+        msg: req.t( 'error.search' ), err
+    } ) }
 
 }
