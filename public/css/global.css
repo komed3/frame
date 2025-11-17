@@ -179,6 +179,10 @@ button:hover {
     background-image: url( ../images/icons/fastForward.svg );
 }
 
+.icon.icon-globe {
+    background-image: url( ../images/icons/globe.svg );
+}
+
 .icon.icon-info {
     background-image: url( ../images/icons/info.svg );
 }
