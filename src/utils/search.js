@@ -71,7 +71,7 @@ class SearchIndex {
 
         // Store basic video info + searchable text index
         this.index.videos[ videoId ] = {
-            id: videoId, stats: { views: 0, likes: 0, dislikes: 0, rating: null },
+            id: videoId, stats: { views: 0, rating: null },
             index: [ videoData.title || '', videoData.description || '' ].join(' ').trim().toLowerCase(),
             year: new Date( videoData.date ).getFullYear(), ...videoData
         };
