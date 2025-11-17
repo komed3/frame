@@ -50,6 +50,21 @@ const formatViews = ( views ) => new Intl.NumberFormat( 'en-US', {
     notation: 'compact', compactDisplay: 'short'
 } ).format( views );
 
+const formatDuration = ( seconds ) => {
+
+    const factor = {
+        yr: 31536000, mo: 2592000, w: 604800,
+        d: 86400, hrs: 3600, min: 60, sec: 1
+    };
+
+    for ( const [ key, value ] of Object.entries( factor ) ) {
+        if ( seconds >= value ) return `${ Math.floor( seconds / value ) } ${ key }`;
+    }
+
+    return '0 sec';
+
+};
+
 document.addEventListener( 'DOMContentLoaded', function () {
 
     document.querySelectorAll( 'date' ).forEach(
@@ -74,6 +89,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
     document.querySelectorAll( 'views' ).forEach(
         el => el.textContent = formatViews( el.textContent )
+    );
+
+    document.querySelectorAll( 'duration' ).forEach(
+        el => el.textContent = formatDuration( el.textContent )
     );
 
     document.querySelectorAll( '[video]' ).forEach( el => {
