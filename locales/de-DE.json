@@ -135,6 +135,7 @@
     },
     "playlists": {
       "count": "{{count}} Videos",
+      "delete": "Wiedergabeliste löschen",
       "title": "Wiedergabelisten"
     },
     "search": {

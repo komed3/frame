@@ -135,6 +135,7 @@
     },
     "playlists": {
       "count": "{{count}} Videos",
+      "delete": "Delete playlist",
       "title": "Playlists"
     },
     "search": {

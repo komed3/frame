@@ -10,3 +10,4 @@ block content
       i.icon.icon-video
       span= list.name
     +videolist( list.videos, { list: listId } )
+    p: button( list= listId, action= "delete" )= t( 'views.playlists.delete' )
