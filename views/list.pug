@@ -1,6 +1,9 @@
 extends ./_layout
 include ./mixin/videolist
 
+append scripts
+  script( src= "/js/playlist.min.js", type= "text/javascript" )
+
 append styles
   link( rel= "stylesheet", href= "/css/mixin.min.css" )
 
