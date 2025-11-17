@@ -13,7 +13,16 @@ mixin videolist( videos, query = '', current = null )
                 src= '/media/' + video.id + '/' + video.thumbnail,
                 alt= "Thumbnail"
               )
-            div.frame-videolist--item-title= video.title
+            div.frame-videolist--item-info
+              h4.title= video.title
+              div.meta
+                span= video.author
+                span •
+                span= t( 'category.' + video.category )
+                span •
+                span= video.pg
+                span •
+                span= video.year
             time.frame-videolist--item-duration= video.duration
             div.frame-videolist--item-rating
               each i in [ 1, 2, 3, 4, 5 ]
