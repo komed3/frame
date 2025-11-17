@@ -39,7 +39,7 @@
 }
 
 .frame-header--nav a.current {
-    background: var( --primary );
+    background: var( --light-30 );
 }
 
 .frame-header--search {
