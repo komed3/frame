@@ -287,6 +287,10 @@ button:hover {
     background-image: url( ../images/icons/user.svg );
 }
 
+.icon.icon-video {
+    background-image: url( ../images/icons/video.svg );
+}
+
 .icon.icon-volume {
     background-image: url( ../images/icons/volume.svg );
 }
