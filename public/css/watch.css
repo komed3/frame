@@ -87,5 +87,32 @@
 }
 
 .frame-watch--playlist-list {
-    margin: 12px 0 -12px;
+    margin: 12px 0 0;
+    max-height: 560px;
+    overflow-y: scroll;
+}
+
+.frame-watch--playlist-list .frame-videolist--item {
+    grid-template-columns: 100px 1fr;
+    align-items: start;
+    gap: 20px;
+}
+
+.frame-watch--playlist-list .frame-videolist--item-preview {
+    aspect-ratio: 1 / 1;
+}
+
+.frame-watch--playlist-list .frame-videolist--item-info .title {
+    margin-bottom: 12px;
+    line-height: 1.2;
+    font-size: 1.05em;
+}
+
+.frame-watch--playlist-list .frame-videolist--item-info .meta span:not( :first-child ) {
+    display: none;
+}
+
+.frame-watch--playlist-list .frame-videolist--item-duration,
+.frame-watch--playlist-list .frame-videolist--item-rating {
+    display: none;
 }

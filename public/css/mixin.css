@@ -110,6 +110,7 @@
     z-index: 1;
 }
 
+.frame-videolist--item.current .frame-videolist--item-preview .icon,
 .frame-videolist--item:hover .frame-videolist--item-preview .icon {
     opacity: 1;
 }
@@ -121,6 +122,7 @@
     transition: all 0.2s ease-out;
 }
 
+.frame-videolist--item.current .frame-videolist--item-preview img,
 .frame-videolist--item:hover .frame-videolist--item-preview img {
     opacity: 0.5;
     filter: blur( 3px );
