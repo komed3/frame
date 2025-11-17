@@ -51,10 +51,14 @@ class SearchIndex {
 
     }
 
-    async getHistory ( n = 10 ) {
+    async getHistory ( n = 10, unique = false ) {
 
         if ( ! this.history ) await this.init();
-        return this.history.videos.reverse.slice( 0, n );
+
+        let history = structuredClone( this.history.videos );
+        if ( unique ) history = [ ...new Set( history ) ];
+
+        return history.reverse().slice( 0, n );
 
     }
 
