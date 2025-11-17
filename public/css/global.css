@@ -275,6 +275,10 @@ button:hover {
     background-image: url( ../images/icons/technology.svg );
 }
 
+.icon.icon-server {
+    background-image: url( ../images/icons/server.svg );
+}
+
 .icon.icon-settings {
     background-image: url( ../images/icons/settings.svg );
 }
@@ -293,4 +297,8 @@ button:hover {
 
 .icon.icon-volume {
     background-image: url( ../images/icons/volume.svg );
+}
+
+.icon.icon-watch {
+    background-image: url( ../images/icons/watch.svg );
 }
