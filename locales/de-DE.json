@@ -130,6 +130,12 @@
     "home": {
       "title": "Startseite"
     },
+    "playlists": {
+      "list": {
+        "count": "{{count}} Videos"
+      },
+      "title": "Wiedergabelisten"
+    },
     "search": {
       "empty": "Keine Ergebnisse gefunden",
       "form": {

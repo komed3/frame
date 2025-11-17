@@ -130,6 +130,12 @@
     "home": {
       "title": "Home"
     },
+    "playlists": {
+      "list": {
+        "count": "{{count}} Videos"
+      },
+      "title": "Playlists"
+    },
     "search": {
       "empty": "No results found",
       "form": {

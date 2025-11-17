@@ -164,11 +164,24 @@ block content
               v= videoId, r= i
             )
 
-        //- Playlist
+        //- (Active) playlist
         if list && list.videos.length > 0
           div.frame-box.frame-watch--playlist
-            div.frame-watch--playlist-header
-              i.icon.icon-playlist
+            h3.frame-icon-heading.frame-watch--playlist-header
+              i.icon.icon-video
               a( href= '/list/' + list.id )= list.name
             div.frame-watch--playlist-list
-              +videolist( list.videos, '?list=' + list.id, videoId )
+              +videolist( list.videos, { list: list.id }, videoId )
+
+        //- Playlist
+        if isInPlaylist
+          div.frame-box.frame-watch--lists
+            h3.frame-icon-heading
+              i.icon.icon-playlist
+              span= t( 'views.playlists.title' )
+            div.frame-watch--lists-list
+              each list in playlists
+                if list.selected
+                  a( href= '/list/' + list.id )
+                    span.name= list.name
+                    span.count= t( 'views.playlists.list.count', { count: list.count } )
