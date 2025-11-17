@@ -34,8 +34,8 @@
     "title": "Frame"
   },
   "header": {
-    "dasher": {
-      "label": "Settings"
+    "lang": {
+      "label": "Select language"
     },
     "nav": {
       "home": "Home",
