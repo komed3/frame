@@ -1,0 +1,12 @@
+extends ./_layout
+include ./mixin/videolist
+
+append styles
+  link( rel= "stylesheet", href= "/css/mixin.min.css" )
+
+block content
+  div.frame-list.frame-content.frame-box
+    h3.frame-icon-heading
+      i.icon.icon-playlist
+      span= list.name
+    +videolist( list.videos )
