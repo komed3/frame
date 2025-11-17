@@ -18,19 +18,31 @@ class SearchIndex {
     async init () {
 
         try {
+
             const data = await readFile( INDEX_FILE, 'utf8' );
             this.index = JSON.parse( data );
+
         } catch {
-            this.index = { videos: {}, hashes: {}, authors: {}, categories: {}, tags: {}, pgs: {}, langs: {} };
+
+            this.index = {
+                videos: {}, hashes: {}, authors: {}, categories: {}, tags: {}, pgs: {},
+                langs: {}, stats: { count: 0, views: 0, size: 0, duration: 0 }
+            };
+
             await this.save();
+
         }
 
         try {
+
             const data = await readFile( HISTORY_FILE, 'utf8' );
             this.history = JSON.parse( data );
+
         } catch {
+
             this.history = { videos: [] };
             await this.save();
+
         }
 
     }
@@ -66,6 +78,26 @@ class SearchIndex {
 
         if ( ! this.history ) await this.init();
         return this.history.videos.at( -1 );
+
+    }
+
+    async clearHistory () {
+
+        if ( ! this.history ) await this.init();
+        this.history.videos = [];
+        await this.save();
+
+    }
+
+    async updateState () {
+
+        if ( ! this.index ) await this.init();
+
+        this.index.stats.count = Object.keys( this.index.videos ).length;
+        this.index.stats.size = Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.size || 0 ), 0 );
+        this.index.stats.duration = Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.duration || 0 ), 0 );
+        this.index.stats.views = Object.values( this.index.videos ).reduce( ( sum, v ) => sum + ( v.stats?.views || 0 ), 0 );
+        await this.save();
 
     }
 
@@ -105,6 +137,7 @@ class SearchIndex {
             }
         }
 
+        this.updateState();
         await this.save();
 
     }
@@ -142,7 +175,15 @@ class SearchIndex {
             }
         }
 
+        this.updateState();
         await this.save();
+
+    }
+
+    async getStats () {
+
+        if ( ! this.index ) await this.init();
+        return structuredClone( this.index.stats );
 
     }
 
@@ -164,7 +205,12 @@ class SearchIndex {
 
         if ( ! this.index ) await this.init();
         const last = await this.getLastVideo();
-        if ( this.index.videos[ videoId ] && last != videoId ) this.index.videos[ videoId ].stats.views += 1;
+
+        if ( this.index.videos[ videoId ] && last != videoId ) {
+            this.index.videos[ videoId ].stats.views += 1;
+            this.index.stats.views += 1;
+        }
+
         await this.save();
 
     }
