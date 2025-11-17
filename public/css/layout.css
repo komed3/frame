@@ -111,6 +111,7 @@
     padding: 24px;
     background: var( --light-10 );
     border-radius: var( --radius );
+    overflow: hidden;
 }
 
 .frame-box h2 {
