@@ -172,7 +172,8 @@ class SearchIndex {
         const video = this.index.videos[ videoId ];
         if ( ! video ) return false;
 
-        video.stats.rating = Math.max( 0, Math.min( 5, Number( rating ) ) );
+        if ( rating === null ) video.stats.rating = null;
+        else video.stats.rating = Math.max( 0, Math.min( 5, Number( rating ) ) );
         await this.save();
 
     }
