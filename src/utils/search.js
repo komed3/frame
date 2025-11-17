@@ -165,42 +165,15 @@ class SearchIndex {
 
     }
 
-    #rating ( video ) {
-
-        const { likes = 0, dislikes = 0 } = video.stats ?? {};
-        return Number( ( likes / Math.max( 1, likes + dislikes ) * 5 ).toFixed( 3 ) );
-
-    }
-
-    async like ( videoId ) {
+    async rateVideo ( videoId, rating ) {
 
         if ( ! this.index ) await this.init();
 
         const video = this.index.videos[ videoId ];
-
         if ( ! video ) return false;
 
-        video.stats.likes += 1;
-        video.stats.rating = this.#rating( video );
+        video.stats.rating = Math.max( 0, Math.min( 5, Number( rating ) ) );
         await this.save();
-
-        return video.stats.rating;
-
-    }
-
-    async dislike ( videoId ) {
-
-        if ( ! this.index ) await this.init();
-
-        const video = this.index.videos[ videoId ];
-
-        if ( ! video ) return false;
-
-        video.stats.dislikes += 1;
-        video.stats.rating = this.#rating( video );
-        await this.save();
-
-        return video.stats.rating;
 
     }
 
