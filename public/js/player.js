@@ -357,6 +357,15 @@ class VideoPlayer {
 
         this.setVolume( this.playerState.volume );
         this.setPlaybackRate( this.playerState.playbackRate );
+        this.autoplay();
+
+    }
+
+    autoplay () {
+
+        if ( this.ready && 'getAutoplayPolicy' in navigator && navigator.getAutoplayPolicy( this.video ) === 'allowed' ) {
+            this.video.play();
+        }
 
     }
 
