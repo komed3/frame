@@ -57,3 +57,26 @@ npm start
 ```
 
 Open a browser to: `http://localhost:3000`
+
+## Configuration notes
+
+- Media, thumbnails and index files live in the `media` directory at the project root.
+- Search index file: `index.json`. Playlists: `list.json`.
+- If you need to change port, edit the startup script or add env var handling in `app.js` (common pattern: `PORT=3000`).
+
+## How to use
+
+- Upload a video via the upload page (the UI streams processing progress as NDJSON).
+- If a duplicate is detected the server responds with the existing `videoId`.
+- Watch a video at `/watch/<id>`; use `?list=<uuid>` to view a playlist context (if you created one).
+- Use the search page to filter/sort videos (the search uses the JSON index).
+
+## Developer notes / maintenance
+
+- The codebase stores lightweight JSON indexes on disk — it is simple and easy to inspect/backup but not ACID under heavy concurrent writes. For multi‑user production deployments consider swapping storage to a small database (SQLite, Postgres) or add file‑locking.
+- ffmpeg is required for media analysis; make sure the installed build is compatible.
+- The project favors readability and minimal dependencies.
+
+## License & privacy
+
+Frame is intended for private use — check [LICENSE](https://github.com/komed3/frame/blob/master/LICENSE) in the repo for the project license. Because all media and indexes are stored locally under media, you retain full control and privacy of your content.
