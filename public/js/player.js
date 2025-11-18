@@ -135,6 +135,7 @@ class VideoPlayer {
         this.video.addEventListener( 'pause', this.showControls.bind( this ) );
         this.video.addEventListener( 'ended', this.updatePlayState.bind( this ) );
         this.video.addEventListener( 'ended', this.showControls.bind( this ) );
+        this.video.addEventListener( 'ended', this.nextPlaylistItem.bind( this ) );
 
         // Events
         this.video.addEventListener( 'volumechange', this.updateVolumeState.bind( this ) );
