@@ -17,33 +17,28 @@ class SearchIndex {
 
     async init () {
 
-        try {
+        let save = false;
 
+        try {
             const data = await readFile( INDEX_FILE, 'utf8' );
             this.index = JSON.parse( data );
-
         } catch {
-
+            save = true;
             this.index = {
                 videos: {}, hashes: {}, authors: {}, categories: {}, tags: {}, pgs: {},
                 langs: {}, stats: { count: 0, views: 0, size: 0, duration: 0 }
             };
-
-            await this.save();
-
         }
 
         try {
-
             const data = await readFile( HISTORY_FILE, 'utf8' );
             this.history = JSON.parse( data );
-
         } catch {
-
+            save = true;
             this.history = { videos: [] };
-            await this.save();
-
         }
+
+        if ( save ) await this.save();
 
     }
 
