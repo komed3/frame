@@ -86,14 +86,14 @@ export async function upload ( req, res ) {
 
             // Prepare video record with search-relevant data
             const searchData = {
-                title: req.body.title || '',
-                author: req.body.author || '',
-                source: req.body.source || '',
-                date: req.body.date || '',
-                lang: req.body.lang || '',
-                description: req.body.description || '',
-                category: req.body.category || '',
-                pg: req.body.pg || '',
+                title: ( req.body.title || '' ).trim(),
+                author: ( req.body.author || '' ).trim(),
+                source: ( req.body.source || '' ).trim(),
+                date: ( req.body.date || '' ).trim(),
+                lang: ( req.body.lang || '' ).trim(),
+                description: ( req.body.description || '' ).trim(),
+                category: ( req.body.category || '' ).trim(),
+                pg: ( req.body.pg || '' ).trim(),
                 tags: req.body.tags ? req.body.tags.split( ',' ).map( t => t.trim() ).filter( Boolean ) : [],
             };
 
