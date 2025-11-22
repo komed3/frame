@@ -23,7 +23,7 @@ function usage () {
 }
 
 const args = process.argv.slice( 2 );
-const DRY = args.includes( '--dry-run' ) || ! args.includes( '--yes' ) && ! args.includes( '--force' );
+const DRY = args.includes( '--dry-run' );
 const FORCE = args.includes( '--yes' ) || args.includes( '--force' );
 const VERBOSE = args.includes( '--verbose' );
 
