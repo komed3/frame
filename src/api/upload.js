@@ -71,7 +71,8 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'segment', progress: 75, msg: req.t( 'views.upload.processing.msg.segment' ) } );
 
             // Generate waveform
-            const waveform = await getWaveform( finalPath, meta );
+            let waveform = [];
+            try{ waveform = await getWaveform( finalPath, meta ) } catch { /** skip */ }
             sendProgress( { phase: 'waveform', progress: 80, msg: req.t( 'views.upload.processing.msg.waveform' ) } );
 
             // Create video thumbnail (poster)
@@ -79,7 +80,8 @@ export async function upload ( req, res ) {
             sendProgress( { phase: 'thumbnail', progress: 85, msg: req.t( 'views.upload.processing.msg.thumbnail' ) } );
 
             // Generate previews (thumbnails every X seconds)
-            const preview = await createPreview( finalPath, thumbDir, meta );
+            let preview = [];
+            try{ preview = await createPreview( finalPath, thumbDir, meta ) } catch { /** skip */ }
             sendProgress( { phase: 'preview', progress: 95, msg: req.t( 'views.upload.processing.msg.preview' ) } );
 
             // Prepare video record with search-relevant data
