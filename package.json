@@ -23,7 +23,7 @@
     "clean": "node scripts/cleanUp.js"
   },
   "dependencies": {
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "fluent-ffmpeg": "^2.1.3",
     "i18next": "^25.7.3",
     "i18next-fs-backend": "^2.6.1",
