@@ -8,6 +8,7 @@ await i18next.use( FsBackend ).use( LanguageDetector ).init( {
     fallbackLng: 'en-US',
     preload: [ 'en-US', 'de-DE' ],
     cleanCode: true,
+    showSupportNotice: false,
     backend: {
         loadPath: join( cwd, 'locales/{{lng}}.json' )
     },
