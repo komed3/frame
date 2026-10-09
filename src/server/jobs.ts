@@ -166,3 +166,6 @@ export async function runMediaJobs ( processJob: JobProcessor ) : Promise< void 
     running = false;
   }
 }
+
+
+export function stopMediaJobs () : void { stopped = true }
