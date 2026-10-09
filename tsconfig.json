@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "lib": [ "ES2025", "DOM", "DOM.Iterable" ],
+    "types": [ "node", "vite/client" ],
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [ "src/*" ]
-    }
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": { "@/*": [ "./*" ] }
   }
 }
