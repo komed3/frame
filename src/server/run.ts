@@ -47,4 +47,11 @@ async function run () : Promise< void > {
   const server = app.listen( port, '127.0.0.1', () =>
     console.log( `Server started on port ${ port }` )
   );
+
+  const shutdown = () => server.close( error => {
+    if ( error ) { console.error( error ); process.exitCode = 1 }
+  } );
+
+  process.once( 'SIGINT', shutdown );
+  process.once( 'SIGTERM', shutdown );
 }
