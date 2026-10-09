@@ -6,6 +6,12 @@ import type { MediaRoot } from './roots';
 
 type MediaType = 'video' | 'audio' | 'image' | 'text';
 
+export interface ScanResult {
+  discovered: number;
+  ignored: number;
+  errors: number;
+}
+
 
 const extensions: Record< string, { type: MediaType, mime: string } > = {};
 
