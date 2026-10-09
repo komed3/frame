@@ -80,6 +80,18 @@ function claimNextJob () : MediaJob | undefined {
   }
 }
 
+function completeJob ( jobId: number ) : void {
+  db.prepare( `
+    UPDATE media_jobs
+    SET status = 'completed',
+        worker_id = NULL,
+        locked_at_ms = NULL,
+        last_error = NULL,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE id = ? AND worker_id = ?
+  ` ).run( jobId, workerId );
+}
+
 
 export function enqueueMediaJob ( mediaId: number | null, jobType: JobType, priority = 0 ) : void {
   db.prepare( `
