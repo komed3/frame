@@ -122,3 +122,26 @@ export function completeJob ( jobId: number, workerId: string ) : void {
 
   if ( result.changes !== 1 ) throw new Error( `Failed to complete media job ${ jobId }` );
 }
+
+
+export function failJob ( job: MediaJob, workerId: string, error: unknown ) : void {
+  const message = error instanceof Error ? error.message : String( error );
+  const retry = job.attempts < job.max_attempts;
+
+  const result = db.prepare( `
+    UPDATE media_jobs
+    SET status = ?,
+        available_at_ms = ?,
+        worker_id = NULL,
+        locked_at_ms = NULL,
+        last_error = ?,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE id = ? AND status = 'running' AND worker_id = ?
+  ` ).run(
+    retry ? 'pending' : 'failed',
+    Date.now() + retryDelayMs * job.attempts,
+    message.slice( 0, 2000 ), job.id, workerId
+  );
+
+  if ( result.changes !== 1 ) throw new Error( `Failed to update media job ${ job.id }` );
+}
