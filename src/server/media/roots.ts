@@ -6,3 +6,20 @@ export interface MediaRoot {
   id: number;
   path: string;
 }
+
+
+export function addMediaRoot ( path: string ) : number {
+  const rootPath = realpathSync( path );
+
+  if ( ! statSync( rootPath ).isDirectory() ) throw new Error( `Media root is not a directory: ${ rootPath }` );
+
+  const root = db.prepare( `
+    INSERT INTO media_roots ( path, enabled )
+    VALUES ( ?, 1 )
+    ON CONFLICT ( path ) DO UPDATE SET enabled = 1
+    RETURNING id
+  ` ).get( rootPath ) as { id: number } | undefined;
+
+  if ( ! root ) throw new Error( `Failed to register media root: ${ rootPath }` );
+  return root.id;
+}
