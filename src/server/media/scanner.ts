@@ -39,3 +39,23 @@ registerExtensions( 'image', {
 registerExtensions( 'text', {
   '.txt': 'text/plain'
 } );
+
+
+const upsertMedia = db.prepare( `
+  INSERT INTO media (
+    relative_path, media_root_id, root_relative_path,
+    file_name, media_type, mime_type, title,
+    file_size, file_mtime_ms, scanned_at
+  )
+  VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+  ON CONFLICT ( media_root_id, root_relative_path ) DO UPDATE SET
+    relative_path = excluded.relative_path,
+    file_name = excluded.file_name,
+    media_type = excluded.media_type,
+    mime_type = excluded.mime_type,
+    title = excluded.title,
+    file_size = excluded.file_size,
+    file_mtime_ms = excluded.file_mtime_ms,
+    scanned_at = excluded.scanned_at,
+    updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+` );
