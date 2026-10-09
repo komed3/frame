@@ -62,3 +62,11 @@ function main () : void {
     console.log( 'Usage: npm run media-roots -- disable <id>' );
   }
 }
+
+
+try { main() }
+catch ( error ) {
+  console.error( error );
+  process.exitCode = 1;
+}
+finally { closeDatabase() }
