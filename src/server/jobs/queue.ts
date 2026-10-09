@@ -107,3 +107,18 @@ export function claimNextJob ( workerId: string ) : MediaJob | undefined {
     throw error;
   }
 }
+
+
+export function completeJob ( jobId: number, workerId: string ) : void {
+  const result = db.prepare( `
+    UPDATE media_jobs
+    SET status = 'completed',
+        worker_id = NULL,
+        locked_at_ms = NULL,
+        last_error = NULL,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE id = ? AND status = 'running' AND worker_id = ?
+  ` ).run( jobId, workerId );
+
+  if ( result.changes !== 1 ) throw new Error( `Failed to complete media job ${ jobId }` );
+}
