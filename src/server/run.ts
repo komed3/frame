@@ -6,3 +6,6 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 config( { quiet: true } );
+
+
+async function run () : Promise< void > {}
