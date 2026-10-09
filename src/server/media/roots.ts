@@ -23,3 +23,22 @@ export function addMediaRoot ( path: string ) : number {
   if ( ! root ) throw new Error( `Failed to register media root: ${ rootPath }` );
   return root.id;
 }
+
+
+export function getEnabledMediaRoots () : MediaRoot[] {
+  return db.prepare( `
+    SELECT id, path
+    FROM media_roots
+    WHERE enabled = 1
+    ORDER BY id
+  ` ).all() as unknown as MediaRoot[];
+}
+
+
+export function setMediaRootEnabled ( id: number, enabled: boolean ) : void {
+  db.prepare( `
+    UPDATE media_roots
+    SET enabled = ?
+    WHERE id = ?
+  ` ).run( enabled ? 1 : 0, id );
+}
