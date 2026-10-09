@@ -52,6 +52,13 @@ function main () : void {
         console.log( `Media root ${ id } ${ command }d.` );
         break;
       }
+
+      default: throw Error();
     }
-  } catch {}
+  } catch {
+    console.log( 'Usage: npm run media-roots -- add <path>' );
+    console.log( 'Usage: npm run media-roots -- list' );
+    console.log( 'Usage: npm run media-roots -- enable <id>' );
+    console.log( 'Usage: npm run media-roots -- disable <id>' );
+  }
 }
