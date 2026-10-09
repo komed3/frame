@@ -20,3 +20,11 @@ registerExtensions( 'video', {
   '.m2ts': 'video/mp2t', '.ts': 'video/mp2t', '.wmv': 'video/x-ms-wmv',
   '.flv': 'video/x-flv', '.ogv': 'video/ogg', '.3gp': 'video/3gpp'
 } );
+
+registerExtensions( 'audio', {
+  '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4', '.aac': 'audio/aac',
+  '.flac': 'audio/flac', '.ogg': 'audio/ogg', '.opus': 'audio/opus',
+  '.wav': 'audio/wav', '.wma': 'audio/x-ms-wma', '.aiff': 'audio/aiff',
+  '.aif': 'audio/aiff', '.ape': 'audio/ape', '.mid': 'audio/midi',
+  '.midi': 'audio/midi'
+} );
