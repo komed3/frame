@@ -21,4 +21,15 @@ async function run () : Promise< void > {
   app.use( express.json( { limit: '32kb' } ) );
   app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
   app.use( '/api', api );
+
+  if ( process.env.NODE_ENV === 'dev' ) {
+    const { createServer } = await import( 'vite' );
+    const vite = await createServer( {
+      configFile: resolve( process.cwd(), 'vite.config.ts' ),
+      server: { middlewareMode: true },
+      appType: 'spa'
+    } );
+
+    app.use( vite.middlewares );
+  }
 }
