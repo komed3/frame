@@ -46,3 +46,12 @@ async function runWorker ( processJob: JobProcessor ) : Promise< void > {
     catch ( error ) { console.error( `Failed to complete media job ${ job.id }:`, error ) }
   }
 }
+
+
+export function startWorker ( processJob: JobProcessor ) : Promise< void > {
+  if ( workerPromise ) return workerPromise;
+
+  stopped = false;
+  workerPromise = runWorker( processJob ).finally( () => workerPromise = undefined );
+  return workerPromise;
+}
