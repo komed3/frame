@@ -92,6 +92,26 @@ function completeJob ( jobId: number ) : void {
   ` ).run( jobId, workerId );
 }
 
+function failJob ( job: MediaJob, error: unknown ) : void {
+  const message = error instanceof Error ? error.message : String( error );
+  const retry = job.attempts < job.max_attempts;
+
+  db.prepare( `
+    UPDATE media_jobs
+    SET status = ?,
+        available_at_ms = ?,
+        worker_id = NULL,
+        locked_at_ms = NULL,
+        last_error = ?,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE id = ? AND worker_id = ?
+  ` ).run(
+    retry ? 'pending' : 'failed',
+    Date.now() + retryDelayMs * job.attempts,
+    message.slice( 0, 2000 ), job.id, workerId
+  );
+}
+
 
 export function enqueueMediaJob ( mediaId: number | null, jobType: JobType, priority = 0 ) : void {
   db.prepare( `
