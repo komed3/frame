@@ -265,3 +265,18 @@ const migrations: { version: number; sql: string }[] = [ {
 const appliedMigrations = new Set( (
   db.prepare( 'SELECT version FROM schema_migrations' ).all() as { version: number }[]
 ).map( migration => migration.version ) );
+
+for ( const migration of migrations ) {
+  if ( appliedMigrations.has( migration.version ) ) continue;
+
+  db.exec( 'BEGIN IMMEDIATE' );
+
+  try {
+    db.exec( migration.sql );
+    db.prepare( 'INSERT INTO schema_migrations ( version ) VALUES ( ? )' ).run( migration.version );
+    db.exec( 'COMMIT' );
+  } catch ( error ) {
+    db.exec( 'ROLLBACK' );
+    throw error;
+  }
+}
