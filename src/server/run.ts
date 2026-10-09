@@ -2,8 +2,7 @@ import { config } from 'dotenv';
 import express from 'express';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import api from '@/src/server/api';
+import api from './api';
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );

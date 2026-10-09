@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
-
-import { db } from '@/src/server/db';
+import { db } from './db';
 
 
 type JobType =
