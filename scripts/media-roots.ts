@@ -35,6 +35,19 @@ function main () : void {
         );
 
         break;
+
+      case 'enable': case 'disable': {
+        if ( ! value || ! /^\d+$/.test( value ) ) throw Error();
+
+        const id = Number( value );
+        const root = db.prepare( 'SELECT id FROM media_roots WHERE id = ?' ).get( id );
+
+        if ( ! root ) throw new Error( `Media root ${ id } does not exist` );
+
+        setMediaRootEnabled( id, command === 'enable' );
+        console.log( `Media root ${ id } ${ command }d.` );
+        break;
+      }
     }
   } catch {}
 }
