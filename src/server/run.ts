@@ -43,4 +43,8 @@ async function run () : Promise< void > {
       res.sendFile( join( clientDist, 'index.html' ) );
     } );
   }
+
+  const server = app.listen( port, '127.0.0.1', () =>
+    console.log( `Server started on port ${ port }` )
+  );
 }
