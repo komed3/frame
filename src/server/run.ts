@@ -31,5 +31,16 @@ async function run () : Promise< void > {
     } );
 
     app.use( vite.middlewares );
+  } else {
+    const clientDist = resolve( __dirname, '../client' );
+    app.use( express.static( clientDist, { index: false, redirect: false } ) );
+
+    app.use( ( req, res, next ) => {
+      if ( req.method !== 'GET' && req.method !== 'HEAD' ) { next(); return }
+      if ( req.path.startsWith( '/api/' ) ) { next(); return }
+      if ( req.path !== '/' ) { res.redirect( 301, '/' ); return }
+
+      res.sendFile( join( clientDist, 'index.html' ) );
+    } );
   }
 }
