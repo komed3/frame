@@ -14,3 +14,5 @@ interface MediaJob {
   attempts: number;
   max_attempts: number;
 }
+
+type JobProcessor = ( job: MediaJob ) => Promise< void >;
