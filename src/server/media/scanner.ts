@@ -65,3 +65,75 @@ const upsertMedia = db.prepare( `
     scanned_at = excluded.scanned_at,
     updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
 ` );
+
+
+export async function scanMediaRoot ( root: MediaRoot ) : Promise< ScanResult > {
+  const result: ScanResult = { discovered: 0, ignored: 0, errors: 0 };
+  let processed = 0;
+
+  async function scanDirectory ( directory: string ) : Promise< void > {
+    const entries = await readdir( directory, { withFileTypes: true } );
+
+    for ( const entry of entries ) {
+      const path = `${ directory }/${ entry.name }`;
+
+      if ( entry.isSymbolicLink() ) {
+        result.ignored++;
+        continue;
+      }
+
+      if ( entry.isDirectory() ) {
+        try { await scanDirectory( path ) }
+        catch ( error ) {
+          result.errors++;
+          console.error( `Failed to scan directory ${ path }:`, error );
+        }
+
+        continue;
+      }
+
+      if ( ! entry.isFile() ) {
+        result.ignored++;
+        continue;
+      }
+
+      const fileName = entry.name;
+      const extension = extname( fileName ).toLowerCase();
+      const media = extensions[ extension ];
+
+      if ( ! media ) {
+        result.ignored++;
+        continue;
+      }
+
+      try {
+        const file = await stat( path );
+        const rootRelativePath = relative( root.path, path ).split( sep ).join( '/' );
+        const relativePath = `${ root.id }/${ rootRelativePath }`;
+
+        upsertMedia.run(
+          relativePath, root.id, rootRelativePath,
+          fileName, media.type, media.mime, basename( fileName, extension ),
+          file.size, file.mtimeMs
+        );
+
+        result.discovered++;
+      } catch ( error ) {
+        result.errors++;
+        console.error( `Failed to register media file ${ path }:`, error );
+      }
+
+      if ( ++processed % 100 === 0 ) await new Promise( resolve => setImmediate( resolve ) );
+    }
+  }
+
+  await scanDirectory( root.path );
+
+  db.prepare( `
+    UPDATE media_roots
+    SET last_scan_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE id = ?
+  ` ).run( root.id );
+
+  return result;
+}
