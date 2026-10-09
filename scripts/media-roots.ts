@@ -65,8 +65,5 @@ function main () : void {
 
 
 try { main() }
-catch ( error ) {
-  console.error( error );
-  process.exitCode = 1;
-}
+catch { process.exitCode = 1 }
 finally { closeDatabase() }
