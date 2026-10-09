@@ -268,6 +268,20 @@ const migrations: { version: number; sql: string }[] = [ {
       ON media_jobs( job_type )
       WHERE media_id IS NULL;
   `
+}, {
+  version: 3,
+  sql: `
+    ALTER TABLE media ADD COLUMN media_root_id INTEGER
+      REFERENCES media_roots( id );
+
+    ALTER TABLE media ADD COLUMN root_relative_path TEXT;
+
+    CREATE INDEX media_root_idx
+      ON media( media_root_id );
+
+    CREATE UNIQUE INDEX media_root_relative_idx
+      ON media( media_root_id, root_relative_path );
+  `
 } ];
 
 const appliedMigrations = new Set( (
