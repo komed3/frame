@@ -12,3 +12,7 @@ export interface MediaJob {
   attempts: number;
   max_attempts: number;
 }
+
+
+const retryDelayMs = 60_000;
+const lockTimeoutMs = 30 * 60_000;
