@@ -28,3 +28,14 @@ registerExtensions( 'audio', {
   '.aif': 'audio/aiff', '.ape': 'audio/ape', '.mid': 'audio/midi',
   '.midi': 'audio/midi'
 } );
+
+registerExtensions( 'image', {
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+  '.gif': 'image/gif', '.webp': 'image/webp', '.avif': 'image/avif',
+  '.bmp': 'image/bmp', '.tif': 'image/tiff', '.tiff': 'image/tiff',
+  '.svg': 'image/svg+xml', '.heic': 'image/heic', '.heif': 'image/heif'
+} );
+
+registerExtensions( 'text', {
+  '.txt': 'text/plain'
+} );
