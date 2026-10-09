@@ -8,4 +8,7 @@ const __dirname = dirname( fileURLToPath( import.meta.url ) );
 config( { quiet: true } );
 
 
-async function run () : Promise< void > {}
+async function run () : Promise< void > {
+  const port = Number( process.env.PORT || 3000 );
+  const app = express();
+}
