@@ -130,3 +130,39 @@ export function enqueueMediaJob ( mediaId: number | null, jobType: JobType, prio
       updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
   ` ).run( mediaId, jobType, priority );
 }
+
+
+export async function runMediaJobs ( processJob: JobProcessor ) : Promise< void > {
+  if ( running ) return;
+
+  running = true, stopped = false;
+  recoverStaleJobs();
+
+  try {
+    while ( ! stopped ) {
+      let job: MediaJob | undefined;
+
+      try { job = claimNextJob() }
+      catch ( error ) {
+        console.error( 'Failed to claim media job:', error );
+        await new Promise( resolve => setTimeout( resolve, errorDelayMs ) );
+        continue;
+      }
+
+      if ( ! job ) {
+        await new Promise( resolve => setTimeout( resolve, idleDelayMs ) );
+        continue;
+      }
+
+      try {
+        await processJob( job );
+        completeJob( job.id );
+      } catch ( error ) {
+        failJob( job, error );
+        console.error( `Media job ${ job.id } failed:`, error );
+      }
+    }
+  } finally {
+    running = false;
+  }
+}
