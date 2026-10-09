@@ -55,3 +55,6 @@ export function startWorker ( processJob: JobProcessor ) : Promise< void > {
   workerPromise = runWorker( processJob ).finally( () => workerPromise = undefined );
   return workerPromise;
 }
+
+
+export function stopWorker () : void { stopped = true }
