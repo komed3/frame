@@ -52,3 +52,17 @@ export function enqueueJob ( mediaId: number | null, jobType: JobType, priority 
   if ( mediaId === null ) db.prepare( sql ).run( jobType, priority );
   else db.prepare( sql ).run( mediaId, jobType, priority );
 }
+
+
+export function recoverStaleJobs () : void {
+  db.prepare( `
+    UPDATE media_jobs
+    SET status = 'pending',
+        worker_id = NULL,
+        locked_at_ms = NULL,
+        available_at_ms = ?,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE status = 'running'
+      AND locked_at_ms < ?
+  ` ).run( Date.now(), Date.now() - lockTimeoutMs );
+}
