@@ -261,3 +261,7 @@ const migrations: { version: number; sql: string }[] = [ {
     );
   `
 } ];
+
+const appliedMigrations = new Set( (
+  db.prepare( 'SELECT version FROM schema_migrations' ).all() as { version: number }[]
+).map( migration => migration.version ) );
