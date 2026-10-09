@@ -134,10 +134,12 @@ export function enqueueMediaJob ( mediaId: number | null, jobType: JobType, prio
 export async function runMediaJobs ( processJob: JobProcessor ) : Promise< void > {
   if ( running ) return;
 
-  running = true, stopped = false;
-  recoverStaleJobs();
+  running = true;
+  stopped = false;
 
   try {
+    recoverStaleJobs();
+
     while ( ! stopped ) {
       let job: MediaJob | undefined;
 
@@ -157,7 +159,9 @@ export async function runMediaJobs ( processJob: JobProcessor ) : Promise< void 
         await processJob( job );
         completeJob( job.id );
       } catch ( error ) {
-        failJob( job, error );
+        try { failJob( job, error ) }
+        catch ( failure ) { console.error( `Failed to update media job ${ job.id }:`, failure ) }
+
         console.error( `Media job ${ job.id } failed:`, error );
       }
     }
