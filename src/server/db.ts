@@ -261,6 +261,13 @@ const migrations: { version: number; sql: string }[] = [ {
       created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
     );
   `
+}, {
+  version: 2,
+  sql: `
+    CREATE UNIQUE INDEX media_jobs_global_idx
+      ON media_jobs( job_type )
+      WHERE media_id IS NULL;
+  `
 } ];
 
 const appliedMigrations = new Set( (
