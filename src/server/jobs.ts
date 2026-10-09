@@ -28,6 +28,20 @@ let running = false;
 let stopped = false;
 
 
+function recoverStaleJobs () : void {
+  db.prepare( `
+    UPDATE media_jobs
+    SET status = 'pending',
+        worker_id = NULL,
+        locked_at_ms = NULL,
+        available_at_ms = ?,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE status = 'running'
+      AND locked_at_ms < ?
+  ` ).run( Date.now(), Date.now() - lockTimeoutMs );
+}
+
+
 export function enqueueMediaJob ( mediaId: number | null, jobType: JobType, priority = 0 ) : void {
   db.prepare( `
     INSERT INTO media_jobs ( media_id, job_type, priority )
