@@ -7,12 +7,15 @@ function main () : void {
 
   try {
     switch ( command ) {
-      case 'add':
+      case 'add': {
+        if ( ! value ) throw Error();
+
         const id = addMediaRoot( value );
         console.log( `Media root registered with ID ${ id }` );
         break;
+      }
 
-      case 'list':
+      case 'list': {
         const roots = db.prepare( `
           SELECT id, path, enabled, last_scan_at
           FROM media_roots
@@ -35,6 +38,7 @@ function main () : void {
         );
 
         break;
+      }
 
       case 'enable': case 'disable': {
         if ( ! value || ! /^\d+$/.test( value ) ) throw Error();
