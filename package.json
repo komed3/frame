@@ -11,10 +11,13 @@
     "react-router": "^8.4.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.4",
     "@vitejs/plugin-react": "^6.1.2",
+    "autoprefixer": "^10.6.1",
     "cross-env": "^10.1.0",
+    "tailwindcss": "^4.3.3",
     "tsc-alias": "^1.9.7",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
