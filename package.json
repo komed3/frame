@@ -8,7 +8,10 @@
     "build:server": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "build:client": "vite build",
     "build": "npm run build:server && npm run build:client",
-    "start": "cross-env NODE_ENV=production node dist/server/run.js"
+    "start": "cross-env NODE_ENV=production node dist/server/run.js",
+
+    "media-roots": "tsx scripts/media-roots.ts",
+    "media-scan": "tsx scripts/media-scan.ts"
   },
   "dependencies": {
     "dotenv": "^18.0.7",
