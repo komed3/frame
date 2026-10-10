@@ -63,3 +63,8 @@ export interface MediaAssetMetadata {
 }
 
 export type JobProcessor = ( job: MediaJob ) => Promise< void >;
+
+export interface MediaRoot {
+  id: number;
+  path: string;
+}
