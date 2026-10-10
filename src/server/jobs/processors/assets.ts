@@ -244,3 +244,61 @@ async function processPoster ( media: MediaRecord, path: string, fingerprint: st
     { thumbnailPath: thumbnailRelativePath, thumbnailWidth: 480, thumbnailHeight: 270 }
   );
 }
+
+async function processScrubber ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+  if ( media.media_type !== 'video' ) return;
+
+  const duration = getDurationSeconds( media );
+  const count = clamp( Math.round( 40 * Math.sqrt( duration / 20 ) ), previewMinCount, previewMaxCount );
+  const frameRate = count / duration;
+
+  const directoryRelativePath = `assets/video-previews/${ media.id }-${ fingerprint }`;
+  const directoryPath = getAssetPath( directoryRelativePath );
+  const tempDirectoryPath = `${ directoryPath }.tmp`;
+  const manifestRelativePath = `${ directoryRelativePath }/manifest.json`;
+  const manifestPath = getAssetPath( manifestRelativePath );
+
+  await rm( tempDirectoryPath, { recursive: true, force: true } );
+  await mkdir( tempDirectoryPath, { recursive: true } );
+
+  try {
+    await runFfmpeg( [
+      '-i', path, '-map', '0:v:0',
+      '-vf', `fps=${ frameRate.toFixed( 10 ) },scale=320:180:force_original_aspect_ratio=decrease:force_divisible_by=2`,
+      '-frames:v', String( count ), '-c:v', 'libwebp', '-quality', '76', '-compression_level', '6',
+      '-start_number', '0', '-y', `${ tempDirectoryPath }/%06d.webp`
+    ] );
+
+    const files = ( await readdir( tempDirectoryPath ) )
+      .filter( file => extname( file ).toLowerCase() === '.webp' )
+      .sort();
+
+    if ( files.length === 0 ) throw new Error( `No preview frames were generated for media ${ media.id }` );
+    await verifySource( media, path );
+
+    const frames = files.map( ( file, index ) => ( {
+      index, timeMs: Math.round( duration * 1000 * index / count ),
+      path: `${ directoryRelativePath }/${ file }`
+    } ) );
+
+    await writeFile(
+      `${ tempDirectoryPath }/manifest.json`,
+      JSON.stringify( {
+        version: 1, durationMs: media.duration_ms,
+        intervalMs: Math.round( duration * 1000 / count ),
+        width: 320, height: 180, frames
+      } )
+    );
+
+    await rm( directoryPath, { recursive: true, force: true } );
+    await rename( tempDirectoryPath, directoryPath );
+  } catch ( error ) {
+    await rm( tempDirectoryPath, { recursive: true, force: true } );
+    throw error;
+  }
+
+  await replaceAsset(
+    media.id, 'scrubber', fingerprint, manifestRelativePath, 320, 180,
+    { frameCount: count, durationMs: media.duration_ms }
+  );
+}
