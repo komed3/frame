@@ -54,4 +54,6 @@ function getMediaIds ( mode: MetadataMode ) : number[] {
       ` ).all() as { id: number }[];
       break;
   }
+
+  return rows.map( row => row.id );
 }
