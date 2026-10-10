@@ -1,5 +1,8 @@
 import { config } from 'dotenv';
 import express from 'express';
+import { closeDatabase } from './db';
+import { processMediaJob } from './jobs/processors';
+import { startWorker, stopWorker } from './jobs/worker';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import api from './api';
@@ -47,9 +50,32 @@ async function run () : Promise< void > {
     console.log( `Server started on port ${ port }` )
   );
 
-  const shutdown = () => server.close( error => {
-    if ( error ) { console.error( error ); process.exitCode = 1 }
-  } );
+  // --- background worker ---
+
+  const worker = startWorker( processMediaJob );
+  worker.catch( error => console.error( 'Background worker stopped:', error ) );
+
+  // --- shutdown ---
+
+  let shuttingDown = false;
+
+  const shutdown = () => {
+    if ( shuttingDown ) return;
+
+    shuttingDown = true;
+    stopWorker();
+
+    server.close( error => {
+      if ( error ) {
+        console.error( error );
+        process.exitCode = 1;
+      }
+
+      void worker
+        .catch( error => console.error( 'Background worker stopped with an error:', error ) )
+        .then( () => closeDatabase() );
+    } );
+  };
 
   process.once( 'SIGINT', shutdown );
   process.once( 'SIGTERM', shutdown );
