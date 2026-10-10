@@ -33,3 +33,15 @@ interface AssetMetadata {
   thumbnailPath?: string;
   [ key: string ]: unknown;
 }
+
+
+const execFileAsync = promisify( execFile );
+const databasePath = resolve( process.env.FRAME_DB_PATH || 'data/frame.sqlite' );
+const dataDirectory = dirname( databasePath );
+const assetDirectory = resolve( dataDirectory, 'assets' );
+
+const waveformSampleRate = 8000;
+const waveformMinPoints = 8000;
+const waveformMaxPoints = 1_500_000;
+const previewMinCount = 2;
+const previewMaxCount = 1000;
