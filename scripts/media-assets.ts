@@ -1,6 +1,6 @@
-import type { MediaAssetQueueRecord } from '@/shared/types';
 import { closeDatabase, db } from '@/src/server/db';
 import { enqueueJob } from '@/src/server/jobs/queue';
+import type { MediaAssetQueueRecord } from '@/src/shared/types';
 
 
 function main () : void {

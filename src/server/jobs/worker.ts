@@ -1,5 +1,5 @@
-import type { JobProcessor, MediaJob } from '@/shared/types';
 import { claimNextJob, completeJob, failJob, recoverStaleJobs } from '@/src/server/jobs/queue';
+import type { JobProcessor, MediaJob } from '@/src/shared/types';
 import { randomUUID } from 'node:crypto';
 
 

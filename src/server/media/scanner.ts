@@ -1,6 +1,6 @@
-import type { ExistingMedia, MediaRoot, MediaType, ScannedFile, ScanResult } from '@/shared/types';
 import { db } from '@/src/server/db';
 import { enqueueJob } from '@/src/server/jobs/queue';
+import type { ExistingMedia, MediaRoot, MediaType, ScannedFile, ScanResult } from '@/src/shared/types';
 import { createHash } from 'node:crypto';
 import { open, readdir, stat } from 'node:fs/promises';
 import { basename, extname, join, relative, sep } from 'node:path';

@@ -1,5 +1,5 @@
-import type { MediaJob, MediaSourceRecord } from '@/shared/types';
 import { db } from '@/src/server/db';
+import type { MediaJob, MediaSourceRecord } from '@/src/shared/types';
 import { execFile } from 'node:child_process';
 import { open, stat } from 'node:fs/promises';
 import { extname, isAbsolute, relative, resolve, sep } from 'node:path';
