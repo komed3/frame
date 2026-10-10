@@ -1,5 +1,5 @@
 import { getEnabledMediaRoots } from '../../media/roots';
-import { scanMediaRoot } from '../../media/scanner';
+import { scanMediaRoots } from '../../media/scanner';
 import type { MediaJob } from '../queue';
 
 
@@ -13,22 +13,12 @@ export async function processScanJob ( job: MediaJob ) : Promise< void > {
     return;
   }
 
-  let errors = 0;
+  const result = await scanMediaRoots( roots );
 
-  for ( const root of roots ) {
-    try {
-      const result = await scanMediaRoot( root );
-      errors += result.errors;
+  console.log(
+    `Media scan finished: ${ result.discovered } files found, ` +
+    `${ result.ignored } ignored, ${ result.errors } errors`
+  );
 
-      console.log(
-        `Scanned ${ root.path }: ${ result.discovered } files found, ` +
-        `${ result.ignored } ignored, ${ result.errors } errors`
-      );
-    } catch ( error ) {
-      errors++;
-      console.error( `Failed to scan media root ${ root.path }:`, error );
-    }
-  }
-
-  if ( errors > 0 ) throw new Error( `Media scan finished with ${ errors } errors` );
+  if ( result.errors > 0 ) throw new Error( `Media scan finished with ${ result.errors } errors` );
 }
