@@ -196,3 +196,51 @@ async function replaceAsset (
   for ( const asset of oldAssets )
     await removeAssetFiles( assetType, asset.relative_path, asset.metadata_json );
 }
+
+
+async function processPoster ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+  if ( media.media_type !== 'video' ) return;
+
+  const duration = getDurationSeconds( media );
+  const posterRelativePath = `assets/posters/${ media.id }-${ fingerprint }.webp`;
+  const thumbnailRelativePath = `assets/thumbnails/${ media.id }-${ fingerprint }.webp`;
+  const posterPath = getAssetPath( posterRelativePath );
+  const thumbnailPath = getAssetPath( thumbnailRelativePath );
+  const posterTempPath = posterPath.replace( /\.webp$/i, '.tmp.webp' );
+  const thumbnailTempPath = thumbnailPath.replace( /\.webp$/i, '.tmp.webp' );
+
+  await mkdir( dirname( posterPath ), { recursive: true } );
+  await mkdir( dirname( thumbnailPath ), { recursive: true } );
+
+  const seekSeconds = Math.min( Math.max( duration * 0.1, 0 ), Math.max( duration - 0.1, 0 ) );
+
+  try {
+    await runFfmpeg( [
+      '-ss', seekSeconds.toFixed( 3 ), '-i', path, '-map', '0:v:0', '-frames:v', '1',
+      '-vf', 'scale=1920:1080:force_original_aspect_ratio=decrease:force_divisible_by=2',
+      '-c:v', 'libwebp', '-quality', '86', '-compression_level', '6', '-y', posterTempPath
+    ] );
+
+    await runFfmpeg( [
+      '-i', posterTempPath, '-frames:v', '1',
+      '-vf', 'scale=480:270:force_original_aspect_ratio=decrease:force_divisible_by=2',
+      '-c:v', 'libwebp', '-quality', '78', '-compression_level', '6',
+      '-y', thumbnailTempPath
+    ] );
+
+    await verifySource( media, path );
+    await rename( posterTempPath, posterPath );
+    await rename( thumbnailTempPath, thumbnailPath );
+  } catch ( error ) {
+    await rm( posterTempPath, { force: true } );
+    await rm( thumbnailTempPath, { force: true } );
+    throw error;
+  }
+
+  const dimensions = getScaledDimensions( media.width, media.height, 1920, 1080 );
+
+  await replaceAsset(
+    media.id, 'poster', fingerprint, posterRelativePath, dimensions.width, dimensions.height,
+    { thumbnailPath: thumbnailRelativePath, thumbnailWidth: 480, thumbnailHeight: 270 }
+  );
+}
