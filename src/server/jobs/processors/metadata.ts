@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { open, stat } from 'node:fs/promises';
-import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
 import { db } from '../../db';
 import type { MediaJob } from '../queue';
@@ -26,6 +26,9 @@ interface ProbeStream {
   bit_rate?: string;
   sample_rate?: string;
   channels?: number;
+  disposition?: {
+    attached_pic?: number;
+  };
   tags?: Record< string, string | undefined >;
 }
 
@@ -63,6 +66,25 @@ interface MetadataResult {
 const execFileAsync = promisify( execFile );
 const textSampleSize = 4096;
 
+const containersByExtension: Record< string, string > = {
+  '.3gp': '3gp', '.aac': 'aac', '.aif': 'aiff', '.aiff': 'aiff', '.ape': 'ape',
+  '.avi': 'avi', '.avif': 'avif', '.bmp': 'bmp', '.flac': 'flac', '.flv': 'flv',
+  '.gif': 'gif', '.heic': 'heic', '.heif': 'heif', '.jpeg': 'jpeg', '.jpg': 'jpeg',
+  '.m2ts': 'mpegts', '.m4a': 'mp4', '.m4v': 'mp4', '.midi': 'midi', '.mid': 'midi',
+  '.mkv': 'matroska', '.mov': 'mov', '.mp3': 'mp3', '.mp4': 'mp4', '.mpeg': 'mpeg',
+  '.mpg': 'mpeg', '.mts': 'mpegts', '.ogg': 'ogg', '.ogv': 'ogg', '.opus': 'opus',
+  '.png': 'png', '.svg': 'svg', '.tif': 'tiff', '.tiff': 'tiff', '.ts': 'mpegts',
+  '.wav': 'wav', '.webm': 'webm', '.webp': 'webp', '.wma': 'asf', '.wmv': 'asf'
+};
+
+const containersByFormat: Record< string, string > = {
+  aac: 'aac', aiff: 'aiff', ape: 'ape', asf: 'asf', avi: 'avi', avif: 'avif',
+  bmp_pipe: 'bmp', flac: 'flac', flv: 'flv', gif: 'gif', heic: 'heic', heif: 'heif',
+  image2: 'image', image2pipe: 'image', jpeg_pipe: 'jpeg', matroska: 'matroska',
+  midi: 'midi', mov: 'mov', mp3: 'mp3', mp4: 'mp4', mpeg: 'mpeg', mpegts: 'mpegts',
+  ogg: 'ogg', opus: 'opus', png_pipe: 'png', wav: 'wav', webm: 'webm'
+};
+
 
 function numberOrNull ( value: unknown ) : number | null {
   if ( value === null || value === undefined || value === '' ) return null;
@@ -78,6 +100,9 @@ function positiveNumberOrNull ( value: unknown ) : number | null {
 
 function normalizeDate ( value: string | undefined ) : string | null {
   if ( ! value ) return null;
+
+  const compactDate = value.match( /^(\d{4})(\d{2})(\d{2})$/ );
+  if ( compactDate ) return `${ compactDate[ 1 ] }-${ compactDate[ 2 ] }-${ compactDate[ 3 ] }`;
 
   const match = value.match( /^\d{4}(?:-\d{2}(?:-\d{2})?)?/ );
   return match?.[ 0 ] || null;
@@ -107,6 +132,18 @@ function getTag ( tags: Record< string, string | undefined > | undefined, names:
 
 function getMetadataDate ( tags: Record< string, string | undefined > | undefined, names: string[] ) : string | null {
   return normalizeDate( getTag( tags, names ) || undefined );
+}
+
+function normalizeContainer ( path: string, formatName: string | undefined ) : string | null {
+  const extension = extname( path ).toLowerCase();
+  if ( containersByExtension[ extension ] ) return containersByExtension[ extension ];
+
+  for ( const format of ( formatName || '' ).split( ',' ) ) {
+    const normalized = containersByFormat[ format.trim().toLowerCase() ];
+    if ( normalized ) return normalized;
+  }
+
+  return null;
 }
 
 async function getTextEncoding ( path: string ) : Promise< string > {
@@ -141,11 +178,20 @@ async function probeFile ( path: string ) : Promise< ProbeResult > {
   return JSON.parse( result.stdout ) as ProbeResult;
 }
 
-function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type' ] ) : MetadataResult {
+function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type' ], path: string ) : MetadataResult {
   const streams = probe.streams || [], format = probe.format || {};
-  const video = streams.find( stream => stream.codec_type === 'video' );
-  const audio = streams.find( stream => stream.codec_type === 'audio' );
-  const primary = video || audio;
+
+  const videoStream = streams.find( stream =>
+    stream.codec_type === 'video' && ! stream.disposition?.attached_pic
+  ) || streams.find( stream => stream.codec_type === 'video' );
+
+  const audioStream = streams.find( stream => stream.codec_type === 'audio' );
+
+  const video = mediaType === 'video' ? videoStream : undefined;
+  const image = mediaType === 'image' ? videoStream : undefined;
+  const audio = mediaType === 'audio' || mediaType === 'video' ? audioStream : undefined;
+  const primary = audio || video || image;
+
   const formatTags = format.tags, streamTags = primary?.tags;
   const language = getTag( audio?.tags, [ 'language' ] ) ||
     getTag( video?.tags, [ 'language' ] ) ||
@@ -154,9 +200,12 @@ function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type'
   const compactStreams = streams.map( stream => ( {
     type: stream.codec_type || null,
     codec: stream.codec_name || null,
+    attachedPicture: Boolean( stream.disposition?.attached_pic ),
     width: positiveNumberOrNull( stream.width ),
     height: positiveNumberOrNull( stream.height ),
-    frameRate: parseFrameRate( stream.avg_frame_rate ) || parseFrameRate( stream.r_frame_rate ),
+    frameRate: mediaType === 'video'
+      ? parseFrameRate( stream.avg_frame_rate ) || parseFrameRate( stream.r_frame_rate )
+      : null,
     sampleRate: positiveNumberOrNull( stream.sample_rate ),
     channels: positiveNumberOrNull( stream.channels ),
     bitrate: positiveNumberOrNull( stream.bit_rate ),
@@ -165,12 +214,20 @@ function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type'
   } ) );
 
   return {
-    durationMs: positiveNumberOrNull( format.duration ) === null ? null : Math.round( Number( format.duration ) * 1000 ),
-    width: positiveNumberOrNull( video?.width ),
-    height: positiveNumberOrNull( video?.height ),
-    frameRate: parseFrameRate( video?.avg_frame_rate ) || parseFrameRate( video?.r_frame_rate ),
-    bitrate: positiveNumberOrNull( format.bit_rate ) || positiveNumberOrNull( primary?.bit_rate ),
-    container: format.format_name || null,
+    durationMs: mediaType === 'video' || mediaType === 'audio'
+      ? positiveNumberOrNull( format.duration ) === null
+        ? null
+        : Math.round( Number( format.duration ) * 1000 )
+      : null,
+    width: positiveNumberOrNull( video?.width || image?.width ),
+    height: positiveNumberOrNull( video?.height || image?.height ),
+    frameRate: mediaType === 'video'
+      ? parseFrameRate( video?.avg_frame_rate ) || parseFrameRate( video?.r_frame_rate )
+      : null,
+    bitrate: mediaType === 'video' || mediaType === 'audio'
+      ? positiveNumberOrNull( format.bit_rate ) || positiveNumberOrNull( primary?.bit_rate )
+      : null,
+    container: normalizeContainer( path, format.format_name ),
     videoCodec: video?.codec_name || null,
     audioCodec: audio?.codec_name || null,
     sampleRate: positiveNumberOrNull( audio?.sample_rate ),
@@ -186,6 +243,7 @@ function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type'
         name: format.format_name || null,
         tags: formatTags || {}
       },
+      normalizedContainer: normalizeContainer( path, format.format_name ),
       streams: compactStreams,
       embeddedTitle: getTag( formatTags, [ 'title' ] ) || getTag( streamTags, [ 'title' ] ),
       embeddedArtist: getTag( formatTags, [ 'artist', 'album_artist', 'performer' ] ),
@@ -254,7 +312,7 @@ export async function processMetadataJob ( job: MediaJob ) : Promise< void > {
       mediaType: media.media_type, textEncoding: encoding, fileSize: fileStat.size
     } };
   } else {
-    try { metadata = makeMetadata( await probeFile( path ), media.media_type ) }
+    try { metadata = makeMetadata( await probeFile( path ), media.media_type, path ) }
     catch ( error ) {
       if ( media.media_type !== 'image' ) throw error;
       metadata = emptyMetadata( media.media_type, error instanceof Error ? error.message : String( error ) );
