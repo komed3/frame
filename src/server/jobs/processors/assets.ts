@@ -21,6 +21,7 @@ interface MediaRecord {
   root_path: string;
   root_relative_path: string;
   is_available: number;
+  file_name: string;
 }
 
 interface AssetRecord {
@@ -301,4 +302,31 @@ async function processScrubber ( media: MediaRecord, path: string, fingerprint: 
     media.id, 'scrubber', fingerprint, manifestRelativePath, 320, 180,
     { frameCount: count, durationMs: media.duration_ms }
   );
+}
+
+async function processImagePreview ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+  if ( media.media_type !== 'image' || media.file_name?.toLowerCase().endsWith( '.svg' ) ) return;
+
+  const relativePath = `assets/image-previews/${ media.id }-${ fingerprint }.webp`;
+  const outputPath = getAssetPath( relativePath );
+  const tempPath = outputPath.replace( /\.webp$/i, '.tmp.webp' );
+
+  await mkdir( dirname( outputPath ), { recursive: true } );
+
+  try {
+    await runFfmpeg( [
+      '-i', path, '-frames:v', '1',
+      '-vf', 'scale=640:640:force_original_aspect_ratio=decrease:force_divisible_by=2',
+      '-c:v', 'libwebp', '-quality', '80', '-compression_level', '6', '-y', tempPath
+    ] );
+
+    await verifySource( media, path );
+    await rename( tempPath, outputPath );
+  } catch ( error ) {
+    await rm( tempPath, { force: true } );
+    throw error;
+  }
+
+  const dimensions = getScaledDimensions( media.width, media.height, 640, 640 );
+  await replaceAsset( media.id, 'image_preview', fingerprint, relativePath, dimensions.width, dimensions.height );
 }
