@@ -131,8 +131,8 @@ const migrations: Migration[] = [ {
       media_id INTEGER NOT NULL REFERENCES media( id ) ON DELETE CASCADE,
       asset_type TEXT NOT NULL CHECK (
         asset_type IN (
-        'poster', 'scrubber', 'image_preview',
-        'text_preview', 'audio_cover', 'waveform'
+          'poster', 'scrubber', 'image_preview', 'text_preview',
+          'audio_cover', 'waveform'
         )
       ),
       relative_path TEXT NOT NULL UNIQUE,
@@ -253,9 +253,8 @@ const migrations: Migration[] = [ {
       media_id INTEGER REFERENCES media( id ) ON DELETE CASCADE,
       job_type TEXT NOT NULL CHECK (
         job_type IN (
-        'scan', 'poster', 'scrubber',
-        'image_preview', 'text_preview',
-        'audio_cover', 'waveform'
+          'scan', 'metadata', 'poster', 'scrubber', 'image_preview',
+          'text_preview', 'audio_cover', 'waveform'
         )
       ),
       status TEXT NOT NULL DEFAULT 'pending' CHECK (
