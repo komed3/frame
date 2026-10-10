@@ -205,3 +205,30 @@ function emptyMetadata ( mediaType: MediaRecord[ 'media_type' ], error?: string 
     }
   };
 }
+
+async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undefined > {
+  return db.prepare( `
+    SELECT
+      media.id,
+      media.media_type,
+      media.file_size,
+      media.file_mtime_ms,
+      media.is_available,
+      media.root_relative_path,
+      media_roots.path AS root_path
+    FROM media
+    JOIN media_roots ON media_roots.id = media.media_root_id
+    WHERE media.id = ?
+  ` ).get( mediaId ) as MediaRecord | undefined;
+}
+
+function getFilePath ( media: MediaRecord ) : string {
+  const root = resolve( media.root_path );
+  const path = resolve( root, media.root_relative_path );
+  const pathFromRoot = relative( root, path );
+
+  if ( pathFromRoot === '..' || pathFromRoot.startsWith( `..${ sep }` ) || isAbsolute( pathFromRoot ) )
+    throw new Error( `Media path escapes its root: ${ media.root_relative_path }` );
+
+  return path;
+}
