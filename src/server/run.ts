@@ -1,11 +1,11 @@
 import { config } from 'dotenv';
 import express from 'express';
-import { closeDatabase } from './db';
-import { processMediaJob } from './jobs/processors';
-import { startWorker, stopWorker } from './jobs/worker';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import api from './api';
+import { closeDatabase } from './db';
+import { processMediaJob } from './jobs/processors';
+import { startWorker, stopWorker } from './jobs/worker';
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
@@ -19,10 +19,14 @@ async function run () : Promise< void > {
   if ( ! Number.isInteger( port ) || port < 1 || port > 65535 )
     throw new Error( 'PORT must be an integer between 1 and 65535' );
 
+  // --- middleware ---
+
   app.disable( 'x-powered-by' );
   app.use( express.json( { limit: '32kb' } ) );
   app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
   app.use( '/api', api );
+
+  // --- react ---
 
   if ( process.env.NODE_ENV === 'dev' ) {
     const { createServer } = await import( 'vite' );
@@ -45,6 +49,8 @@ async function run () : Promise< void > {
       res.sendFile( join( clientDist, 'index.html' ) );
     } );
   }
+
+  // --- start server ---
 
   const server = app.listen( port, '127.0.0.1', () =>
     console.log( `Server started on port ${ port }` )
