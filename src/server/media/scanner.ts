@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { open, readdir, stat } from 'node:fs/promises';
 import { basename, extname, join, relative, sep } from 'node:path';
 import { db } from '../db';
+import { enqueueJob } from '../jobs/queue';
 import type { MediaRoot } from './roots';
 
 
@@ -33,6 +34,7 @@ interface ExistingMedia {
   file_size: number;
   file_mtime_ms: number | null;
   content_hash: string | null;
+  metadata_json: string;
   is_available: number;
 }
 
@@ -123,7 +125,7 @@ export async function scanMediaRoots ( roots: MediaRoot[] ) : Promise< ScanResul
   const existing = db.prepare( `
     SELECT id, relative_path, media_root_id, root_relative_path,
       file_name, media_type, mime_type, title, file_size,
-      file_mtime_ms, content_hash, is_available
+      file_mtime_ms, content_hash, metadata_json, is_available
     FROM media
   ` ).all() as unknown as ExistingMedia[];
 
@@ -295,17 +297,30 @@ export async function scanMediaRoots ( roots: MediaRoot[] ) : Promise< ScanResul
     for ( const file of files ) {
       const previous = matchedFiles.get( file );
 
-      if ( previous ) updateMedia.run(
-        file.relativePath, file.root.id, file.rootRelativePath,
-        file.fileName, file.type, file.mime, file.title,
-        file.size, file.mtimeMs, file.hash, previous.id
-      );
+      const metadataChanged = ! previous || previous.file_size !== file.size ||
+        previous.file_mtime_ms !== file.mtimeMs || previous.content_hash !== file.hash ||
+        previous.media_type !== file.type || ! previous.metadata_json ||
+        previous.metadata_json === '{}';
 
-      else insertMedia.run(
-        file.relativePath, file.root.id, file.rootRelativePath,
-        file.fileName, file.type, file.mime, file.title,
-        file.size, file.mtimeMs, file.hash
-      );
+      let mediaId: number;
+
+      if ( previous ) {
+        updateMedia.run(
+          file.relativePath, file.root.id, file.rootRelativePath, file.fileName, file.type,
+          file.mime, file.title, file.size, file.mtimeMs, file.hash, previous.id
+        );
+
+        mediaId = previous.id;
+      } else {
+        const inserted = insertMedia.run(
+          file.relativePath, file.root.id, file.rootRelativePath, file.fileName, file.type,
+          file.mime, file.title, file.size, file.mtimeMs, file.hash
+        );
+
+        mediaId = Number( inserted.lastInsertRowid );
+      }
+
+      if ( metadataChanged ) enqueueJob( mediaId, 'metadata', 10 );
     }
 
     const updateRoot = db.prepare( `
