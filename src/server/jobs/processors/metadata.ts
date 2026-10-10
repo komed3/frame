@@ -62,3 +62,16 @@ interface MetadataResult {
 
 const execFileAsync = promisify( execFile );
 const textSampleSize = 4096;
+
+
+function numberOrNull ( value: unknown ) : number | null {
+  if ( value === null || value === undefined || value === '' ) return null;
+
+  const number = Number( value );
+  return Number.isFinite( number ) ? number : null;
+}
+
+function positiveNumberOrNull ( value: unknown ) : number | null {
+  const number = numberOrNull( value );
+  return number !== null && number > 0 ? number : null;
+}
