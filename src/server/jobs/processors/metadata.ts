@@ -93,3 +93,14 @@ function parseFrameRate ( value: string | undefined ) : number | null {
   const rate = parts[ 0 ] / parts[ 1 ];
   return Number.isFinite( rate ) && rate > 0 ? rate : null;
 }
+
+function getTag ( tags: Record< string, string | undefined > | undefined, names: string[] ) : string | null {
+  if ( ! tags ) return null;
+
+  for ( const name of names ) {
+    const entry = Object.entries( tags ).find( ( [ key ] ) => key.toLowerCase() === name );
+    if ( entry?.[ 1 ]?.trim() ) return entry[ 1 ].trim();
+  }
+
+  return null;
+}
