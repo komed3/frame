@@ -195,3 +195,13 @@ function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type'
     }
   };
 }
+
+function emptyMetadata ( mediaType: MediaRecord[ 'media_type' ], error?: string ) : MetadataResult {
+  return {
+    durationMs: null, width: null, height: null, frameRate: null, bitrate: null, container: null,
+    videoCodec: null, audioCodec: null, sampleRate: null, channels: null, encoding: null,
+    language: null, releaseDate: null, recordedAt: null, metadata: {
+      mediaType, ...( error ? { probeError: error } : {} )
+    }
+  };
+}
