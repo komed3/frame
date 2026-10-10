@@ -100,3 +100,27 @@ async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undef
     WHERE media.id = ?
   ` ).get( mediaId ) as MediaRecord | undefined;
 }
+
+async function verifySource ( media: MediaRecord, path: string ) : Promise< void > {
+  const fileStat = await stat( path );
+
+  if (
+    fileStat.size !== media.file_size ||
+    ( media.file_mtime_ms !== null && fileStat.mtimeMs !== media.file_mtime_ms )
+  ) throw new Error( `Media changed since scan; scan it again: ${ path }` );
+}
+
+function getFingerprint ( media: MediaRecord ) : string {
+  return createHash( 'sha256' )
+    .update( `${ media.content_hash || '' }:${ media.file_size }:${ media.file_mtime_ms ?? '' }` )
+    .digest( 'hex' ).slice( 0, 20 );
+}
+
+function getDurationSeconds ( media: MediaRecord ) : number {
+  const duration = ( media.duration_ms || 0 ) / 1000;
+
+  if ( ! Number.isFinite( duration ) || duration <= 0 )
+    throw new Error( `Media ${ media.id } has no valid duration` );
+
+  return duration;
+}
