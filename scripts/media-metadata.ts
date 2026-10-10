@@ -14,3 +14,19 @@ function usage () : never {
   console.log( 'npm run media-metadata -- --id <id> Re-extract one media item' );
   process.exit( 1 );
 }
+
+
+function getMediaIds ( mode: MetadataMode ) : number[] {
+  let rows: { id: number }[];
+
+  switch ( mode ) {
+    case 'all':
+      rows = db.prepare( `
+        SELECT id
+        FROM media
+        WHERE is_available = 1
+        ORDER BY id
+      ` ).all() as { id: number }[];
+      break;
+  }
+}
