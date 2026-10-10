@@ -28,5 +28,30 @@ function getMediaIds ( mode: MetadataMode ) : number[] {
         ORDER BY id
       ` ).all() as { id: number }[];
       break;
+
+    case 'failed':
+      rows = db.prepare( `
+        SELECT media.id
+        FROM media
+        JOIN media_jobs ON media_jobs.media_id = media.id
+        WHERE media.is_available = 1
+          AND media_jobs.job_type = 'metadata'
+          AND media_jobs.status = 'failed'
+        ORDER BY media.id
+      ` ).all() as { id: number }[];
+      break;
+
+    case 'missing':
+      rows = db.prepare( `
+        SELECT id
+        FROM media
+        WHERE is_available = 1
+          AND (
+            metadata_json = '{}'
+            OR json_extract( metadata_json, '$.probeError' ) IS NOT NULL
+          )
+        ORDER BY id
+      ` ).all() as { id: number }[];
+      break;
   }
 }
