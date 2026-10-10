@@ -15,7 +15,6 @@ function usage () : never {
   process.exit( 1 );
 }
 
-
 function getMediaIds ( mode: MetadataMode ) : number[] {
   let rows: { id: number }[];
 
@@ -56,4 +55,30 @@ function getMediaIds ( mode: MetadataMode ) : number[] {
   }
 
   return rows.map( row => row.id );
+}
+
+function main () : void {
+  const args = process.argv.slice( 2 );
+  let mode: MetadataMode = 'missing', mediaId: number | null = null;
+
+  if ( args.length > 0 ) {
+    if ( args.length === 1 && [ '--missing', '--failed', '--all' ].includes( args[ 0 ] ) )
+      mode = args[ 0 ].slice( 2 ) as MetadataMode;
+
+    else if ( args.length === 2 && args[ 0 ] === '--id' && /^\d+$/.test( args[ 1 ] ) )
+      mediaId = Number( args[ 1 ] );
+
+    else usage();
+  }
+
+  const mediaIds = mediaId === null ? getMediaIds( mode ) : ( db.prepare( `
+    SELECT id
+    FROM media
+    WHERE id = ? AND is_available = 1
+  ` ).get( mediaId ) ? [ mediaId ] : [] );
+
+  for ( const id of mediaIds ) enqueueJob( id, 'metadata', 20 );
+
+  console.log( `Queued metadata jobs: ${ mediaIds.length }` );
+  if ( mediaIds.length === 0 ) console.log( 'Nothing to do.' );
 }
