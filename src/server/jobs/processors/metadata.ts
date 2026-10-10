@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { open, stat } from 'node:fs/promises';
-import { relative, resolve, sep, isAbsolute } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
 import { db } from '../../db';
 import type { MediaJob } from '../queue';
@@ -231,4 +231,60 @@ function getFilePath ( media: MediaRecord ) : string {
     throw new Error( `Media path escapes its root: ${ media.root_relative_path }` );
 
   return path;
+}
+
+
+export async function processMetadataJob ( job: MediaJob ) : Promise< void > {
+  if ( job.job_type !== 'metadata' || job.media_id === null ) throw new Error( 'Invalid metadata job' );
+
+  const media = await getMediaRecord( job.media_id );
+  if ( ! media || ! media.is_available ) return;
+
+  const path = getFilePath( media );
+  const fileStat = await stat( path );
+
+  if ( fileStat.size !== media.file_size || ( media.file_mtime_ms !== null && fileStat.mtimeMs !== media.file_mtime_ms ) )
+    throw new Error( `Media changed since scan; scan it again: ${ path }` );
+
+  let metadata: MetadataResult;
+
+  if ( media.media_type === 'text' ) {
+    const encoding = await getTextEncoding( path );
+    metadata = { ...emptyMetadata( media.media_type ), encoding, metadata: {
+      mediaType: media.media_type, textEncoding: encoding, fileSize: fileStat.size
+    } };
+  } else {
+    try { metadata = makeMetadata( await probeFile( path ), media.media_type ) }
+    catch ( error ) {
+      if ( media.media_type !== 'image' ) throw error;
+      metadata = emptyMetadata( media.media_type, error instanceof Error ? error.message : String( error ) );
+    }
+  }
+
+  db.prepare( `
+    UPDATE media SET
+      duration_ms = ?,
+      width = ?,
+      height = ?,
+      frame_rate = ?,
+      bitrate = ?,
+      container = ?,
+      video_codec = ?,
+      audio_codec = ?,
+      sample_rate = ?,
+      channels = ?,
+      encoding = ?,
+      language = ?,
+      release_date = ?,
+      recorded_at = ?,
+      metadata_json = ?,
+      updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    WHERE id = ? AND is_available = 1
+  ` ).run(
+    metadata.durationMs, metadata.width, metadata.height, metadata.frameRate,
+    metadata.bitrate, metadata.container, metadata.videoCodec, metadata.audioCodec,
+    metadata.sampleRate, metadata.channels, metadata.encoding, metadata.language,
+    metadata.releaseDate, metadata.recordedAt, JSON.stringify( metadata.metadata ),
+    media.id
+  );
 }
