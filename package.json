@@ -10,6 +10,7 @@
     "build": "npm run build:server && npm run build:client",
     "start": "cross-env NODE_ENV=production node dist/server/run.js",
 
+    "migrate-db": "tsx scripts/migrate-db.ts",
     "media-roots": "tsx scripts/media-roots.ts",
     "media-scan": "tsx scripts/media-scan.ts"
   },
