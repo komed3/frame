@@ -1,12 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src/server",
-    "outDir": "dist/server"
+    "rootDir": "src",
+    "outDir": "dist"
   },
   "tsc-alias": {
     "resolveFullPaths": true,
     "verbose": false
   },
-  "include": [ "src/server/**/*.ts" ]
+  "include": [
+    "src/server/**/*.ts",
+    "src/shared/**/*.ts"
+  ]
 }
