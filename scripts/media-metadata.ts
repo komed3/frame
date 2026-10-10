@@ -8,10 +8,10 @@ type MetadataMode = 'missing' | 'failed' | 'all';
 function usage () : never {
   console.log( 'Usage:' );
   console.log( 'npm run media-metadata              Queue missing metadata' );
-  console.log( 'npm run media-metadata -- --missing Queue missing metadata' );
-  console.log( 'npm run media-metadata -- --failed  Retry failed metadata jobs' );
-  console.log( 'npm run media-metadata -- --all     Re-extract all metadata' );
-  console.log( 'npm run media-metadata -- --id <id> Re-extract one media item' );
+  console.log( 'npm run media-metadata -- missing   Queue missing metadata' );
+  console.log( 'npm run media-metadata -- failed    Retry failed metadata jobs' );
+  console.log( 'npm run media-metadata -- all       Re-extract all metadata' );
+  console.log( 'npm run media-metadata -- id <id>   Re-extract one media item' );
   process.exit( 1 );
 }
 
@@ -62,10 +62,10 @@ function main () : void {
   let mode: MetadataMode = 'missing', mediaId: number | null = null;
 
   if ( args.length > 0 ) {
-    if ( args.length === 1 && [ '--missing', '--failed', '--all' ].includes( args[ 0 ] ) )
-      mode = args[ 0 ].slice( 2 ) as MetadataMode;
+    if ( args.length === 1 && [ 'missing', 'failed', 'all' ].includes( args[ 0 ] ) )
+      mode = args[ 0 ] as MetadataMode;
 
-    else if ( args.length === 2 && args[ 0 ] === '--id' && /^\d+$/.test( args[ 1 ] ) )
+    else if ( args.length === 2 && args[ 0 ] === 'id' && /^\d+$/.test( args[ 1 ] ) )
       mediaId = Number( args[ 1 ] );
 
     else usage();
