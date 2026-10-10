@@ -11,7 +11,6 @@ function usage () : never {
   process.exit( 1 );
 }
 
-
 function main () : void {
   const [ command, value ] = process.argv.slice( 2 );
 
