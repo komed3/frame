@@ -129,7 +129,7 @@ export async function scanMediaRoot ( root: MediaRoot ) : Promise< ScanResult > 
 
   await scanDirectory( root.path );
 
-  db.prepare( `
+  if ( result.errors === 0 ) db.prepare( `
     UPDATE media_roots
     SET last_scan_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
     WHERE id = ?
