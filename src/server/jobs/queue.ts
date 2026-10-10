@@ -25,11 +25,19 @@ export function enqueueJob ( mediaId: number | null, jobType: JobType, priority 
     ON CONFLICT ( job_type ) WHERE media_id IS NULL DO UPDATE SET
       priority = MAX( media_jobs.priority, excluded.priority ),
       status = CASE
-        WHEN media_jobs.status = 'failed' THEN 'pending'
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN 'pending'
         ELSE media_jobs.status
       END,
+      attempts = CASE
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN 0
+        ELSE media_jobs.attempts
+      END,
+      last_error = CASE
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN NULL
+        ELSE media_jobs.last_error
+      END,
       available_at_ms = CASE
-        WHEN media_jobs.status = 'failed' THEN excluded.available_at_ms
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN excluded.available_at_ms
         ELSE media_jobs.available_at_ms
       END,
       updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
@@ -39,11 +47,19 @@ export function enqueueJob ( mediaId: number | null, jobType: JobType, priority 
     ON CONFLICT ( media_id, job_type ) DO UPDATE SET
       priority = MAX( media_jobs.priority, excluded.priority ),
       status = CASE
-        WHEN media_jobs.status = 'failed' THEN 'pending'
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN 'pending'
         ELSE media_jobs.status
       END,
+      attempts = CASE
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN 0
+        ELSE media_jobs.attempts
+      END,
+      last_error = CASE
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN NULL
+        ELSE media_jobs.last_error
+      END,
       available_at_ms = CASE
-        WHEN media_jobs.status = 'failed' THEN excluded.available_at_ms
+        WHEN media_jobs.status IN ( 'failed', 'completed' ) THEN excluded.available_at_ms
         ELSE media_jobs.available_at_ms
       END,
       updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
