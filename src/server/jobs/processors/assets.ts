@@ -79,3 +79,24 @@ function getMediaPath ( media: MediaRecord ) : string {
 
   return path;
 }
+
+async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undefined > {
+  return db.prepare( `
+    SELECT
+      media.id,
+      media.media_type,
+      media.file_size,
+      media.file_mtime_ms,
+      media.content_hash,
+      media.duration_ms,
+      media.width,
+      media.height,
+      media.audio_codec,
+      media.root_relative_path,
+      media.is_available,
+      media_roots.path AS root_path
+    FROM media
+    JOIN media_roots ON media_roots.id = media.media_root_id
+    WHERE media.id = ?
+  ` ).get( mediaId ) as MediaRecord | undefined;
+}
