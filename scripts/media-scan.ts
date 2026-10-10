@@ -1,5 +1,5 @@
-import { closeDatabase } from '../src/server/db';
-import { enqueueJob } from '../src/server/jobs/queue';
+import { closeDatabase } from '@/src/server/db';
+import { enqueueJob } from '@/src/server/jobs/queue';
 
 
 try {

@@ -1,13 +1,6 @@
-import { closeDatabase, db } from '../src/server/db';
-import { enqueueJob } from '../src/server/jobs/queue';
-
-
-interface MediaAssetSource {
-  id: number;
-  media_type: 'video' | 'audio' | 'image' | 'text' | 'other';
-  file_name: string;
-  audio_codec: string | null;
-}
+import type { MediaAssetQueueRecord } from '@/shared/types';
+import { closeDatabase, db } from '@/src/server/db';
+import { enqueueJob } from '@/src/server/jobs/queue';
 
 
 function main () : void {
@@ -17,7 +10,7 @@ function main () : void {
     WHERE is_available = 1
       AND media_type IN ( 'video', 'audio', 'image' )
     ORDER BY id
-  ` ).all() as unknown as MediaAssetSource[];
+  ` ).all() as unknown as MediaAssetQueueRecord[];
 
   let queued = 0;
 

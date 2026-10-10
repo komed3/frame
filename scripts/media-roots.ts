@@ -1,5 +1,5 @@
-import { closeDatabase, db } from '../src/server/db';
-import { addMediaRoot, setMediaRootEnabled } from '../src/server/media/roots';
+import { closeDatabase, db } from '@/src/server/db';
+import { addMediaRoot, setMediaRootEnabled } from '@/src/server/media/roots';
 
 
 function usage () : never {
