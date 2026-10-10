@@ -140,3 +140,58 @@ async function probeFile ( path: string ) : Promise< ProbeResult > {
 
   return JSON.parse( result.stdout ) as ProbeResult;
 }
+
+function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type' ] ) : MetadataResult {
+  const streams = probe.streams || [], format = probe.format || {};
+  const video = streams.find( stream => stream.codec_type === 'video' );
+  const audio = streams.find( stream => stream.codec_type === 'audio' );
+  const primary = video || audio;
+  const formatTags = format.tags, streamTags = primary?.tags;
+  const language = getTag( audio?.tags, [ 'language' ] ) ||
+    getTag( video?.tags, [ 'language' ] ) ||
+    getTag( formatTags, [ 'language' ] );
+
+  const compactStreams = streams.map( stream => ( {
+    type: stream.codec_type || null,
+    codec: stream.codec_name || null,
+    width: positiveNumberOrNull( stream.width ),
+    height: positiveNumberOrNull( stream.height ),
+    frameRate: parseFrameRate( stream.avg_frame_rate ) || parseFrameRate( stream.r_frame_rate ),
+    sampleRate: positiveNumberOrNull( stream.sample_rate ),
+    channels: positiveNumberOrNull( stream.channels ),
+    bitrate: positiveNumberOrNull( stream.bit_rate ),
+    language: getTag( stream.tags, [ 'language' ] ),
+    tags: stream.tags || {}
+  } ) );
+
+  return {
+    durationMs: positiveNumberOrNull( format.duration ) === null ? null : Math.round( Number( format.duration ) * 1000 ),
+    width: positiveNumberOrNull( video?.width ),
+    height: positiveNumberOrNull( video?.height ),
+    frameRate: parseFrameRate( video?.avg_frame_rate ) || parseFrameRate( video?.r_frame_rate ),
+    bitrate: positiveNumberOrNull( format.bit_rate ) || positiveNumberOrNull( primary?.bit_rate ),
+    container: format.format_name || null,
+    videoCodec: video?.codec_name || null,
+    audioCodec: audio?.codec_name || null,
+    sampleRate: positiveNumberOrNull( audio?.sample_rate ),
+    channels: positiveNumberOrNull( audio?.channels ),
+    encoding: null,
+    language,
+    releaseDate: getMetadataDate( formatTags, [ 'date', 'year', 'release_date', 'releasedate' ] ) ||
+      getMetadataDate( streamTags, [ 'date', 'year', 'release_date', 'releasedate' ] ),
+    recordedAt: getMetadataDate( formatTags, [ 'creation_time', 'recorded_date', 'date_recorded' ] ) ||
+      getMetadataDate( streamTags, [ 'creation_time', 'recorded_date', 'date_recorded' ] ),
+    metadata: {
+      format: {
+        name: format.format_name || null,
+        tags: formatTags || {}
+      },
+      streams: compactStreams,
+      embeddedTitle: getTag( formatTags, [ 'title' ] ) || getTag( streamTags, [ 'title' ] ),
+      embeddedArtist: getTag( formatTags, [ 'artist', 'album_artist', 'performer' ] ),
+      embeddedAlbum: getTag( formatTags, [ 'album' ] ),
+      embeddedComment: getTag( formatTags, [ 'comment', 'description' ] ),
+      mediaType
+    }
+  };
+}
