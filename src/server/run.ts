@@ -1,11 +1,11 @@
+import api from '@/src/server/api';
+import { closeDatabase } from '@/src/server/db';
+import { processMediaJob } from '@/src/server/jobs/processors';
+import { startWorker, stopWorker } from '@/src/server/jobs/worker';
 import { config } from 'dotenv';
 import express from 'express';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import api from './api';
-import { closeDatabase } from './db';
-import { processMediaJob } from './jobs/processors';
-import { startWorker, stopWorker } from './jobs/worker';
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
