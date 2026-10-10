@@ -1,11 +1,6 @@
+import { MediaRoot } from '@/shared/types';
+import { db } from '@/src/server/db';
 import { realpathSync, statSync } from 'node:fs';
-import { db } from '../db';
-
-
-export interface MediaRoot {
-  id: number;
-  path: string;
-}
 
 
 export function addMediaRoot ( path: string ) : number {
