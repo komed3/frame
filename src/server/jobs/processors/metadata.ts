@@ -104,3 +104,7 @@ function getTag ( tags: Record< string, string | undefined > | undefined, names:
 
   return null;
 }
+
+function getMetadataDate ( tags: Record< string, string | undefined > | undefined, names: string[] ) : string | null {
+  return normalizeDate( getTag( tags, names ) || undefined );
+}
