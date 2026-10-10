@@ -427,3 +427,48 @@ async function processWaveform ( media: MediaRecord, path: string, fingerprint: 
     values: 'signed-int16-min-max'
   } );
 }
+
+
+export async function processPosterJob ( job: MediaJob ) : Promise< void > {
+  if ( job.job_type !== 'poster' || job.media_id === null ) throw new Error( 'Invalid poster job' );
+
+  const media = await getMediaRecord( job.media_id );
+  if ( ! media || ! media.is_available ) return;
+
+  const path = getMediaPath( media );
+  await verifySource( media, path );
+  await processPoster( media, path, getFingerprint( media ) );
+}
+
+export async function processScrubberJob ( job: MediaJob ) : Promise< void > {
+  if ( job.job_type !== 'scrubber' || job.media_id === null ) throw new Error( 'Invalid scrubber job' );
+
+  const media = await getMediaRecord( job.media_id );
+  if ( ! media || ! media.is_available ) return;
+
+  const path = getMediaPath( media );
+  await verifySource( media, path );
+  await processScrubber( media, path, getFingerprint( media ) );
+}
+
+export async function processImagePreviewJob ( job: MediaJob ) : Promise< void > {
+  if ( job.job_type !== 'image_preview' || job.media_id === null ) throw new Error( 'Invalid image preview job' );
+
+  const media = await getMediaRecord( job.media_id );
+  if ( ! media || ! media.is_available ) return;
+
+  const path = getMediaPath( media );
+  await verifySource( media, path );
+  await processImagePreview( media, path, getFingerprint( media ) );
+}
+
+export async function processWaveformJob ( job: MediaJob ) : Promise< void > {
+  if ( job.job_type !== 'waveform' || job.media_id === null ) throw new Error( 'Invalid waveform job' );
+
+  const media = await getMediaRecord( job.media_id );
+  if ( ! media || ! media.is_available ) return;
+
+  const path = getMediaPath( media );
+  await verifySource( media, path );
+  await processWaveform( media, path, getFingerprint( media ) );
+}
