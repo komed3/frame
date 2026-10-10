@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto';
-import { createReadStream } from 'node:fs';
-import { readdir, stat } from 'node:fs/promises';
+import { open, readdir, stat } from 'node:fs/promises';
 import { basename, extname, join, relative, sep } from 'node:path';
 import { db } from '../db';
 import type { MediaRoot } from './roots';
@@ -44,6 +43,7 @@ export interface ScanResult {
 }
 
 
+const hashVersion = 'partial-sha256-v1', sampleSize = 64 * 1024;
 const extensions: Record< string, { type: MediaType, mime: string } > = {};
 
 function registerExtensions ( type: MediaType, mimeTypes: Record< string, string > ) : void {
@@ -78,17 +78,40 @@ registerExtensions( 'text', {
 } );
 
 
-async function hashFile ( path: string ) : Promise< string > {
-  const hash = createHash( 'sha256' );
+async function hashFile ( path: string, size: number, mtimeMs: number ) : Promise< string > {
+  const file = await open( path );
 
-  await new Promise< void >( ( resolve, reject ) => {
-    const stream = createReadStream( path );
-    stream.on( 'data', chunk => hash.update( chunk ) );
-    stream.on( 'error', reject );
-    stream.on( 'end', resolve );
-  } );
+  try {
+    const initialStat = await file.stat();
 
-  return hash.digest( 'hex' );
+    if ( initialStat.size !== size || initialStat.mtimeMs !== mtimeMs )
+      throw new Error( `File changed before hashing: ${ path }` );
+
+    const hash = createHash( 'sha256' );
+    hash.update( `${ hashVersion }\0${ size }\0` );
+
+    const offsets = size <= sampleSize ? [ 0 ] : [ 0, Math.floor( ( size - sampleSize ) / 2 ), size - sampleSize ];
+
+    for ( const offset of [ ...new Set( offsets ) ] ) {
+      const length = Math.min( sampleSize, size - offset );
+      const buffer = Buffer.allocUnsafe( length );
+      const { bytesRead } = await file.read( buffer, 0, length, offset );
+
+      if ( bytesRead !== length ) throw new Error( `Incomplete read while hashing: ${ path }` );
+
+      hash.update( `${ offset }\0${ length }\0` );
+      hash.update( buffer );
+    }
+
+    const finalStat = await file.stat();
+
+    if ( finalStat.size !== size || finalStat.mtimeMs !== mtimeMs )
+      throw new Error( `File changed while hashing: ${ path }` );
+
+    return `${ hashVersion }:${ hash.digest( 'hex' ) }`;
+  } finally {
+    await file.close();
+  }
 }
 
 
@@ -153,11 +176,10 @@ export async function scanMediaRoots ( roots: MediaRoot[] ) : Promise< ScanResul
         let hash: string;
 
         if (
-          previous?.content_hash &&
-          previous.file_size === file.size &&
-          previous.file_mtime_ms === file.mtimeMs
+          previous?.content_hash?.startsWith( `${ hashVersion }:` ) &&
+          previous.file_size === file.size && previous.file_mtime_ms === file.mtimeMs
         ) hash = previous.content_hash;
-        else hash = await hashFile( path );
+        else hash = await hashFile( path, file.size, file.mtimeMs );
 
         files.push( {
           root, path, relativePath, rootRelativePath, fileName,
