@@ -1,6 +1,6 @@
+import type { JobProcessor, MediaJob } from '@/shared/types';
+import { claimNextJob, completeJob, failJob, recoverStaleJobs } from '@/src/server/jobs/queue';
 import { randomUUID } from 'node:crypto';
-import type { JobProcessor, MediaJob } from '../../../shared/types';
-import { claimNextJob, completeJob, failJob, recoverStaleJobs } from './queue';
 
 
 const idleDelayMs = 1000;

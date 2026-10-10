@@ -1,10 +1,10 @@
+import type { MediaAssetMetadata, MediaAssetRecord, MediaAssetSource, MediaAssetType, MediaJob } from '@/shared/types';
+import { db } from '@/src/server/db';
 import { execFile, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
-import type { MediaAssetMetadata, MediaAssetRecord, MediaAssetSource, MediaAssetType, MediaJob } from '../../../../shared/types';
-import { db } from '../../db';
 
 
 const execFileAsync = promisify( execFile );

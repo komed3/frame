@@ -1,5 +1,5 @@
-import type { MediaJob, MediaJobType } from '../../../shared/types';
-import { db } from '../db';
+import type { MediaJob, MediaJobType } from '@/shared/types';
+import { db } from '@/src/server/db';
 
 
 const retryDelayMs = 60_000;

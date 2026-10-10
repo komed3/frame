@@ -1,9 +1,11 @@
 import type { JobProcessor, MediaAssetQueueRecord, MediaJob } from '@/shared/types';
-import { db } from '../../db';
-import { enqueueJob } from '../queue';
-import { processImagePreviewJob, processPosterJob, processScrubberJob, processWaveformJob } from './assets';
-import { processMetadataJob } from './metadata';
-import { processScanJob } from './scan';
+import { db } from '@/src/server/db';
+import {
+  processImagePreviewJob, processPosterJob, processScrubberJob, processWaveformJob
+} from '@/src/server/jobs/processors/assets';
+import { processMetadataJob } from '@/src/server/jobs/processors/metadata';
+import { processScanJob } from '@/src/server/jobs/processors/scan';
+import { enqueueJob } from '@/src/server/jobs/queue';
 
 
 function enqueueMediaAssets ( mediaId: number ) : void {
