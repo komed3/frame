@@ -142,3 +142,17 @@ async function runFfmpeg ( args: string[] ) : Promise< void > {
     encoding: 'utf8', maxBuffer: 16 * 1024 * 1024
   } );
 }
+
+async function removeAssetFiles ( assetType: string, relativePath: string, metadataJson: string ) : Promise< void > {
+  const absolutePath = getAssetPath( relativePath );
+
+  if ( assetType === 'scrubber' ) await rm( dirname( absolutePath ), { recursive: true, force: true } );
+  else await rm( absolutePath, { force: true } );
+
+  let metadata: AssetMetadata = {};
+
+  try { metadata = JSON.parse( metadataJson ) as AssetMetadata }
+  catch {}
+
+  if ( metadata.thumbnailPath ) await rm( getAssetPath( metadata.thumbnailPath ), { force: true } );
+}
