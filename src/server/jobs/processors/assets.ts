@@ -124,3 +124,21 @@ function getDurationSeconds ( media: MediaRecord ) : number {
 
   return duration;
 }
+
+function getScaledDimensions ( width: number | null, height: number | null, maxWidth: number, maxHeight: number ) : {
+  width: number | null; height: number | null
+} {
+  if ( ! width || ! height ) return { width: null, height: null };
+  const scale = Math.min( 1, maxWidth / width, maxHeight / height );
+
+  return {
+    width: Math.max( 1, Math.round( width * scale ) ),
+    height: Math.max( 1, Math.round( height * scale ) )
+  };
+}
+
+async function runFfmpeg ( args: string[] ) : Promise< void > {
+  await execFileAsync( 'ffmpeg', [ '-hide_banner', '-loglevel', 'error', '-nostdin', ...args ], {
+    encoding: 'utf8', maxBuffer: 16 * 1024 * 1024
+  } );
+}
