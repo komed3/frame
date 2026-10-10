@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import type { MediaJob } from './queue';
+import type { JobProcessor, MediaJob } from '../../../shared/types';
 import { claimNextJob, completeJob, failJob, recoverStaleJobs } from './queue';
-
-
-export type JobProcessor = ( job: MediaJob ) => Promise< void >;
 
 
 const idleDelayMs = 1000;
