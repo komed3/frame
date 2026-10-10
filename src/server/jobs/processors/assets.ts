@@ -6,3 +6,30 @@ import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { db } from '../../db';
 import type { MediaJob } from '../queue';
+
+
+interface MediaRecord {
+  id: number;
+  media_type: 'video' | 'audio' | 'image' | 'text' | 'other';
+  file_size: number;
+  file_mtime_ms: number | null;
+  content_hash: string | null;
+  duration_ms: number | null;
+  width: number | null;
+  height: number | null;
+  audio_codec: string | null;
+  root_path: string;
+  root_relative_path: string;
+  is_available: number;
+}
+
+interface AssetRecord {
+  id: number;
+  relative_path: string;
+  metadata_json: string;
+}
+
+interface AssetMetadata {
+  thumbnailPath?: string;
+  [ key: string ]: unknown;
+}
