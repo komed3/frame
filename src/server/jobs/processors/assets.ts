@@ -1,44 +1,15 @@
 import { execFile, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, relative, resolve, sep } from 'node:path';
+import { dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
+import type { MediaAssetMetadata, MediaAssetRecord, MediaAssetSource, MediaAssetType, MediaJob } from '../../../../shared/types';
 import { db } from '../../db';
-import type { MediaJob } from '../queue';
-
-
-interface MediaRecord {
-  id: number;
-  media_type: 'video' | 'audio' | 'image' | 'text' | 'other';
-  file_size: number;
-  file_mtime_ms: number | null;
-  content_hash: string | null;
-  duration_ms: number | null;
-  width: number | null;
-  height: number | null;
-  audio_codec: string | null;
-  root_path: string;
-  root_relative_path: string;
-  is_available: number;
-  file_name: string;
-}
-
-interface AssetRecord {
-  id: number;
-  relative_path: string;
-  metadata_json: string;
-}
-
-interface AssetMetadata {
-  thumbnailPath?: string;
-  [ key: string ]: unknown;
-}
 
 
 const execFileAsync = promisify( execFile );
 const databasePath = resolve( process.env.FRAME_DB_PATH || 'data/frame.sqlite' );
 const dataDirectory = dirname( databasePath );
-const assetDirectory = resolve( dataDirectory, 'assets' );
 
 const waveformSampleRate = 8000;
 const waveformMinPoints = 8000;
@@ -51,36 +22,30 @@ function clamp ( value: number, min: number, max: number ) : number {
   return Math.max( min, Math.min( max, value ) );
 }
 
-function toRelativePath ( path: string ) : string {
-  return relative( dataDirectory, path ).split( sep ).join( '/' );
-}
-
 function getAssetPath ( path: string ) : string {
   const absolutePath = resolve( dataDirectory, path );
   const pathFromRoot = relative( dataDirectory, absolutePath );
 
-  if (
-    pathFromRoot === '..' || pathFromRoot.startsWith( `..${ sep }` ) ||
-    resolve( pathFromRoot ) === resolve( '..' )
-  ) throw new Error( `Asset path escapes the data directory: ${ path }` );
+  if ( pathFromRoot === '..' || pathFromRoot.startsWith( `..${ sep }` ) || isAbsolute( pathFromRoot ) )
+    throw new Error( `Asset path escapes the data directory: ${ path }` );
 
   return absolutePath;
 }
 
-function getMediaPath ( media: MediaRecord ) : string {
+function getMediaPath ( media: MediaAssetSource ) : string {
+  if ( ! media.root_relative_path ) throw new Error( `Media ${ media.id } has no root-relative path` );
+
   const root = resolve( media.root_path );
   const path = resolve( root, media.root_relative_path );
   const pathFromRoot = relative( root, path );
 
-  if (
-    ! media.root_relative_path || pathFromRoot === '..' ||
-    pathFromRoot.startsWith( `..${ sep }` ) || resolve( pathFromRoot ) === resolve( '..' )
-  ) throw new Error( `Media path escapes its root: ${ media.root_relative_path }` );
+  if ( pathFromRoot === '..' || pathFromRoot.startsWith( `..${ sep }` ) || isAbsolute( pathFromRoot ) )
+    throw new Error( `Media path escapes its root: ${ media.root_relative_path }` );
 
   return path;
 }
 
-async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undefined > {
+async function getMediaRecord ( mediaId: number ) : Promise< MediaAssetSource | undefined > {
   return db.prepare( `
     SELECT
       media.id,
@@ -92,16 +57,17 @@ async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undef
       media.width,
       media.height,
       media.audio_codec,
+      media.file_name,
       media.root_relative_path,
       media.is_available,
       media_roots.path AS root_path
     FROM media
     JOIN media_roots ON media_roots.id = media.media_root_id
     WHERE media.id = ?
-  ` ).get( mediaId ) as MediaRecord | undefined;
+  ` ).get( mediaId ) as MediaAssetSource | undefined;
 }
 
-async function verifySource ( media: MediaRecord, path: string ) : Promise< void > {
+async function verifySource ( media: MediaAssetSource, path: string ) : Promise< void > {
   const fileStat = await stat( path );
 
   if (
@@ -110,13 +76,13 @@ async function verifySource ( media: MediaRecord, path: string ) : Promise< void
   ) throw new Error( `Media changed since scan; scan it again: ${ path }` );
 }
 
-function getFingerprint ( media: MediaRecord ) : string {
+function getFingerprint ( media: MediaAssetSource ) : string {
   return createHash( 'sha256' )
     .update( `${ media.content_hash || '' }:${ media.file_size }:${ media.file_mtime_ms ?? '' }` )
     .digest( 'hex' ).slice( 0, 20 );
 }
 
-function getDurationSeconds ( media: MediaRecord ) : number {
+function getDurationSeconds ( media: MediaAssetSource ) : number {
   const duration = ( media.duration_ms || 0 ) / 1000;
 
   if ( ! Number.isFinite( duration ) || duration <= 0 )
@@ -125,10 +91,11 @@ function getDurationSeconds ( media: MediaRecord ) : number {
   return duration;
 }
 
-function getScaledDimensions ( width: number | null, height: number | null, maxWidth: number, maxHeight: number ) : {
-  width: number | null; height: number | null
-} {
+function getScaledDimensions (
+  width: number | null, height: number | null, maxWidth: number, maxHeight: number
+) : { width: number | null; height: number | null } {
   if ( ! width || ! height ) return { width: null, height: null };
+
   const scale = Math.min( 1, maxWidth / width, maxHeight / height );
 
   return {
@@ -143,24 +110,23 @@ async function runFfmpeg ( args: string[] ) : Promise< void > {
   } );
 }
 
-async function removeAssetFiles ( assetType: string, relativePath: string, metadataJson: string ) : Promise< void > {
+async function removeAssetFiles ( assetType: MediaAssetType, relativePath: string, metadataJson: string ) : Promise< void > {
   const absolutePath = getAssetPath( relativePath );
 
   if ( assetType === 'scrubber' ) await rm( dirname( absolutePath ), { recursive: true, force: true } );
   else await rm( absolutePath, { force: true } );
 
-  let metadata: AssetMetadata = {};
+  let metadata: MediaAssetMetadata = {};
 
-  try { metadata = JSON.parse( metadataJson ) as AssetMetadata }
+  try { metadata = JSON.parse( metadataJson ) as MediaAssetMetadata }
   catch {}
 
   if ( metadata.thumbnailPath ) await rm( getAssetPath( metadata.thumbnailPath ), { force: true } );
 }
 
 async function replaceAsset (
-  mediaId: number, assetType: 'poster' | 'scrubber' | 'image_preview' | 'waveform',
-  fingerprint: string, relativePath: string, width: number | null,
-  height: number | null, metadata: Record< string, unknown > = {}
+  mediaId: number, assetType: MediaAssetType, fingerprint: string, relativePath: string,
+  width: number | null, height: number | null, metadata: Record< string, unknown > = {}
 ) : Promise< void > {
   const oldAssets = db.prepare( `
     SELECT id, relative_path, metadata_json
@@ -168,7 +134,7 @@ async function replaceAsset (
     WHERE media_id = ?
       AND asset_type = ?
       AND source_fingerprint <> ?
-  ` ).all( mediaId, assetType, fingerprint ) as unknown as AssetRecord[];
+  ` ).all( mediaId, assetType, fingerprint ) as unknown as MediaAssetRecord[];
 
   db.prepare( `
     DELETE FROM media_assets
@@ -198,7 +164,7 @@ async function replaceAsset (
 }
 
 
-async function processPoster ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+async function processPoster ( media: MediaAssetSource, path: string, fingerprint: string ) : Promise< void > {
   if ( media.media_type !== 'video' ) return;
 
   const duration = getDurationSeconds( media );
@@ -212,20 +178,19 @@ async function processPoster ( media: MediaRecord, path: string, fingerprint: st
   await mkdir( dirname( posterPath ), { recursive: true } );
   await mkdir( dirname( thumbnailPath ), { recursive: true } );
 
-  const seekSeconds = Math.min( Math.max( duration * 0.1, 0 ), Math.max( duration - 0.1, 0 ) );
+  const seekSeconds = Math.min( duration * 0.1, Math.max( duration - 0.1, 0 ) );
 
   try {
     await runFfmpeg( [
-      '-ss', seekSeconds.toFixed( 3 ), '-i', path, '-map', '0:v:0', '-frames:v', '1',
-      '-vf', 'scale=1920:1080:force_original_aspect_ratio=decrease:force_divisible_by=2',
+      '-ss', seekSeconds.toFixed( 3 ), '-i', path, '-map', '0:V:0', '-frames:v', '1',
+      '-vf', "scale=w='min(1920,iw)':h='min(1080,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2",
       '-c:v', 'libwebp', '-quality', '86', '-compression_level', '6', '-y', posterTempPath
     ] );
 
     await runFfmpeg( [
       '-i', posterTempPath, '-frames:v', '1',
-      '-vf', 'scale=480:270:force_original_aspect_ratio=decrease:force_divisible_by=2',
-      '-c:v', 'libwebp', '-quality', '78', '-compression_level', '6',
-      '-y', thumbnailTempPath
+      '-vf', "scale=w='min(480,iw)':h='min(270,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2",
+      '-c:v', 'libwebp', '-quality', '78', '-compression_level', '6', '-y', thumbnailTempPath
     ] );
 
     await verifySource( media, path );
@@ -245,7 +210,7 @@ async function processPoster ( media: MediaRecord, path: string, fingerprint: st
   );
 }
 
-async function processScrubber ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+async function processScrubber ( media: MediaAssetSource, path: string, fingerprint: string ) : Promise< void > {
   if ( media.media_type !== 'video' ) return;
 
   const duration = getDurationSeconds( media );
@@ -256,15 +221,14 @@ async function processScrubber ( media: MediaRecord, path: string, fingerprint: 
   const directoryPath = getAssetPath( directoryRelativePath );
   const tempDirectoryPath = `${ directoryPath }.tmp`;
   const manifestRelativePath = `${ directoryRelativePath }/manifest.json`;
-  const manifestPath = getAssetPath( manifestRelativePath );
 
   await rm( tempDirectoryPath, { recursive: true, force: true } );
   await mkdir( tempDirectoryPath, { recursive: true } );
 
   try {
     await runFfmpeg( [
-      '-i', path, '-map', '0:v:0',
-      '-vf', `fps=${ frameRate.toFixed( 10 ) },scale=320:180:force_original_aspect_ratio=decrease:force_divisible_by=2`,
+      '-i', path, '-map', '0:V:0',
+      '-vf', `fps=${ frameRate.toFixed( 10 ) },scale=w='min(320,iw)':h='min(180,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`,
       '-frames:v', String( count ), '-c:v', 'libwebp', '-quality', '76', '-compression_level', '6',
       '-start_number', '0', '-y', `${ tempDirectoryPath }/%06d.webp`
     ] );
@@ -281,14 +245,11 @@ async function processScrubber ( media: MediaRecord, path: string, fingerprint: 
       path: `${ directoryRelativePath }/${ file }`
     } ) );
 
-    await writeFile(
-      `${ tempDirectoryPath }/manifest.json`,
-      JSON.stringify( {
-        version: 1, durationMs: media.duration_ms,
-        intervalMs: Math.round( duration * 1000 / count ),
-        width: 320, height: 180, frames
-      } )
-    );
+    await writeFile( `${ tempDirectoryPath }/manifest.json`, JSON.stringify( {
+      version: 1, durationMs: media.duration_ms,
+      intervalMs: Math.round( duration * 1000 / count ),
+      width: 320, height: 180, frames
+    } ) );
 
     await rm( directoryPath, { recursive: true, force: true } );
     await rename( tempDirectoryPath, directoryPath );
@@ -297,13 +258,14 @@ async function processScrubber ( media: MediaRecord, path: string, fingerprint: 
     throw error;
   }
 
-  await replaceAsset( media.id, 'scrubber', fingerprint, manifestRelativePath, 320, 180, {
-    frameCount: count, durationMs: media.duration_ms
-  } );
+  await replaceAsset(
+    media.id, 'scrubber', fingerprint, manifestRelativePath, 320, 180,
+    { frameCount: count, durationMs: media.duration_ms }
+  );
 }
 
-async function processImagePreview ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
-  if ( media.media_type !== 'image' || media.file_name?.toLowerCase().endsWith( '.svg' ) ) return;
+async function processImagePreview ( media: MediaAssetSource, path: string, fingerprint: string ) : Promise< void > {
+  if ( media.media_type !== 'image' || media.file_name.toLowerCase().endsWith( '.svg' ) ) return;
 
   const relativePath = `assets/image-previews/${ media.id }-${ fingerprint }.webp`;
   const outputPath = getAssetPath( relativePath );
@@ -314,7 +276,7 @@ async function processImagePreview ( media: MediaRecord, path: string, fingerpri
   try {
     await runFfmpeg( [
       '-i', path, '-frames:v', '1',
-      '-vf', 'scale=640:640:force_original_aspect_ratio=decrease:force_divisible_by=2',
+      '-vf', "scale=w='min(640,iw)':h='min(640,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2",
       '-c:v', 'libwebp', '-quality', '80', '-compression_level', '6', '-y', tempPath
     ] );
 
@@ -329,7 +291,7 @@ async function processImagePreview ( media: MediaRecord, path: string, fingerpri
   await replaceAsset( media.id, 'image_preview', fingerprint, relativePath, dimensions.width, dimensions.height );
 }
 
-async function processWaveform ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+async function processWaveform ( media: MediaAssetSource, path: string, fingerprint: string ) : Promise< void > {
   if ( ! [ 'audio', 'video' ].includes( media.media_type ) || ! media.audio_codec ) return;
 
   const duration = getDurationSeconds( media );
@@ -355,7 +317,7 @@ async function processWaveform ( media: MediaRecord, path: string, fingerprint: 
     child.once( 'close', code => resolveExit( code ?? -1 ) );
   } );
 
-  let carry = Buffer.alloc( 0 );
+  let carry: Buffer< ArrayBufferLike > = Buffer.alloc( 0 );
   let pointCount = 0, samplesInPoint = 0;
   let min = Infinity, max = -Infinity;
 
@@ -365,8 +327,7 @@ async function processWaveform ( media: MediaRecord, path: string, fingerprint: 
     max = Math.max( max, value );
     samplesInPoint++;
 
-    if ( samplesInPoint < samplesPerPoint ) return;
-    writePoint();
+    if ( samplesInPoint >= samplesPerPoint ) writePoint();
   }
 
   function writePoint () : void {
@@ -384,7 +345,9 @@ async function processWaveform ( media: MediaRecord, path: string, fingerprint: 
 
   try {
     for await ( const chunk of child.stdout ) {
-      const buffer = carry.length ? Buffer.concat( [ carry, chunk as Buffer ] ) : chunk as Buffer;
+      const buffer: Buffer< ArrayBufferLike > = carry.length
+        ? Buffer.concat( [ carry, chunk as Buffer< ArrayBufferLike > ] )
+        : chunk as Buffer< ArrayBufferLike >;
       const completeLength = buffer.length - buffer.length % 4;
 
       for ( let offset = 0; offset < completeLength; offset += 4 )
@@ -397,7 +360,6 @@ async function processWaveform ( media: MediaRecord, path: string, fingerprint: 
 
     const exitCode = await exitPromise;
     if ( exitCode !== 0 ) throw new Error( `ffmpeg exited with code ${ exitCode } while generating waveform` );
-
     await verifySource( media, path );
   } catch ( error ) {
     child.kill( 'SIGTERM' );
