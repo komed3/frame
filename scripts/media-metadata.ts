@@ -82,3 +82,11 @@ function main () : void {
   console.log( `Queued metadata jobs: ${ mediaIds.length }` );
   if ( mediaIds.length === 0 ) console.log( 'Nothing to do.' );
 }
+
+
+try { main() }
+catch ( error ) {
+  console.error( error );
+  process.exitCode = 1;
+}
+finally { closeDatabase() }
