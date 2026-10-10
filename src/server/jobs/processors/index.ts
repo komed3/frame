@@ -1,18 +1,9 @@
+import type { JobProcessor, MediaAssetQueueRecord, MediaJob } from '@/shared/types';
 import { db } from '../../db';
 import { enqueueJob } from '../queue';
-import type { JobProcessor } from '../worker';
 import { processImagePreviewJob, processPosterJob, processScrubberJob, processWaveformJob } from './assets';
 import { processMetadataJob } from './metadata';
 import { processScanJob } from './scan';
-
-
-interface MediaAssetSource {
-  id: number;
-  media_type: 'video' | 'audio' | 'image' | 'text' | 'other';
-  file_name: string;
-  audio_codec: string | null;
-  is_available: number;
-}
 
 
 function enqueueMediaAssets ( mediaId: number ) : void {
@@ -20,7 +11,7 @@ function enqueueMediaAssets ( mediaId: number ) : void {
     SELECT id, media_type, file_name, audio_codec, is_available
     FROM media
     WHERE id = ?
-  ` ).get( mediaId ) as MediaAssetSource | undefined;
+  ` ).get( mediaId ) as MediaAssetQueueRecord | undefined;
 
   if ( ! media || ! media.is_available ) return;
 
@@ -37,7 +28,7 @@ function enqueueMediaAssets ( mediaId: number ) : void {
 }
 
 
-export const processMediaJob: JobProcessor = async job => {
+export const processMediaJob: JobProcessor = async ( job: MediaJob ) => {
   switch ( job.job_type ) {
     case 'scan': return await processScanJob( job );
 
