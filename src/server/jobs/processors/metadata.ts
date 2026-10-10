@@ -131,3 +131,12 @@ async function getTextEncoding ( path: string ) : Promise< string > {
     await file.close();
   }
 }
+
+async function probeFile ( path: string ) : Promise< ProbeResult > {
+  const result = await execFileAsync(
+    'ffprobe', [ '-v', 'error', '-show_format', '-show_streams', '-of', 'json', '-i', path ],
+    { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 60_000 }
+  );
+
+  return JSON.parse( result.stdout ) as ProbeResult;
+}
