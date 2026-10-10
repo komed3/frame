@@ -75,3 +75,14 @@ function positiveNumberOrNull ( value: unknown ) : number | null {
   const number = numberOrNull( value );
   return number !== null && number > 0 ? number : null;
 }
+
+function parseFrameRate ( value: string | undefined ) : number | null {
+  if ( ! value ) return null;
+
+  const parts = value.split( '/' ).map( Number );
+  if ( parts.length !== 2 || ! Number.isFinite( parts[ 0 ] ) || ! Number.isFinite( parts[ 1 ] ) ) return null;
+  if ( parts[ 1 ] === 0 ) return null;
+
+  const rate = parts[ 0 ] / parts[ 1 ];
+  return Number.isFinite( rate ) && rate > 0 ? rate : null;
+}
