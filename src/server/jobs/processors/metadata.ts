@@ -108,3 +108,26 @@ function getTag ( tags: Record< string, string | undefined > | undefined, names:
 function getMetadataDate ( tags: Record< string, string | undefined > | undefined, names: string[] ) : string | null {
   return normalizeDate( getTag( tags, names ) || undefined );
 }
+
+async function getTextEncoding ( path: string ) : Promise< string > {
+  const file = await open( path );
+
+  try {
+    const buffer = Buffer.alloc( textSampleSize );
+    const { bytesRead } = await file.read( buffer, 0, buffer.length, 0 );
+    const sample = buffer.subarray( 0, bytesRead );
+
+    if ( sample.length >= 3 && sample[ 0 ] === 0xEF && sample[ 1 ] === 0xBB && sample[ 2 ] === 0xBF ) return 'UTF-8 BOM';
+    if ( sample.length >= 2 && sample[ 0 ] === 0xFF && sample[ 1 ] === 0xFE ) return 'UTF-16 LE';
+    if ( sample.length >= 2 && sample[ 0 ] === 0xFE && sample[ 1 ] === 0xFF ) return 'UTF-16 BE';
+
+    try {
+      new TextDecoder( 'utf-8', { fatal: true } ).decode( sample );
+      return 'UTF-8';
+    } catch {
+      return 'Windows-1252';
+    }
+  } finally {
+    await file.close();
+  }
+}
