@@ -1,6 +1,6 @@
+import type { MediaJob } from '../../../../shared/types';
 import { getEnabledMediaRoots } from '../../media/roots';
 import { scanMediaRoots } from '../../media/scanner';
-import type { MediaJob } from '../queue';
 
 
 export async function processScanJob ( job: MediaJob ) : Promise< void > {
