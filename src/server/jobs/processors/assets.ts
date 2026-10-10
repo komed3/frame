@@ -298,10 +298,9 @@ async function processScrubber ( media: MediaRecord, path: string, fingerprint: 
     throw error;
   }
 
-  await replaceAsset(
-    media.id, 'scrubber', fingerprint, manifestRelativePath, 320, 180,
-    { frameCount: count, durationMs: media.duration_ms }
-  );
+  await replaceAsset( media.id, 'scrubber', fingerprint, manifestRelativePath, 320, 180, {
+    frameCount: count, durationMs: media.duration_ms
+  } );
 }
 
 async function processImagePreview ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
@@ -329,4 +328,102 @@ async function processImagePreview ( media: MediaRecord, path: string, fingerpri
 
   const dimensions = getScaledDimensions( media.width, media.height, 640, 640 );
   await replaceAsset( media.id, 'image_preview', fingerprint, relativePath, dimensions.width, dimensions.height );
+}
+
+async function processWaveform ( media: MediaRecord, path: string, fingerprint: string ) : Promise< void > {
+  if ( ! [ 'audio', 'video' ].includes( media.media_type ) || ! media.audio_codec ) return;
+
+  const duration = getDurationSeconds( media );
+  const targetPoints = clamp( Math.ceil( duration * 100 ), waveformMinPoints, waveformMaxPoints );
+  const samplesPerPoint = Math.max( 1, Math.ceil( waveformSampleRate / ( targetPoints / duration ) ) );
+  const estimatedPoints = Math.ceil( duration * waveformSampleRate / samplesPerPoint );
+
+  const output = Buffer.allocUnsafe( 24 + estimatedPoints * 4 );
+  Buffer.from( 'FRMWAV1\0', 'ascii' ).copy( output, 0 );
+  output.writeUInt32LE( Math.round( waveformSampleRate / samplesPerPoint ), 8 );
+  output.writeUInt32LE( 0, 12 );
+  output.writeDoubleLE( duration, 16 );
+
+  const child = spawn( 'ffmpeg', [
+    '-hide_banner', '-loglevel', 'error', '-nostdin', '-i', path, '-map', '0:a:0',
+    '-vn', '-ac', '1', '-ar', String( waveformSampleRate ), '-f', 'f32le', 'pipe:1'
+  ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
+
+  child.stderr.resume();
+
+  const exitPromise = new Promise< number >( ( resolveExit, reject ) => {
+    child.once( 'error', reject );
+    child.once( 'close', code => resolveExit( code ?? -1 ) );
+  } );
+
+  let carry = Buffer.alloc( 0 );
+  let pointCount = 0, samplesInPoint = 0;
+  let min = Infinity, max = -Infinity;
+
+  function addSample ( sample: number ) : void {
+    const value = Number.isFinite( sample ) ? clamp( sample, -1, 1 ) : 0;
+    min = Math.min( min, value );
+    max = Math.max( max, value );
+    samplesInPoint++;
+
+    if ( samplesInPoint < samplesPerPoint ) return;
+    writePoint();
+  }
+
+  function writePoint () : void {
+    if ( pointCount >= estimatedPoints ) return;
+
+    const offset = 24 + pointCount * 4;
+    output.writeInt16LE( Math.round( clamp( min, -1, 1 ) * 32767 ), offset );
+    output.writeInt16LE( Math.round( clamp( max, -1, 1 ) * 32767 ), offset + 2 );
+
+    pointCount++;
+    samplesInPoint = 0;
+    min = Infinity;
+    max = -Infinity;
+  }
+
+  try {
+    for await ( const chunk of child.stdout ) {
+      const buffer = carry.length ? Buffer.concat( [ carry, chunk as Buffer ] ) : chunk as Buffer;
+      const completeLength = buffer.length - buffer.length % 4;
+
+      for ( let offset = 0; offset < completeLength; offset += 4 )
+        addSample( buffer.readFloatLE( offset ) );
+
+      carry = buffer.subarray( completeLength );
+    }
+
+    if ( samplesInPoint > 0 ) writePoint();
+
+    const exitCode = await exitPromise;
+    if ( exitCode !== 0 ) throw new Error( `ffmpeg exited with code ${ exitCode } while generating waveform` );
+
+    await verifySource( media, path );
+  } catch ( error ) {
+    child.kill( 'SIGTERM' );
+    throw error;
+  }
+
+  output.writeUInt32LE( pointCount, 12 );
+
+  const relativePath = `assets/waveforms/${ media.id }-${ fingerprint }.bin`;
+  const outputPath = getAssetPath( relativePath );
+  const tempPath = `${ outputPath }.tmp`;
+
+  await mkdir( dirname( outputPath ), { recursive: true } );
+
+  try {
+    await writeFile( tempPath, output.subarray( 0, 24 + pointCount * 4 ) );
+    await rename( tempPath, outputPath );
+  } catch ( error ) {
+    await rm( tempPath, { force: true } );
+    throw error;
+  }
+
+  await replaceAsset( media.id, 'waveform', fingerprint, relativePath, null, null, {
+    format: 'FRMWAV1', durationMs: media.duration_ms, pointCount,
+    pointsPerSecond: Math.round( waveformSampleRate / samplesPerPoint ),
+    values: 'signed-int16-min-max'
+  } );
 }
