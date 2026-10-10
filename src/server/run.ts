@@ -2,14 +2,16 @@ import { config } from 'dotenv';
 import express from 'express';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import api from './api';
-import { closeDatabase } from './db';
-import { processMediaJob } from './jobs/processors';
-import { startWorker, stopWorker } from './jobs/worker';
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 config( { quiet: true } );
+
+
+import api from './api';
+import { closeDatabase } from './db';
+import { processMediaJob } from './jobs/processors';
+import { startWorker, stopWorker } from './jobs/worker';
 
 
 async function run () : Promise< void > {
