@@ -61,3 +61,5 @@ export interface MediaAssetMetadata {
   thumbnailPath?: string;
   [ key: string ]: unknown;
 }
+
+export type JobProcessor = ( job: MediaJob ) => Promise< void >;
