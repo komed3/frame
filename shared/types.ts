@@ -68,3 +68,39 @@ export interface MediaRoot {
   id: number;
   path: string;
 }
+
+export interface ScannedFile {
+  root: MediaRoot;
+  path: string;
+  relativePath: string;
+  rootRelativePath: string;
+  fileName: string;
+  type: MediaType;
+  mime: string;
+  title: string;
+  size: number;
+  mtimeMs: number;
+  hash: string;
+}
+
+export interface ExistingMedia {
+  id: number;
+  relative_path: string;
+  media_root_id: number | null;
+  root_relative_path: string | null;
+  file_name: string;
+  media_type: MediaType;
+  mime_type: string | null;
+  title: string | null;
+  file_size: number;
+  file_mtime_ms: number | null;
+  content_hash: string | null;
+  metadata_json: string;
+  is_available: number;
+}
+
+export interface ScanResult {
+  discovered: number;
+  ignored: number;
+  errors: number;
+}

@@ -1,4 +1,4 @@
-import { MediaRoot } from '@/shared/types';
+import type { MediaRoot } from '@/shared/types';
 import { db } from '@/src/server/db';
 import { realpathSync, statSync } from 'node:fs';
 
