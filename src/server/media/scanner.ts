@@ -1,5 +1,5 @@
 import { readdir, stat } from 'node:fs/promises';
-import { basename, extname, relative, sep } from 'node:path';
+import { basename, extname, join, relative, sep } from 'node:path';
 import { db } from '../db';
 import type { MediaRoot } from './roots';
 
@@ -75,7 +75,7 @@ export async function scanMediaRoot ( root: MediaRoot ) : Promise< ScanResult > 
     const entries = await readdir( directory, { withFileTypes: true } );
 
     for ( const entry of entries ) {
-      const path = `${ directory }/${ entry.name }`;
+      const path = join( directory, entry.name );
 
       if ( entry.isSymbolicLink() ) {
         result.ignored++;
