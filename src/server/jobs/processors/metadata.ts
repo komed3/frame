@@ -1,20 +1,10 @@
+import type { MediaJob, MediaSourceRecord } from '@/shared/types';
+import { db } from '@/src/server/db';
 import { execFile } from 'node:child_process';
 import { open, stat } from 'node:fs/promises';
 import { extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
-import { db } from '../../db';
-import type { MediaJob } from '../queue';
 
-
-interface MediaRecord {
-  id: number;
-  media_type: 'video' | 'audio' | 'image' | 'text' | 'other';
-  file_size: number;
-  file_mtime_ms: number | null;
-  root_path: string;
-  root_relative_path: string;
-  is_available: number;
-}
 
 interface ProbeStream {
   codec_type?: string;
@@ -178,7 +168,7 @@ async function probeFile ( path: string ) : Promise< ProbeResult > {
   return JSON.parse( result.stdout ) as ProbeResult;
 }
 
-function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type' ], path: string ) : MetadataResult {
+function makeMetadata ( probe: ProbeResult, mediaType: MediaSourceRecord[ 'media_type' ], path: string ) : MetadataResult {
   const streams = probe.streams || [], format = probe.format || {};
 
   const videoStream = streams.find( stream =>
@@ -254,7 +244,7 @@ function makeMetadata ( probe: ProbeResult, mediaType: MediaRecord[ 'media_type'
   };
 }
 
-function emptyMetadata ( mediaType: MediaRecord[ 'media_type' ], error?: string ) : MetadataResult {
+function emptyMetadata ( mediaType: MediaSourceRecord[ 'media_type' ], error?: string ) : MetadataResult {
   return {
     durationMs: null, width: null, height: null, frameRate: null, bitrate: null, container: null,
     videoCodec: null, audioCodec: null, sampleRate: null, channels: null, encoding: null,
@@ -264,7 +254,7 @@ function emptyMetadata ( mediaType: MediaRecord[ 'media_type' ], error?: string 
   };
 }
 
-async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undefined > {
+async function getMediaRecord ( mediaId: number ) : Promise< MediaSourceRecord | undefined > {
   return db.prepare( `
     SELECT
       media.id,
@@ -277,12 +267,12 @@ async function getMediaRecord ( mediaId: number ) : Promise< MediaRecord | undef
     FROM media
     JOIN media_roots ON media_roots.id = media.media_root_id
     WHERE media.id = ?
-  ` ).get( mediaId ) as MediaRecord | undefined;
+  ` ).get( mediaId ) as MediaSourceRecord | undefined;
 }
 
-function getFilePath ( media: MediaRecord ) : string {
+function getFilePath ( media: MediaSourceRecord ) : string {
   const root = resolve( media.root_path );
-  const path = resolve( root, media.root_relative_path );
+  const path = resolve( root, media.root_relative_path || '' );
   const pathFromRoot = relative( root, path );
 
   if ( pathFromRoot === '..' || pathFromRoot.startsWith( `..${ sep }` ) || isAbsolute( pathFromRoot ) )
