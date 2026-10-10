@@ -156,3 +156,43 @@ async function removeAssetFiles ( assetType: string, relativePath: string, metad
 
   if ( metadata.thumbnailPath ) await rm( getAssetPath( metadata.thumbnailPath ), { force: true } );
 }
+
+async function replaceAsset (
+  mediaId: number, assetType: 'poster' | 'scrubber' | 'image_preview' | 'waveform',
+  fingerprint: string, relativePath: string, width: number | null,
+  height: number | null, metadata: Record< string, unknown > = {}
+) : Promise< void > {
+  const oldAssets = db.prepare( `
+    SELECT id, relative_path, metadata_json
+    FROM media_assets
+    WHERE media_id = ?
+      AND asset_type = ?
+      AND source_fingerprint <> ?
+  ` ).all( mediaId, assetType, fingerprint ) as unknown as AssetRecord[];
+
+  db.prepare( `
+    DELETE FROM media_assets
+    WHERE media_id = ?
+      AND asset_type = ?
+      AND source_fingerprint <> ?
+  ` ).run( mediaId, assetType, fingerprint );
+
+  db.prepare( `
+    INSERT INTO media_assets (
+      media_id, asset_type, relative_path, source_fingerprint,
+      width, height, metadata_json
+    )
+    VALUES ( ?, ?, ?, ?, ?, ?, ? )
+    ON CONFLICT ( media_id, asset_type, source_fingerprint ) DO UPDATE SET
+      relative_path = excluded.relative_path,
+      width = excluded.width,
+      height = excluded.height,
+      metadata_json = excluded.metadata_json
+  ` ).run(
+    mediaId, assetType, relativePath, fingerprint,
+    width, height, JSON.stringify( metadata )
+  );
+
+  for ( const asset of oldAssets )
+    await removeAssetFiles( assetType, asset.relative_path, asset.metadata_json );
+}
