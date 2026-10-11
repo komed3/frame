@@ -1,4 +1,4 @@
-export type MediaType = 'video' | 'audio' | 'image' | 'text' | 'other';
+export type MediaType = 'video' | 'audio' | 'image' | 'text';
 
 export type MediaAssetType = 'poster' | 'thumb' | 'frames' | 'wave' | 'text';
 

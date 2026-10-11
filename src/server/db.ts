@@ -72,7 +72,7 @@ const migrations: Migration[] = [ {
       root_relative_path TEXT,
       file_name TEXT NOT NULL,
       media_type TEXT NOT NULL CHECK ( media_type IN (
-        'video', 'audio', 'image', 'text', 'other'
+        'video', 'audio', 'image', 'text'
       ) ),
       mime_type TEXT,
       title TEXT,
