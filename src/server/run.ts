@@ -84,3 +84,9 @@ async function run () : Promise< void > {
   process.once( 'SIGINT', shutdown );
   process.once( 'SIGTERM', shutdown );
 }
+
+
+run().catch( err => {
+  console.error( 'Failed to start Frame:', err );
+  process.exitCode = 1;
+} );
