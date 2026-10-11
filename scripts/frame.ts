@@ -96,3 +96,52 @@ frame
     for ( const row of rows ) enqueueJob( row.id, 'metadata', 10 );
     console.log( `Metadata jobs queued: ${ rows.length }` );
   } );
+
+
+// --- assets ---
+
+frame
+  .command( 'assets' )
+  .description( 'Queue asset generation' )
+  .option( '--all', 'Regenerate all assets' )
+  .action( ( options: { all?: boolean } ) => {
+    const rows = db.prepare( `
+      SELECT id, media_type, file_name, audio_codec
+      FROM media
+      WHERE is_available = 1
+      ORDER BY id
+    ` ).all() as {
+      id: number;
+      media_type: string;
+      file_name: string;
+      audio_codec: string | null;
+    }[];
+
+    let queued = 0;
+
+    for ( const media of rows ) {
+      const assets: Array< [ string, number ] > = [];
+
+      if ( [ 'video', 'audio', 'image' ].includes( media.media_type ) ) assets.push( [ 'poster', 8 ], [ 'thumb', 5 ] );
+      if ( media.media_type === 'video' ) assets.push( [ 'frames', 2 ] );
+      if ( [ 'audio', 'video' ].includes( media.media_type ) && media.audio_codec ) assets.push( [ 'wave', 3 ] );
+      if ( media.media_type === 'text' ) assets.push( [ 'text', 4 ] );
+
+      for ( const [ type, priority ] of assets ) {
+        if ( ! options.all ) {
+          const exists = db.prepare( `
+            SELECT 1 FROM media_assets
+            WHERE media_id = ? AND asset_type = ? AND
+              source_fingerprint = ( SELECT content_hash FROM media WHERE id = ? )
+          ` ).get( media.id, type, media.id );
+
+          if ( exists ) continue;
+        }
+
+        enqueueJob( media.id, type as 'poster' | 'thumb' | 'frames' | 'wave' | 'text', priority );
+        queued++;
+      }
+    }
+
+    console.log( `Asset jobs queued: ${ queued }` );
+  } );
