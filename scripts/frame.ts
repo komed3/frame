@@ -12,5 +12,17 @@ cli.name( 'frame' ).description( 'Frame media library maintenance' ).version( '2
 
 const roots = cli.command( 'roots' ).description( 'Manage media roots' );
 
-roots.command( 'add <path>' ).description( 'Register a media directory' )
-  .action( ( path: string ) => console.log( `Registered media root ${ mediaRoots.add( path ) }` ) );
+roots.command( 'add <path>' ).description( 'Register a media directory' ).action(
+  ( path: string ) => console.log( `Registered media root ${ mediaRoots.add( path ) }` )
+);
+
+roots.command( 'list' ).description( 'List media directories' ).action( () => {
+  const allRoots = db.prepare( 'SELECT id, path, enabled, last_scan_at FROM media_roots ORDER BY id' ).all() as {
+    id: number, path: string, enabled: number, last_scan_at: string | null
+  }[];
+
+  for ( const root of allRoots ) console.log(
+    `${ root.id } [${ root.enabled ? 'enabled' : 'disabled' }] ${ root.path }` +
+    ` (last scan: ${ root.last_scan_at ?? 'never' })`
+  );
+} );
