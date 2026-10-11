@@ -39,6 +39,13 @@ export class MediaAssetProcessor {
     return path;
   }
 
+  private async verifySource ( media: MediaAssetSource, path: string ) : Promise< void > {
+    const info = await stat( path );
+
+    if ( info.size !== media.file_size || ( media.file_mtime_ms !== null && info.mtimeMs !== media.file_mtime_ms ) )
+      throw new Error( `Media changed since scan: ${ path }` );
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
