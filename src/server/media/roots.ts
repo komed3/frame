@@ -20,4 +20,13 @@ export class MediaRootRepo {
     if ( ! row ) throw new Error( `Could not register media root: ${ canonicalPath }` );
     return row.id;
   }
+
+  public list ( enabledOnly = false ) : MediaRoot[] {
+    return db.prepare( `
+      SELECT id, path
+      FROM media_roots
+      ${ enabledOnly ? 'WHERE enabled = 1' : '' }
+      ORDER BY id
+    ` ).all() as unknown as MediaRoot[];
+  }
 }
