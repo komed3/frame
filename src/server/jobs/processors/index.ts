@@ -39,4 +39,20 @@ export class MediaJobProcessor {
       enqueueJob( media.id, 'text', 2 );
     }
   }
+
+  public async process ( job: MediaJob ) : Promise< void > {
+    switch ( job.job_type ) {
+      case 'scan': return await processScanJob( job );
+
+      case 'metadata':
+        await processMetadataJob( job );
+        if ( job.media_id !== null ) this.enqueueMediaAssets( job.media_id );
+        return;
+
+      case 'poster': case 'thumb': case 'frames': case 'wave': case 'text':
+        return await processAssetJob( job );
+
+      default: throw new Error( `Unsupported media job type: ${ job.job_type }` );
+    }
+  }
 }
