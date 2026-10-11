@@ -22,4 +22,8 @@ export class JobWorker {
 
     return this.running;
   }
+
+  public stop () : void {
+    this.stopped = true;
+  }
 }
