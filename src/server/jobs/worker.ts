@@ -13,4 +13,13 @@ export class JobWorker {
     private readonly idleDelayMs = 1000,
     private readonly errorDelayMs = 5000
   ) {}
+
+  public start () : Promise< void > {
+    if ( this.running ) return this.running;
+
+    this.stopped = false;
+    this.running = this.run().finally( () => this.running = undefined );
+
+    return this.running;
+  }
 }
