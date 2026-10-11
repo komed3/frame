@@ -298,3 +298,6 @@ export class MediaScanner {
     return result;
   }
 }
+
+
+export const mediaScanner = new MediaScanner();
