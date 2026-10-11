@@ -110,6 +110,22 @@ const migrations: Migration[] = [ {
     CREATE VIRTUAL TABLE media_search USING fts5 (
       title, description, file_name, relative_path
     );
+
+
+    CREATE TABLE media_assets (
+      id INTEGER PRIMARY KEY,
+      media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+      asset_type TEXT NOT NULL CHECK ( asset_type IN ( 'poster', 'thumb', 'frames', 'wave', 'text' ) ),
+      relative_path TEXT NOT NULL UNIQUE,
+      source_fingerprint TEXT NOT NULL,
+      width INTEGER,
+      height INTEGER,
+      metadata_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( metadata_json ) ),
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      UNIQUE ( media_id, asset_type )
+    );
+
+    CREATE INDEX media_assets_media_idx ON media_assets ( media_id );
   `
 } ];
 
