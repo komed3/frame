@@ -16,17 +16,17 @@ function main () : void {
 
   for ( const item of media ) {
     if ( item.media_type === 'video' ) {
-      enqueueJob( item.id, 'poster', 5 );
-      enqueueJob( item.id, 'scrubber', 5 );
+      enqueueJob( item.id, 'poster', 8 );
+      enqueueJob( item.id, 'scrubber', 1 );
       queued += 2;
 
       if ( item.audio_codec ) {
-        enqueueJob( item.id, 'waveform', 5 );
+        enqueueJob( item.id, 'waveform', 3 );
         queued++;
       }
     } else if ( item.media_type === 'audio' ) {
       if ( item.audio_codec ) {
-        enqueueJob( item.id, 'waveform', 5 );
+        enqueueJob( item.id, 'waveform', 3 );
         queued++;
       }
     } else if (

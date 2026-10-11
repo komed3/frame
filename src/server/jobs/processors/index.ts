@@ -16,11 +16,11 @@ function enqueueMediaAssets ( mediaId: number ) : void {
   if ( ! media || ! media.is_available ) return;
 
   if ( media.media_type === 'video' ) {
-    enqueueJob( media.id, 'poster', 5 );
-    enqueueJob( media.id, 'scrubber', 5 );
-    if ( media.audio_codec ) enqueueJob( media.id, 'waveform', 5 );
+    enqueueJob( media.id, 'poster', 8 );
+    enqueueJob( media.id, 'scrubber', 1 );
+    if ( media.audio_codec ) enqueueJob( media.id, 'waveform', 3 );
   } else if ( media.media_type === 'audio' ) {
-    if ( media.audio_codec ) enqueueJob( media.id, 'waveform', 5 );
+    if ( media.audio_codec ) enqueueJob( media.id, 'waveform', 3 );
   } else if (
     media.media_type === 'image' &&
     ! media.file_name.toLowerCase().endsWith( '.svg' )

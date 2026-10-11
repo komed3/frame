@@ -77,7 +77,7 @@ function main () : void {
     WHERE id = ? AND is_available = 1
   ` ).get( mediaId ) ? [ mediaId ] : [] );
 
-  for ( const id of mediaIds ) enqueueJob( id, 'metadata', 20 );
+  for ( const id of mediaIds ) enqueueJob( id, 'metadata', 10 );
 
   console.log( `Queued metadata jobs: ${ mediaIds.length }` );
   if ( mediaIds.length === 0 ) console.log( 'Nothing to do.' );

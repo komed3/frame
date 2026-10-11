@@ -3,7 +3,7 @@ import { enqueueJob } from '@/src/server/jobs/queue';
 
 
 try {
-  enqueueJob( null, 'scan', 100 );
+  enqueueJob( null, 'scan', 10 );
   console.log( 'Media scan queued.' );
 } catch ( error ) {
   console.error( error );
