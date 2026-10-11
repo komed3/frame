@@ -5,6 +5,10 @@ import { dirname, resolve, sep } from 'node:path';
 
 
 export class AssetStorage {
+  private static readonly DIR: Record< MediaAssetType, string > = {
+    poster: 'posters', thumb: 'thumbs', frames: 'frames', wave: 'waves', text: 'text'
+  };
+
   public readonly root: string;
 
   public constructor ( root = 'data/assets' ) {
@@ -18,11 +22,7 @@ export class AssetStorage {
   }
 
   public relativePath ( type: MediaAssetType, mediaId: number, fingerprint: string, extension: string ) : string {
-    const directory: Record< MediaAssetType, string > = {
-      poster: 'posters', thumb: 'thumbs', frames: 'frames', wave: 'waves', text: 'text'
-    };
-
-    return `${ directory[ type ] }/${ mediaId }-${ fingerprint }${ extension }`;
+    return `${ AssetStorage.DIR[ type ] }/${ mediaId }-${ fingerprint }${ extension }`;
   }
 
   public absolutePath ( relativePath: string ) : string {
