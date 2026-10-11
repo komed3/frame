@@ -91,8 +91,7 @@ export class MediaAssetProcessor {
 
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
     const fingerprint = assetStorage.fingerprint( media );
-    const extension = '.webp';
-    const relativePath = assetStorage.relativePath( type, media.id, fingerprint, extension );
+    const relativePath = assetStorage.relativePath( type, media.id, fingerprint, '.webp' );
     const outputPath = assetStorage.absolutePath( relativePath );
     const tempPath = `${ outputPath }.tmp.webp`;
 
@@ -141,6 +140,59 @@ export class MediaAssetProcessor {
     await this.commitAsset( media, type, relativePath, null, null, {
       purpose: type, mediaType: media.media_type
     } );
+  }
+
+  private async createFrames ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
+    if ( media.media_type !== 'video' ) return;
+
+    const durationMs = media.duration_ms ?? 0;
+    if ( durationMs <= 0 ) throw new Error( `Video duration is unknown: ${ media.id }` );
+
+    const durationSeconds = durationMs / 1000;
+    const count = Math.max( minFrames, Math.min( maxFrames, Math.ceil( durationSeconds * frameRate ) ) );
+    const intervalMs = Math.round( durationMs / count );
+    const relativeDirectory = `frames/${ media.id }-${ assetStorage.fingerprint( media ) }`;
+    const outputDirectory = assetStorage.absolutePath( relativeDirectory );
+    const tempDirectory = `${ outputDirectory }.tmp`;
+
+    await rm( tempDirectory, { recursive: true, force: true } );
+    await mkdir( tempDirectory, { recursive: true } );
+
+    try {
+      await this.runFfmpeg( [
+        '-i', sourcePath, '-map', '0:V:0', '-vf',
+        `fps=${ ( count / durationSeconds ).toFixed( 8 ) },scale=w='min(320,iw)':h='min(180,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`,
+        '-frames:v', String( count ), '-c:v', 'libwebp', '-quality', '76', '-start_number', '0',
+        '-y', `${ tempDirectory }/%06d.webp`
+      ] );
+
+      const files = ( await readdir( tempDirectory ) )
+        .filter( file => extname( file ).toLowerCase() === '.webp' )
+        .sort();
+
+      if ( ! files.length ) throw new Error( `No frames generated for media ${ media.id }` );
+
+      const frames = files.map( ( file, index ) => ( {
+        index, timeMs: Math.min( durationMs, index * intervalMs ),
+        path: `${ relativeDirectory }/${ file }`
+      } ) );
+
+      await writeFile( `${ tempDirectory }/manifest.json`, JSON.stringify( {
+        version: 1, durationMs, intervalMs, width: 320, height: 180, frames
+      } ) );
+
+      await this.verifySource( media, sourcePath );
+      await rm( outputDirectory, { recursive: true, force: true } );
+      await rename( tempDirectory, outputDirectory );
+    } catch ( err ) {
+      await rm( tempDirectory, { recursive: true, force: true } );
+      throw err;
+    }
+
+    await this.commitAsset(
+      media, 'frames', `${ relativeDirectory }/manifest.json`, 320, 180,
+      { frameCount: count, durationMs, intervalMs }
+    );
   }
 
   public async process ( job: MediaJob ) : Promise< void > {
