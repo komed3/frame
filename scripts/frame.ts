@@ -1,7 +1,7 @@
-import { Command } from 'commander';
 import { closeDatabase, db } from '@/src/server/db';
 import { enqueueJob } from '@/src/server/jobs/queue';
 import { mediaRoots } from '@/src/server/media/roots';
+import { Command } from 'commander';
 
 
 const frame = new Command();
@@ -177,3 +177,8 @@ frame
 
     for ( const item of counts ) console.log( `${ item.job_type } [${ item.status }]: ${ item.count }` );
   } );
+
+
+try { await frame.parseAsync( process.argv ) }
+catch ( err ) { console.error( err ), process.exitCode = 1 }
+finally { closeDatabase() }
