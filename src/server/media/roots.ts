@@ -35,3 +35,6 @@ export class MediaRootRepo {
     if ( result.changes !== 1 ) throw new Error( `Media root ${ id } does not exist` );
   }
 }
+
+
+export const mediaRoots = new MediaRootRepo();
