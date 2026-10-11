@@ -35,6 +35,17 @@ const execFileAsync = promisify( execFile );
 
 
 class MetadataProcessor {
+  private getPath ( media: MediaSourceRecord ) : string {
+    const root = resolve( media.root_path );
+    const path = resolve( root, media.root_relative_path );
+    const relativePath = relative( root, path );
+
+    if ( relativePath === '..' || relativePath.startsWith( `..${ sep }` ) )
+      throw new Error( `Media path escapes root: ${ media.root_relative_path }` );
+
+    return path;
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( job.job_type !== 'metadata' || job.media_id === null )
       throw new Error( 'Invalid metadata job' );
