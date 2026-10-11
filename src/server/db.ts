@@ -71,7 +71,9 @@ const migrations: Migration[] = [ {
       media_root_id INTEGER REFERENCES media_roots ( id ) ON DELETE SET NULL,
       root_relative_path TEXT,
       file_name TEXT NOT NULL,
-      media_type TEXT NOT NULL CHECK ( media_type IN ( 'video', 'audio', 'image', 'text', 'other' ) ),
+      media_type TEXT NOT NULL CHECK ( media_type IN (
+        'video', 'audio', 'image', 'text', 'other'
+      ) ),
       mime_type TEXT,
       title TEXT,
       description TEXT,
@@ -115,7 +117,9 @@ const migrations: Migration[] = [ {
     CREATE TABLE media_assets (
       id INTEGER PRIMARY KEY,
       media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
-      asset_type TEXT NOT NULL CHECK ( asset_type IN ( 'poster', 'thumb', 'frames', 'wave', 'text' ) ),
+      asset_type TEXT NOT NULL CHECK ( asset_type IN (
+        'poster', 'thumb', 'frames', 'wave', 'text'
+      ) ),
       relative_path TEXT NOT NULL UNIQUE,
       source_fingerprint TEXT NOT NULL,
       width INTEGER,
@@ -126,6 +130,31 @@ const migrations: Migration[] = [ {
     );
 
     CREATE INDEX media_assets_media_idx ON media_assets ( media_id );
+
+
+    CREATE TABLE media_jobs (
+      id INTEGER PRIMARY KEY,
+      media_id INTEGER REFERENCES media ( id ) ON DELETE CASCADE,
+      job_type TEXT NOT NULL CHECK ( job_type IN (
+        'scan', 'metadata', 'poster', 'thumb', 'frames', 'wave', 'text'
+      ) ),
+      status TEXT NOT NULL DEFAULT 'pending' CHECK ( status IN (
+        'pending', 'running', 'completed', 'failed'
+      ) ),
+      priority INTEGER NOT NULL DEFAULT 0,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      max_attempts INTEGER NOT NULL DEFAULT 3,
+      available_at_ms INTEGER NOT NULL DEFAULT ( unixepoch() * 1000 ),
+      locked_at_ms INTEGER,
+      worker_id TEXT,
+      last_error TEXT,
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      UNIQUE ( media_id, job_type )
+    );
+
+    CREATE INDEX media_jobs_pending_idx ON media_jobs ( status, available_at_ms, priority DESC, id );
+    CREATE UNIQUE INDEX media_jobs_global_idx ON media_jobs ( job_type ) WHERE media_id IS NULL;
   `
 } ];
 
