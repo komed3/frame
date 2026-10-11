@@ -3,7 +3,7 @@ import type { MediaRoot } from '@/src/shared/types';
 import { realpathSync, statSync } from 'node:fs';
 
 
-export class MediaRootRepo {
+export class MediaRoots {
   public add ( path: string ) : number {
     const canonicalPath = realpathSync( path );
 
@@ -37,4 +37,4 @@ export class MediaRootRepo {
 }
 
 
-export const mediaRoots = new MediaRootRepo();
+export const mediaRoots = new MediaRoots();
