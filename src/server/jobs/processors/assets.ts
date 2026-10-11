@@ -195,6 +195,99 @@ export class MediaAssetProcessor {
     );
   }
 
+  private async createWave ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
+    if ( ! [ 'video', 'audio' ].includes( media.media_type ) || ! media.audio_codec ) return;
+
+    const durationSeconds = Math.max( 0, ( media.duration_ms ?? 0 ) / 1000 );
+    if ( ! durationSeconds ) throw new Error( `Audio duration is unknown: ${ media.id }` );
+
+    const targetPoints = Math.min( 1_500_000, Math.max( 8000, Math.ceil( durationSeconds * 100 ) ) );
+    const samplesPerPoint = Math.max( 1, Math.ceil( waveformRate * durationSeconds / targetPoints ) );
+    const child = spawn( 'ffmpeg', [
+      '-hide_banner', '-loglevel', 'error', '-nostdin', '-i', sourcePath, '-map', '0:a:0', '-vn',
+      '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
+    ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
+
+    child.stderr.resume();
+
+    const values: Array< [ number, number ] > = [];
+    let min = Infinity, max = -Infinity, samples = 0;
+    let carry = Buffer.alloc( 0 );
+
+    const writePoint = () => {
+      if ( ! samples ) return;
+
+      values.push( [ min, max ] );
+      min = Infinity, max = -Infinity;
+      samples = 0;
+    };
+
+    const exitPromise = new Promise< number >( ( resolveExit, reject ) => {
+      child.once( 'error', reject );
+      child.once( 'close', code => resolveExit( code ?? -1 ) );
+    } );
+
+    try {
+      for await ( const chunk of child.stdout ) {
+        const buffer = carry.length ? Buffer.concat( [ carry, chunk as Buffer ] ) : chunk as Buffer;
+        const completeLength = buffer.length - buffer.length % 4;
+
+        for ( let offset = 0; offset < completeLength; offset += 4 ) {
+          const value = buffer.readFloatLE( offset );
+          const normalized = Number.isFinite( value ) ? Math.max( -1, Math.min( 1, value ) ) : 0;
+          min = Math.min( min, normalized );
+          max = Math.max( max, normalized );
+
+          if ( ++samples >= samplesPerPoint ) writePoint();
+        }
+
+        carry = buffer.subarray( completeLength ) as Buffer< ArrayBuffer >;
+      }
+
+      writePoint();
+
+      if ( await exitPromise !== 0 )
+        throw new Error( `ffmpeg waveform extraction failed for media ${ media.id }` );
+    } catch ( err ) {
+      child.kill( 'SIGTERM' );
+      throw err;
+    }
+
+    await this.verifySource( media, sourcePath );
+
+    const header = Buffer.alloc( 24 );
+    Buffer.from( 'FRMWAV1\0', 'ascii' ).copy( header, 0 );
+    header.writeUInt32LE( Math.round( waveformRate / samplesPerPoint ), 8 );
+    header.writeUInt32LE( values.length, 12 );
+    header.writeDoubleLE( durationSeconds, 16 );
+
+    const data = Buffer.alloc( values.length * 4 );
+    values.forEach( ( [ low, high ], index ) => {
+      data.writeInt16LE( Math.round( low * 32767 ), index * 4 );
+      data.writeInt16LE( Math.round( high * 32767 ), index * 4 + 2 );
+    } );
+
+    const fingerprint = assetStorage.fingerprint( media );
+    const relativePath = assetStorage.relativePath( 'wave', media.id, fingerprint, '.bin' );
+    const outputPath = assetStorage.absolutePath( relativePath );
+    const tempPath = `${ outputPath }.tmp`;
+
+    await assetStorage.ensureParent( outputPath );
+
+    try {
+      await writeFile( tempPath, Buffer.concat( [ header, data ] ) );
+      await rename( tempPath, outputPath );
+    } catch ( err ) {
+      await rm( tempPath, { force: true } );
+      throw err;
+    }
+
+    await this.commitAsset( media, 'wave', relativePath, null, null, {
+      format: 'FRMWAV1', durationMs: media.duration_ms, pointCount: values.length,
+      values: 'signed-int16-min-max'
+    } );
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
