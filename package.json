@@ -9,11 +9,7 @@
     "build:client": "vite build",
     "build": "npm run build:server && npm run build:client",
     "start": "cross-env NODE_ENV=production node dist/server/run.js",
-    "migrate-db": "tsx scripts/migrate-db.ts",
-    "media-roots": "tsx scripts/media-roots.ts",
-    "media-scan": "tsx scripts/media-scan.ts",
-    "media-metadata": "tsx scripts/media-metadata.ts",
-    "media-assets": "tsx scripts/media-assets.ts"
+    "frame": "tsx scripts/frame.ts"
   },
   "dependencies": {
     "commander": "^15.0.0",
