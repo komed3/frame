@@ -145,3 +145,23 @@ frame
 
     console.log( `Asset jobs queued: ${ queued }` );
   } );
+
+
+// --- database ---
+
+frame
+  .command( 'db:status' )
+  .description( 'Show database schema version and media counts' )
+  .action( () => {
+    const version = db.prepare( `
+      SELECT MAX(version) AS version FROM schema_migrations
+    ` ).get() as { version: number | null };
+
+    const counts = db.prepare( `
+      SELECT media_type, COUNT(*) AS count
+      FROM media GROUP BY media_type ORDER BY media_type
+    ` ).all() as { media_type: string; count: number }[];
+
+    console.log( `Schema version: ${ version.version ?? 0 }` );
+    for ( const item of counts ) console.log( `${ item.media_type }: ${ item.count }` );
+  } );
