@@ -39,3 +39,6 @@ export class AssetStorage {
     await mkdir( dirname( path ), { recursive: true } );
   }
 }
+
+
+export const assetStorage = new AssetStorage();
