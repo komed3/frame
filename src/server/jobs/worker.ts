@@ -38,7 +38,7 @@ export class JobWorker {
         jobQueue.complete( job, workerId );
       } catch ( err ) {
         try { jobQueue.fail( job, workerId, err ) }
-        catch ( queueError ) { console.error( `Could not update job ${ job.id }:`, queueError ) }
+        catch ( queueErr ) { console.error( `Could not update job ${ job.id }:`, queueErr ) }
 
         console.error( `Job ${ job.id } failed:`, err );
       }
