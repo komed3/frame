@@ -165,3 +165,15 @@ frame
     console.log( `Schema version: ${ version.version ?? 0 }` );
     for ( const item of counts ) console.log( `${ item.media_type }: ${ item.count }` );
   } );
+
+frame
+  .command( 'db:jobs' )
+  .description( 'Show job queue status' )
+  .action( () => {
+    const counts = db.prepare( `
+      SELECT job_type, status, COUNT(*) AS count
+      FROM media_jobs GROUP BY job_type, status ORDER BY job_type, status
+    ` ).all() as { job_type: string; status: string; count: number }[];
+
+    for ( const item of counts ) console.log( `${ item.job_type } [${ item.status }]: ${ item.count }` );
+  } );
