@@ -34,3 +34,27 @@ db.exec( `
 
 
 const migrations: Migration[] = [];
+
+
+const appliedMigrations = db.prepare(
+  'SELECT version FROM schema_migrations ORDER BY version'
+).all() as { version: number }[];
+
+const appliedVersions = new Set( appliedMigrations.map( migration => migration.version ) );
+
+
+for ( const migration of migrations ) {
+  if ( appliedVersions.has( migration.version ) ) continue;
+  db.exec( 'BEGIN IMMEDIATE' );
+
+  try {
+    db.exec( migration.sql );
+    db.prepare( 'INSERT INTO schema_migrations ( version ) VALUES ( ? )' ).run( migration.version );
+    db.exec( 'COMMIT' );
+
+    console.log( `Database migration ${ migration.version } applied.` );
+  } catch ( error ) {
+    db.exec( 'ROLLBACK' );
+    throw error;
+  }
+}
