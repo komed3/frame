@@ -34,3 +34,11 @@ for ( const action of [ 'enable', 'disable' ] as const ) roots.command( `${ acti
     mediaRoots.setEnabled( Number( idText ), action === 'enable' );
     console.log( `Media root ${ idText } ${ action }d` );
   } );
+
+
+// --- scanning ---
+
+cli.command( 'scan' ).description( 'Queue a full media scan' ).action( () => {
+  enqueueJob( null, 'scan', 10 );
+  console.log( 'Media scan queued' );
+} );
