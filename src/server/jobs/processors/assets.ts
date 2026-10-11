@@ -28,6 +28,17 @@ export class MediaAssetProcessor {
     ` ).get( id ) as MediaAssetSource | undefined;
   }
 
+  private getSourcePath ( media: MediaAssetSource ) : string {
+    const root = resolve( media.root_path );
+    const path = resolve( root, media.root_relative_path );
+    const relativePath = path.slice( root.length );
+
+    if ( relativePath.startsWith( sep + '..' ) || path === root )
+      throw new Error( `Media path escapes its root: ${ media.root_relative_path }` );
+
+    return path;
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
