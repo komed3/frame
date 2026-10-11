@@ -52,4 +52,9 @@ async function run () : Promise< void > {
   // --- start server ---
 
   const server = app.listen( port, '127.0.0.1', () => console.log( `Server started on port ${ port }` ) );
+
+  // --- background worker ---
+
+  const worker = new JobWorker( processMediaJob ), workerRun = worker.start();
+  workerRun.catch( error => console.error( 'Background worker stopped:', error ) );
 }
