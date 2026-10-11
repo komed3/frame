@@ -56,3 +56,7 @@ export class MediaJobProcessor {
     }
   }
 }
+
+
+export const mediaJobProcessor = new MediaJobProcessor();
+export const processMediaJob: JobProcessor = ( job: MediaJob ) => mediaJobProcessor.process( job );
