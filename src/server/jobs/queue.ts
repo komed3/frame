@@ -81,4 +81,18 @@ export class JobQueue {
       throw err;
     }
   }
+
+  public complete ( job: MediaJob, workerId: string ) : void {
+    const result = db.prepare( `
+      UPDATE media_jobs
+      SET status = 'completed',
+          worker_id = NULL,
+          locked_at_ms = NULL,
+          last_error = NULL,
+          updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'running' AND worker_id = ?
+    ` ).run( job.id, workerId );
+
+    if ( result.changes !== 1 ) throw new Error( `Could not complete job ${ job.id }` );
+  }
 }
