@@ -56,5 +56,31 @@ async function run () : Promise< void > {
   // --- background worker ---
 
   const worker = new JobWorker( processMediaJob ), workerRun = worker.start();
-  workerRun.catch( error => console.error( 'Background worker stopped:', error ) );
+  workerRun.catch( err => console.error( 'Background worker stopped:', err ) );
+
+  // --- shutdown ---
+
+  let shuttingDown = false;
+
+  const shutdown = () => {
+    if ( shuttingDown ) return;
+
+    shuttingDown = true;
+    worker.stop();
+
+    server.close( err => {
+      if ( err ) console.error( err ), process.exitCode = 1;
+
+      void workerRun
+        .catch( error => console.error( 'Background worker stopped with an error:', error ) )
+        .then( () => closeDatabase() )
+        .catch( error => {
+          console.error( 'Failed to close the database:', error );
+          process.exitCode = 1;
+        } );
+    } );
+  };
+
+  process.once( 'SIGINT', shutdown );
+  process.once( 'SIGTERM', shutdown );
 }
