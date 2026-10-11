@@ -155,6 +155,61 @@ const migrations: Migration[] = [ {
 
     CREATE INDEX media_jobs_pending_idx ON media_jobs ( status, available_at_ms, priority DESC, id );
     CREATE UNIQUE INDEX media_jobs_global_idx ON media_jobs ( job_type ) WHERE media_id IS NULL;
+
+
+    CREATE TABLE playback_progress (
+      user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+      media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+      position_ms INTEGER NOT NULL DEFAULT 0 CHECK ( position_ms >= 0 ),
+      completed INTEGER NOT NULL DEFAULT 0 CHECK ( completed IN ( 0, 1 ) ),
+      updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      PRIMARY KEY ( user_id, media_id )
+    );
+
+    CREATE TABLE user_settings (
+      user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+      setting_key TEXT NOT NULL,
+      value_json TEXT NOT NULL CHECK ( json_valid( value_json ) ),
+      updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      PRIMARY KEY ( user_id, setting_key )
+    );
+
+    CREATE TABLE favorites (
+      user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+      media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      PRIMARY KEY ( user_id, media_id )
+    );
+
+    CREATE TABLE playlists (
+      id INTEGER PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+    );
+
+    CREATE TABLE playlist_items (
+      playlist_id INTEGER NOT NULL REFERENCES playlists ( id ) ON DELETE CASCADE,
+      media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+      position INTEGER NOT NULL CHECK ( position >= 0 ),
+      added_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      PRIMARY KEY ( playlist_id, media_id ),
+      UNIQUE ( playlist_id, position )
+    );
+
+    CREATE TABLE markers (
+      id INTEGER PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+      media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+      position_ms INTEGER NOT NULL CHECK ( position_ms >= 0 ),
+      title TEXT NOT NULL,
+      note TEXT,
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+    );
+
+    CREATE INDEX markers_media_idx ON markers ( media_id, position_ms );
   `
 } ];
 
