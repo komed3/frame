@@ -1,18 +1,21 @@
 import { db } from '@/src/server/db';
-import type { ExistingMedia, MediaRoot, MediaType, ScanResult, ScannedFile } from '@/src/shared/types';
+import { enqueueJob } from '@/src/server/jobs/queue';
+import { mediaRoots } from '@/src/server/media/roots';
+import type { MediaRoot, MediaType, ScanResult, ScannedFile } from '@/src/shared/types';
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { opendir, realpath, stat } from 'node:fs/promises';
-import { basename, extname, relative, resolve, sep } from 'node:path';
+import { readdir, stat } from 'node:fs/promises';
+import { basename, extname, relative, resolve } from 'node:path';
 
 
-interface ClassifiedFile {
-  type: MediaType;
-  mime: string;
-}
+const extensions: Record< MediaType, Set< string > > = {
+  video: new Set( [ '.avi', '.m2ts', '.m4v', '.mkv', '.mov', '.mp4', '.mpeg', '.mpg', '.ogv', '.ts', '.webm', '.wmv' ] ),
+  audio: new Set( [ '.aac', '.aif', '.aiff', '.alac', '.flac', '.m4a', '.mp3', '.ogg', '.opus', '.wav', '.wma' ] ),
+  image: new Set( [ '.avif', '.bmp', '.gif', '.heic', '.jpeg', '.jpg', '.png', '.svg', '.tif', '.tiff', '.webp' ] ),
+  text: new Set( [ '.txt' ] ),
+  other: new Set( [] )
+};
 
-interface ScanCounters {
-  discovered: number;
-  ignored: number;
-  errors: number;
-}
+const mimeTypes: Record< string, string > = {
+  video: 'video/*', audio: 'audio/*', image: 'image/*', text: 'text/plain'
+};
