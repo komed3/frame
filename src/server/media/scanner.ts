@@ -90,4 +90,60 @@ export class MediaScanner {
       await file.close();
     }
   }
+
+  private async scanDirectory (
+    root: MediaRoot, directory: string, existingByPath: Map< string, ExistingMedia >,
+    files: ScannedFile[], result: ScanResult, progress: { count: number }
+  ) : Promise< void > {
+    let entries;
+
+    try { entries = await readdir( directory, { withFileTypes: true } ) }
+    catch ( err ) {
+      result.errors++;
+      console.error( `Failed to scan directory ${ directory }:`, err );
+      return;
+    }
+
+    for ( const entry of entries ) {
+      const path = join( directory, entry.name );
+
+      if ( entry.isSymbolicLink() ) { result.ignored++; continue }
+      if ( entry.isDirectory() ) {
+        await this.scanDirectory( root, path, existingByPath, files, result, progress );
+        continue;
+      }
+
+      if ( ! entry.isFile() ) { result.ignored++; continue }
+
+      const fileName = entry.name;
+      const extension = extname( fileName ).toLowerCase();
+      const media = extensions[ extension ];
+
+      if ( ! media ) { result.ignored++; continue }
+
+      try {
+        const file = await stat( path );
+        const rootRelativePath = relative( root.path, path ).split( sep ).join( '/' );
+        const relativePath = `${ root.id }/${ rootRelativePath }`;
+        const previous = existingByPath.get( relativePath );
+
+        const hash = previous?.content_hash?.startsWith( `${ hashVersion }:` ) &&
+          previous.file_size === file.size && previous.file_mtime_ms === file.mtimeMs
+          ? previous.content_hash : await this.hashFile( path, file.size, file.mtimeMs );
+
+        files.push( {
+          root, path, relativePath, rootRelativePath, fileName,
+          type: media.type, mime: media.mime, title: basename( fileName, extension ),
+          size: file.size, mtimeMs: file.mtimeMs, hash
+        } );
+
+        result.discovered++;
+      } catch ( err ) {
+        result.errors++;
+        console.error( `Failed to register media file ${ path }:`, err );
+      }
+
+      if ( ++progress.count % 100 === 0 ) await new Promise( resolve => setImmediate( resolve ) );
+    }
+  }
 }
