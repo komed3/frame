@@ -50,3 +50,44 @@ const extensions: Record< string, { type: MediaType, mime: string } > = {
   '.heif': { type: 'image', mime: 'image/heif' },
   '.txt': { type: 'text', mime: 'text/plain' }
 };
+
+
+export class MediaScanner {
+  private async hashFile ( path: string, size: number, mtimeMs: number ) : Promise< string > {
+    const file = await open( path );
+
+    try {
+      const initialStat = await file.stat();
+
+      if ( initialStat.size !== size || initialStat.mtimeMs !== mtimeMs )
+        throw new Error( `File changed before hashing: ${ path }` );
+
+      const hash = createHash( 'sha256' );
+      hash.update( `${ hashVersion }\0${ size }\0` );
+
+      const offsets = size <= sampleSize ? [ 0 ] : [
+        0, Math.floor( ( size - sampleSize ) / 2 ), size - sampleSize
+      ];
+
+      for ( const offset of [ ...new Set( offsets ) ] ) {
+        const length = Math.min( sampleSize, size - offset );
+        const buffer = Buffer.allocUnsafe( length );
+        const { bytesRead } = await file.read( buffer, 0, length, offset );
+
+        if ( bytesRead !== length ) throw new Error( `Incomplete read while hashing: ${ path }` );
+
+        hash.update( `${ offset }\0${ length }\0` );
+        hash.update( buffer );
+      }
+
+      const finalStat = await file.stat();
+
+      if ( finalStat.size !== size || finalStat.mtimeMs !== mtimeMs )
+        throw new Error( `File changed while hashing: ${ path }` );
+
+      return `${ hashVersion }:${ hash.digest( 'hex' ) }`;
+    } finally {
+      await file.close();
+    }
+  }
+}
