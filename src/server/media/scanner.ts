@@ -146,4 +146,155 @@ export class MediaScanner {
       if ( ++progress.count % 100 === 0 ) await new Promise( resolve => setImmediate( resolve ) );
     }
   }
+
+  public async scan ( roots: MediaRoot[] ) : Promise< ScanResult > {
+    const result: ScanResult = { discovered: 0, ignored: 0, errors: 0 };
+    const files: ScannedFile[] = [], rootIds = roots.map( root => root.id );
+
+    const existing = db.prepare( `
+      SELECT id, relative_path, media_root_id, root_relative_path,
+        file_name, media_type, mime_type, title, file_size,
+        file_mtime_ms, content_hash, metadata_json, is_available
+      FROM media
+    ` ).all() as unknown as ExistingMedia[];
+
+    const existingByPath = new Map( existing.map( media => [ media.relative_path, media ] ) );
+    const progress = { count: 0 };
+
+    for ( const root of roots ) await this.scanDirectory( root, root.path, existingByPath, files, result, progress );
+    if ( result.errors > 0 ) return result;
+
+    const scannedPaths = new Set( files.map( file => file.relativePath ) );
+    const hashCounts = new Map< string, number >();
+    const existingHashCounts = new Map< string, number >();
+
+    for ( const file of files ) hashCounts.set( file.hash, ( hashCounts.get( file.hash ) || 0 ) + 1 );
+
+    for ( const media of existing ) if ( media.content_hash ) existingHashCounts.set(
+      media.content_hash, ( existingHashCounts.get( media.content_hash ) || 0 ) + 1
+    );
+
+    const matchedIds = new Set< number >();
+    const matchedFiles = new Map< ScannedFile, ExistingMedia >();
+
+    for ( const file of files ) {
+      const previous = existingByPath.get( file.relativePath );
+
+      if ( previous ) {
+        matchedIds.add( previous.id );
+        matchedFiles.set( file, previous );
+      }
+    }
+
+    for ( const file of files ) {
+      if ( matchedFiles.has( file ) ) continue;
+      if ( hashCounts.get( file.hash ) !== 1 ) continue;
+      if ( existingHashCounts.get( file.hash ) !== 1 ) continue;
+
+      const previous = existing.find( media =>
+        media.content_hash === file.hash && rootIds.includes( media.media_root_id as number ) &&
+        ! scannedPaths.has( media.relative_path ) && ! matchedIds.has( media.id )
+      );
+
+      if ( ! previous ) continue;
+
+      matchedIds.add( previous.id );
+      matchedFiles.set( file, previous );
+    }
+
+    const updateMedia = db.prepare( `
+      UPDATE media SET
+        relative_path = ?,
+        media_root_id = ?,
+        root_relative_path = ?,
+        file_name = ?,
+        media_type = ?,
+        mime_type = ?,
+        title = ?,
+        file_size = ?,
+        file_mtime_ms = ?,
+        content_hash = ?,
+        is_available = 1,
+        missing_since = NULL,
+        scanned_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ),
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ?
+    ` );
+
+    const insertMedia = db.prepare( `
+      INSERT INTO media (
+        relative_path, media_root_id, root_relative_path,
+        file_name, media_type, mime_type, title,
+        file_size, file_mtime_ms, content_hash,
+        is_available, scanned_at
+      )
+      VALUES (
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1,
+        strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      )
+    ` );
+
+    db.exec( 'BEGIN IMMEDIATE' );
+
+    try {
+      for ( const media of existing ) {
+        if ( ! rootIds.includes( media.media_root_id as number ) ) continue;
+        if ( scannedPaths.has( media.relative_path ) ) continue;
+
+        db.prepare( `
+          UPDATE media
+          SET is_available = 0,
+              missing_since = COALESCE(
+                missing_since,
+                strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+              ),
+              updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+          WHERE id = ?
+        ` ).run( media.id );
+      }
+
+      for ( const file of files ) {
+        const previous = matchedFiles.get( file );
+        const metadataChanged = ! previous || previous.file_size !== file.size ||
+          previous.file_mtime_ms !== file.mtimeMs || previous.content_hash !== file.hash ||
+          previous.media_type !== file.type || ! previous.metadata_json ||
+          previous.metadata_json === '{}';
+
+        let mediaId: number;
+
+        if ( previous ) {
+          updateMedia.run(
+            file.relativePath, file.root.id, file.rootRelativePath, file.fileName,
+            file.type, file.mime, file.title, file.size, file.mtimeMs, file.hash, previous.id
+          );
+
+          mediaId = previous.id;
+        } else {
+          const inserted = insertMedia.run(
+            file.relativePath, file.root.id, file.rootRelativePath, file.fileName,
+            file.type, file.mime, file.title, file.size, file.mtimeMs, file.hash
+          );
+
+          mediaId = Number( inserted.lastInsertRowid );
+        }
+
+        if ( metadataChanged ) enqueueJob( mediaId, 'metadata', 10 );
+      }
+
+      const updateRoot = db.prepare( `
+        UPDATE media_roots
+        SET last_scan_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE id = ?
+      ` );
+
+      for ( const root of roots ) updateRoot.run( root.id );
+
+      db.exec( 'COMMIT' );
+    } catch ( error ) {
+      db.exec( 'ROLLBACK' );
+      throw error;
+    }
+
+    return result;
+  }
 }
