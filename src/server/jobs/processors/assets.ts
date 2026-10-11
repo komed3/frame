@@ -78,6 +78,60 @@ export class MediaAssetProcessor {
     );
   }
 
+  private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
+    const fingerprint = assetStorage.fingerprint( media );
+    const extension = '.webp';
+    const relativePath = assetStorage.relativePath( type, media.id, fingerprint, extension );
+    const outputPath = assetStorage.absolutePath( relativePath );
+    const tempPath = `${ outputPath }.tmp.webp`;
+
+    await assetStorage.ensureParent( outputPath );
+
+    const isAudio = media.media_type === 'audio';
+    const isImage = media.media_type === 'image';
+    const limit = type === 'poster' ? 1920 : 480;
+    const scale = `scale=w='min(${ limit },iw)':h='min(${ limit },ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
+
+    try {
+      if ( isImage && extname( sourcePath ).toLowerCase() === '.svg' )
+        await this.runFfmpeg( [ '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-y', tempPath ] );
+
+      else if ( isAudio )
+        try { await this.runFfmpeg( [
+          '-i', sourcePath, '-map', '0:v:0', '-frames:v', '1', '-vf', scale, '-c:v',
+          'libwebp', '-quality', '84', '-y', tempPath
+        ] ) }
+        catch { await this.createAudioFallback( sourcePath, tempPath, scale ) }
+
+      else if ( media.media_type === 'video' ) {
+        const duration = Math.max( 0, ( media.duration_ms ?? 0 ) / 1000 );
+        const seek = duration > 1 ? duration * 0.1 : 0;
+
+        await this.runFfmpeg( [
+          '-ss', seek.toFixed( 3 ), '-i', sourcePath, '-map', '0:V:0', '-frames:v', '1', '-vf', scale,
+          '-c:v', 'libwebp', '-quality', type === 'poster' ? '86' : '78', '-y', tempPath
+        ] );
+      }
+
+      else if ( isImage ) await this.runFfmpeg( [
+        '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-c:v', 'libwebp',
+        '-quality', type === 'poster' ? '86' : '78', '-y', tempPath
+      ] );
+
+      else return;
+
+      await this.verifySource( media, sourcePath );
+      await rename( tempPath, outputPath );
+    } catch ( err ) {
+      await rm( tempPath, { force: true } );
+      throw err;
+    }
+
+    await this.commitAsset( media, type, relativePath, null, null, {
+      purpose: type, mediaType: media.media_type
+    } );
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
