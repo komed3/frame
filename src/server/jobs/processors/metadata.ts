@@ -32,3 +32,11 @@ interface ProbeData {
 
 
 const execFileAsync = promisify( execFile );
+
+
+class MetadataProcessor {}
+
+
+export const metadataProcessor = new MetadataProcessor();
+export const processMetadataJob = ( job: MediaJob ) : Promise< void > =>
+  metadataProcessor.process( job );
