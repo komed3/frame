@@ -55,6 +55,61 @@ const migrations: Migration[] = [ {
 
     CREATE INDEX sessions_user_idx ON sessions ( user_id );
     CREATE INDEX sessions_expiry_idx ON sessions ( expires_at );
+
+
+    CREATE TABLE media_roots (
+      id INTEGER PRIMARY KEY,
+      path TEXT NOT NULL UNIQUE,
+      enabled INTEGER NOT NULL DEFAULT 1 CHECK ( enabled IN ( 0, 1 ) ),
+      last_scan_at TEXT,
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+    );
+
+    CREATE TABLE media (
+      id INTEGER PRIMARY KEY,
+      relative_path TEXT NOT NULL UNIQUE,
+      media_root_id INTEGER REFERENCES media_roots ( id ) ON DELETE SET NULL,
+      root_relative_path TEXT,
+      file_name TEXT NOT NULL,
+      media_type TEXT NOT NULL CHECK ( media_type IN ( 'video', 'audio', 'image', 'text', 'other' ) ),
+      mime_type TEXT,
+      title TEXT,
+      description TEXT,
+      file_size INTEGER NOT NULL DEFAULT 0 CHECK ( file_size >= 0 ),
+      file_mtime_ms REAL,
+      content_hash TEXT,
+      is_available INTEGER NOT NULL DEFAULT 1 CHECK ( is_available IN ( 0, 1 ) ),
+      missing_since TEXT,
+      duration_ms INTEGER CHECK ( duration_ms IS NULL OR duration_ms >= 0 ),
+      width INTEGER CHECK ( width IS NULL OR width > 0 ),
+      height INTEGER CHECK ( height IS NULL OR height > 0 ),
+      frame_rate REAL,
+      bitrate INTEGER,
+      container TEXT,
+      video_codec TEXT,
+      audio_codec TEXT,
+      sample_rate INTEGER,
+      channels INTEGER,
+      encoding TEXT,
+      language TEXT,
+      release_date TEXT,
+      recorded_at TEXT,
+      metadata_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( metadata_json ) ),
+      scanned_at TEXT,
+      created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+      UNIQUE ( media_root_id, root_relative_path )
+    );
+
+    CREATE INDEX media_type_idx ON media ( media_type );
+    CREATE INDEX media_title_idx ON media ( title COLLATE NOCASE );
+    CREATE INDEX media_root_availability_idx ON media ( media_root_id, is_available );
+    CREATE INDEX media_hash_idx ON media ( content_hash );
+    CREATE INDEX media_duration_idx ON media ( duration_ms );
+
+    CREATE VIRTUAL TABLE media_search USING fts5 (
+      title, description, file_name, relative_path
+    );
   `
 } ];
 
