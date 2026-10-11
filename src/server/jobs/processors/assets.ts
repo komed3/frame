@@ -46,6 +46,38 @@ export class MediaAssetProcessor {
       throw new Error( `Media changed since scan: ${ path }` );
   }
 
+  private async runFfmpeg ( args: string[] ) : Promise< void > {
+    await execFileAsync(
+      'ffmpeg', [ '-hide_banner', '-loglevel', 'error', '-nostdin', ...args ],
+      { timeout: 10 * 60_000, maxBuffer: 4 * 1024 * 1024 }
+    );
+  }
+
+  private async commitAsset (
+    media: MediaAssetSource, type: MediaAssetType, relativePath: string, width: number | null,
+    height: number | null, metadata: Record< string, unknown > = {}
+  ) : Promise< void > {
+    const fingerprint = assetStorage.fingerprint( media );
+
+    db.prepare( `
+      INSERT INTO media_assets (
+        media_id, asset_type, relative_path, source_fingerprint,
+        width, height, metadata_json
+      )
+      VALUES ( ?, ?, ?, ?, ?, ?, ? )
+      ON CONFLICT ( media_id, asset_type ) DO UPDATE SET
+        relative_path = excluded.relative_path,
+        source_fingerprint = excluded.source_fingerprint,
+        width = excluded.width,
+        height = excluded.height,
+        metadata_json = excluded.metadata_json,
+        created_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    `).run(
+      media.id, type, relativePath, fingerprint,
+      width, height, JSON.stringify( metadata )
+    );
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
