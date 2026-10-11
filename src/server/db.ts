@@ -8,3 +8,6 @@ config( { quiet: true } );
 
 const databasePath = resolve( process.env.FRAME_DB_PATH || 'data/frame.sqlite' );
 mkdirSync( dirname( databasePath ), { recursive: true } );
+
+
+export const db = new DatabaseSync( databasePath );
