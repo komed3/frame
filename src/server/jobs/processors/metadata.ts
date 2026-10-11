@@ -130,6 +130,35 @@ class MetadataProcessor {
     };
   }
 
+  private async readTextMetadata ( path: string, size: number ) : Promise< MediaMetadata > {
+    const file = await open( path );
+
+    try {
+      const buffer = Buffer.alloc( 4096 );
+      const { bytesRead } = await file.read( buffer, 0, buffer.length, 0 );
+      const sample = buffer.subarray( 0, bytesRead );
+      let encoding = 'UTF-8';
+
+      if ( sample[ 0 ] === 0xef && sample[ 1 ] === 0xbb && sample[ 2 ] === 0xbf) encoding = 'UTF-8 BOM';
+      else if ( sample[ 0 ] === 0xff && sample[ 1 ] === 0xfe ) encoding = 'UTF-16 LE';
+      else if ( sample[ 0 ] === 0xfe && sample[ 1 ] === 0xff ) encoding = 'UTF-16 BE';
+      else {
+        try { new TextDecoder( 'utf-8', { fatal: true } ).decode( sample ) }
+        catch { encoding = 'Windows-1252' }
+      }
+
+      return {
+        durationMs: null, width: null, height: null, frameRate: null,
+        bitrate: null, container: 'text', videoCodec: null, audioCodec: null,
+        sampleRate: null, channels: null, encoding, language: null,
+        releaseDate: null, recordedAt: null,
+        metadata: { mediaType: 'text', textEncoding: encoding, fileSize: size }
+      };
+    } finally {
+      await file.close();
+    }
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( job.job_type !== 'metadata' || job.media_id === null )
       throw new Error( 'Invalid metadata job' );
