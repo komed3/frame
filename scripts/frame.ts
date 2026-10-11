@@ -26,3 +26,11 @@ roots.command( 'list' ).description( 'List media directories' ).action( () => {
     ` (last scan: ${ root.last_scan_at ?? 'never' })`
   );
 } );
+
+for ( const action of [ 'enable', 'disable' ] as const ) roots.command( `${ action } <id>` )
+  .description( `${ action } a media directory` ).action( ( idText: string ) => {
+    if ( ! /^\d+$/.test( idText ) ) throw new Error( 'ID must be an integer' );
+
+    mediaRoots.setEnabled( Number( idText ), action === 'enable' );
+    console.log( `Media root ${ idText } ${ action }d` );
+  } );
