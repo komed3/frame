@@ -19,3 +19,15 @@ const extensions: Record< MediaType, Set< string > > = {
 const mimeTypes: Record< string, string > = {
   video: 'video/*', audio: 'audio/*', image: 'image/*', text: 'text/plain'
 };
+
+
+export class MediaScanner {
+  private classify ( path: string ) : MediaType | null {
+    const extension = extname( path ).toLowerCase();
+
+    for ( const [ type, values ] of Object.entries( extensions ) as [ MediaType, Set< string > ][] )
+      if ( values.has( extension ) ) return type;
+
+    return null;
+  }
+}
