@@ -5,3 +5,8 @@ import { mediaRoots } from '@/src/server/media/roots';
 
 
 const cli = new Command();
+
+cli
+  .name( 'frame' )
+  .description( 'Frame media library maintenance' )
+  .version( '2.0.0' );
