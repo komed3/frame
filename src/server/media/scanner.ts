@@ -20,13 +20,4 @@ const mimeTypes: Record< string, string > = {
 };
 
 
-export class MediaScanner {
-  private classify ( path: string ) : MediaType | null {
-    const extension = extname( path ).toLowerCase();
-
-    for ( const [ type, values ] of Object.entries( extensions ) as [ MediaType, Set< string > ][] )
-      if ( values.has( extension ) ) return type;
-
-    return null;
-  }
-}
+export class MediaScanner {}
