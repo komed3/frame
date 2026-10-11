@@ -290,9 +290,9 @@ export class MediaScanner {
       for ( const root of roots ) updateRoot.run( root.id );
 
       db.exec( 'COMMIT' );
-    } catch ( error ) {
+    } catch ( err ) {
       db.exec( 'ROLLBACK' );
-      throw error;
+      throw err;
     }
 
     return result;

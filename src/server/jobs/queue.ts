@@ -96,8 +96,8 @@ export class JobQueue {
     if ( result.changes !== 1 ) throw new Error( `Could not complete job ${ job.id }` );
   }
 
-  public fail ( job: MediaJob, workerId: string, error: unknown ) : void {
-    const message = error instanceof Error ? error.message : String( error );
+  public fail ( job: MediaJob, workerId: string, err: unknown ) : void {
+    const message = err instanceof Error ? err.message : String( err );
     const retry = job.attempts < job.max_attempts;
 
     const result = db.prepare( `

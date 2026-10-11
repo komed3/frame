@@ -228,8 +228,8 @@ for ( const migration of migrations ) {
     db.exec( 'COMMIT' );
 
     console.log( `Database migration ${ migration.version } applied.` );
-  } catch ( error ) {
+  } catch ( err ) {
     db.exec( 'ROLLBACK' );
-    throw error;
+    throw err;
   }
 }

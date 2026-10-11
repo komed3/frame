@@ -72,10 +72,10 @@ async function run () : Promise< void > {
       if ( err ) console.error( err ), process.exitCode = 1;
 
       void workerRun
-        .catch( error => console.error( 'Background worker stopped with an error:', error ) )
+        .catch( err => console.error( 'Background worker stopped with an error:', err ) )
         .then( () => closeDatabase() )
-        .catch( error => {
-          console.error( 'Failed to close the database:', error );
+        .catch( err => {
+          console.error( 'Failed to close the database:', err );
           process.exitCode = 1;
         } );
     } );
