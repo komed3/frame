@@ -44,4 +44,41 @@ export class JobQueue {
       WHERE status = 'running' AND locked_at_ms < ?
     ` ).run( Date.now(), Date.now() - lockTimeoutMs );
   }
+
+  public claim ( workerId: string ) : MediaJob | undefined {
+    const now = Date.now();
+    db.exec( 'BEGIN IMMEDIATE' );
+
+    try {
+      const job = db.prepare( `
+        SELECT id, media_id, job_type, attempts, max_attempts
+        FROM media_jobs
+        WHERE status = 'pending'
+          AND available_at_ms <= ?
+          AND attempts < max_attempts
+        ORDER BY priority DESC, available_at_ms, id
+        LIMIT 1
+      ` ).get( now ) as MediaJob | undefined;
+
+      if ( ! job ) { db.exec( 'COMMIT' ); return }
+
+      const result = db.prepare( `
+        UPDATE media_jobs
+        SET status = 'running',
+            attempts = attempts + 1,
+            worker_id = ?,
+            locked_at_ms = ?,
+            updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE id = ? AND status = 'pending'
+      ` ).run( workerId, now, job.id );
+
+      if ( result.changes !== 1 ) throw new Error( `Could not claim job ${ job.id }` );
+
+      db.exec( 'COMMIT' );
+      return { ...job, attempts: job.attempts + 1 };
+    } catch ( err ) {
+      db.exec( 'ROLLBACK' );
+      throw err;
+    }
+  }
 }
