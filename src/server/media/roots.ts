@@ -29,4 +29,9 @@ export class MediaRootRepo {
       ORDER BY id
     ` ).all() as unknown as MediaRoot[];
   }
+
+  public setEnabled ( id: number, enabled: boolean ) : void {
+    const result = db.prepare( 'UPDATE media_roots SET enabled = ? WHERE id = ?' ).run( enabled ? 1 : 0, id );
+    if ( result.changes !== 1 ) throw new Error( `Media root ${ id } does not exist` );
+  }
 }
