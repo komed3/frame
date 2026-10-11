@@ -288,6 +288,31 @@ export class MediaAssetProcessor {
     } );
   }
 
+  private async createTextPreview ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
+    if ( media.media_type !== 'text' ) return;
+
+    const fingerprint = assetStorage.fingerprint( media );
+    const relativePath = assetStorage.relativePath( 'text', media.id, fingerprint, '.txt' );
+    const outputPath = assetStorage.absolutePath( relativePath );
+    const tempPath = `${ outputPath }.tmp`;
+
+    await assetStorage.ensureParent( outputPath );
+
+    try {
+      const file = await readFile( sourcePath );
+      const preview = file.subarray( 0, 16 * 1024 ).toString( 'utf8' );
+      await writeFile( tempPath, preview );
+      await rename( tempPath, outputPath );
+    } catch ( err ) {
+      await rm( tempPath, { force: true } );
+      throw err;
+    }
+
+    await this.commitAsset( media, 'text', relativePath, null, null, {
+      maxBytes: 16 * 1024, encoding: 'utf-8'
+    } );
+  }
+
   public async process ( job: MediaJob ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
