@@ -86,15 +86,12 @@ export class MediaAssetProcessor {
 
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
     const relativePath = assetStorage.relativePath( type, media.id, assetStorage.fingerprint( media ), '.webp' );
-    const outputPath = assetStorage.absolutePath( relativePath );
-    const tempPath = `${ outputPath }.tmp.webp`;
-    const isAudio = media.media_type === 'audio';
-    const isImage = media.media_type === 'image';
+    const outputPath = assetStorage.absolutePath( relativePath ), tempPath = `${ outputPath }.tmp.webp`;
+    const isAudio = media.media_type === 'audio', isImage = media.media_type === 'image';
     const limit = type === 'poster' ? 1920 : 480;
     const scale = `scale=w='min(${ limit },iw)':h='min(${ limit },ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
 
     await assetStorage.ensureParent( outputPath );
-
     if ( isAudio && ! await this.hasAttachedPicture( sourcePath ) ) return;
 
     try {
