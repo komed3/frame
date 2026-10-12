@@ -55,8 +55,6 @@ export class MediaAssetProcessor {
     media: MediaAssetSource, type: MediaAssetType, relativePath: string, width: number | null,
     height: number | null, metadata: Record< string, unknown > = {}
   ) : Promise< void > {
-    const fingerprint = assetStorage.fingerprint( media );
-
     db.prepare( `
       INSERT INTO media_assets (
         media_id, asset_type, relative_path, source_fingerprint,
@@ -70,8 +68,8 @@ export class MediaAssetProcessor {
         height = excluded.height,
         metadata_json = excluded.metadata_json,
         created_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
-    `).run(
-      media.id, type, relativePath, fingerprint,
+    ` ).run(
+      media.id, type, relativePath, assetStorage.fingerprint( media ),
       width, height, JSON.stringify( metadata )
     );
   }
