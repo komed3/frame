@@ -44,23 +44,11 @@ export class MediaAssetProcessor {
     return path;
   }
 
-  private async verifySource ( media: MediaAssetSource, path: string ) : Promise< void > {
-    const info = await stat( path );
-
-    if ( info.size !== media.file_size || ( media.file_mtime_ms !== null && info.mtimeMs !== media.file_mtime_ms ) )
-      throw new Error( `Media changed since scan: ${ path }` );
-  }
-
   private async runFfmpeg ( args: string[] ) : Promise< void > {
     await execFileAsync( 'ffmpeg', [
       '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
       '-max_alloc', '536870912', '-max_pixels', '89128960', ...args
-    ], { timeout: 10 * 60_000, maxBuffer: 4 * 1024 * 1024 } );
-  }
-
-  private async verifyOutput ( path: string ) : Promise< void > {
-    const info = await stat( path );
-    if ( ! info.isFile() || info.size === 0 ) throw new Error( `FFmpeg produced no usable output: ${ path }` );
+    ], { timeout: ffmpegTimeoutMs, maxBuffer: 4 * 1024 * 1024 } );
   }
 
   private async commitAsset (
@@ -96,16 +84,6 @@ export class MediaAssetProcessor {
 
     const probe = JSON.parse( stdout ) as { streams?: Array< { disposition?: { attached_pic?: number } } > };
     return ( probe.streams ?? [] ).some( stream => stream.disposition?.attached_pic === 1 );
-  }
-
-  private async removeAsset ( mediaId: number, type: 'poster' | 'thumb' ) : Promise< void > {
-    const asset = db.prepare( `
-      SELECT relative_path FROM media_assets
-      WHERE media_id = ? AND asset_type = ?
-    ` ).get( mediaId, type ) as { relative_path: string } | undefined;
-
-    db.prepare( 'DELETE FROM media_assets WHERE media_id = ? AND asset_type = ?' ).run( mediaId, type );
-    if ( asset ) await rm( assetStorage.absolutePath( asset.relative_path ), { force: true } );
   }
 
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
