@@ -85,24 +85,19 @@ export class MediaAssetProcessor {
   }
 
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
-    const fingerprint = assetStorage.fingerprint( media );
-    const relativePath = assetStorage.relativePath( type, media.id, fingerprint, '.webp' );
+    const relativePath = assetStorage.relativePath( type, media.id, assetStorage.fingerprint( media ), '.webp' );
     const outputPath = assetStorage.absolutePath( relativePath );
     const tempPath = `${ outputPath }.tmp.webp`;
-
-    await assetStorage.ensureParent( outputPath );
-
     const isAudio = media.media_type === 'audio';
     const isImage = media.media_type === 'image';
     const limit = type === 'poster' ? 1920 : 480;
     const scale = `scale=w='min(${ limit },iw)':h='min(${ limit },ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
 
-    try {
-      if ( isAudio && ! await this.hasAttachedPicture( sourcePath ) ) {
-        await this.removeAsset( media.id, type );
-        return;
-      }
+    await assetStorage.ensureParent( outputPath );
 
+    if ( isAudio && ! await this.hasAttachedPicture( sourcePath ) ) return;
+
+    try {
       if ( isImage && extname( sourcePath ).toLowerCase() === '.svg' )
         await this.runFfmpeg( [ '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-y', tempPath ] );
 
@@ -116,8 +111,9 @@ export class MediaAssetProcessor {
         const seek = duration > 1 ? duration * 0.1 : 0;
 
         await this.runFfmpeg( [
-          '-ss', seek.toFixed( 3 ), '-i', sourcePath, '-map', '0:V:0', '-frames:v', '1', '-vf',
-          scale, '-c:v', 'libwebp', '-quality', type === 'poster' ? '86' : '78', '-y', tempPath
+          '-ss', seek.toFixed( 3 ), '-i', sourcePath, '-map', '0:V:0', '-frames:v', '1',
+          '-vf', scale, '-c:v', 'libwebp', '-quality', type === 'poster' ? '86' : '78',
+          '-y', tempPath
         ] );
       }
 
@@ -128,12 +124,9 @@ export class MediaAssetProcessor {
 
       else return;
 
-      await this.verifyOutput( tempPath );
-      await this.verifySource( media, sourcePath );
       await rename( tempPath, outputPath );
     } catch ( err ) {
       await rm( tempPath, { force: true } );
-      await this.removeAsset( media.id, type );
       throw err;
     }
 
