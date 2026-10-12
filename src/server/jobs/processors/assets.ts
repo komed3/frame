@@ -258,7 +258,11 @@ export class MediaAssetProcessor {
 
         for ( let offset = 0; offset < completeLength; offset += 4 ) {
           const value = buffer.readFloatLE( offset );
-          const normalized = Number.isFinite( value ) ? Math.max( -1, Math.min( 1, value ) ) : 0;
+
+          if ( ! Number.isFinite( value ) )
+            throw new Error( `Invalid audio sample for media ${ media.id }` );
+
+          const normalized = Math.max( -1, Math.min( 1, value ) );
           min = Math.min( min, normalized );
           max = Math.max( max, normalized );
 
