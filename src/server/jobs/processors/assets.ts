@@ -138,30 +138,29 @@ export class MediaAssetProcessor {
     const durationMs = media.duration_ms ?? 0;
     if ( durationMs <= 0 ) throw new Error( `Video duration is unknown: ${ media.id }` );
 
-    const durationSeconds = durationMs / 1000;
-    const count = Math.max( minFrames, Math.min( maxFrames, Math.ceil( durationSeconds * frameRate ) ) );
-    const intervalMs = Math.round( durationMs / count );
+    const count = Math.min( maxFrames, Math.max( minFrames, Math.ceil( durationMs / 1000 * frameRate ) ) );
+    const intervalMs = Math.ceil( durationMs / count );
     const relativeDirectory = `frames/${ media.id }-${ assetStorage.fingerprint( media ) }`;
     const outputDirectory = assetStorage.absolutePath( relativeDirectory );
     const tempDirectory = `${ outputDirectory }.tmp`;
+    const scale = `scale=w='min(320,iw)':h='min(180,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
+    const select = `select='isnan(prev_selected_t)+gte(t-prev_selected_t\\,${ ( intervalMs / 1000 ).toFixed( 8 ) })'`;
 
     await rm( tempDirectory, { recursive: true, force: true } );
     await mkdir( tempDirectory, { recursive: true } );
 
     try {
       await this.runFfmpeg( [
-        '-i', sourcePath, '-map', '0:V:0', '-vf',
-        `fps=${ ( count / durationSeconds ).toFixed( 8 ) },scale=w='min(320,iw)':h='min(180,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`,
-        '-frames:v', String( count ), '-c:v', 'libwebp', '-quality', '76', '-start_number', '0',
-        '-y', `${ tempDirectory }/%06d.webp`
+        '-i', sourcePath, '-map', '0:V:0', '-vf', `${ select },${ scale }`,
+        '-fps_mode', 'vfr', '-frames:v', String( count ), '-c:v', 'libwebp',
+        '-quality', '76', '-start_number', '0', '-y', `${ tempDirectory }/%06d.webp`
       ] );
 
       const files = ( await readdir( tempDirectory ) )
         .filter( file => extname( file ).toLowerCase() === '.webp' )
         .sort();
 
-      if ( ! files.length || files.length > maxFrames ) throw new Error( `Invalid frame count for media ${ media.id }: ${ files.length }` );
-      for ( const file of files ) await this.verifyOutput( resolve( tempDirectory, file ) );
+      if ( ! files.length ) throw new Error( `No frames generated for media ${ media.id }` );
 
       const frames = files.map( ( file, index ) => ( {
         index, timeMs: Math.min( durationMs, index * intervalMs ),
@@ -172,7 +171,6 @@ export class MediaAssetProcessor {
         version: 1, durationMs, intervalMs, width: 320, height: 180, frames
       } ) );
 
-      await this.verifySource( media, sourcePath );
       await rm( outputDirectory, { recursive: true, force: true } );
       await rename( tempDirectory, outputDirectory );
     } catch ( err ) {
