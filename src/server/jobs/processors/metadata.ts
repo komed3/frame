@@ -1,9 +1,8 @@
 import { db } from '@/src/server/db';
+import { execFileAsync } from '@/src/server/utils';
 import type { MediaJob, MediaMetadata, MediaSourceRecord } from '@/src/shared/types';
-import { execFile } from 'node:child_process';
 import { open, stat } from 'node:fs/promises';
 import { extname, relative, resolve, sep } from 'node:path';
-import { promisify } from 'node:util';
 
 
 interface ProbeStream {
@@ -29,9 +28,6 @@ interface ProbeData {
     tags?: Record< string, string >;
   };
 }
-
-
-const execFileAsync = promisify( execFile );
 
 
 class MetadataProcessor {

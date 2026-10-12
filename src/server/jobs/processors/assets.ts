@@ -1,14 +1,11 @@
 import { db } from '@/src/server/db';
 import { assetStorage } from '@/src/server/media/assets';
-import { envInteger, envNumber } from '@/src/server/utils';
+import { envInteger, envNumber, execFileAsync } from '@/src/server/utils';
 import type { MediaAssetSource, MediaAssetType, MediaJob } from '@/src/shared/types';
-import { execFile, spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
-import { promisify } from 'node:util';
 
-
-const execFileAsync = promisify( execFile );
 
 const assetTimeoutMs = envInteger( 'FRAME_ASSET_TIMEOUT_MS', 25 * 60_000, 1_000, 24 * 60 * 60_000 );
 const ffmpegTimeoutMs = envInteger( 'FRAME_FFMPEG_TIMEOUT_MS', assetTimeoutMs, 1_000, 24 * 60 * 60_000 );

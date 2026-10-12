@@ -1,3 +1,9 @@
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+
+
+export const execFileAsync = promisify( execFile );
+
 export function envNumber ( name: string, fallback: number, min: number, max: number ) : number {
   const value = process.env[ name ];
   if ( ! value?.trim() ) return fallback;
