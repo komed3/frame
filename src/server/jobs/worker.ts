@@ -48,6 +48,8 @@ export class JobWorker {
   public start () : Promise< void > {
     if ( this.running ) return this.running;
 
+    console.log( 'Starting job worker ...' );
+
     this.stopped = false;
     this.running = this.run().finally( () => this.running = undefined );
 
@@ -55,6 +57,7 @@ export class JobWorker {
   }
 
   public stop () : void {
+    console.log( 'Stopping job worker ...' );
     this.stopped = true;
   }
 }
