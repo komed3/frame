@@ -222,8 +222,9 @@ export class MediaAssetProcessor {
     const targetPoints = Math.min( 1_500_000, Math.max( 8000, Math.ceil( durationSeconds * 100 ) ) );
     const samplesPerPoint = Math.max( 1, Math.ceil( waveformRate * durationSeconds / targetPoints ) );
     const child = spawn( 'ffmpeg', [
-      '-hide_banner', '-loglevel', 'error', '-nostdin', '-i', sourcePath, '-map', '0:a:0', '-vn',
-      '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
+      '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
+      '-max_alloc', '536870912', '-i', sourcePath, '-t', durationSeconds.toFixed( 3 ), '-map',
+      '0:a:0', '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
     ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
 
     child.stderr.resume();
