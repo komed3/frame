@@ -78,7 +78,7 @@ export class MediaAssetProcessor {
     const { stdout } = await execFileAsync( 'ffprobe', [
       '-v', 'error', '-select_streams', 'v', '-show_entries',
       'stream_disposition=attached_pic', '-of', 'json', sourcePath
-    ], { encoding: 'utf8', timeout: 30_000, maxBuffer: 1024 * 1024 } );
+    ], { encoding: 'utf8', timeout: ffprobeTimeoutMs, maxBuffer: 1024 * 1024 } );
 
     const probe = JSON.parse( stdout ) as { streams?: Array< { disposition?: { attached_pic?: number } } > };
     return ( probe.streams ?? [] ).some( stream => stream.disposition?.attached_pic === 1 );
