@@ -77,17 +77,6 @@ export class MediaAssetProcessor {
     );
   }
 
-  private async createAudioFallback ( sourcePath: string, outputPath: string, scale: string ) : Promise< void > {
-    const fallback = resolve( 'data/assets/audio-fallback.png' );
-
-    try {
-      await stat( fallback );
-      await this.runFfmpeg( [ '-i', fallback, '-vf', scale, '-frames:v', '1', '-c:v', 'libwebp', '-y', outputPath ] );
-    } catch {
-      throw new Error( `No embedded cover or configured data/assets/audio-fallback.png for ${ sourcePath }` );
-    }
-  }
-
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
     const fingerprint = assetStorage.fingerprint( media );
     const relativePath = assetStorage.relativePath( type, media.id, fingerprint, '.webp' );
