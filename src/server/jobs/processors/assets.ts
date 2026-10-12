@@ -318,7 +318,10 @@ export class MediaAssetProcessor {
     if ( ! media || ! media.is_available ) return;
 
     const sourcePath = this.getSourcePath( media );
-    await this.verifySource( media, sourcePath );
+    const info = await stat( sourcePath );
+
+    if ( info.size !== media.file_size || ( media.file_mtime_ms !== null && info.mtimeMs !== media.file_mtime_ms ) )
+      throw new Error( `Media changed since scan: ${ sourcePath }` );
 
     switch ( job.job_type ) {
       case 'poster': case 'thumb': return await this.createImageAsset( media, sourcePath, job.job_type );
