@@ -121,5 +121,5 @@ export class JobQueue {
 
 export const jobQueue = new JobQueue();
 
-export const enqueueJob = ( mediaId: number | null, jobType: MediaJobType, priority = 0 ): void =>
+export const enqueueJob = ( mediaId: number | null, jobType: MediaJobType, priority = 0 ) : void =>
   jobQueue.enqueue( mediaId, jobType, priority );
