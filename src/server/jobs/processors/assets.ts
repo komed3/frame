@@ -116,23 +116,26 @@ export class MediaAssetProcessor {
     const scale = `scale=w='min(${ limit },iw)':h='min(${ limit },ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
 
     try {
+      if ( isAudio && ! await this.hasAttachedPicture( sourcePath ) ) {
+        await this.removeAsset( media.id, type );
+        return;
+      }
+
       if ( isImage && extname( sourcePath ).toLowerCase() === '.svg' )
         await this.runFfmpeg( [ '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-y', tempPath ] );
 
-      else if ( isAudio )
-        try { await this.runFfmpeg( [
-          '-i', sourcePath, '-map', '0:v:0', '-frames:v', '1', '-vf', scale, '-c:v',
-          'libwebp', '-quality', '84', '-y', tempPath
-        ] ) }
-        catch { await this.createAudioFallback( sourcePath, tempPath, scale ) }
+      else if ( isAudio ) await this.runFfmpeg( [
+        '-i', sourcePath, '-map', '0:v:0', '-frames:v', '1', '-vf', scale,
+        '-c:v', 'libwebp', '-quality', '84', '-y', tempPath
+      ] );
 
       else if ( media.media_type === 'video' ) {
         const duration = Math.max( 0, ( media.duration_ms ?? 0 ) / 1000 );
         const seek = duration > 1 ? duration * 0.1 : 0;
 
         await this.runFfmpeg( [
-          '-ss', seek.toFixed( 3 ), '-i', sourcePath, '-map', '0:V:0', '-frames:v', '1', '-vf', scale,
-          '-c:v', 'libwebp', '-quality', type === 'poster' ? '86' : '78', '-y', tempPath
+          '-ss', seek.toFixed( 3 ), '-i', sourcePath, '-map', '0:V:0', '-frames:v', '1', '-vf',
+          scale, '-c:v', 'libwebp', '-quality', type === 'poster' ? '86' : '78', '-y', tempPath
         ] );
       }
 
@@ -143,10 +146,12 @@ export class MediaAssetProcessor {
 
       else return;
 
+      await this.verifyOutput( tempPath );
       await this.verifySource( media, sourcePath );
       await rename( tempPath, outputPath );
     } catch ( err ) {
       await rm( tempPath, { force: true } );
+      await this.removeAsset( media.id, type );
       throw err;
     }
 
