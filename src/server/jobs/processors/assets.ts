@@ -52,6 +52,11 @@ export class MediaAssetProcessor {
     );
   }
 
+  private async verifyOutput ( path: string ) : Promise< void > {
+    const info = await stat( path );
+    if ( ! info.isFile() || info.size === 0 ) throw new Error( `FFmpeg produced no usable output: ${ path }` );
+  }
+
   private async commitAsset (
     media: MediaAssetSource, type: MediaAssetType, relativePath: string, width: number | null,
     height: number | null, metadata: Record< string, unknown > = {}
