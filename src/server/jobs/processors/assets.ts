@@ -87,6 +87,16 @@ export class MediaAssetProcessor {
     return ( probe.streams ?? [] ).some( stream => stream.disposition?.attached_pic === 1 );
   }
 
+  private async removeAsset ( mediaId: number, type: 'poster' | 'thumb' ) : Promise< void > {
+    const asset = db.prepare( `
+      SELECT relative_path FROM media_assets
+      WHERE media_id = ? AND asset_type = ?
+    ` ).get( mediaId, type ) as { relative_path: string } | undefined;
+
+    db.prepare( 'DELETE FROM media_assets WHERE media_id = ? AND asset_type = ?' ).run( mediaId, type );
+    if ( asset ) await rm( assetStorage.absolutePath( asset.relative_path ), { force: true } );
+  }
+
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
     const fingerprint = assetStorage.fingerprint( media );
     const relativePath = assetStorage.relativePath( type, media.id, fingerprint, '.webp' );
