@@ -1,7 +1,7 @@
 import type { MediaAssetSource, MediaAssetType } from '@/src/shared/types';
 import { createHash } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
-import { dirname, resolve, sep } from 'node:path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 
 export class AssetStorage {
@@ -27,9 +27,9 @@ export class AssetStorage {
 
   public absolutePath ( relativePath: string ) : string {
     const path = resolve( this.root, relativePath );
-    const fromRoot = path.slice( this.root.length );
+    const fromRoot = relative( this.root, path );
 
-    if ( fromRoot.startsWith( sep + '..' ) || path === this.root )
+    if ( ! fromRoot || fromRoot === '..' || fromRoot.startsWith( `..${ sep }` ) || isAbsolute( fromRoot ) )
       throw new Error( `Invalid asset path: ${ relativePath }` );
 
     return path;
