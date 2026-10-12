@@ -239,6 +239,7 @@ export class MediaAssetProcessor {
 
     const writePoint = () => {
       if ( ! samples ) return;
+      if ( values.length >= targetPoints ) throw new Error( `Waveform exceeded point limit for ${ media.id }` );
 
       values.push( [ min, max ] );
       min = Infinity, max = -Infinity;
