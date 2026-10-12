@@ -77,6 +77,16 @@ export class MediaAssetProcessor {
     );
   }
 
+  private async hasAttachedPicture ( sourcePath: string ) : Promise< boolean > {
+    const { stdout } = await execFileAsync( 'ffprobe', [
+      '-v', 'error', '-select_streams', 'v', '-show_entries',
+      'stream_disposition=attached_pic', '-of', 'json', sourcePath
+    ], { encoding: 'utf8', timeout: 30_000, maxBuffer: 1024 * 1024 } );
+
+    const probe = JSON.parse( stdout ) as { streams?: Array< { disposition?: { attached_pic?: number } } > };
+    return ( probe.streams ?? [] ).some( stream => stream.disposition?.attached_pic === 1 );
+  }
+
   private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
     const fingerprint = assetStorage.fingerprint( media );
     const relativePath = assetStorage.relativePath( type, media.id, fingerprint, '.webp' );
