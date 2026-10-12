@@ -188,7 +188,8 @@ export class MediaAssetProcessor {
         .filter( file => extname( file ).toLowerCase() === '.webp' )
         .sort();
 
-      if ( ! files.length ) throw new Error( `No frames generated for media ${ media.id }` );
+      if ( ! files.length || files.length > maxFrames ) throw new Error( `Invalid frame count for media ${ media.id }: ${ files.length }` );
+      for ( const file of files ) await this.verifyOutput( resolve( tempDirectory, file ) );
 
       const frames = files.map( ( file, index ) => ( {
         index, timeMs: Math.min( durationMs, index * intervalMs ),
@@ -209,7 +210,7 @@ export class MediaAssetProcessor {
 
     await this.commitAsset(
       media, 'frames', `${ relativeDirectory }/manifest.json`, 320, 180,
-      { frameCount: count, durationMs, intervalMs }
+      { frameCount: frames.length, durationMs, intervalMs }
     );
   }
 
