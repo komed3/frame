@@ -292,17 +292,13 @@ export class MediaAssetProcessor {
   private async createTextPreview ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
     if ( media.media_type !== 'text' ) return;
 
-    const fingerprint = assetStorage.fingerprint( media );
-    const relativePath = assetStorage.relativePath( 'text', media.id, fingerprint, '.txt' );
-    const outputPath = assetStorage.absolutePath( relativePath );
-    const tempPath = `${ outputPath }.tmp`;
-
+    const relativePath = assetStorage.relativePath( 'text', media.id, assetStorage.fingerprint( media ), '.txt' );
+    const outputPath = assetStorage.absolutePath( relativePath ), tempPath = `${ outputPath }.tmp`;
     await assetStorage.ensureParent( outputPath );
 
     try {
       const file = await readFile( sourcePath );
-      const preview = file.subarray( 0, 16 * 1024 ).toString( 'utf8' );
-      await writeFile( tempPath, preview );
+      await writeFile( tempPath, file.subarray( 0, 16 * 1024 ).toString( 'utf8' ) );
       await rename( tempPath, outputPath );
     } catch ( err ) {
       await rm( tempPath, { force: true } );
