@@ -9,9 +9,14 @@ import { promisify } from 'node:util';
 
 
 const execFileAsync = promisify( execFile );
-const frameRate = Number( process.env.FRAME_SCRUBBER_FPS || 1 );
-const maxFrames = Number( process.env.FRAME_SCRUBBER_MAX_FRAMES || 600 );
-const minFrames = Number( process.env.FRAME_SCRUBBER_MIN_FRAMES || 24 );
+
+const assetTimeoutMs = envInteger( 'FRAME_ASSET_TIMEOUT_MS', 25 * 60_000, 1_000, 24 * 60 * 60_000 );
+const ffmpegTimeoutMs = envInteger( 'FRAME_FFMPEG_TIMEOUT_MS', assetTimeoutMs, 1_000, 24 * 60 * 60_000 );
+const ffprobeTimeoutMs = envInteger( 'FRAME_FFPROBE_TIMEOUT_MS', Math.min( assetTimeoutMs, 2 * 60_000 ), 1_000, 24 * 60 * 60_000 );
+const waveformTimeoutMs = envInteger( 'FRAME_WAVE_TIMEOUT_MS', ffmpegTimeoutMs, 1_000, 24 * 60 * 60_000 );
+const frameRate = envNumber( 'FRAME_SCRUBBER_FPS', 1, 0.1, 10 );
+const maxFrames = envInteger( 'FRAME_SCRUBBER_MAX_FRAMES', 450, 1, 500 );
+const minFrames = envInteger( 'FRAME_SCRUBBER_MIN_FRAMES', 24, 1, maxFrames );
 const waveformRate = 8000;
 
 
