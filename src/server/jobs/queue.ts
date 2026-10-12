@@ -1,36 +1,48 @@
 import { db } from '@/src/server/db';
+import { envInteger } from '@/src/server/utils';
 import type { MediaJob, MediaJobType } from '@/src/shared/types';
 
 
-const retryDelayMs = 60_000;
-const lockTimeoutMs = 30 * 60_000;
+const permanentMediaError = /Invalid data found when processing input|moov atom not found|Invalid NAL unit|Error splitting the input into NAL units|Could not find codec parameters|(?:Unknown|Unsupported) decoder|Decoder .+ not found|does not contain any stream|matches no streams|Unsupported codec|Error while decoding|corrupt decoded frame|header damaged|Error parsing/i;
+const retryDelayMs = envInteger( 'QUEUE_RETRY_DELAY_MS', 60_000, 1_000, 60 * 60_000 );
+const lockTimeoutMs = envInteger( 'QUEUE_LOCK_TIMEOUT_MS', 30 * 60_000, 1_000, 90 * 60_000 );
+
+
+function getErrorMessage ( err: unknown ) : string {
+  if ( ! ( err instanceof Error ) ) return String( err );
+
+  const stderr = ( err as Error & { stderr?: string | Buffer } ).stderr;
+  return [ err.message, stderr?.toString() ].filter( Boolean ).join( '\n' );
+}
 
 
 export class JobQueue {
-  public enqueue ( mediaId: number | null, jobType: MediaJobType, priority = 0 ) : void {
+  public enqueue ( mediaId: number | null, jobType: MediaJobType, priority = 0, retryFailed = false ) : void {
+    const retry = retryFailed ? 1 : 0;
+
     db.prepare( `
       INSERT INTO media_jobs ( media_id, job_type, priority )
       VALUES ( ?, ?, ? )
       ON CONFLICT DO UPDATE SET
         priority = MAX( media_jobs.priority, excluded.priority ),
         status = CASE
-          WHEN media_jobs.status IN ( 'completed', 'failed' ) THEN 'pending'
+          WHEN media_jobs.status = 'completed' OR ( media_jobs.status = 'failed' AND ? = 1 ) THEN 'pending'
           ELSE media_jobs.status
         END,
         attempts = CASE
-          WHEN media_jobs.status IN ( 'completed', 'failed' ) THEN 0
+          WHEN media_jobs.status = 'completed' OR ( media_jobs.status = 'failed' AND ? = 1 ) THEN 0
           ELSE media_jobs.attempts
         END,
         available_at_ms = CASE
-          WHEN media_jobs.status IN ( 'completed', 'failed' ) THEN excluded.available_at_ms
+          WHEN media_jobs.status = 'completed' OR ( media_jobs.status = 'failed' AND ? = 1 ) THEN excluded.available_at_ms
           ELSE media_jobs.available_at_ms
         END,
         last_error = CASE
-          WHEN media_jobs.status IN ( 'completed', 'failed' ) THEN NULL
+          WHEN media_jobs.status = 'completed' OR ( media_jobs.status = 'failed' AND ? = 1 ) THEN NULL
           ELSE media_jobs.last_error
         END,
         updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
-    ` ).run( mediaId, jobType, priority );
+    ` ).run( mediaId, jobType, priority, retry, retry, retry, retry );
   }
 
   public recoverStale () : void {
@@ -97,8 +109,9 @@ export class JobQueue {
   }
 
   public fail ( job: MediaJob, workerId: string, err: unknown ) : void {
-    const message = err instanceof Error ? err.message : String( err );
-    const retry = job.attempts < job.max_attempts;
+    const message = getErrorMessage( err );
+    const permanent = permanentMediaError.test( message );
+    const retry = ! permanent && job.attempts < job.max_attempts;
 
     const result = db.prepare( `
       UPDATE media_jobs
@@ -121,5 +134,5 @@ export class JobQueue {
 
 export const jobQueue = new JobQueue();
 
-export const enqueueJob = ( mediaId: number | null, jobType: MediaJobType, priority = 0 ) : void =>
-  jobQueue.enqueue( mediaId, jobType, priority );
+export const enqueueJob = ( mediaId: number | null, jobType: MediaJobType, priority = 0, retryFailed = false ) : void =>
+  jobQueue.enqueue( mediaId, jobType, priority, retryFailed );
