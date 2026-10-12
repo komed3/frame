@@ -238,8 +238,8 @@ export class MediaAssetProcessor {
     let carry = Buffer.alloc( 0 );
 
     const writePoint = () => {
+      if ( values.length >= targetPoints ) throw new Error( `Waveform exceeded point limit for media ${ media.id }` );
       if ( ! samples ) return;
-      if ( values.length >= targetPoints ) throw new Error( `Waveform exceeded point limit for ${ media.id }` );
 
       values.push( [ min, max ] );
       min = Infinity, max = -Infinity;
@@ -272,10 +272,12 @@ export class MediaAssetProcessor {
         carry = buffer.subarray( completeLength ) as Buffer< ArrayBuffer >;
       }
 
+      if ( carry.length ) throw new Error( `Incomplete waveform sample for media ${ media.id }` );
+
       writePoint();
 
-      if ( await exitPromise !== 0 )
-        throw new Error( `ffmpeg waveform extraction failed for media ${ media.id }` );
+      if ( ! values.length ) throw new Error( `No audio samples generated for media ${ media.id }` );
+      if ( timedOut || await exitPromise !== 0 ) throw new Error( `FFmpeg waveform extraction failed for media ${ media.id }` );
     } catch ( err ) {
       child.kill( 'SIGTERM' );
       throw err;
