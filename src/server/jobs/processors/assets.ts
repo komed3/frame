@@ -146,6 +146,8 @@ export class MediaAssetProcessor {
     await rm( tempDirectory, { recursive: true, force: true } );
     await mkdir( tempDirectory, { recursive: true } );
 
+    let frameCount = 0;
+
     try {
       await this.runFfmpeg( [
         '-i', sourcePath, '-map', '0:V:0', '-vf', `${ select },${ scale }`,
@@ -164,6 +166,8 @@ export class MediaAssetProcessor {
         path: `${ relativeDirectory }/${ file }`
       } ) );
 
+      frameCount = frames.length;
+
       await writeFile( `${ tempDirectory }/manifest.json`, JSON.stringify( {
         version: 1, durationMs, intervalMs, width: 320, height: 180, frames
       } ) );
@@ -177,7 +181,7 @@ export class MediaAssetProcessor {
 
     await this.commitAsset(
       media, 'frames', `${ relativeDirectory }/manifest.json`, 320, 180,
-      { frameCount: frames.length, durationMs, intervalMs }
+      { frameCount, durationMs, intervalMs }
     );
   }
 
