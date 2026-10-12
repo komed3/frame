@@ -194,27 +194,26 @@ export class MediaAssetProcessor {
     const samplesPerPoint = Math.max( 1, Math.ceil( waveformRate * durationSeconds / targetPoints ) );
     const child = spawn( 'ffmpeg', [
       '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
-      '-max_alloc', '536870912', '-i', sourcePath, '-t', durationSeconds.toFixed( 3 ), '-map',
-      '0:a:0', '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
+      '-max_alloc', '536870912', '-i', sourcePath, '-t', durationSeconds.toFixed( 3 ),
+      '-map', '0:a:0', '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
     ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
 
-    let timedOut = false;
-    const timeout = setTimeout( () => timedOut = true && child.kill( 'SIGKILL' ), 10 * 60_000 );
+    let timedOut = false, stderr = '';
 
+    const timeout = setTimeout( () => { timedOut = true; child.kill( 'SIGKILL' ) }, waveformTimeoutMs );
     timeout.unref();
-    child.stderr.resume();
+
+    child.stderr.setEncoding( 'utf8' );
+    child.stderr.on( 'data', ( chunk: string ) => { stderr = ( stderr + chunk ).slice( -16_384 ) } );
 
     const values: Array< [ number, number ] > = [];
     let min = Infinity, max = -Infinity, samples = 0;
     let carry = Buffer.alloc( 0 );
 
     const writePoint = () => {
-      if ( values.length >= targetPoints ) throw new Error( `Waveform exceeded point limit for media ${ media.id }` );
       if ( ! samples ) return;
-
-      values.push( [ min, max ] );
-      min = Infinity, max = -Infinity;
-      samples = 0;
+      if ( values.length < targetPoints ) values.push( [ min, max ] );
+      min = Infinity, max = -Infinity, samples = 0;
     };
 
     const exitPromise = new Promise< number >( ( resolveExit, reject ) => {
@@ -230,8 +229,7 @@ export class MediaAssetProcessor {
         for ( let offset = 0; offset < completeLength; offset += 4 ) {
           const value = buffer.readFloatLE( offset );
 
-          if ( ! Number.isFinite( value ) )
-            throw new Error( `Invalid audio sample for media ${ media.id }` );
+          if ( ! Number.isFinite( value ) ) throw new Error( `Invalid audio sample for media ${ media.id }` );
 
           const normalized = Math.max( -1, Math.min( 1, value ) );
           min = Math.min( min, normalized );
@@ -246,15 +244,18 @@ export class MediaAssetProcessor {
       if ( carry.length ) throw new Error( `Incomplete waveform sample for media ${ media.id }` );
 
       writePoint();
+      const exitCode = await exitPromise;
+
+      if ( timedOut || exitCode !== 0 )
+        throw new Error( `FFmpeg waveform failed for media ${ media.id } (exit ${ exitCode }): ${ stderr.trim() }` );
 
       if ( ! values.length ) throw new Error( `No audio samples generated for media ${ media.id }` );
-      if ( timedOut || await exitPromise !== 0 ) throw new Error( `FFmpeg waveform extraction failed for media ${ media.id }` );
     } catch ( err ) {
       child.kill( 'SIGTERM' );
       throw err;
+    } finally {
+      clearTimeout( timeout );
     }
-
-    await this.verifySource( media, sourcePath );
 
     const header = Buffer.alloc( 24 );
     Buffer.from( 'FRMWAV1\0', 'ascii' ).copy( header, 0 );
@@ -268,8 +269,7 @@ export class MediaAssetProcessor {
       data.writeInt16LE( Math.round( high * 32767 ), index * 4 + 2 );
     } );
 
-    const fingerprint = assetStorage.fingerprint( media );
-    const relativePath = assetStorage.relativePath( 'wave', media.id, fingerprint, '.bin' );
+    const relativePath = assetStorage.relativePath( 'wave', media.id, assetStorage.fingerprint( media ), '.bin' );
     const outputPath = assetStorage.absolutePath( relativePath );
     const tempPath = `${ outputPath }.tmp`;
 
