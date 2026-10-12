@@ -227,6 +227,10 @@ export class MediaAssetProcessor {
       '0:a:0', '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
     ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
 
+    let timedOut = false;
+    const timeout = setTimeout( () => timedOut = true && child.kill( 'SIGKILL' ), 10 * 60_000 );
+
+    timeout.unref();
     child.stderr.resume();
 
     const values: Array< [ number, number ] > = [];
