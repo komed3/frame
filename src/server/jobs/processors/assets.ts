@@ -46,10 +46,10 @@ export class MediaAssetProcessor {
   }
 
   private async runFfmpeg ( args: string[] ) : Promise< void > {
-    await execFileAsync(
-      'ffmpeg', [ '-hide_banner', '-loglevel', 'error', '-nostdin', ...args ],
-      { timeout: 10 * 60_000, maxBuffer: 4 * 1024 * 1024 }
-    );
+    await execFileAsync( 'ffmpeg', [
+      '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
+      '-max_alloc', '536870912', '-max_pixels', '89128960', ...args
+    ], { timeout: 10 * 60_000, maxBuffer: 4 * 1024 * 1024 } );
   }
 
   private async verifyOutput ( path: string ) : Promise< void > {
