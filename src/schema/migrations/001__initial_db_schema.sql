@@ -329,6 +329,7 @@ CREATE TABLE markers (
   media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   position_ms INTEGER NOT NULL CHECK ( position_ms >= 0 ),
   title TEXT,
+  description TEXT,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
 );
 
