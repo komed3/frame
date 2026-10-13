@@ -107,6 +107,38 @@ CREATE INDEX media_hash_idx ON media ( file_hash );
 
 
 -- ============================================================
+-- 3. Individual media streams
+-- ============================================================
+
+CREATE TABLE tracks (
+  id INTEGER PRIMARY KEY,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  stream_index INTEGER NOT NULL,
+  kind TEXT NOT NULL CHECK ( kind IN ( 'video', 'audio', 'subtitle', 'data' ) ),
+  codec TEXT,
+  language TEXT,
+  title TEXT,
+  is_default INTEGER NOT NULL DEFAULT 0 CHECK ( is_default IN ( 0, 1 ) ),
+  is_forced INTEGER NOT NULL DEFAULT 0 CHECK ( is_forced IN ( 0, 1 ) ),
+  width INTEGER CHECK ( width IS NULL OR width > 0 ),
+  height INTEGER CHECK ( height IS NULL OR height > 0 ),
+  fps REAL CHECK ( fps IS NULL OR fps > 0 ),
+  bitrate INTEGER CHECK ( bitrate IS NULL OR bitrate >= 0 ),
+  sample_rate INTEGER CHECK ( sample_rate IS NULL OR sample_rate > 0 ),
+  channels INTEGER CHECK ( channels IS NULL OR channels > 0 ),
+  data_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( data_json ) ),
+
+  UNIQUE (media_id, stream_index)
+);
+
+CREATE INDEX tracks_media_idx
+  ON tracks(media_id);
+
+CREATE INDEX tracks_kind_language_idx
+  ON tracks(kind, language);
+
+
+-- ============================================================
 -- 4. Additional metadata
 -- ============================================================
 
