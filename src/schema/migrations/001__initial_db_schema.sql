@@ -279,3 +279,41 @@ CREATE TABLE plays (
 
 CREATE INDEX plays_user_recent_idx ON plays ( user_id, started_at DESC );
 CREATE INDEX plays_media_recent_idx ON plays ( media_id, started_at DESC );
+
+
+-- ============================================================
+-- 10. Favorites and playlists
+-- ============================================================
+
+CREATE TABLE favorites (
+  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  PRIMARY KEY ( user_id, media_id )
+);
+
+CREATE INDEX favorites_media_idx ON favorites ( media_id );
+
+CREATE TABLE playlists (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+  updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  UNIQUE ( user_id, name )
+);
+
+CREATE TABLE playlist_items (
+  playlist_id INTEGER NOT NULL REFERENCES playlists ( id ) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  position INTEGER NOT NULL CHECK ( position >= 0 ),
+  added_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  PRIMARY KEY ( playlist_id, media_id ),
+  UNIQUE ( playlist_id, position )
+);
+
+CREATE INDEX playlist_items_media_idx ON playlist_items ( media_id );
