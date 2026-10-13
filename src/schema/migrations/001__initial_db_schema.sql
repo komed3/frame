@@ -128,14 +128,11 @@ CREATE TABLE tracks (
   channels INTEGER CHECK ( channels IS NULL OR channels > 0 ),
   data_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( data_json ) ),
 
-  UNIQUE (media_id, stream_index)
+  UNIQUE ( media_id, stream_index )
 );
 
-CREATE INDEX tracks_media_idx
-  ON tracks(media_id);
-
-CREATE INDEX tracks_kind_language_idx
-  ON tracks(kind, language);
+CREATE INDEX tracks_media_idx ON tracks ( media_id );
+CREATE INDEX tracks_kind_language_idx ON tracks ( kind, language );
 
 
 -- ============================================================
