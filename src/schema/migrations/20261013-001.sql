@@ -2,9 +2,11 @@
 -- Database: SQLite
 -- Apply once to a new, empty database.
 
+
 PRAGMA foreign_keys = ON;
 
 BEGIN IMMEDIATE;
+
 
 -- ============================================================
 -- 1. Users and authentication
@@ -30,3 +32,16 @@ CREATE TABLE sessions (
 
 CREATE INDEX sessions_user_idx ON sessions ( user_id );
 CREATE INDEX sessions_expiry_idx ON sessions ( expires_at );
+
+
+-- ============================================================
+-- 2. Media roots and media files
+-- ============================================================
+
+CREATE TABLE roots (
+  id INTEGER PRIMARY KEY,
+  path TEXT NOT NULL UNIQUE,
+  enabled INTEGER NOT NULL DEFAULT 1 CHECK ( enabled IN ( 0, 1 ) ),
+  scanned_at TEXT,
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+);
