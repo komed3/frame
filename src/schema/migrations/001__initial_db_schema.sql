@@ -218,3 +218,19 @@ CREATE TABLE jobs (
 CREATE INDEX jobs_queue_idx ON jobs ( status, run_after_ms, priority DESC, id );
 CREATE INDEX jobs_root_idx ON jobs ( root_id, created_at );
 CREATE INDEX jobs_media_idx ON jobs ( media_id, created_at );
+
+-- Prevent duplicate active work for the same target and job kind.
+
+CREATE UNIQUE INDEX jobs_root_active_idx ON jobs ( root_id, kind )
+  WHERE root_id IS NOT NULL
+    AND media_id IS NULL
+    AND status IN ( 'pending', 'running' );
+
+CREATE UNIQUE INDEX jobs_media_active_idx ON jobs ( media_id, kind )
+  WHERE media_id IS NOT NULL
+    AND status IN ( 'pending', 'running' );
+
+CREATE UNIQUE INDEX jobs_global_active_idx ON jobs ( kind )
+  WHERE root_id IS NULL
+    AND media_id IS NULL
+    AND status IN ( 'pending', 'running' );
