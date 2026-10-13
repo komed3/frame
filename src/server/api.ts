@@ -235,3 +235,19 @@ function getMediaSourcePath ( media: MediaRecord ) : string {
 
   return path;
 }
+
+function getAssetPath ( asset: AssetRecord ) : string {
+  return assetStorage.absolutePath( asset.relative_path );
+}
+
+function sendAssetFile ( path: string, res: Response, contentType?: string ) : void {
+  res.setHeader( 'Cache-Control', 'private, no-store' );
+  if ( contentType ) res.setHeader( 'Content-Type', contentType );
+
+  res.sendFile( path, err => {
+    if ( ! err ) return;
+    if ( res.headersSent ) { res.destroy( err ); return }
+
+    res.status( 404 ).json( { error: 'Asset file not found' } );
+  } );
+}
