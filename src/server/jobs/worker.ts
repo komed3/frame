@@ -22,7 +22,7 @@ export class JobWorker {
 
   private async run ( signal: AbortSignal ) : Promise< void > {
     const workerId = randomUUID();
-    jobQueue.recoverStale();
+    jobQueue.recoverInterrupted();
 
     while ( ! signal.aborted ) {
       let job;
