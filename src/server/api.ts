@@ -432,3 +432,15 @@ api.post( '/auth/logout', ( req, res ) => {
   clearSessionCookie( res );
   res.status( 204 ).end();
 } );
+
+
+// --- authenticated endpoints ---
+
+api.use( requireSession );
+
+api.get( '/auth/me', ( req, res ) => {
+  res.json( {
+    user: { id: req.user!.id, username: req.user!.username },
+    sessionId: req.user!.sessionId
+  } );
+} );
