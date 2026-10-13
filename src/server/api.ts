@@ -996,3 +996,62 @@ api.put( '/media/:id/progress', ( req, res ) => {
 
   res.json( { mediaId, positionMs, completed } );
 } );
+
+
+// --- per-user settings ---
+
+api.get( '/settings', ( req, res ) => {
+  const rows = db.prepare( `
+    SELECT setting_key, value_json, updated_at
+    FROM user_settings
+    WHERE user_id = ?
+    ORDER BY setting_key
+  ` ).all( req.user!.id ) as Array< {
+    setting_key: string;
+    value_json: string;
+    updated_at: string;
+  } >;
+
+  res.json( {
+    settings: Object.fromEntries( rows.map( row => [
+      row.setting_key, {
+        value: parseJson( row.value_json ),
+        updatedAt: row.updated_at
+      }
+    ] ) )
+  } );
+} );
+
+api.put( '/settings/:key', ( req, res ) => {
+  const key = req.params.key;
+  if ( ! /^[a-zA-Z0-9._-]{1,100}$/.test( key ) ) fail( 400, 'Invalid setting key' );
+
+  const body = getBody( req );
+  if ( ! Object.prototype.hasOwnProperty.call( body, 'value' ) ) fail( 400, 'The value property is required' );
+
+  const value = JSON.stringify( body.value );
+  if ( value === undefined || value.length > 16_384 ) fail( 400, 'Setting value is invalid or too large' );
+
+  db.prepare( `
+    INSERT INTO user_settings ( user_id, setting_key, value_json )
+    VALUES ( ?, ?, ? )
+    ON CONFLICT ( user_id, setting_key ) DO UPDATE SET
+      value_json = excluded.value_json,
+      updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+  ` ).run( req.user!.id, key, value );
+
+  res.json( { key, value: body.value } );
+} );
+
+
+api.delete( '/settings/:key', ( req, res ) => {
+  const key = req.params.key;
+  if ( ! /^[a-zA-Z0-9._-]{1,100}$/.test( key ) ) fail( 400, 'Invalid setting key' );
+
+  db.prepare( `
+    DELETE FROM user_settings
+    WHERE user_id = ? AND setting_key = ?
+  ` ).run( req.user!.id, key );
+
+  res.status( 204 ).end();
+} );
