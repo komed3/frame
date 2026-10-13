@@ -335,3 +335,37 @@ CREATE TABLE markers (
 
 CREATE INDEX markers_media_position_idx ON markers ( media_id, position_ms );
 CREATE INDEX markers_user_idx ON markers ( user_id );
+
+
+-- ============================================================
+-- 12. Full-text search
+-- ============================================================
+
+CREATE VIRTUAL TABLE media_fts USING fts5 (
+  title, description, file_name, path, content = 'media', content_rowid = 'id',
+  tokenize = 'unicode61 remove_diacritics 2'
+);
+
+CREATE TRIGGER media_fts_insert
+AFTER INSERT ON media
+BEGIN
+  INSERT INTO media_fts ( rowid, title, description, file_name, path )
+  VALUES ( new.id, new.title, new.description, new.file_name, new.path );
+END;
+
+CREATE TRIGGER media_fts_delete
+AFTER DELETE ON media
+BEGIN
+  INSERT INTO media_fts ( media_fts, rowid, title, description, file_name, path )
+  VALUES ( 'delete', old.id, old.title, old.description, old.file_name, old.path );
+END;
+
+CREATE TRIGGER media_fts_update
+AFTER UPDATE OF title, description, file_name, path ON media
+BEGIN
+  INSERT INTO media_fts ( media_fts, rowid, title, description, file_name, path )
+  VALUES ( 'delete', old.id, old.title, old.description, old.file_name, old.path );
+
+  INSERT INTO media_fts ( rowid, title, description, file_name, path )
+  VALUES ( new.id, new.title, new.description, new.file_name, new.path );
+END;
