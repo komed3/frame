@@ -143,7 +143,7 @@ export class MediaAssetProcessor {
     } );
   }
 
-  private async createFrames ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
+  private async createFrames ( media: MediaAssetSource, sourcePath: string, signal: AbortSignal ) : Promise< void > {
     if ( media.media_type !== 'video' ) return;
 
     const durationMs = media.duration_ms ?? 0;
@@ -157,6 +157,7 @@ export class MediaAssetProcessor {
     const scale = `scale=w='min(320,iw)':h='min(180,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
     const select = `select='isnan(prev_selected_t)+gte(t-prev_selected_t\\,${ ( intervalMs / 1000 ).toFixed( 8 ) })'`;
 
+    signal.throwIfAborted();
     await rm( tempDirectory, { recursive: true, force: true } );
     await mkdir( tempDirectory, { recursive: true } );
 
@@ -167,7 +168,9 @@ export class MediaAssetProcessor {
         '-i', sourcePath, '-map', '0:V:0', '-vf', `${ select },${ scale }`,
         '-fps_mode', 'vfr', '-frames:v', String( count ), '-c:v', 'libwebp',
         '-quality', '76', '-start_number', '0', '-y', `${ tempDirectory }/%06d.webp`
-      ] );
+      ], signal );
+
+      signal.throwIfAborted();
 
       const files = ( await readdir( tempDirectory ) )
         .filter( file => extname( file ).toLowerCase() === '.webp' )
@@ -186,20 +189,23 @@ export class MediaAssetProcessor {
         version: 1, durationMs, intervalMs, width: 320, height: 180, frames
       } ) );
 
+      signal.throwIfAborted();
       await rm( outputDirectory, { recursive: true, force: true } );
+      signal.throwIfAborted();
       await rename( tempDirectory, outputDirectory );
     } catch ( err ) {
       await rm( tempDirectory, { recursive: true, force: true } );
       throw err;
     }
 
+    signal.throwIfAborted();
     await this.commitAsset(
       media, 'frames', `${ relativeDirectory }/manifest.json`, 320, 180,
       { frameCount, durationMs, intervalMs }
     );
   }
 
-  private async createWave ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
+  private async createWave ( media: MediaAssetSource, sourcePath: string, signal: AbortSignal ) : Promise< void > {
     if ( ! [ 'video', 'audio' ].includes( media.media_type ) || ! media.audio_codec ) return;
 
     const durationSeconds = Math.max( 0, ( media.duration_ms ?? 0 ) / 1000 );
