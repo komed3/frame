@@ -8,4 +8,13 @@ import { Config } from '@/src/server/core/Config';
 export class Database {
   private connection: DatabaseSync | null = null;
   private transactionDepth = 0;
+
+  public get isOpen () : boolean {
+    return this.connection !== null;
+  }
+
+  public get db () : DatabaseSync {
+    if ( ! this.connection ) throw new Error( 'The database connection is not open.' );
+    return this.connection;
+  }
 }
