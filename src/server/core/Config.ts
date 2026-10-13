@@ -23,10 +23,10 @@ export class Config {
     return value;
   }
 
-  static readonly NODE_ENV = Config.getNodeEnv();
-  static readonly HOST = process.env.HOST?.trim() || '0.0.0.0';
-  static readonly PORT = Config.getInteger( 'PORT', 3000, 1, 65535 );
-  static readonly DB_PATH = resolve( process.env.DB_PATH?.trim() || 'data/frame.sqlite' );
-  static readonly DB_BUSY_TIMEOUT_MS = Config.getInteger( 'DB_BUSY_TIMEOUT_MS', 5000, 0, 60000 );
-  static readonly ASSETS_PATH = resolve( process.env.ASSETS_PATH?.trim() || 'data/assets' );
+  public static readonly NODE_ENV = Config.getNodeEnv();
+  public static readonly HOST = process.env.HOST?.trim() || '0.0.0.0';
+  public static readonly PORT = Config.getInteger( 'PORT', 3000, 1, 65535 );
+  public static readonly DB_PATH = resolve( process.env.DB_PATH?.trim() || 'data/frame.sqlite' );
+  public static readonly DB_BUSY_TIMEOUT_MS = Config.getInteger( 'DB_BUSY_TIMEOUT_MS', 5000, 0, 60000 );
+  public static readonly ASSETS_PATH = resolve( process.env.ASSETS_PATH?.trim() || 'data/assets' );
 }
