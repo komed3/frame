@@ -14,7 +14,7 @@ export class Database {
   }
 
   public get db () : DatabaseSync {
-    if ( ! this.connection ) throw new Error( 'The database connection is not open.' );
+    if ( ! this.connection ) throw new Error( 'Database connection is not open' );
     return this.connection;
   }
 
@@ -41,5 +41,13 @@ export class Database {
       connection.close();
       throw err;
     }
+  }
+
+  public close () : void {
+    if ( ! this.connection ) return;
+    if ( this.transactionDepth > 0 ) throw new Error( 'Database cannot be closed while a transaction is running' );
+
+    this.connection.close();
+    this.connection = null;
   }
 }
