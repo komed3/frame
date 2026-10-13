@@ -41,3 +41,17 @@ function deriveKey (
     } );
   } );
 }
+
+
+export async function hashPassword ( password: string ) : Promise< string > {
+  const salt = randomBytes( 16 );
+  const key = await deriveKey( password, salt, passwordKeyLength, {
+    N: passwordCost, r: passwordBlockSize, p: passwordParallelization,
+    maxmem: 64 * 1024 * 1024
+  } );
+
+  return [
+    'scrypt', passwordCost, passwordBlockSize, passwordParallelization,
+    salt.toString( 'base64url' ), key.toString( 'base64url' )
+  ].join( '$' );
+}
