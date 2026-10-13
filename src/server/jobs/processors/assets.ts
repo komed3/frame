@@ -213,15 +213,19 @@ export class MediaAssetProcessor {
 
     const targetPoints = Math.min( 1_500_000, Math.max( 8000, Math.ceil( durationSeconds * 100 ) ) );
     const samplesPerPoint = Math.max( 1, Math.ceil( waveformRate * durationSeconds / targetPoints ) );
+
+    signal.throwIfAborted();
+
     const child = spawn( 'ffmpeg', [
       '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
       '-max_alloc', '536870912', '-i', sourcePath, '-t', durationSeconds.toFixed( 3 ),
       '-map', '0:a:0', '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
     ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
 
-    let timedOut = false, stderr = '';
+    let timedOut = false, stderr = '', closed = false;
+    let killTimer: ReturnType< typeof setTimeout > | undefined;
 
-    const timeout = setTimeout( () => { timedOut = true; child.kill( 'SIGKILL' ) }, waveformTimeoutMs );
+    const timeout = setTimeout( () => { timedOut = true, child.kill( 'SIGKILL' ) }, waveformTimeoutMs );
     timeout.unref();
 
     child.stderr.setEncoding( 'utf8' );
@@ -239,11 +243,24 @@ export class MediaAssetProcessor {
 
     const exitPromise = new Promise< number >( ( resolveExit, reject ) => {
       child.once( 'error', reject );
-      child.once( 'close', code => resolveExit( code ?? -1 ) );
+      child.once( 'close', code => { closed = true, resolveExit( code ?? -1 ) } );
     } );
+
+    const abortChild = () => {
+      if ( closed ) return;
+
+      child.kill( 'SIGTERM' );
+      killTimer = setTimeout( () => { if ( ! closed ) child.kill( 'SIGKILL' ) }, 5000 );
+      killTimer.unref();
+    };
+
+    signal.addEventListener( 'abort', abortChild, { once: true } );
+    if ( signal.aborted ) abortChild();
 
     try {
       for await ( const chunk of child.stdout ) {
+        signal.throwIfAborted();
+
         const buffer = carry.length ? Buffer.concat( [ carry, chunk as Buffer ] ) : chunk as Buffer;
         const completeLength = buffer.length - buffer.length % 4;
 
@@ -253,8 +270,7 @@ export class MediaAssetProcessor {
           if ( ! Number.isFinite( value ) ) throw new Error( `Invalid audio sample for media ${ media.id }` );
 
           const normalized = Math.max( -1, Math.min( 1, value ) );
-          min = Math.min( min, normalized );
-          max = Math.max( max, normalized );
+          min = Math.min( min, normalized ), max = Math.max( max, normalized );
 
           if ( ++samples >= samplesPerPoint ) writePoint();
         }
@@ -262,21 +278,33 @@ export class MediaAssetProcessor {
         carry = buffer.subarray( completeLength ) as Buffer< ArrayBuffer >;
       }
 
+      signal.throwIfAborted();
+
       if ( carry.length ) throw new Error( `Incomplete waveform sample for media ${ media.id }` );
 
       writePoint();
       const exitCode = await exitPromise;
+
+      signal.throwIfAborted();
 
       if ( timedOut || exitCode !== 0 )
         throw new Error( `FFmpeg waveform failed for media ${ media.id } (exit ${ exitCode }): ${ stderr.trim() }` );
 
       if ( ! values.length ) throw new Error( `No audio samples generated for media ${ media.id }` );
     } catch ( err ) {
-      child.kill( 'SIGTERM' );
+      abortChild();
+
+      try { await exitPromise }
+      catch { /* The child could not be started. */ }
+
       throw err;
     } finally {
+      signal.removeEventListener( 'abort', abortChild );
       clearTimeout( timeout );
+      if ( killTimer ) clearTimeout( killTimer );
     }
+
+    signal.throwIfAborted();
 
     const header = Buffer.alloc( 24 );
     Buffer.from( 'FRMWAV1\0', 'ascii' ).copy( header, 0 );
@@ -297,13 +325,16 @@ export class MediaAssetProcessor {
     await assetStorage.ensureParent( outputPath );
 
     try {
+      signal.throwIfAborted();
       await writeFile( tempPath, Buffer.concat( [ header, data ] ) );
+      signal.throwIfAborted();
       await rename( tempPath, outputPath );
     } catch ( err ) {
       await rm( tempPath, { force: true } );
       throw err;
     }
 
+    signal.throwIfAborted();
     await this.commitAsset( media, 'wave', relativePath, null, null, {
       format: 'FRMWAV1', durationMs: media.duration_ms, pointCount: values.length,
       values: 'signed-int16-min-max'
