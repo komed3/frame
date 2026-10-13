@@ -341,30 +341,37 @@ export class MediaAssetProcessor {
     } );
   }
 
-  private async createTextPreview ( media: MediaAssetSource, sourcePath: string ) : Promise< void > {
+  private async createTextPreview ( media: MediaAssetSource, sourcePath: string, signal: AbortSignal ) : Promise< void > {
     if ( media.media_type !== 'text' ) return;
 
     const relativePath = assetStorage.relativePath( 'text', media.id, assetStorage.fingerprint( media ), '.txt' );
     const outputPath = assetStorage.absolutePath( relativePath ), tempPath = `${ outputPath }.tmp`;
+
+    signal.throwIfAborted();
     await assetStorage.ensureParent( outputPath );
 
     try {
       const file = await readFile( sourcePath );
+      signal.throwIfAborted();
       await writeFile( tempPath, file.subarray( 0, 16 * 1024 ).toString( 'utf8' ) );
+      signal.throwIfAborted();
       await rename( tempPath, outputPath );
     } catch ( err ) {
       await rm( tempPath, { force: true } );
       throw err;
     }
 
+    signal.throwIfAborted();
     await this.commitAsset( media, 'text', relativePath, null, null, {
       maxBytes: 16 * 1024, encoding: 'utf-8'
     } );
   }
 
-  public async process ( job: MediaJob ) : Promise< void > {
+  public async process ( job: MediaJob, signal: AbortSignal ) : Promise< void > {
     if ( ! job.media_id || ! [ 'poster', 'thumb', 'frames', 'wave', 'text' ].includes( job.job_type ) )
       throw new Error( `Invalid asset job: ${ job.job_type }` );
+
+    signal.throwIfAborted();
 
     const media = this.getMedia( job.media_id );
     if ( ! media || ! media.is_available ) return;
@@ -372,14 +379,16 @@ export class MediaAssetProcessor {
     const sourcePath = this.getSourcePath( media );
     const info = await stat( sourcePath );
 
+    signal.throwIfAborted();
+
     if ( info.size !== media.file_size || ( media.file_mtime_ms !== null && info.mtimeMs !== media.file_mtime_ms ) )
       throw new Error( `Media changed since scan: ${ sourcePath }` );
 
     switch ( job.job_type ) {
-      case 'poster': case 'thumb': return await this.createImageAsset( media, sourcePath, job.job_type );
-      case 'frames': return await this.createFrames( media, sourcePath );
-      case 'wave': return await this.createWave( media, sourcePath );
-      case 'text': return await this.createTextPreview( media, sourcePath );
+      case 'poster': case 'thumb': return await this.createImageAsset( media, sourcePath, job.job_type, signal );
+      case 'frames': return await this.createFrames( media, sourcePath, signal );
+      case 'wave': return await this.createWave( media, sourcePath, signal );
+      case 'text': return await this.createTextPreview( media, sourcePath, signal );
     }
   }
 }
