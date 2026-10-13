@@ -127,3 +127,9 @@ export interface MediaMetadata {
 }
 
 export type JobProcessor = ( job: MediaJob, signal: AbortSignal ) => Promise< void >;
+
+export interface SessionUser {
+  id: number;
+  username: string;
+  sessionId: number;
+}
