@@ -359,3 +359,38 @@ api.get( '/auth/setup-status', ( _req, res ) => {
   const row = db.prepare( 'SELECT COUNT(*) AS count FROM users' ).get() as { count: number };
   res.json( { setupRequired: row.count === 0 } );
 } );
+
+api.post( '/auth/setup', async ( req, res ) => {
+  const body = getBody( req );
+  const username = getString( body.username )?.trim();
+  const password = getString( body.password );
+
+  if ( ! username || ! /^[a-zA-Z0-9_.-]{3,32}$/.test( username ) )
+    fail( 400, 'Username must be 3–32 characters: letters, numbers, dot, underscore or hyphen' );
+
+  if ( ! password || password.length < 12 )
+    fail( 400, 'Password must contain at least 12 characters' );
+
+  const passwordHash = await hashPassword( password );
+  db.exec( 'BEGIN IMMEDIATE' );
+
+  try {
+    const count = db.prepare( 'SELECT COUNT(*) AS count FROM users' ).get() as { count: number };
+    if ( count.count > 0 ) fail( 409, 'Initial account has already been created' );
+
+    const existing = db.prepare( 'SELECT id FROM users WHERE username = ?' ).get( username );
+    if ( existing ) fail( 409, 'Username is already in use' );
+
+    const result = db.prepare( 'INSERT INTO users ( username, password_hash ) VALUES ( ?, ? )' ).run( username, passwordHash );
+    const userId = Number( result.lastInsertRowid );
+    const session = createSession( userId );
+
+    db.exec( 'COMMIT' );
+
+    setSessionCookie( res, session.token );
+    res.status( 201 ).json( { user: { id: userId, username }, expiresAt: session.expiresAt } );
+  } catch ( err ) {
+    db.exec( 'ROLLBACK' );
+    throw err;
+  }
+} );
