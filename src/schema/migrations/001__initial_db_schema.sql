@@ -45,3 +45,61 @@ CREATE TABLE roots (
   scanned_at TEXT,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
 );
+
+CREATE TABLE media (
+  id INTEGER PRIMARY KEY,
+  root_id INTEGER NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
+  path TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+
+  -- General file information
+  type TEXT NOT NULL CHECK ( type IN ( 'video', 'audio', 'image', 'text', 'other' ) ),
+  mime_type TEXT,
+  size_bytes INTEGER NOT NULL DEFAULT 0 CHECK ( size_bytes >= 0 ),
+  modified_at TEXT,
+  file_hash TEXT,
+  available INTEGER NOT NULL DEFAULT 1 CHECK ( available IN ( 0, 1 ) ),
+
+  -- Human-readable metadata
+  title TEXT,
+  description TEXT,
+  creator TEXT,
+  rating REAL CHECK ( rating IS NULL OR rating BETWEEN 0.0 AND 1.0 ),
+  released_at TEXT,
+  recorded_at TEXT,
+  language TEXT,
+
+  -- Common technical properties
+  duration_ms INTEGER CHECK ( duration_ms IS NULL OR duration_ms >= 0 ),
+  width INTEGER CHECK ( width IS NULL OR width > 0 ),
+  height INTEGER CHECK ( height IS NULL OR height > 0 ),
+  fps REAL CHECK ( fps IS NULL OR fps > 0 ),
+  bitrate INTEGER CHECK ( bitrate IS NULL OR bitrate >= 0 ),
+  container TEXT,
+  video_codec TEXT,
+  audio_codec TEXT,
+  sample_rate INTEGER CHECK ( sample_rate IS NULL OR sample_rate > 0 ),
+  channels INTEGER CHECK ( channels IS NULL OR channels > 0 ),
+  encoding TEXT,
+
+  -- Additional format-specific properties
+  data_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( data_json ) ),
+
+  scanned_at TEXT,
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+  updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  UNIQUE ( root_id, path )
+);
+
+CREATE INDEX media_type_available_idx ON media ( type, available );
+CREATE INDEX media_root_idx ON media ( root_id );
+CREATE INDEX media_file_name_idx ON media ( file_name COLLATE NOCASE );
+CREATE INDEX media_title_idx ON media ( title COLLATE NOCASE );
+CREATE INDEX media_creator_idx ON media ( creator COLLATE NOCASE );
+CREATE INDEX media_size_idx ON media ( size_bytes );
+CREATE INDEX media_modified_idx ON media ( modified_at );
+CREATE INDEX media_duration_idx ON media ( duration_ms );
+CREATE INDEX media_rating_idx ON media ( rating );
+CREATE INDEX media_released_idx ON media ( released_at );
+CREATE INDEX media_hash_idx ON media ( file_hash );
