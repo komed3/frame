@@ -394,3 +394,41 @@ api.post( '/auth/setup', async ( req, res ) => {
     throw err;
   }
 } );
+
+api.post( '/auth/login', async ( req, res ) => {
+  const body = getBody( req );
+  const username = getString( body.username )?.trim();
+  const password = getString( body.password );
+
+  if ( ! username || ! password ) fail( 400, 'Username and password are required' );
+
+  const user = db.prepare( `
+    SELECT id, username, password_hash, disabled_at
+    FROM users
+    WHERE username = ?
+  ` ).get( username ) as {
+    id: number;
+    username: string;
+    password_hash: string;
+    disabled_at: string | null;
+  } | undefined;
+
+  if ( ! user || user.disabled_at !== null || ! await verifyPassword( password, user.password_hash ) )
+    fail( 401, 'Invalid username or password' );
+
+  const session = createSession( user.id );
+
+  setSessionCookie( res, session.token );
+  res.json( {
+    user: { id: user.id, username: user.username },
+    expiresAt: session.expiresAt
+  } );
+} );
+
+api.post( '/auth/logout', ( req, res ) => {
+  const token = readSessionToken( req );
+  if ( token ) revokeSession( token );
+
+  clearSessionCookie( res );
+  res.status( 204 ).end();
+} );
