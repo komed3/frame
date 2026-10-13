@@ -28,5 +28,5 @@ export class Config {
   static readonly PORT = Config.getInteger( 'PORT', 3000, 1, 65535 );
   static readonly DB_PATH = resolve( process.env.DB_PATH?.trim() || 'data/frame.sqlite' );
   static readonly DB_BUSY_TIMEOUT_MS = Config.getInteger( 'DB_BUSY_TIMEOUT_MS', 5000, 0, 60000 );
-  static readonly ASSETS_PATH = resolve( process.env.DB_PATH?.trim() || 'data/assets' );
+  static readonly ASSETS_PATH = resolve( process.env.ASSETS_PATH?.trim() || 'data/assets' );
 }
