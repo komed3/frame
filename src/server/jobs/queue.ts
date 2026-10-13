@@ -94,6 +94,20 @@ export class JobQueue {
     }
   }
 
+  public release ( job: MediaJob, workerId: string ) : void {
+    const result = db.prepare( `
+      UPDATE media_jobs
+      SET status = 'pending',
+          worker_id = NULL,
+          locked_at_ms = NULL,
+          available_at_ms = ?,
+          updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'running' AND worker_id = ?
+    ` ).run( Date.now(), job.id, workerId );
+
+    if ( result.changes !== 1 ) throw new Error( `Could not release job ${ job.id }` );
+  }
+
   public complete ( job: MediaJob, workerId: string ) : void {
     const result = db.prepare( `
       UPDATE media_jobs
