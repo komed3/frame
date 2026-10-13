@@ -720,3 +720,225 @@ api.get( '/stats', ( _req, res ) => {
     ] ) )
   } );
 } );
+
+
+// --- media search and retrieval ---
+
+api.get( '/media', ( req, res ) => {
+  const conditions: string[] = [];
+  const params: Array< string | number > = [];
+
+  const q = getString( req.query.q )?.trim();
+  const type = getString( req.query.type );
+  const rootIdValue = getString( req.query.rootId );
+  const available = getString( req.query.available ) ?? 'true';
+
+  if ( q ) {
+    if ( q.length > 200 ) fail( 400, 'Search query is too long' );
+
+    const escaped = q.replace( /[\\%_]/g, '\\$&' );
+    const pattern = `%${ escaped }%`;
+
+    conditions.push( `(
+      media.title LIKE ? ESCAPE '\\'
+      OR media.file_name LIKE ? ESCAPE '\\'
+      OR media.description LIKE ? ESCAPE '\\'
+      OR media.relative_path LIKE ? ESCAPE '\\'
+    )` );
+
+    params.push( pattern, pattern, pattern, pattern );
+  }
+
+  if ( type ) {
+    if ( ! mediaTypes.includes( type as MediaType ) ) fail( 400, 'Invalid media type' );
+
+    conditions.push( 'media.media_type = ?' );
+    params.push( type );
+  }
+
+  if ( rootIdValue !== undefined ) {
+    const rootId = getInteger( rootIdValue );
+    if ( rootId === undefined ) fail( 400, 'Invalid rootId' );
+
+    conditions.push( 'media.media_root_id = ?' );
+    params.push( rootId );
+  }
+
+  if ( available === 'true' ) conditions.push( 'media.is_available = 1' );
+  else if ( available === 'false' ) conditions.push( 'media.is_available = 0' );
+  else if ( available !== 'all' ) fail( 400, 'available must be true, false or all' );
+
+  const sort = getString( req.query.sort ) ?? 'title';
+  const direction = ( getString( req.query.direction ) ?? 'asc' ).toLowerCase();
+
+  const sortColumns: Record< string, string > = {
+    title: 'media.title COLLATE NOCASE',
+    fileName: 'media.file_name COLLATE NOCASE',
+    createdAt: 'media.created_at',
+    updatedAt: 'media.updated_at',
+    duration: 'media.duration_ms',
+    size: 'media.file_size',
+    releaseDate: 'media.release_date'
+  };
+
+  if ( ! sortColumns[ sort ] ) fail( 400, 'Invalid sort field' );
+  if ( direction !== 'asc' && direction !== 'desc' ) fail( 400, 'direction must be asc or desc' );
+
+  const limit = getInteger( getString( req.query.limit ), 1, 100 ) ?? 40;
+  const offset = getInteger( getString( req.query.offset ), 0 ) ?? 0;
+  const where = conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '';
+
+  const count = db.prepare( `
+    SELECT COUNT(*) AS count
+    FROM media
+    ${ where }
+  ` ).get( ...params ) as { count: number };
+
+  const rows = db.prepare( `
+    SELECT media.*, media_roots.path AS root_path,
+      poster.relative_path AS poster_asset,
+      thumb.relative_path AS thumb_asset
+    FROM media
+    LEFT JOIN media_roots ON media_roots.id = media.media_root_id
+    LEFT JOIN media_assets AS poster
+      ON poster.media_id = media.id AND poster.asset_type = 'poster'
+    LEFT JOIN media_assets AS thumb
+      ON thumb.media_id = media.id AND thumb.asset_type = 'thumb'
+    ${ where }
+    ORDER BY ${ sortColumns[ sort ] } ${ direction.toUpperCase() }, media.id DESC
+    LIMIT ? OFFSET ?
+  ` ).all( ...params, limit, offset ) as unknown as Array< MediaRecord & {
+    poster_asset: string | null;
+    thumb_asset: string | null;
+  } >;
+
+  res.json( { items: rows.map( media => ( {
+    ...serializeMedia( media ),
+    posterUrl: media.poster_asset
+      ? `/api/media/${ media.id }/assets/poster`
+      : media.thumb_asset ? `/api/media/${ media.id }/assets/thumb` : null,
+    thumbUrl: media.thumb_asset ? `/api/media/${ media.id }/assets/thumb` : null
+  } ) ), total: count.count, limit, offset, sort, direction } );
+} );
+
+api.get( '/media/:id', ( req, res ) => {
+  const id = routeId( req.params.id );
+  const media = getMediaRecord( id );
+
+  if ( ! media ) fail( 404, 'Media not found' );
+  const assets = getAssetRecords( id );
+
+  res.json( {
+    media: serializeMedia( media ),
+    assets: assets.map( serializeAsset ),
+    streamUrl: `/api/media/${ id }/stream`
+  } );
+} );
+
+api.get( '/media/:id/meta', ( req, res ) => {
+  const id = routeId( req.params.id );
+  const media = getMediaRecord( id );
+
+  if ( ! media ) fail( 404, 'Media not found' );
+
+  res.json( {
+    id: media.id,
+    type: media.media_type,
+    metadata: parseJson( media.metadata_json ),
+    durationMs: media.duration_ms,
+    width: media.width,
+    height: media.height,
+    frameRate: media.frame_rate,
+    bitrate: media.bitrate,
+    container: media.container,
+    videoCodec: media.video_codec,
+    audioCodec: media.audio_codec,
+    sampleRate: media.sample_rate,
+    channels: media.channels,
+    encoding: media.encoding,
+    language: media.language,
+    releaseDate: media.release_date,
+    recordedAt: media.recorded_at
+  } );
+} );
+
+api.get( '/media/:id/assets', ( req, res ) => {
+  const id = routeId( req.params.id );
+  if ( ! getMediaRecord( id ) ) fail( 404, 'Media not found' );
+
+  res.json( { items: getAssetRecords( id ).map( serializeAsset ) } );
+} );
+
+api.get( '/media/:id/assets/:type', async ( req, res ) => {
+  const id = routeId( req.params.id );
+  const type = req.params.type as MediaAssetType;
+
+  if ( ! assetTypes.includes( type ) ) fail( 400, 'Invalid asset type' );
+  if ( ! getMediaRecord( id ) ) fail( 404, 'Media not found' );
+
+  const asset = db.prepare( `
+    SELECT id, media_id, asset_type, relative_path, width, height, metadata_json, created_at
+    FROM media_assets
+    WHERE media_id = ? AND asset_type = ?
+  ` ).get( id, type ) as AssetRecord | undefined;
+
+  if ( ! asset ) fail( 404, 'Asset not found' );
+
+  if ( type === 'frames' ) {
+    const manifest = await getFramesManifest( asset );
+
+    res.setHeader( 'Cache-Control', 'private, no-store' );
+    res.json( {
+      version: manifest.version,
+      durationMs: manifest.durationMs,
+      intervalMs: manifest.intervalMs,
+      width: manifest.width,
+      height: manifest.height,
+      frames: manifest.frames.map( frame => ( {
+        index: frame.index,
+        timeMs: frame.timeMs,
+        url: `/api/media/${ id }/frames/${ frame.index }`
+      } ) )
+    } );
+
+    return;
+  }
+
+  const contentType = type === 'wave' ? 'application/octet-stream'
+    : type === 'text' ? 'text/plain; charset=utf-8' : 'image/webp';
+
+  sendAssetFile( getAssetPath( asset ), res, contentType );
+} );
+
+api.get( '/media/:id/frames/:index', async ( req, res ) => {
+  const id = routeId( req.params.id );
+  const index = getInteger( req.params.index, 0 );
+
+  if ( index === undefined ) fail( 400, 'Invalid frame index' );
+  if ( ! getMediaRecord( id ) ) fail( 404, 'Media not found' );
+
+  const asset = db.prepare( `
+    SELECT id, media_id, asset_type, relative_path, width, height, metadata_json, created_at
+    FROM media_assets
+    WHERE media_id = ? AND asset_type = 'frames'
+  ` ).get( id ) as AssetRecord | undefined;
+
+  if ( ! asset ) fail( 404, 'Frames asset not found' );
+
+  const manifest = await getFramesManifest( asset );
+  const frame = manifest.frames.find( item => item.index === index );
+  if ( ! frame ) fail( 404, 'Frame not found' );
+  const path = assetStorage.absolutePath( frame.path );
+
+  try {
+    const info = await stat( path );
+    if ( ! info.isFile() ) fail( 404, 'Frame file not found' );
+  } catch {
+    fail( 404, 'Frame file not found' );
+  }
+
+  sendAssetFile( path, res, 'image/webp' );
+} );
+
+api.get( '/media/:id/stream', streamMedia );
+api.head( '/media/:id/stream', streamMedia );
