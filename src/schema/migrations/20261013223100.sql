@@ -27,4 +27,12 @@ CREATE TABLE sessions (
 CREATE INDEX sessions_user_idx ON sessions ( user_id );
 CREATE INDEX sessions_expiry_idx ON sessions ( expires_at );
 
+CREATE TABLE roots (
+  id INTEGER PRIMARY KEY,
+  root_path TEXT NOT NULL UNIQUE,
+  is_enabled INTEGER NOT NULL DEFAULT 1 CHECK ( enabled IN ( 0, 1 ) ),
+  scanned_at TEXT,
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+);
+
 COMMIT;
