@@ -173,3 +173,12 @@ function serializeMedia ( media: MediaRecord ) {
     updatedAt: media.updated_at
   };
 }
+
+function getJobRecord ( id: number ) : JobRecord | undefined {
+  return db.prepare( `
+    SELECT id, media_id, job_type, status, priority, attempts, max_attempts,
+      available_at_ms, locked_at_ms, last_error, created_at, updated_at
+    FROM media_jobs
+    WHERE id = ?
+  ` ).get( id ) as JobRecord | undefined;
+}
