@@ -9,6 +9,58 @@ export class Database {
   private connection: DatabaseSync | null = null;
   private transactionDepth = 0;
 
+  private migrate () : void {
+    const db = this.db;
+    const migrationsPath = resolve( 'src/schema/migrations' );
+
+    db.exec( `
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        name TEXT PRIMARY KEY,
+        checksum TEXT NOT NULL,
+        applied_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+      );
+    ` );
+
+    if ( ! existsSync( migrationsPath ) )
+      throw new Error( `The migrations directory does not exist: ${ migrationsPath }` );
+
+    const files = readdirSync( migrationsPath )
+      .filter( ( name ) => /^\d+__.*\.sql$/i.test( name ) )
+      .sort( ( a, b ) => a.localeCompare( b, 'en' ) );
+
+    for ( const name of files ) {
+      const path = join( migrationsPath, name );
+      const sql = readFileSync( path, 'utf8' );
+      const checksum = createHash( 'sha256' ).update( sql ).digest( 'hex' );
+      const existing = db.prepare( `
+        SELECT checksum
+        FROM schema_migrations
+        WHERE name = ?
+      ` ).get( name );
+
+      if ( existing && typeof existing === 'object' && 'checksum' in existing ) {
+        if ( existing.checksum !== checksum )
+          throw new Error( `An already applied migration has been modified: ${ name }` );
+
+        continue;
+      }
+
+      const migration = sql
+        .replace( /^\s*PRAGMA\s+foreign_keys\s*=\s*ON\s*;\s*/gim, '' )
+        .replace( /^\s*BEGIN\s+IMMEDIATE\s*;\s*/gim, '' )
+        .replace( /^\s*COMMIT\s*;\s*$/gim, '' );
+
+      this.transaction( ( connection ) => {
+        connection.exec( migration );
+
+        connection.prepare( `
+          INSERT INTO schema_migrations ( name, checksum )
+          VALUES ( ?, ? )
+        ` ).run( name, checksum );
+      } );
+    }
+  }
+
   public get isOpen () : boolean {
     return this.connection !== null;
   }
