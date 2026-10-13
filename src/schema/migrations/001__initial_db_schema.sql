@@ -103,3 +103,22 @@ CREATE INDEX media_duration_idx ON media ( duration_ms );
 CREATE INDEX media_rating_idx ON media ( rating );
 CREATE INDEX media_released_idx ON media ( released_at );
 CREATE INDEX media_hash_idx ON media ( file_hash );
+
+
+-- ============================================================
+-- 4. Additional metadata
+-- ============================================================
+
+CREATE TABLE media_metadata (
+  id INTEGER PRIMARY KEY,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  key TEXT NOT NULL COLLATE NOCASE,
+  value TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'manual' CHECK ( source IN ( 'manual', 'scan', 'import' ) ),
+  updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  UNIQUE ( media_id, key, source )
+);
+
+CREATE INDEX media_metadata_key_value_idx ON media_metadata ( key, value );
+CREATE INDEX media_metadata_media_idx ON media_metadata ( media_id );
