@@ -122,3 +122,37 @@ CREATE TABLE media_metadata (
 
 CREATE INDEX media_metadata_key_value_idx ON media_metadata ( key, value );
 CREATE INDEX media_metadata_media_idx ON media_metadata ( media_id );
+
+
+-- ============================================================
+-- 5. Tags and categories
+-- ============================================================
+
+CREATE TABLE tags (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL COLLATE NOCASE UNIQUE
+);
+
+CREATE TABLE media_tags (
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  tag_id INTEGER NOT NULL REFERENCES tags ( id ) ON DELETE CASCADE,
+  PRIMARY KEY ( media_id, tag_id )
+);
+
+CREATE INDEX media_tags_tag_idx ON media_tags ( tag_id, media_id );
+
+CREATE TABLE categories (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL COLLATE NOCASE UNIQUE,
+  parent_id INTEGER REFERENCES categories ( id ) ON DELETE SET NULL
+);
+
+CREATE INDEX categories_parent_idx ON categories ( parent_id );
+
+CREATE TABLE media_categories (
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  category_id INTEGER NOT NULL REFERENCES categories ( id ) ON DELETE CASCADE,
+  PRIMARY KEY ( media_id, category_id )
+);
+
+CREATE INDEX media_categories_category_idx ON media_categories ( category_id, media_id );
