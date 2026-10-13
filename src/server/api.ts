@@ -108,3 +108,22 @@ function getInteger ( value: unknown, min = 1, max = Number.MAX_SAFE_INTEGER ) :
   const parsed = typeof value === 'number' ? value : Number( value );
   return Number.isSafeInteger( parsed ) && parsed >= min && parsed <= max ? parsed : undefined;
 }
+
+function routeId ( value: string | undefined, name = 'id' ) : number {
+  const id = getInteger( value );
+
+  if ( id === undefined ) fail( 400, `Invalid ${ name }` );
+  return id;
+}
+
+function getBody ( req: Request ) : Record< string, unknown > {
+  if ( ! req.body || typeof req.body !== 'object' || Array.isArray( req.body ) )
+    fail( 400, 'A JSON object is required' );
+
+  return req.body as Record< string, unknown >;
+}
+
+function parseJson ( value: string ) : unknown {
+  try { return JSON.parse( value ) }
+  catch { return {} }
+}
