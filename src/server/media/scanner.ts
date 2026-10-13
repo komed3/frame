@@ -53,10 +53,12 @@ const extensions: Record< string, { type: MediaType, mime: string } > = {
 
 
 export class MediaScanner {
-  private async hashFile ( path: string, size: number, mtimeMs: number ) : Promise< string > {
+  private async hashFile ( path: string, size: number, mtimeMs: number, signal: AbortSignal ) : Promise< string > {
+    signal.throwIfAborted();
     const file = await open( path );
 
     try {
+      signal.throwIfAborted();
       const initialStat = await file.stat();
 
       if ( initialStat.size !== size || initialStat.mtimeMs !== mtimeMs )
@@ -70,9 +72,13 @@ export class MediaScanner {
       ];
 
       for ( const offset of [ ...new Set( offsets ) ] ) {
+        signal.throwIfAborted();
+
         const length = Math.min( sampleSize, size - offset );
         const buffer = Buffer.allocUnsafe( length );
         const { bytesRead } = await file.read( buffer, 0, length, offset );
+
+        signal.throwIfAborted();
 
         if ( bytesRead !== length ) throw new Error( `Incomplete read while hashing: ${ path }` );
 
@@ -81,6 +87,7 @@ export class MediaScanner {
       }
 
       const finalStat = await file.stat();
+      signal.throwIfAborted();
 
       if ( finalStat.size !== size || finalStat.mtimeMs !== mtimeMs )
         throw new Error( `File changed while hashing: ${ path }` );
@@ -93,23 +100,27 @@ export class MediaScanner {
 
   private async scanDirectory (
     root: MediaRoot, directory: string, existingByPath: Map< string, ExistingMedia >,
-    files: ScannedFile[], result: ScanResult, progress: { count: number }
+    files: ScannedFile[], result: ScanResult, progress: { count: number }, signal: AbortSignal
   ) : Promise< void > {
+    signal.throwIfAborted();
     let entries;
 
     try { entries = await readdir( directory, { withFileTypes: true } ) }
     catch ( err ) {
+      if ( signal.aborted ) throw err;
+
       result.errors++;
       console.error( `Failed to scan directory ${ directory }:`, err );
       return;
     }
 
     for ( const entry of entries ) {
+      signal.throwIfAborted();
       const path = join( directory, entry.name );
 
       if ( entry.isSymbolicLink() ) { result.ignored++; continue }
       if ( entry.isDirectory() ) {
-        await this.scanDirectory( root, path, existingByPath, files, result, progress );
+        await this.scanDirectory( root, path, existingByPath, files, result, progress, signal );
         continue;
       }
 
@@ -122,14 +133,19 @@ export class MediaScanner {
       if ( ! media ) { result.ignored++; continue }
 
       try {
+        signal.throwIfAborted();
         const file = await stat( path );
+        signal.throwIfAborted();
+
         const rootRelativePath = relative( root.path, path ).split( sep ).join( '/' );
         const relativePath = `${ root.id }/${ rootRelativePath }`;
         const previous = existingByPath.get( relativePath );
 
         const hash = previous?.content_hash?.startsWith( `${ hashVersion }:` ) &&
           previous.file_size === file.size && previous.file_mtime_ms === file.mtimeMs
-          ? previous.content_hash : await this.hashFile( path, file.size, file.mtimeMs );
+          ? previous.content_hash : await this.hashFile( path, file.size, file.mtimeMs, signal );
+
+        signal.throwIfAborted();
 
         files.push( {
           root, path, relativePath, rootRelativePath, fileName,
@@ -139,15 +155,22 @@ export class MediaScanner {
 
         result.discovered++;
       } catch ( err ) {
+        if ( signal.aborted ) throw err;
+
         result.errors++;
         console.error( `Failed to register media file ${ path }:`, err );
       }
 
-      if ( ++progress.count % 100 === 0 ) await new Promise( resolve => setImmediate( resolve ) );
+      if ( ++progress.count % 100 === 0 ) {
+        signal.throwIfAborted();
+        await new Promise( resolve => setImmediate( resolve ) );
+      }
     }
   }
 
-  public async scan ( roots: MediaRoot[] ) : Promise< ScanResult > {
+  public async scan ( roots: MediaRoot[], signal: AbortSignal ) : Promise< ScanResult > {
+    signal.throwIfAborted();
+
     const result: ScanResult = { discovered: 0, ignored: 0, errors: 0 };
     const files: ScannedFile[] = [], rootIds = roots.map( root => root.id );
 
@@ -158,26 +181,43 @@ export class MediaScanner {
       FROM media
     ` ).all() as unknown as ExistingMedia[];
 
+    signal.throwIfAborted();
+
     const existingByPath = new Map( existing.map( media => [ media.relative_path, media ] ) );
     const progress = { count: 0 };
 
-    for ( const root of roots ) await this.scanDirectory( root, root.path, existingByPath, files, result, progress );
+    for ( const root of roots ) {
+      signal.throwIfAborted();
+      await this.scanDirectory( root, root.path, existingByPath, files, result, progress, signal );
+    }
+
+    signal.throwIfAborted();
+
     if ( result.errors > 0 ) return result;
 
     const scannedPaths = new Set( files.map( file => file.relativePath ) );
     const hashCounts = new Map< string, number >();
     const existingHashCounts = new Map< string, number >();
 
-    for ( const file of files ) hashCounts.set( file.hash, ( hashCounts.get( file.hash ) || 0 ) + 1 );
+    for ( const file of files ) {
+      signal.throwIfAborted();
+      hashCounts.set( file.hash, ( hashCounts.get( file.hash ) || 0 ) + 1 );
+    }
 
-    for ( const media of existing ) if ( media.content_hash ) existingHashCounts.set(
-      media.content_hash, ( existingHashCounts.get( media.content_hash ) || 0 ) + 1
-    );
+    for ( const media of existing ) {
+      signal.throwIfAborted();
+
+      if ( media.content_hash ) existingHashCounts.set(
+        media.content_hash, ( existingHashCounts.get( media.content_hash ) || 0 ) + 1
+      );
+    }
 
     const matchedIds = new Set< number >();
     const matchedFiles = new Map< ScannedFile, ExistingMedia >();
 
     for ( const file of files ) {
+      signal.throwIfAborted();
+
       const previous = existingByPath.get( file.relativePath );
 
       if ( previous ) {
@@ -187,6 +227,8 @@ export class MediaScanner {
     }
 
     for ( const file of files ) {
+      signal.throwIfAborted();
+
       if ( matchedFiles.has( file ) ) continue;
       if ( hashCounts.get( file.hash ) !== 1 ) continue;
       if ( existingHashCounts.get( file.hash ) !== 1 ) continue;
@@ -234,10 +276,13 @@ export class MediaScanner {
       )
     ` );
 
+    signal.throwIfAborted();
     db.exec( 'BEGIN IMMEDIATE' );
 
     try {
       for ( const media of existing ) {
+        signal.throwIfAborted();
+
         if ( ! rootIds.includes( media.media_root_id as number ) ) continue;
         if ( scannedPaths.has( media.relative_path ) ) continue;
 
@@ -254,6 +299,8 @@ export class MediaScanner {
       }
 
       for ( const file of files ) {
+        signal.throwIfAborted();
+
         const previous = matchedFiles.get( file );
         const metadataChanged = ! previous || previous.file_size !== file.size ||
           previous.file_mtime_ms !== file.mtimeMs || previous.content_hash !== file.hash ||
@@ -287,8 +334,8 @@ export class MediaScanner {
         WHERE id = ?
       ` );
 
-      for ( const root of roots ) updateRoot.run( root.id );
-
+      for ( const root of roots ) { signal.throwIfAborted(), updateRoot.run( root.id ) }
+      signal.throwIfAborted();
       db.exec( 'COMMIT' );
     } catch ( err ) {
       db.exec( 'ROLLBACK' );
