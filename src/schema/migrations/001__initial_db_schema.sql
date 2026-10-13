@@ -58,6 +58,7 @@ CREATE TABLE media (
   size_bytes INTEGER NOT NULL DEFAULT 0 CHECK ( size_bytes >= 0 ),
   modified_at TEXT,
   file_hash TEXT,
+  fingerprint TEXT,
   available INTEGER NOT NULL DEFAULT 1 CHECK ( available IN ( 0, 1 ) ),
 
   -- Human-readable metadata
@@ -168,7 +169,6 @@ CREATE TABLE assets (
   kind TEXT NOT NULL CHECK ( kind IN (
     'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle'
   ) ),
-  variant TEXT NOT NULL DEFAULT 'default',
   path TEXT NOT NULL UNIQUE,
   fingerprint TEXT,
   mime_type TEXT,
