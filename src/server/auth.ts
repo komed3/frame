@@ -84,3 +84,7 @@ export async function verifyPassword ( password: string, storedHash: string ) : 
     return false;
   }
 }
+
+function hashToken ( token: string ) : string {
+  return createHash( 'sha256' ).update( token ).digest( 'hex' );
+}
