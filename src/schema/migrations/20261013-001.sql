@@ -1,5 +1,5 @@
 -- Frame: initial database migration (001)
--- Date: 26/10/13 22:31
+-- Date: 26/10/13; Version 2.0.0
 -- SQLite. Apply once to a new database.
 
 PRAGMA foreign_keys = ON;
