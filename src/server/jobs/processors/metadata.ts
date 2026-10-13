@@ -42,11 +42,15 @@ class MetadataProcessor {
     return path;
   }
 
-  private async probe ( path: string, mediaType: MediaSourceRecord[ 'media_type' ] ) : Promise< MediaMetadata > {
+  private async probe ( path: string, mediaType: MediaSourceRecord[ 'media_type' ], signal: AbortSignal ) : Promise< MediaMetadata > {
+    signal.throwIfAborted();
+
     const { stdout } = await execFileAsync(
       'ffprobe', [ '-v', 'error', '-show_format', '-show_streams', '-of', 'json', path ],
-      { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024 }
+      { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024, signal }
     );
+
+    signal.throwIfAborted();
 
     const probe = JSON.parse( stdout ) as ProbeData;
     const streams = probe.streams ?? [], format = probe.format ?? {};
@@ -126,10 +130,13 @@ class MetadataProcessor {
     };
   }
 
-  private async readTextMetadata ( path: string, size: number ) : Promise< MediaMetadata > {
+  private async readTextMetadata ( path: string, size: number, signal: AbortSignal ) : Promise< MediaMetadata > {
+    signal.throwIfAborted();
     const file = await open( path );
 
     try {
+      signal.throwIfAborted();
+
       const buffer = Buffer.alloc( 4096 );
       const { bytesRead } = await file.read( buffer, 0, buffer.length, 0 );
       const sample = buffer.subarray( 0, bytesRead );
@@ -143,6 +150,8 @@ class MetadataProcessor {
         catch { encoding = 'Windows-1252' }
       }
 
+      signal.throwIfAborted();
+
       return {
         durationMs: null, width: null, height: null, frameRate: null,
         bitrate: null, container: 'text', videoCodec: null, audioCodec: null,
@@ -155,9 +164,9 @@ class MetadataProcessor {
     }
   }
 
-  public async process ( job: MediaJob ) : Promise< void > {
-    if ( job.job_type !== 'metadata' || job.media_id === null )
-      throw new Error( 'Invalid metadata job' );
+  public async process ( job: MediaJob, signal: AbortSignal ) : Promise< void > {
+    if ( job.job_type !== 'metadata' || job.media_id === null ) throw new Error( 'Invalid metadata job' );
+    signal.throwIfAborted();
 
     const media = db.prepare( `
       SELECT media.id, media.media_type, media.file_name, media.file_size,
@@ -173,12 +182,16 @@ class MetadataProcessor {
     const path = this.getPath( media );
     const info = await stat( path );
 
+    signal.throwIfAborted();
+
     if ( info.size !== media.file_size || ( media.file_mtime_ms !== null && info.mtimeMs !== media.file_mtime_ms ) )
       throw new Error( `Media changed since scan: ${ path }` );
 
     const metadata = media.media_type === 'text'
-      ? await this.readTextMetadata( path, info.size )
-      : await this.probe( path, media.media_type );
+      ? await this.readTextMetadata( path, info.size, signal )
+      : await this.probe( path, media.media_type, signal );
+
+    signal.throwIfAborted();
 
     db.prepare( `
       UPDATE media SET
@@ -201,5 +214,5 @@ class MetadataProcessor {
 
 
 export const metadataProcessor = new MetadataProcessor();
-export const processMetadataJob = ( job: MediaJob ) : Promise< void > =>
-  metadataProcessor.process( job );
+export const processMetadataJob = ( job: MediaJob, signal: AbortSignal ) : Promise< void > =>
+  metadataProcessor.process( job, signal );
