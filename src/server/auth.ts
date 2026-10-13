@@ -119,3 +119,22 @@ export function createSession ( userId: number ) : { token: string, expiresAt: s
 export function revokeSession ( token: string ) : void {
   db.prepare( 'DELETE FROM sessions WHERE token_hash = ?' ).run( hashToken( token ) );
 }
+
+export function setSessionCookie ( res: Response, token: string ) : void {
+  const maxAge = Math.floor( sessionLifetimeMs / 1000 );
+  const secure = process.env.FRAME_COOKIE_SECURE === '1' ? '; Secure' : '';
+
+  res.setHeader(
+    'Set-Cookie',
+    `${ cookieName }=${ token }; Path=/; HttpOnly; SameSite=Strict; Max-Age=${ maxAge }${ secure }`
+  );
+}
+
+export function clearSessionCookie ( res: Response ) : void {
+  const secure = process.env.FRAME_COOKIE_SECURE === '1' ? '; Secure' : '';
+
+  res.setHeader(
+    'Set-Cookie',
+    `${ cookieName }=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${ secure }`
+  );
+}
