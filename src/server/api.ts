@@ -16,3 +16,16 @@ import { readFile, stat } from 'node:fs/promises';
 import { relative, resolve, sep } from 'node:path';
 
 
+const api = Router();
+
+const mediaTypes: MediaType[] = [ 'video', 'audio', 'image', 'text' ];
+const assetTypes: MediaAssetType[] = [ 'poster', 'thumb', 'frames', 'wave', 'text' ];
+const jobTypes: MediaJobType[] = [ 'scan', 'metadata', ...assetTypes ];
+const jobStatuses: MediaJobStatus[] = [ 'pending', 'running', 'completed', 'failed' ];
+
+
+class ApiError extends Error {
+  public constructor ( public readonly status: number, message: string ) {
+    super( message );
+  }
+}
