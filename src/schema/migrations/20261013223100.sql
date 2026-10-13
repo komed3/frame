@@ -24,4 +24,7 @@ CREATE TABLE sessions (
   last_seen_at TEXT
 );
 
+CREATE INDEX sessions_user_idx ON sessions ( user_id );
+CREATE INDEX sessions_expiry_idx ON sessions ( expires_at );
+
 COMMIT;
