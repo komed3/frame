@@ -42,6 +42,10 @@ function deriveKey (
   } );
 }
 
+function hashToken ( token: string ) : string {
+  return createHash( 'sha256' ).update( token ).digest( 'hex' );
+}
+
 
 export async function hashPassword ( password: string ) : Promise< string > {
   const salt = randomBytes( 16 );
@@ -85,6 +89,14 @@ export async function verifyPassword ( password: string, storedHash: string ) : 
   }
 }
 
-function hashToken ( token: string ) : string {
-  return createHash( 'sha256' ).update( token ).digest( 'hex' );
+export function readSessionToken ( req: Request ) : string | undefined {
+  const cookie = req.headers.cookie;
+  if ( ! cookie ) return;
+
+  for ( const part of cookie.split( ';' ) ) {
+    const separator = part.indexOf( '=' );
+
+    if ( separator < 0 ) continue;
+    if ( part.slice( 0, separator ).trim() === cookieName ) return part.slice( separator + 1 ).trim();
+  }
 }
