@@ -78,6 +78,11 @@ interface AssetRecord {
   created_at: string;
 }
 
+interface ByteRange {
+  start: number;
+  end: number;
+}
+
 
 const api = Router();
 
