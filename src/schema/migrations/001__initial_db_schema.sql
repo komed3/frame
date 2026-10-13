@@ -234,3 +234,29 @@ CREATE UNIQUE INDEX jobs_global_active_idx ON jobs ( kind )
   WHERE root_id IS NULL
     AND media_id IS NULL
     AND status IN ( 'pending', 'running' );
+
+
+-- ============================================================
+-- 8. User preferences and playback progress
+-- ============================================================
+
+CREATE TABLE user_preferences (
+  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  key TEXT NOT NULL,
+  value_json TEXT NOT NULL CHECK ( json_valid( value_json ) ),
+  updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  PRIMARY KEY ( user_id, key )
+);
+
+CREATE TABLE progress (
+  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  position_ms INTEGER NOT NULL DEFAULT 0 CHECK ( position_ms >= 0 ),
+  completed INTEGER NOT NULL DEFAULT 0 CHECK ( completed IN ( 0, 1 ) ),
+  updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  PRIMARY KEY ( user_id, media_id )
+);
+
+CREATE INDEX progress_recent_idx ON progress ( user_id, updated_at DESC );
