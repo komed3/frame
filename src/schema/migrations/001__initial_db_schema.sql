@@ -156,3 +156,28 @@ CREATE TABLE media_categories (
 );
 
 CREATE INDEX media_categories_category_idx ON media_categories ( category_id, media_id );
+
+
+-- ============================================================
+-- 6. Generated assets
+-- ============================================================
+
+CREATE TABLE assets (
+  id INTEGER PRIMARY KEY,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK ( kind IN ( 'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle' ) ),
+  variant TEXT NOT NULL DEFAULT 'default',
+  path TEXT NOT NULL UNIQUE,
+  fingerprint TEXT,
+  mime_type TEXT,
+  size_bytes INTEGER CHECK ( size_bytes IS NULL OR size_bytes >= 0 ),
+  width INTEGER CHECK ( width IS NULL OR width > 0 ),
+  height INTEGER CHECK ( height IS NULL OR height > 0 ),
+  data_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( data_json ) ),
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  UNIQUE ( media_id, kind, variant )
+);
+
+CREATE INDEX assets_media_idx ON assets ( media_id );
+CREATE INDEX assets_kind_idx ON assets ( kind );
