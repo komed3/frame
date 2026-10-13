@@ -126,4 +126,4 @@ export interface MediaMetadata {
   metadata: Record<string, unknown>;
 }
 
-export type JobProcessor = ( job: MediaJob ) => Promise< void >;
+export type JobProcessor = ( job: MediaJob, signal: AbortSignal ) => Promise< void >;
