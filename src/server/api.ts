@@ -444,3 +444,74 @@ api.get( '/auth/me', ( req, res ) => {
     sessionId: req.user!.sessionId
   } );
 } );
+
+
+// --- roots ---
+
+api.get( '/roots', ( _req, res ) => {
+  const roots = db.prepare( `
+    SELECT roots.id, roots.path, roots.enabled, roots.last_scan_at AS lastScanAt,
+      roots.created_at AS createdAt, COUNT( media.id ) AS mediaCount
+    FROM media_roots AS roots
+    LEFT JOIN media ON media.media_root_id = roots.id AND media.is_available = 1
+    GROUP BY roots.id
+    ORDER BY roots.id
+  ` ).all();
+
+  res.json( { items: roots } );
+} );
+
+
+api.post( '/roots', ( req, res ) => {
+  const body = getBody( req );
+  const path = getString( body.path )?.trim();
+
+  if ( ! path ) fail( 400, 'Root path is required' );
+
+  let id: number;
+
+  try { id = mediaRoots.add( path ) }
+  catch ( err ) {
+    const message = err instanceof Error ? err.message : 'Invalid root path';
+    fail( 400, message );
+  }
+
+  const root = db.prepare( `
+    SELECT id, path, enabled, last_scan_at AS lastScanAt, created_at AS createdAt
+    FROM media_roots
+    WHERE id = ?
+  ` ).get( id );
+
+  res.status( 201 ).json( { root } );
+} );
+
+
+api.patch( '/roots/:id', ( req, res ) => {
+  const id = routeId( req.params.id );
+  const body = getBody( req );
+
+  if ( typeof body.enabled !== 'boolean' ) fail( 400, 'The enabled property must be a boolean' );
+
+  const existing = db.prepare( 'SELECT id FROM media_roots WHERE id = ?' ).get( id );
+  if ( ! existing ) fail( 404, 'Media root not found' );
+
+  mediaRoots.setEnabled( id, body.enabled );
+  res.json( { id, enabled: body.enabled } );
+} );
+
+
+api.delete( '/roots/:id', ( req, res ) => {
+  const id = routeId( req.params.id );
+  const existing = db.prepare( 'SELECT id FROM media_roots WHERE id = ?' ).get( id );
+  if ( ! existing ) fail( 404, 'Media root not found' );
+
+  const count = db.prepare( `
+    SELECT COUNT(*) AS count
+    FROM media
+    WHERE media_root_id = ?
+  ` ).get( id ) as { count: number };
+
+  if ( count.count > 0 ) fail( 409, 'This root still has media records. Disable it instead or remove its media records first.' );
+  db.prepare( 'DELETE FROM media_roots WHERE id = ?' ).run( id );
+  res.status( 204 ).end();
+} );
