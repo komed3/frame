@@ -345,3 +345,7 @@ async function streamMedia ( req: Request, res: Response ) : Promise< void > {
 
   stream.pipe( res );
 }
+
+function getFramesManifest ( asset: AssetRecord ) : Promise< FramesManifest > {
+  return readFile( getAssetPath( asset ), 'utf8' ).then( value => JSON.parse( value ) as FramesManifest );
+}
