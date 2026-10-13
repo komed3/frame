@@ -144,7 +144,7 @@ CREATE TABLE media_metadata (
   media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   key TEXT NOT NULL COLLATE NOCASE,
   value TEXT NOT NULL,
-  source TEXT NOT NULL DEFAULT 'manual' CHECK ( source IN ( 'manual', 'scan', 'import' ) ),
+  source TEXT NOT NULL DEFAULT 'manual' CHECK ( source IN ( 'manual', 'scan' ) ),
   updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
 
   UNIQUE ( media_id, key, source )
