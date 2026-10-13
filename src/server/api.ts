@@ -92,3 +92,19 @@ class ApiError extends Error {
     super( message );
   }
 }
+
+
+function fail ( status: number, message: string ) : never {
+  throw new ApiError( status, message );
+}
+
+function getString ( value: unknown ) : string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function getInteger ( value: unknown, min = 1, max = Number.MAX_SAFE_INTEGER ) : number | undefined {
+  if ( typeof value !== 'string' && typeof value !== 'number' ) return;
+
+  const parsed = typeof value === 'number' ? value : Number( value );
+  return Number.isSafeInteger( parsed ) && parsed >= min && parsed <= max ? parsed : undefined;
+}
