@@ -260,3 +260,22 @@ CREATE TABLE progress (
 );
 
 CREATE INDEX progress_recent_idx ON progress ( user_id, updated_at DESC );
+
+
+-- ============================================================
+-- 9. Playback history
+-- ============================================================
+
+CREATE TABLE plays (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  session_id INTEGER REFERENCES sessions ( id ) ON DELETE SET NULL,
+  started_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+  ended_at TEXT,
+  watched_ms INTEGER NOT NULL DEFAULT 0 CHECK ( watched_ms >= 0 ),
+  completed INTEGER NOT NULL DEFAULT 0 CHECK ( completed IN ( 0, 1 ) )
+);
+
+CREATE INDEX plays_user_recent_idx ON plays ( user_id, started_at DESC );
+CREATE INDEX plays_media_recent_idx ON plays ( media_id, started_at DESC );
