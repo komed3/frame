@@ -198,6 +198,7 @@ CREATE TABLE assets (
   kind TEXT NOT NULL CHECK ( kind IN (
     'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle'
   ) ),
+  variant TEXT NOT NULL DEFAULT 'default'
   path TEXT NOT NULL UNIQUE,
   fingerprint TEXT,
   mime_type TEXT,
