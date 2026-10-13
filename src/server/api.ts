@@ -1,14 +1,12 @@
-import { db } from '@/src/server/db';
 import {
   clearSessionCookie, createSession, hashPassword, readSessionToken,
   requireSession, revokeSession, setSessionCookie, verifyPassword
 } from '@/src/server/auth';
-import { jobQueue, enqueueJob } from '@/src/server/jobs/queue';
+import { db } from '@/src/server/db';
+import { enqueueJob } from '@/src/server/jobs/queue';
 import { assetStorage } from '@/src/server/media/assets';
 import { mediaRoots } from '@/src/server/media/roots';
-import type {
-  FramesManifest, MediaAssetType, MediaJobStatus, MediaJobType, MediaType
-} from '@/src/shared/types';
+import type { FramesManifest, MediaAssetType, MediaJobStatus, MediaJobType, MediaType } from '@/src/shared/types';
 import type { NextFunction, Request, Response } from 'express';
 import { Router } from 'express';
 import { createReadStream } from 'node:fs';
@@ -1043,7 +1041,6 @@ api.put( '/settings/:key', ( req, res ) => {
   res.json( { key, value: body.value } );
 } );
 
-
 api.delete( '/settings/:key', ( req, res ) => {
   const key = req.params.key;
   if ( ! /^[a-zA-Z0-9._-]{1,100}$/.test( key ) ) fail( 400, 'Invalid setting key' );
@@ -1055,3 +1052,22 @@ api.delete( '/settings/:key', ( req, res ) => {
 
   res.status( 204 ).end();
 } );
+
+
+// --- errors and unknown endpoints ---
+
+api.use( ( _req, res ) => res.status( 404 ).json( { error: 'API endpoint not found' } ) );
+
+api.use( ( err: unknown, _req: Request, res: Response, _next: NextFunction ) => {
+  const error = err as { status?: number, statusCode?: number, message?: string };
+  const status = error.status ?? error.statusCode ?? 500;
+
+  if ( status >= 500 ) console.error( 'API request failed:', err );
+
+  res.status( status ).json( {
+    error: status >= 500 ? 'Internal server error' : error.message ?? 'Request failed'
+  } );
+} );
+
+
+export default api;
