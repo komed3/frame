@@ -40,17 +40,21 @@ export class MediaJobProcessor {
     }
   }
 
-  public async process ( job: MediaJob ) : Promise< void > {
+  public async process ( job: MediaJob, signal: AbortSignal ) : Promise< void > {
+    signal.throwIfAborted();
+
     switch ( job.job_type ) {
-      case 'scan': return await processScanJob( job );
+      case 'scan': return await processScanJob( job, signal );
 
       case 'metadata':
-        await processMetadataJob( job );
+        await processMetadataJob( job, signal );
+        signal.throwIfAborted();
+
         if ( job.media_id !== null ) this.enqueueMediaAssets( job.media_id );
         return;
 
       case 'poster': case 'thumb': case 'frames': case 'wave': case 'text':
-        return await processAssetJob( job );
+        return await processAssetJob( job, signal );
 
       default: throw new Error( `Unsupported media job type: ${ job.job_type }` );
     }
@@ -59,4 +63,5 @@ export class MediaJobProcessor {
 
 
 export const mediaJobProcessor = new MediaJobProcessor();
-export const processMediaJob: JobProcessor = ( job: MediaJob ) => mediaJobProcessor.process( job );
+export const processMediaJob: JobProcessor = ( job: MediaJob, signal: AbortSignal ) =>
+  mediaJobProcessor.process( job, signal );
