@@ -7,7 +7,7 @@ export class Config {
     const value = process.env.NODE_ENV?.trim() || 'dev';
 
     if ( ! [ 'development', 'dev', 'test', 'prod', 'production' ].includes( value ) )
-      throw new Error( `Invalid NODE_ENV: ${ value }` );
+      throw new Error( `Invalid environment name: ${ value }` );
 
     return value;
   }
