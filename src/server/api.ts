@@ -16,6 +16,69 @@ import { readFile, stat } from 'node:fs/promises';
 import { relative, resolve, sep } from 'node:path';
 
 
+interface MediaRecord {
+  id: number;
+  relative_path: string;
+  media_root_id: number | null;
+  root_relative_path: string | null;
+  file_name: string;
+  media_type: MediaType;
+  mime_type: string | null;
+  title: string | null;
+  description: string | null;
+  file_size: number;
+  file_mtime_ms: number | null;
+  content_hash: string | null;
+  is_available: number;
+  missing_since: string | null;
+  duration_ms: number | null;
+  width: number | null;
+  height: number | null;
+  frame_rate: number | null;
+  bitrate: number | null;
+  container: string | null;
+  video_codec: string | null;
+  audio_codec: string | null;
+  sample_rate: number | null;
+  channels: number | null;
+  encoding: string | null;
+  language: string | null;
+  release_date: string | null;
+  recorded_at: string | null;
+  metadata_json: string;
+  scanned_at: string | null;
+  created_at: string;
+  updated_at: string;
+  root_path: string | null;
+}
+
+interface JobRecord {
+  id: number;
+  media_id: number | null;
+  job_type: MediaJobType;
+  status: MediaJobStatus;
+  priority: number;
+  attempts: number;
+  max_attempts: number;
+  available_at_ms: number;
+  locked_at_ms: number | null;
+  last_error: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface AssetRecord {
+  id: number;
+  media_id: number;
+  asset_type: MediaAssetType;
+  relative_path: string;
+  width: number | null;
+  height: number | null;
+  metadata_json: string;
+  created_at: string;
+}
+
+
 const api = Router();
 
 const mediaTypes: MediaType[] = [ 'video', 'audio', 'image', 'text' ];
