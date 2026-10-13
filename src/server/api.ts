@@ -127,3 +127,12 @@ function parseJson ( value: string ) : unknown {
   try { return JSON.parse( value ) }
   catch { return {} }
 }
+
+function getMediaRecord ( id: number ) : MediaRecord | undefined {
+  return db.prepare( `
+    SELECT media.*, media_roots.path AS root_path
+    FROM media
+    LEFT JOIN media_roots ON media_roots.id = media.media_root_id
+    WHERE media.id = ?
+  ` ).get( id ) as MediaRecord | undefined;
+}
