@@ -256,3 +256,92 @@ function sendAssetFile ( path: string, res: Response, contentType?: string ) : v
     res.status( 404 ).json( { error: 'Asset file not found' } );
   } );
 }
+
+function parseByteRange ( value: string, size: number ) : ByteRange | undefined {
+  const match = value.match( /^bytes=(\d*)-(\d*)$/ );
+  if ( ! match || size <= 0 || ( ! match[ 1 ] && ! match[ 2 ] ) ) return;
+
+  let start: number, end: number;
+
+  if ( ! match[ 1 ] ) {
+    const suffixLength = Number( match[ 2 ] );
+    if ( ! Number.isSafeInteger( suffixLength ) || suffixLength <= 0 ) return;
+
+    start = Math.max( 0, size - suffixLength );
+    end = size - 1;
+  } else {
+    start = Number( match[ 1 ] );
+    end = match[ 2 ] ? Number( match[ 2 ] ) : size - 1;
+    if ( ! Number.isSafeInteger( start ) || ! Number.isSafeInteger( end ) || start < 0 || end < start || start >= size ) return;
+
+    end = Math.min( end, size - 1 );
+  }
+
+  return { start, end };
+}
+
+
+async function streamMedia ( req: Request, res: Response ) : Promise< void > {
+  const id = routeId( ( req.params as any ).id );
+  const media = getMediaRecord( id );
+
+  if ( ! media ) { res.status( 404 ).json( { error: 'Media not found' } ); return }
+  if ( media.is_available !== 1 ) { res.status( 410 ).json( { error: 'Media is unavailable' } ); return }
+
+  const path = getMediaSourcePath( media );
+  let info;
+
+  try { info = await stat( path ) }
+  catch {
+    res.status( 410 ).json( { error: 'Media file is missing' } );
+    return;
+  }
+
+  if ( ! info.isFile() ) {
+    res.status( 410 ).json( { error: 'Media file is not a regular file' } );
+    return;
+  }
+
+  res.setHeader( 'Accept-Ranges', 'bytes' );
+  res.setHeader( 'Content-Type', media.mime_type || 'application/octet-stream' );
+  res.setHeader( 'Content-Disposition', 'inline' );
+  res.setHeader( 'Cache-Control', 'private, no-store' );
+  res.setHeader( 'X-Content-Type-Options', 'nosniff' );
+
+  if ( info.size === 0 ) {
+    res.status( 200 ).setHeader( 'Content-Length', '0' );
+    res.end();
+    return;
+  }
+
+  const rangeHeader = req.headers.range;
+  let start = 0, end = info.size - 1;
+
+  if ( rangeHeader ) {
+    const range = parseByteRange( rangeHeader, info.size );
+
+    if ( ! range ) {
+      res.status( 416 ).setHeader( 'Content-Range', `bytes */${ info.size }` );
+      res.end();
+      return;
+    }
+
+    start = range.start;
+    end = range.end;
+
+    res.status( 206 );
+    res.setHeader( 'Content-Range', `bytes ${ start }-${ end }/${ info.size }` );
+  }
+
+  res.setHeader( 'Content-Length', String( end - start + 1 ) );
+  if ( req.method === 'HEAD' ) { res.end(); return }
+
+  const stream = createReadStream( path, { start, end } );
+
+  stream.on( 'error', err => {
+    if ( res.headersSent ) res.destroy( err );
+    else res.status( 500 ).json( { error: 'Unable to read media file' } );
+  } );
+
+  stream.pipe( res );
+}
