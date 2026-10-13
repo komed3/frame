@@ -659,3 +659,64 @@ api.post( '/jobs/:id/retry', ( req, res ) => {
 
   res.status( 202 ).json( { job: serializeJob( updated ) } );
 } );
+
+
+// --- stats ---
+
+api.get( '/stats', ( _req, res ) => {
+  const media = db.prepare( `
+    SELECT COUNT(*) AS total,
+      SUM( CASE WHEN is_available = 1 THEN 1 ELSE 0 END ) AS available,
+      SUM( CASE WHEN is_available = 0 THEN 1 ELSE 0 END ) AS unavailable,
+      COALESCE( SUM( file_size ), 0 ) AS totalBytes,
+      COALESCE( SUM( duration_ms ), 0 ) AS totalDurationMs
+    FROM media
+  ` ).get() as {
+    total: number;
+    available: number;
+    unavailable: number;
+    totalBytes: number;
+    totalDurationMs: number;
+  };
+
+  const mediaByType = db.prepare( `
+    SELECT media_type AS type, COUNT(*) AS count
+    FROM media
+    GROUP BY media_type
+    ORDER BY media_type
+  ` ).all() as Array< { type: MediaType, count: number } >;
+
+  const roots = db.prepare( `
+    SELECT COUNT(*) AS total,
+      SUM( CASE WHEN enabled = 1 THEN 1 ELSE 0 END ) AS enabled
+    FROM media_roots
+  ` ).get() as { total: number, enabled: number };
+
+  const assets = db.prepare( 'SELECT COUNT(*) AS count FROM media_assets' ).get() as { count: number };
+
+  const jobs = db.prepare( `
+    SELECT status, COUNT(*) AS count
+    FROM media_jobs
+    GROUP BY status
+  ` ).all() as Array< { status: MediaJobStatus, count: number } >;
+
+  res.json( {
+    collectedAt: new Date().toISOString(),
+    media: {
+      total: media.total,
+      available: media.available ?? 0,
+      unavailable: media.unavailable ?? 0,
+      totalBytes: media.totalBytes,
+      totalDurationMs: media.totalDurationMs,
+      byType: mediaByType
+    },
+    roots: {
+      total: roots.total,
+      enabled: roots.enabled ?? 0
+    },
+    assets: { total: assets.count },
+    jobs: Object.fromEntries( jobStatuses.map( status => [
+      status, jobs.find( job => job.status === status )?.count ?? 0
+    ] ) )
+  } );
+} );
