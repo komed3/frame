@@ -1,8 +1,8 @@
 import { db } from '@/src/server/db';
-import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { envInteger } from '@/src/server/utils';
 import type { SessionUser } from '@/src/shared/types';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 
 declare global {
@@ -138,3 +138,42 @@ export function clearSessionCookie ( res: Response ) : void {
     `${ cookieName }=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${ secure }`
   );
 }
+
+export const requireSession: RequestHandler = ( req: Request, res: Response, next: NextFunction ) => {
+  const token = readSessionToken( req );
+
+  if ( ! token ) {
+    res.status( 401 ).json( { error: 'Authentication required' } );
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const session = db.prepare( `
+    SELECT sessions.id AS session_id, users.id AS user_id,
+      users.username, users.disabled_at
+    FROM sessions
+    JOIN users ON users.id = sessions.user_id
+    WHERE sessions.token_hash = ?
+      AND sessions.expires_at > ?
+  ` ).get( hashToken( token ), now ) as SessionRecord | undefined;
+
+  if ( ! session || session.disabled_at !== null ) {
+    revokeSession( token );
+    clearSessionCookie( res );
+
+    res.status( 401 ).json( { error: 'Session is invalid or expired' } );
+    return;
+  }
+
+  req.user = { id: session.user_id, username: session.username, sessionId: session.session_id };
+  const touchBefore = new Date( Date.now() - sessionTouchIntervalMs ).toISOString();
+
+  db.prepare( `
+    UPDATE sessions
+    SET last_seen_at = ?
+    WHERE id = ?
+      AND ( last_seen_at IS NULL OR last_seen_at < ? )
+  ` ).run( now, session.session_id, touchBefore );
+
+  next();
+};
