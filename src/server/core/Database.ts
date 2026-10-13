@@ -45,9 +45,35 @@ export class Database {
 
   public close () : void {
     if ( ! this.connection ) return;
-    if ( this.transactionDepth > 0 ) throw new Error( 'Database cannot be closed while a transaction is running' );
+
+    if ( this.transactionDepth > 0 )
+      throw new Error( 'Database cannot be closed while a transaction is running' );
 
     this.connection.close();
     this.connection = null;
+  }
+
+  public transaction < T > ( callback: ( db: DatabaseSync ) => T ) : T {
+    const db = this.db;
+    if ( this.transactionDepth > 0 ) throw new Error( 'Nested transactions are not supported' );
+
+    db.exec( 'BEGIN IMMEDIATE' );
+    this.transactionDepth++;
+
+    try {
+      const result = callback( db );
+
+      if ( result && typeof result === 'object' && 'then' in result )
+        throw new Error( 'Database transactions must execute synchronously' );
+
+      db.exec( 'COMMIT' );
+
+      return result;
+    } catch ( error ) {
+      db.exec( 'ROLLBACK' );
+      throw error;
+    } finally {
+      this.transactionDepth--;
+    }
   }
 }
