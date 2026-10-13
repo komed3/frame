@@ -28,3 +28,16 @@ const passwordBlockSize = 8;
 const passwordParallelization = 1;
 const passwordKeyLength = 64;
 const sessionTouchIntervalMs = 5 * 60 * 1000;
+
+
+function deriveKey (
+  password: string, salt: Buffer, length: number,
+  options: { N: number, r: number, p: number, maxmem: number }
+) : Promise< Buffer > {
+  return new Promise( ( resolve, reject ) => {
+    scrypt( password, salt, length, options, ( err, key ) => {
+      if ( err ) { reject( err ); return }
+      resolve( key as Buffer );
+    } );
+  } );
+}
