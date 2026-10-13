@@ -136,3 +136,40 @@ function getMediaRecord ( id: number ) : MediaRecord | undefined {
     WHERE media.id = ?
   ` ).get( id ) as MediaRecord | undefined;
 }
+
+function serializeMedia ( media: MediaRecord ) {
+  return {
+    id: media.id,
+    relativePath: media.relative_path,
+    rootId: media.media_root_id,
+    rootRelativePath: media.root_relative_path,
+    fileName: media.file_name,
+    type: media.media_type,
+    mimeType: media.mime_type,
+    title: media.title,
+    description: media.description,
+    fileSize: media.file_size,
+    fileMtimeMs: media.file_mtime_ms,
+    contentHash: media.content_hash,
+    available: media.is_available === 1,
+    missingSince: media.missing_since,
+    durationMs: media.duration_ms,
+    width: media.width,
+    height: media.height,
+    frameRate: media.frame_rate,
+    bitrate: media.bitrate,
+    container: media.container,
+    videoCodec: media.video_codec,
+    audioCodec: media.audio_codec,
+    sampleRate: media.sample_rate,
+    channels: media.channels,
+    encoding: media.encoding,
+    language: media.language,
+    releaseDate: media.release_date,
+    recordedAt: media.recorded_at,
+    metadata: parseJson( media.metadata_json ),
+    scannedAt: media.scanned_at,
+    createdAt: media.created_at,
+    updatedAt: media.updated_at
+  };
+}
