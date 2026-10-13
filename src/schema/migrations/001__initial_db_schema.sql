@@ -317,3 +317,20 @@ CREATE TABLE playlist_items (
 );
 
 CREATE INDEX playlist_items_media_idx ON playlist_items ( media_id );
+
+
+-- ============================================================
+-- 11. Markers
+-- ============================================================
+
+CREATE TABLE markers (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  position_ms INTEGER NOT NULL CHECK ( position_ms >= 0 ),
+  title TEXT,
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+);
+
+CREATE INDEX markers_media_position_idx ON markers ( media_id, position_ms );
+CREATE INDEX markers_user_idx ON markers ( user_id );
