@@ -89,24 +89,28 @@ export class MediaAssetProcessor {
     return ( probe.streams ?? [] ).some( stream => stream.disposition?.attached_pic === 1 );
   }
 
-  private async createImageAsset ( media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb' ) : Promise< void > {
+  private async createImageAsset (
+    media: MediaAssetSource, sourcePath: string, type: 'poster' | 'thumb', signal: AbortSignal
+  ) : Promise< void > {
     const relativePath = assetStorage.relativePath( type, media.id, assetStorage.fingerprint( media ), '.webp' );
     const outputPath = assetStorage.absolutePath( relativePath ), tempPath = `${ outputPath }.tmp.webp`;
     const isAudio = media.media_type === 'audio', isImage = media.media_type === 'image';
     const limit = type === 'poster' ? 1920 : 480;
     const scale = `scale=w='min(${ limit },iw)':h='min(${ limit },ih)':force_original_aspect_ratio=decrease:force_divisible_by=2`;
 
+    signal.throwIfAborted();
     await assetStorage.ensureParent( outputPath );
-    if ( isAudio && ! await this.hasAttachedPicture( sourcePath ) ) return;
+
+    if ( isAudio && ! await this.hasAttachedPicture( sourcePath, signal ) ) return;
 
     try {
       if ( isImage && extname( sourcePath ).toLowerCase() === '.svg' )
-        await this.runFfmpeg( [ '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-y', tempPath ] );
+        await this.runFfmpeg( [ '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-y', tempPath ], signal );
 
       else if ( isAudio ) await this.runFfmpeg( [
         '-i', sourcePath, '-map', '0:v:0', '-frames:v', '1', '-vf', scale,
         '-c:v', 'libwebp', '-quality', '84', '-y', tempPath
-      ] );
+      ], signal );
 
       else if ( media.media_type === 'video' ) {
         const duration = Math.max( 0, ( media.duration_ms ?? 0 ) / 1000 );
@@ -116,22 +120,24 @@ export class MediaAssetProcessor {
           '-ss', seek.toFixed( 3 ), '-i', sourcePath, '-map', '0:V:0', '-frames:v', '1',
           '-vf', scale, '-c:v', 'libwebp', '-quality', type === 'poster' ? '86' : '78',
           '-y', tempPath
-        ] );
+        ], signal );
       }
 
       else if ( isImage ) await this.runFfmpeg( [
         '-i', sourcePath, '-frames:v', '1', '-vf', scale, '-c:v', 'libwebp',
         '-quality', type === 'poster' ? '86' : '78', '-y', tempPath
-      ] );
+      ], signal );
 
       else return;
 
+      signal.throwIfAborted();
       await rename( tempPath, outputPath );
     } catch ( err ) {
       await rm( tempPath, { force: true } );
       throw err;
     }
 
+    signal.throwIfAborted();
     await this.commitAsset( media, type, relativePath, null, null, {
       purpose: type, mediaType: media.media_type
     } );
