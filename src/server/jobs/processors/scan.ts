@@ -3,8 +3,9 @@ import { mediaScanner } from '@/src/server/media/scanner';
 import type { MediaJob } from '@/src/shared/types';
 
 
-export async function processScanJob ( job: MediaJob ) : Promise< void > {
+export async function processScanJob ( job: MediaJob, signal: AbortSignal ) : Promise< void > {
   if ( job.job_type !== 'scan' || job.media_id !== null ) throw new Error( 'Invalid scan job' );
+  signal.throwIfAborted();
 
   const roots = mediaRoots.list( true );
 
@@ -13,7 +14,8 @@ export async function processScanJob ( job: MediaJob ) : Promise< void > {
     return;
   }
 
-  const result = await mediaScanner.scan( roots );
+  const result = await mediaScanner.scan( roots, signal );
+  signal.throwIfAborted();
 
   console.log(
     `Media scan finished: ${ result.discovered } files found, ` +
