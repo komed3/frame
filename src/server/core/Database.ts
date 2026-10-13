@@ -1,8 +1,8 @@
+import { Config } from '@/src/server/core/Config';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { Config } from '@/src/server/core/Config';
 
 
 export class Database {
@@ -11,7 +11,7 @@ export class Database {
 
   private migrate () : void {
     const db = this.db;
-    const migrationsPath = resolve( 'src/schema/migrations' );
+    const migrationsPath = resolve( 'schema/migrations' );
 
     db.exec( `
       CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -22,7 +22,7 @@ export class Database {
     ` );
 
     if ( ! existsSync( migrationsPath ) )
-      throw new Error( `The migrations directory does not exist: ${ migrationsPath }` );
+      throw new Error( `Migrations directory does not exist: ${ migrationsPath }` );
 
     const files = readdirSync( migrationsPath )
       .filter( ( name ) => /^\d+__.*\.sql$/i.test( name ) )
