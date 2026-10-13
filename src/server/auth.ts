@@ -100,3 +100,22 @@ export function readSessionToken ( req: Request ) : string | undefined {
     if ( part.slice( 0, separator ).trim() === cookieName ) return part.slice( separator + 1 ).trim();
   }
 }
+
+export function createSession ( userId: number ) : { token: string, expiresAt: string } {
+  const token = randomBytes( 32 ).toString( 'base64url' );
+  const expiresAt = new Date( Date.now() + sessionLifetimeMs ).toISOString();
+  const now = new Date().toISOString();
+
+  db.prepare( 'DELETE FROM sessions WHERE expires_at <= ?' ).run( now );
+
+  db.prepare( `
+    INSERT INTO sessions ( user_id, token_hash, expires_at, last_seen_at )
+    VALUES ( ?, ?, ?, ? )
+  ` ).run( userId, hashToken( token ), expiresAt, now );
+
+  return { token, expiresAt };
+}
+
+export function revokeSession ( token: string ) : void {
+  db.prepare( 'DELETE FROM sessions WHERE token_hash = ?' ).run( hashToken( token ) );
+}
