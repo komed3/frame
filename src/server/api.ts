@@ -515,3 +515,147 @@ api.delete( '/roots/:id', ( req, res ) => {
   db.prepare( 'DELETE FROM media_roots WHERE id = ?' ).run( id );
   res.status( 204 ).end();
 } );
+
+
+// --- jobs ---
+
+api.get( '/jobs', ( req, res ) => {
+  const conditions: string[] = [];
+  const params: Array< string | number > = [];
+
+  const status = getString( req.query.status );
+  const type = getString( req.query.type );
+  const mediaIdValue = getString( req.query.mediaId );
+
+  if ( status ) {
+    if ( ! jobStatuses.includes( status as MediaJobStatus ) ) fail( 400, 'Invalid job status' );
+
+    conditions.push( 'status = ?' );
+    params.push( status );
+  }
+
+  if ( type ) {
+    if ( ! jobTypes.includes( type as MediaJobType ) ) fail( 400, 'Invalid job type' );
+
+    conditions.push( 'job_type = ?' );
+    params.push( type );
+  }
+
+  if ( mediaIdValue !== undefined ) {
+    if ( mediaIdValue === 'null' ) conditions.push( 'media_id IS NULL' );
+    else {
+      const mediaId = getInteger( mediaIdValue );
+      if ( mediaId === undefined ) fail( 400, 'Invalid mediaId' );
+
+      conditions.push( 'media_id = ?' );
+      params.push( mediaId );
+    }
+  }
+
+  const limit = getInteger( getString( req.query.limit ), 1, 200 ) ?? 50;
+  const offset = getInteger( getString( req.query.offset ), 0 ) ?? 0;
+  const where = conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '';
+
+  const count = db.prepare( `
+    SELECT COUNT(*) AS count
+    FROM media_jobs
+    ${ where }
+  ` ).get( ...params ) as { count: number };
+
+  const items = db.prepare( `
+    SELECT id, media_id, job_type, status, priority, attempts, max_attempts,
+      available_at_ms, locked_at_ms, last_error, created_at, updated_at
+    FROM media_jobs
+    ${ where }
+    ORDER BY
+      CASE status
+        WHEN 'running' THEN 0
+        WHEN 'pending' THEN 1
+        WHEN 'failed' THEN 2
+        ELSE 3
+      END,
+      priority DESC, created_at DESC, id DESC
+    LIMIT ? OFFSET ?
+  ` ).all( ...params, limit, offset ) as unknown as JobRecord[];
+
+  res.json( { items: items.map( serializeJob ), total: count.count, limit, offset } );
+} );
+
+
+api.post( '/jobs', ( req, res ) => {
+  const body = getBody( req );
+  const type = getString( body.type );
+
+  if ( ! type || ! jobTypes.includes( type as MediaJobType ) ) fail( 400, 'Invalid job type' );
+
+  const jobType = type as MediaJobType;
+  const rawMediaId = body.mediaId;
+  let mediaId: number | null = null;
+
+  if ( jobType === 'scan' ) {
+    if ( rawMediaId !== undefined && rawMediaId !== null )
+      fail( 400, 'Scan jobs are global and must not specify mediaId' );
+  } else {
+    if ( typeof rawMediaId !== 'number' || ! Number.isSafeInteger( rawMediaId ) || rawMediaId < 1 )
+      fail( 400, 'A positive mediaId is required for this job type' );
+
+    mediaId = rawMediaId;
+
+    const media = db.prepare( 'SELECT id, is_available FROM media WHERE id = ?' ).get( mediaId ) as {
+      id: number, is_available: number;
+    } | undefined;
+
+    if ( ! media ) fail( 404, 'Media not found' );
+    if ( media.is_available !== 1 ) fail( 409, 'Media is unavailable' );
+  }
+
+  const priority = body.priority === undefined ? 0 : body.priority;
+  if ( typeof priority !== 'number' || ! Number.isSafeInteger( priority ) || priority < -100 || priority > 100 )
+    fail( 400, 'Priority must be an integer between -100 and 100' );
+
+  const retryFailed = body.retryFailed === undefined ? false : body.retryFailed;
+  if ( typeof retryFailed !== 'boolean' ) fail( 400, 'retryFailed must be a boolean' );
+
+  enqueueJob( mediaId, jobType, priority, retryFailed );
+
+  const job = db.prepare( `
+    SELECT id, media_id, job_type, status, priority, attempts, max_attempts,
+      available_at_ms, locked_at_ms, last_error, created_at, updated_at
+    FROM media_jobs
+    WHERE job_type = ?
+      AND ${ mediaId === null ? 'media_id IS NULL' : 'media_id = ?' }
+  ` ).get( ...[ jobType, ...( mediaId === null ? [] : [ mediaId ] ) ] ) as JobRecord | undefined;
+
+  if ( ! job ) fail( 500, 'Could not retrieve the queued job' );
+  res.status( 202 ).json( { job: serializeJob( job ) } );
+} );
+
+
+api.get( '/jobs/:id', ( req, res ) => {
+  const id = routeId( req.params.id );
+  const job = getJobRecord( id );
+
+  if ( ! job ) fail( 404, 'Job not found' );
+  res.json( { job: serializeJob( job ) } );
+} );
+
+
+api.post( '/jobs/:id/retry', ( req, res ) => {
+  const id = routeId( req.params.id );
+  const job = getJobRecord( id );
+
+  if ( ! job ) fail( 404, 'Job not found' );
+  if ( job.status === 'running' ) fail( 409, 'A running job cannot be retried' );
+
+  if ( job.status === 'pending' ) {
+    res.json( { job: serializeJob( job ) } );
+    return;
+  }
+
+  enqueueJob( job.media_id, job.job_type, job.priority, true );
+
+  const updated = getJobRecord( id );
+  if ( ! updated ) fail( 404, 'Job not found after retry' );
+
+  res.status( 202 ).json( { job: serializeJob( updated ) } );
+} );
