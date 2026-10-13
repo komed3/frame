@@ -55,3 +55,32 @@ export async function hashPassword ( password: string ) : Promise< string > {
     salt.toString( 'base64url' ), key.toString( 'base64url' )
   ].join( '$' );
 }
+
+export async function verifyPassword ( password: string, storedHash: string ) : Promise< boolean > {
+  const [ algorithm, n, r, p, saltValue, keyValue, ...extra ] = storedHash.split( '$' );
+
+  if ( algorithm !== 'scrypt' || extra.length > 0 || ! n || ! r || ! p || ! saltValue || ! keyValue )
+    return false;
+
+  const N = Number( n ), blockSize = Number( r ), parallelization = Number( p );
+
+  if (
+    ! Number.isSafeInteger( N ) || N < 2 || ! Number.isSafeInteger( blockSize ) || blockSize < 1 ||
+    ! Number.isSafeInteger( parallelization ) || parallelization < 1
+  ) return false;
+
+  try {
+    const salt = Buffer.from( saltValue, 'base64url' );
+    const expected = Buffer.from( keyValue, 'base64url' );
+
+    if ( salt.length !== 16 || expected.length !== passwordKeyLength ) return false;
+
+    const actual = await deriveKey( password, salt, expected.length, {
+      N, r: blockSize, p: parallelization, maxmem: 64 * 1024 * 1024
+    } );
+
+    return timingSafeEqual( actual, expected );
+  } catch {
+    return false;
+  }
+}
