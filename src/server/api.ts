@@ -942,3 +942,57 @@ api.get( '/media/:id/frames/:index', async ( req, res ) => {
 
 api.get( '/media/:id/stream', streamMedia );
 api.head( '/media/:id/stream', streamMedia );
+
+
+// --- per-user playback progress ---
+
+
+api.get( '/media/:id/progress', ( req, res ) => {
+  const mediaId = routeId( req.params.id );
+  const userId = req.user!.id;
+
+  if ( ! getMediaRecord( mediaId ) ) fail( 404, 'Media not found' );
+
+  const progress = db.prepare( `
+    SELECT position_ms, completed, updated_at
+    FROM playback_progress
+    WHERE user_id = ? AND media_id = ?
+  ` ).get( userId, mediaId ) as {
+    position_ms: number;
+    completed: number;
+    updated_at: string;
+  } | undefined;
+
+  res.json( {
+    mediaId,
+    positionMs: progress?.position_ms ?? 0,
+    completed: progress?.completed === 1,
+    updatedAt: progress?.updated_at ?? null
+  } );
+} );
+
+api.put( '/media/:id/progress', ( req, res ) => {
+  const mediaId = routeId( req.params.id );
+  const userId = req.user!.id;
+  const body = getBody( req );
+
+  if ( ! getMediaRecord( mediaId ) ) fail( 404, 'Media not found' );
+  const positionMs = body.positionMs;
+
+  if ( typeof positionMs !== 'number' || ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
+    fail( 400, 'positionMs must be a non-negative integer' );
+
+  const completed = body.completed === undefined ? false : body.completed;
+  if ( typeof completed !== 'boolean' ) fail( 400, 'completed must be a boolean' );
+
+  db.prepare( `
+    INSERT INTO playback_progress ( user_id, media_id, position_ms, completed )
+    VALUES ( ?, ?, ?, ? )
+    ON CONFLICT ( user_id, media_id ) DO UPDATE SET
+      position_ms = excluded.position_ms,
+      completed = excluded.completed,
+      updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+  ` ).run( userId, mediaId, positionMs, completed ? 1 : 0 );
+
+  res.json( { mediaId, positionMs, completed } );
+} );
