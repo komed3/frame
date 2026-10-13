@@ -214,3 +214,7 @@ CREATE TABLE jobs (
 
   CHECK ( root_id IS NULL OR media_id IS NULL )
 );
+
+CREATE INDEX jobs_queue_idx ON jobs ( status, run_after_ms, priority DESC, id );
+CREATE INDEX jobs_root_idx ON jobs ( root_id, created_at );
+CREATE INDEX jobs_media_idx ON jobs ( media_id, created_at );
