@@ -48,6 +48,8 @@ export class MediaAssetProcessor {
       '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
       '-max_alloc', '536870912', '-max_pixels', '89128960', ...args
     ], { timeout: ffmpegTimeoutMs, maxBuffer: 4 * 1024 * 1024, signal } );
+
+    signal.throwIfAborted();
   }
 
   private async commitAsset (
