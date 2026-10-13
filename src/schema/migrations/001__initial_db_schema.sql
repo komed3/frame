@@ -165,7 +165,9 @@ CREATE INDEX media_categories_category_idx ON media_categories ( category_id, me
 CREATE TABLE assets (
   id INTEGER PRIMARY KEY,
   media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
-  kind TEXT NOT NULL CHECK ( kind IN ( 'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle' ) ),
+  kind TEXT NOT NULL CHECK ( kind IN (
+    'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle'
+  ) ),
   variant TEXT NOT NULL DEFAULT 'default',
   path TEXT NOT NULL UNIQUE,
   fingerprint TEXT,
@@ -181,3 +183,34 @@ CREATE TABLE assets (
 
 CREATE INDEX assets_media_idx ON assets ( media_id );
 CREATE INDEX assets_kind_idx ON assets ( kind );
+
+
+-- ============================================================
+-- 7. Background jobs
+-- ============================================================
+
+CREATE TABLE jobs (
+  id INTEGER PRIMARY KEY,
+  root_id INTEGER REFERENCES roots ( id ) ON DELETE CASCADE,
+  media_id INTEGER REFERENCES media ( id ) ON DELETE CASCADE,
+
+  kind TEXT NOT NULL CHECK ( kind IN (
+    'scan', 'metadata', 'preview', 'frames', 'wave', 'text'
+  ) ),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK ( status IN (
+    'pending', 'running', 'done', 'failed', 'cancelled'
+  ) ),
+  priority INTEGER NOT NULL DEFAULT 0,
+  attempts INTEGER NOT NULL DEFAULT 0 CHECK ( attempts >= 0 ),
+  max_attempts INTEGER NOT NULL DEFAULT 3 CHECK ( max_attempts > 0 ),
+  run_after_ms INTEGER NOT NULL DEFAULT ( unixepoch() * 1000 ),
+  locked_at_ms INTEGER,
+  worker TEXT,
+  error TEXT,
+  payload_json TEXT NOT NULL DEFAULT '{}' CHECK ( json_valid( payload_json ) ),
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+  updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+  finished_at TEXT,
+
+  CHECK ( root_id IS NULL OR media_id IS NULL )
+);
