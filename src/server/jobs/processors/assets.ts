@@ -395,5 +395,5 @@ export class MediaAssetProcessor {
 
 
 export const mediaAssetProcessor = new MediaAssetProcessor();
-export const processAssetJob = ( job: MediaJob ) : Promise< void > =>
-  mediaAssetProcessor.process( job );
+export const processAssetJob = ( job: MediaJob, signal: AbortSignal ) : Promise< void > =>
+  mediaAssetProcessor.process( job, signal );
