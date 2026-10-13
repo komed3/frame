@@ -182,3 +182,56 @@ function getJobRecord ( id: number ) : JobRecord | undefined {
     WHERE id = ?
   ` ).get( id ) as JobRecord | undefined;
 }
+
+function serializeJob ( job: JobRecord ) {
+  return {
+    id: job.id,
+    mediaId: job.media_id,
+    type: job.job_type,
+    status: job.status,
+    priority: job.priority,
+    attempts: job.attempts,
+    maxAttempts: job.max_attempts,
+    availableAtMs: job.available_at_ms,
+    lockedAtMs: job.locked_at_ms,
+    lastError: job.last_error,
+    createdAt: job.created_at,
+    updatedAt: job.updated_at
+  };
+}
+
+function getAssetRecords ( mediaId: number ) : AssetRecord[] {
+  return db.prepare( `
+    SELECT id, media_id, asset_type, relative_path, width, height, metadata_json, created_at
+    FROM media_assets
+    WHERE media_id = ?
+    ORDER BY asset_type
+  ` ).all( mediaId ) as unknown as AssetRecord[];
+}
+
+function serializeAsset ( asset: AssetRecord ) {
+  return {
+    id: asset.id,
+    mediaId: asset.media_id,
+    type: asset.asset_type,
+    width: asset.width,
+    height: asset.height,
+    metadata: parseJson( asset.metadata_json ),
+    createdAt: asset.created_at,
+    url: `/api/media/${ asset.media_id }/assets/${ asset.asset_type }`
+  };
+}
+
+function getMediaSourcePath ( media: MediaRecord ) : string {
+  if ( ! media.root_path || ! media.root_relative_path )
+    fail( 409, 'The media file has no registered source path' );
+
+  const root = resolve( media.root_path );
+  const path = resolve( root, media.root_relative_path );
+  const fromRoot = relative( root, path );
+
+  if ( ! fromRoot || fromRoot === '..' || fromRoot.startsWith( `..${ sep }` ) )
+    fail( 500, 'The media path is outside its registered root' );
+
+  return path;
+}
