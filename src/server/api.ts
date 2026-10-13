@@ -349,3 +349,13 @@ async function streamMedia ( req: Request, res: Response ) : Promise< void > {
 function getFramesManifest ( asset: AssetRecord ) : Promise< FramesManifest > {
   return readFile( getAssetPath( asset ), 'utf8' ).then( value => JSON.parse( value ) as FramesManifest );
 }
+
+
+// --- public endpoints ---
+
+api.get( '/health', ( _req, res ) => res.json( { status: 'ok' } ) );
+
+api.get( '/auth/setup-status', ( _req, res ) => {
+  const row = db.prepare( 'SELECT COUNT(*) AS count FROM users' ).get() as { count: number };
+  res.json( { setupRequired: row.count === 0 } );
+} );
