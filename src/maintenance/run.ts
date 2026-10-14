@@ -11,7 +11,7 @@ frame
   .version( 'Frame 2.0.0' )
   .description(
     'Frame, the private self-hosted video management platform.\n' +
-    'Copyright (c) 2026 komed3. MIT license.' +
+    'Copyright (c) 2026 komed3. MIT license.\n\n' +
     'Maintenance script.'
   );
 
