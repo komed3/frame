@@ -7,18 +7,9 @@ export const ui = {
   warning: ( text: string ) => console.log( `${ chalk.yellow( '[WARN]' ) } ${ text }` ),
   error: ( text: string ) => console.error( `${ chalk.red( '[ERR]' ) } ${ text }` ),
 
-  confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`,
-  cancelled: () => console.log( chalk.yellow( 'Cancelled.' ) )
-};
-
-
-export const ui_old = {
-  success: ( text: string ) => console.log( chalk.green( text ) ),
-  warning: ( text: string ) => console.log( chalk.yellow( `[WARN] ${ text }` ) ),
-  error: ( text: string ) => console.error( chalk.red( `[ERR] ${ text }` ) ),
-  muted: ( text: string ) => chalk.gray( text ),
   key: ( text: string ) => chalk.bold( text ),
   value: ( text: string ) => chalk.cyan( text ),
-  status: ( active: boolean ) => active ? chalk.green( 'active' ) : chalk.red( 'disabled' ),
-  confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`
+
+  confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`,
+  cancelled: () => console.log( chalk.yellow( 'Cancelled.' ) )
 };

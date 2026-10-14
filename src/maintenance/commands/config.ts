@@ -35,7 +35,7 @@ export const registerConfigCommands = ( program: Command ) : void => {
     .action( ( name: string ) => {
       const key = resolveName( name ), def = Config.schema[ key ];
 
-      console.log( ui.muted( def.desc ) );
+      ui.info( def.desc );
       console.log( `${ ui.key( key ) }=${ ui.value( JSON.stringify( Config.get( key ) ) ) }` );
     } );
 
