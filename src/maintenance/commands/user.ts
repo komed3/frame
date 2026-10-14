@@ -19,4 +19,13 @@ export const registerUserCommands = ( program: Command ) : void => {
   const user = program
     .command( 'user' )
     .description( 'Manage users' );
+
+  user
+    .command( 'list' )
+    .description( 'List all users' )
+    .action( () => console.table( users.list().map( user => ( {
+      id: user.id, username: user.username, admin: user.isAdmin,
+      status: user.disabledAt ? 'disabled' : 'active',
+      createdAt: user.createdAt
+    } ) ) ) );
 }
