@@ -1,7 +1,7 @@
-import 'dotenv/config';
-import { existsSync, readFileSync, writeFileSync, chmodSync } from 'node:fs';
-import { resolve } from 'node:path';
 import type { ConfigName, ConfigSchema, ConfigTable, ConfigValue } from '@/src/shared/types/config';
+import 'dotenv/config';
+import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 
 export class Config {
@@ -65,5 +65,11 @@ export class Config {
 
   public static reset ( name: ConfigName ) : void {
     this.set( name, this.schema[ name ].default as ConfigValue< typeof name > );
+  }
+
+  public static all () : ConfigSchema {
+    return Object.assign( Object.create( null ), ...Object.keys( this.schema ).map(
+      name => ( { [ name ]: this.get( name as ConfigName ) } )
+    ) );
   }
 }
