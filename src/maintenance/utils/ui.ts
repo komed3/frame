@@ -2,6 +2,9 @@ import chalk from 'chalk';
 
 
 export const ui = {
+  error: ( text: string ) => console.error( chalk.red( `[ERR] ${ text }` ) ),
+
+  confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`,
   cancelled: () => console.log( chalk.yellow( 'Cancelled.' ) )
 };
 
