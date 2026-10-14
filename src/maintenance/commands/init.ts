@@ -76,7 +76,7 @@ const createAdmin = async () : Promise< void > => {
 export const registerInitCommands = ( program: Command ) : void => {
   program
     .command( 'init' )
-    .description( 'Initialize Frame configuration and administrator account' )
+    .description( 'Initialize Frame' )
     .action( async () => {
       ui.info( 'Welcome to Frame' );
       ui.info( 'This command will guide you through the initial configuration of Frame.' );
