@@ -1,5 +1,6 @@
 import { users } from '@/src/server/core/User';
 import { Command } from 'commander';
+import { promptPassword } from '@/src/maintenance/utils/prompt';
 
 
 const resolveUser = ( ref: string ) => {
@@ -32,10 +33,13 @@ export const registerUserCommands = ( program: Command ) : void => {
   userCommand
     .command( 'create <username>' )
     .description( 'Create a user' )
-    .requiredOption( '--pw <password>', 'Initial password' )
     .option( '--admin', 'Grant administrator privileges' )
-    .action( async ( username: string, options: { pw: string; admin?: boolean } ) => {
-      const created = await users.create( username, options.pw, !! options.admin );
+    .action( async ( username: string, options: { admin?: boolean } ) => {
+      const wd = await promptPassword( 'Password: ' );
+      const conf = await promptPassword( 'Confirm password: ' );
+      if ( wd !== conf ) throw new Error( 'Passwords do not match' );
+
+      const created = await users.create( username, wd, !! options.admin );
       console.log( `Created user ${ created.username } (ID ${ created.id })` );
     } );
 
