@@ -3,11 +3,6 @@
 -- Apply once to a new, empty database.
 
 
-PRAGMA foreign_keys = ON;
-
-BEGIN IMMEDIATE;
-
-
 -- ============================================================
 -- 1. Users and authentication
 -- ============================================================
@@ -399,6 +394,3 @@ BEGIN
   INSERT INTO media_fts ( rowid, title, description, file_name, path )
   VALUES ( new.id, new.title, new.description, new.file_name, new.path );
 END;
-
-
-COMMIT;
