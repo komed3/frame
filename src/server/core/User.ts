@@ -78,4 +78,16 @@ export class User {
 
     return target;
   }
+
+  public get ( userId: number ) : UserRecord | null {
+    const row = this.getRow( userId );
+    return row ? this.toRecord( row ) : null;
+  }
+
+  public getByUsername ( username: string ) : UserRecord | null {
+    const row = conn.prepare( 'SELECT * FROM users WHERE username = ? COLLATE NOCASE' )
+      .get( username.trim() ) as unknown as UserRow | null;
+
+    return row ? this.toRecord( row ) : null;
+  }
 }
