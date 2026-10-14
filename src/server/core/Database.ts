@@ -107,6 +107,5 @@ export class Database {
 
 
 export const as = < T > ( x: unknown ) : T => x as T;
-
 export const db = new Database();
 export const conn = () => db.open().db;
