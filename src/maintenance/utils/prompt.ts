@@ -1,3 +1,4 @@
+import { ui } from '@/src/maintenance/utils/ui';
 import { emitKeypressEvents } from 'node:readline';
 import { createInterface } from 'node:readline/promises';
 
@@ -61,7 +62,7 @@ export const promptPassword = async ( message: string ) : Promise< string > => {
     };
 
     try {
-      stdout.write( message );
+      stdout.write( ui.prompt( message ) );
       stdin.setRawMode( true );
       rawMode = true;
 
@@ -77,6 +78,6 @@ export const promptPassword = async ( message: string ) : Promise< string > => {
 
 
 export const confirm = async ( message: string ) : Promise< boolean > => {
-  const answer = await prompt( `${ message } [y/N] ` );
+  const answer = await prompt( ui.confirm( message ) );
   return /^y(?:es)?$/i.test( answer );
 };
