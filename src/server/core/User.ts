@@ -157,8 +157,23 @@ export class User {
 
   public setAdmin ( actorId: number, userId: number, isAdmin: boolean ) : void {
     this.assertAdmin( actorId );
+
+    if ( ! this.getRow( userId ) ) throw new Error( 'User does not exist' );
+    conn.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
+  }
+
+  public setDisabled ( actorId: number, userId: number, disabled: boolean ) : void {
+    this.assertAdmin( actorId );
+
+    if ( actorId === userId ) throw new Error( 'You cannot disable your own account' );
     if ( ! this.getRow( userId ) ) throw new Error( 'User does not exist' );
 
-    conn.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
+    db.transaction( db => {
+      db.prepare( 'UPDATE users SET disabled_at = ? WHERE id = ?' ).run(
+        disabled ? new Date().toISOString() : null, userId
+      );
+
+      if ( disabled ) db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
+    } );
   }
 }
