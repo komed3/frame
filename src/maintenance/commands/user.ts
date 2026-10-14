@@ -52,10 +52,8 @@ export const registerUserCommands = ( program: Command ) : void => {
     .action( async ( ref: string, options: { yes?: boolean } ) => {
       const target = resolveUser( ref );
 
-      if ( ! options.yes && ! await confirm( `Delete user ${ target.username } (ID ${ target.id })?` ) ) {
-        ui.info( 'Cancelled.' );
-        return;
-      }
+      if ( ! options.yes && ! await confirm( `Delete user ${ target.username } (ID ${ target.id })?` ) )
+        return ui.cancelled();
 
       if ( target.isAdmin && ! target.disabledAt && users.list().filter(
         user => user.isAdmin && ! user.disabledAt

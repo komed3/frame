@@ -2,6 +2,11 @@ import chalk from 'chalk';
 
 
 export const ui = {
+  cancelled: () => console.log( chalk.yellow( 'Cancelled.' ) )
+};
+
+
+export const ui_old = {
   success: ( text: string ) => console.log( chalk.green( text ) ),
   info: ( text: string ) => console.log( text ),
   warning: ( text: string ) => console.log( chalk.yellow( `[WARN] ${ text }` ) ),

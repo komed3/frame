@@ -33,10 +33,8 @@ export const registerAuthCommands = ( program: Command ) : void => {
     .description( 'Revoke all sessions' )
     .option( '-y, --yes', 'Confirm revoking all sessions without prompting' )
     .action( async ( options: { yes?: boolean } ) => {
-      if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) ) {
-        ui.info( 'Cancelled.' );
-        return;
-      }
+      if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) )
+        return ui.cancelled();
 
       const count = auth.logoutAll();
       ui.success( `Revoked ${ count } session(s).` );
