@@ -67,4 +67,15 @@ export class User {
     if ( ! actor || actor.disabled_at || actor.is_admin !== 1 )
       throw new Error( 'Administrator privileges are required' );
   }
+
+  private assertCanManage ( actorId: number, userId: number ) : UserRow {
+    const actor = this.getRow( actorId ), target = this.getRow( userId );
+    if ( ! actor || actor.disabled_at ) throw new Error( 'User is not available' );
+    if ( ! target ) throw new Error( 'User does not exist' );
+
+    if ( actorId !== userId && actor.is_admin !== 1 )
+      throw new Error( 'Administrator privileges are required' );
+
+    return target;
+  }
 }
