@@ -35,11 +35,11 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Create a user' )
     .option( '--admin', 'Grant administrator privileges' )
     .action( async ( username: string, options: { admin?: boolean } ) => {
-      const wd = await promptPassword( 'Password: ' );
+      const pw = await promptPassword( 'Password: ' );
       const conf = await promptPassword( 'Confirm password: ' );
-      if ( wd !== conf ) throw new Error( 'Passwords do not match' );
+      if ( pw !== conf ) throw new Error( 'Passwords do not match' );
 
-      const created = await users.create( username, wd, !! options.admin );
+      const created = await users.create( username, pw, !! options.admin );
       console.log( `Created user ${ created.username } (ID ${ created.id })` );
     } );
 
@@ -78,11 +78,13 @@ export const registerUserCommands = ( program: Command ) : void => {
     .command( 'password <user>' )
     .description( 'Change a user password' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
-    .requiredOption( '--pw <password>', 'New password' )
-    .option( '--current-pw <password>', 'Current password when changing your own password' )
-    .action( async ( ref: string, options: { actor: string; pw: string; currentPw?: string } ) => {
+    .action( async ( ref: string, options: { actor: string } ) => {
+      const pw = await promptPassword( 'Password: ' );
+      const conf = await promptPassword( 'Confirm password: ' );
+      if ( pw !== conf ) throw new Error( 'Passwords do not match' );
+
       const target = resolveUser( ref );
-      await users.changePassword( resolveId( options.actor ), target.id, options.pw, options.currentPw );
+      await users.changePassword( resolveId( options.actor ), target.id, pw );
 
       console.log( `Changed password for ${ target.username } (ID ${ target.id })` );
       console.log( 'All sessions for this user have been revoked.' );
