@@ -85,6 +85,41 @@ export class Database {
     ` ).all() );
   }
 
+  public getStats () : DatabaseStats {
+    const db = this.open().db, path = Config.get( 'DB_PATH' );
+    const tables = as< { name: string }[] >( db.prepare( `
+      SELECT name
+      FROM sqlite_schema
+      WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+    ` ).all() );
+
+    const rowCount = tables.reduce( ( count, table ) => {
+      const result = as< { count: number } >( db.prepare(
+        `SELECT COUNT(*) AS count FROM "${ table.name.replace( /"/g, '""' ) }"`
+      ).get() );
+
+      return count + result.count;
+    }, 0 );
+
+    const sizeBytes = path === ':memory:' ? 0 : [ path, `${ path }-wal`, `${ path }-shm` ].reduce(
+      ( size, file ) => size + ( existsSync( file ) ? statSync( file ).size : 0 ), 0
+    );
+
+    const sqlite = as< { version: string } >( db.prepare( 'SELECT sqlite_version() AS version' ).get() );
+    const pages = as< { page_count: number } >( db.prepare( 'PRAGMA page_count' ).get() );
+    const pageSize = as< { page_size: number } >( db.prepare( 'PRAGMA page_size' ).get() );
+    const freePages = as< { freelist_count: number } >( db.prepare( 'PRAGMA freelist_count' ).get() );
+    const migrations = as< { count: number } >( db.prepare( 'SELECT COUNT(*) AS count FROM schema_migrations' ).get() );
+    const integrity = as< { integrity_check: string } >( db.prepare( 'PRAGMA integrity_check' ).get() );
+
+    return {
+      path, sqliteVersion: sqlite.version, tableCount: tables.length, rowCount,
+      migrationCount: migrations.count, sizeBytes, pageCount: pages.page_count,
+      pageSize: pageSize.page_size, freePages: freePages.freelist_count,
+      integrityCheck: integrity.integrity_check
+    };
+  }
+
   public close () : void {
     if ( ! this.connection ) return;
 
