@@ -1,4 +1,4 @@
-import { as, conn } from '@/src/server/core/Database';
+import { as, conn, db } from '@/src/server/core/Database';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
@@ -114,5 +114,14 @@ export class User {
     if ( ! user ) throw new Error( 'Failed to create user' );
 
     return user;
+  }
+
+  public delete ( userId: number ) : void {
+    if ( ! this.getRow( userId ) ) throw new Error( 'User does not exist' );
+
+    db.transaction( db => {
+      db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
+      db.prepare( 'DELETE FROM users WHERE id = ?' ).run( userId );
+    } );
   }
 }
