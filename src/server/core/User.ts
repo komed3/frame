@@ -5,7 +5,7 @@ import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 export class User {
   private getRow ( userId: number ) : UserRow | null {
-    return as< UserRow | null >( conn.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
+    return as< UserRow | null >( conn().prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
   }
 
   private toRecord ( row: UserRow ) : UserRecord {
@@ -80,7 +80,7 @@ export class User {
   }
 
   public list () : UserRecord[] {
-    return as< UserRow[] >( conn.prepare(
+    return as< UserRow[] >( conn().prepare(
       'SELECT * FROM users ORDER BY username COLLATE NOCASE'
     ).all() ).map( row => this.toRecord( row ) );
   }
@@ -91,7 +91,7 @@ export class User {
   }
 
   public getByUsername ( username: string ) : UserRecord | null {
-    const row = as< UserRow | null >( conn.prepare(
+    const row = as< UserRow | null >( conn().prepare(
       'SELECT * FROM users WHERE username = ? COLLATE NOCASE'
     ).get( username.trim() ) );
 
@@ -105,7 +105,7 @@ export class User {
     if ( this.getByUsername( name ) ) throw new Error( 'Username is already taken' );
     const hash = await this.hashPassword( pw );
 
-    const result = conn.prepare( `
+    const result = conn().prepare( `
       INSERT INTO users ( username, pw_hash, is_admin )
       VALUES ( ?, ?, ? )
     ` ).run( name, hash, isAdmin ? 1 : 0 );
@@ -132,7 +132,7 @@ export class User {
     const existing = this.getByUsername( name );
     if ( existing && existing.id !== target.id ) throw new Error( 'Username is already taken' );
 
-    conn.prepare( 'UPDATE users SET username = ? WHERE id = ?' ).run( name, userId );
+    conn().prepare( 'UPDATE users SET username = ? WHERE id = ?' ).run( name, userId );
 
     const user = this.get( userId );
     if ( ! user ) throw new Error( 'User does not exist' );
