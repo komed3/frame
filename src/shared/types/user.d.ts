@@ -14,18 +14,3 @@ export interface UserRow {
   created_at: string;
   disabled_at: string | null;
 }
-
-export interface SessionRow {
-  id: number;
-  user_id: number;
-  token_hash: string;
-  created_at: string;
-  expires_at: string;
-  last_seen_at: string;
-}
-
-export interface AuthResult {
-  token: string;
-  expiresAt: string;
-  user: UserRecord;
-}
