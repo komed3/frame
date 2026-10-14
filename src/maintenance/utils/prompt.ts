@@ -26,40 +26,52 @@ export const promptPassword = async ( message: string ) : Promise< string > => {
   const stdout = process.stdout;
 
   return new Promise( ( resolve, reject ) => {
-    let value = '';
-
-    const cleanup = () : void => {
-      stdin.removeListener( 'keypress', onKeypress );
-      stdin.setRawMode( false );
-      stdin.pause();
-      stdout.write( '\n' );
-    };
+    let value = '', rawMode = false, settled = false;
+    let finish: ( err?: Error ) => void = () => {};
 
     const onKeypress = ( character: string, key: { name?: string; ctrl?: boolean } ) : void => {
-      if ( key.ctrl && key.name === 'c' ) {
-        cleanup();
-        reject( new Error( 'Input cancelled' ) );
-        return;
-      }
-
-      if ( key.name === 'return' || key.name === 'enter' ) {
-        cleanup();
-        resolve( value );
-        return;
-      }
+      if ( key.ctrl && ( key.name === 'c' || key.name === 'd' ) ) return finish( new Error( 'Input cancelled' ) );
+      if ( key.name === 'return' || key.name === 'enter' ) return finish();
 
       if ( key.name === 'backspace' ) {
         value = Array.from( value ).slice( 0, -1 ).join( '' );
         return;
       }
 
-      if ( character && ! key.ctrl && character.length > 0 ) value += character;
+      if ( character && ! key.ctrl ) value += character;
     };
 
-    stdout.write( message );
-    stdin.setRawMode( true );
-    stdin.resume();
-    stdin.on( 'keypress', onKeypress );
+    const onError = ( err: Error ) : void => finish( err );
+    const onClose = () : void => finish( new Error( 'Input cancelled' ) );
+
+    finish = ( err?: Error ) : void => {
+      if ( settled ) return;
+      settled = true;
+
+      stdin.removeListener( 'keypress', onKeypress );
+      stdin.removeListener( 'error', onError );
+      stdin.removeListener( 'close', onClose );
+
+      try { if ( rawMode ) stdin.setRawMode( false ) }
+      catch ( E ) { err ??= E instanceof Error ? E : new Error( String( E ) ) }
+      finally { stdin.pause(), stdout.write( '\n' ) }
+
+      if ( err ) reject( err );
+      else resolve( value );
+    };
+
+    try {
+      stdout.write( message );
+      stdin.setRawMode( true );
+      rawMode = true;
+
+      stdin.on( 'keypress', onKeypress );
+      stdin.on( 'error', onError );
+      stdin.on( 'close', onClose );
+      stdin.resume();
+    } catch ( err ) {
+      finish( err instanceof Error ? err : new Error( String( err ) ) );
+    }
   } );
 };
 
