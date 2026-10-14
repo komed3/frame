@@ -62,7 +62,7 @@ export const promptPassword = async ( message: string ) : Promise< string > => {
     };
 
     try {
-      stdout.write( ui.prompt( message ) );
+      stdout.write( message );
       stdin.setRawMode( true );
       rawMode = true;
 

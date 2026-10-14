@@ -29,7 +29,7 @@ export const registerAuthCommands = ( program: Command ) : void => {
     } );
 
   authCommand
-    .command( 'logout-all' )
+    .command( 'clear' )
     .description( 'Revoke all sessions' )
     .option( '-y, --yes', 'Confirm revoking all sessions without prompting' )
     .action( async ( options: { yes?: boolean } ) => {

@@ -10,6 +10,5 @@ export const ui = {
   key: ( text: string ) => chalk.bold( text ),
   value: ( text: string ) => chalk.cyan( text ),
   status: ( active: boolean ) => active ? chalk.green( 'active' ) : chalk.red( 'disabled' ),
-  prompt: ( text: string ) => chalk.cyan( text ),
-  confirm: ( text: string ) => `${ chalk.yellow( text ) } ${ chalk.gray( '[y/N] ' ) }`
+  confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`
 };
