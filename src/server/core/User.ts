@@ -182,3 +182,6 @@ export class User {
     return !! user && await this.verifyHash( password, user.pw_hash );
   }
 }
+
+
+export const users = new User();
