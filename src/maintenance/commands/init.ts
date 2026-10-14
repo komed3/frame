@@ -4,6 +4,8 @@ import { Config } from '@/src/server/core/Config';
 import { users } from '@/src/server/core/User';
 import type { ConfigName, ConfigValue } from '@/src/shared/types/config';
 import { Command } from 'commander';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 
 const configure = async () : Promise< void > => {
@@ -82,6 +84,9 @@ export const registerInitCommands = ( program: Command ) : void => {
     .command( 'init' )
     .description( 'Initialize Frame' )
     .action( async () => {
+      if ( existsSync( resolve( '.env' ) ) )
+        throw new Error( 'Frame has already been initialized (.env already exists).' );
+
       ui.info( 'Welcome to Frame' );
       ui.info( 'This command will guide you through the initial configuration of Frame.' );
       ui.nl();
@@ -92,5 +97,6 @@ export const registerInitCommands = ( program: Command ) : void => {
       ui.nl();
       ui.info( 'Frame initialization complete.' );
       ui.info( 'Start Frame and have fun watching your videos!' );
+      ui.info( 'Run `npm run start` to start server.' );
     } );
 };
