@@ -2,6 +2,9 @@ import chalk from 'chalk';
 
 
 export const ui = {
+  nl: () => console.log(),
+  headline: ( text: string, step: string ) => console.log( `${ chalk.cyan( step ) } ${ text }` ),
+
   success: ( text: string ) => console.log( `${ chalk.green( '[OK]' ) } ${ text }` ),
   info: ( text: string ) => console.log( text ),
   warning: ( text: string ) => console.log( `${ chalk.yellow( '[WARN]' ) } ${ text }` ),
