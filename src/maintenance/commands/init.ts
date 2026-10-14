@@ -36,3 +36,38 @@ const configure = async () : Promise< void > => {
     }
   }
 };
+
+const createAdmin = async () : Promise< void > => {
+  const activeAdmin = users.list().find( user => user.isAdmin && ! user.disabledAt );
+  if ( activeAdmin ) return ui.info( `An active administrator already exists: ${ activeAdmin.username }` );
+
+  ui.headline( 'Create administrator account', '[2/2]' );
+  ui.nl();
+
+  let username = await prompt( 'Administrator username:', 'admin' );
+
+  while ( true ) {
+    const pw = await promptPassword( 'Password: ' );
+    const conf = await promptPassword( 'Confirm password: ' );
+
+    if ( pw !== conf ) {
+      ui.error( 'Passwords do not match.' );
+      continue;
+    }
+
+    try {
+      const admin = await users.create( username, pw, true );
+      ui.success( `Administrator ${ admin.username } created (ID ${ admin.id }).` );
+      return;
+    } catch ( err ) {
+      const message = err instanceof Error ? err.message : String( err );
+      if ( ! message.startsWith( 'Username' ) && ! message.startsWith( 'Password' ) )
+        throw err;
+
+      ui.error( message );
+
+      if ( message.startsWith( 'Username' ) )
+        username = await prompt( 'Administrator username:', username );
+    }
+  }
+};
