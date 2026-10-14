@@ -39,4 +39,8 @@ export class Config {
       ? name === 'DB_PATH' && parsed === ':memory:' ? parsed : resolve( parsed )
       : parsed ) as ConfigValue< K >;
   }
+
+  public static get < K extends ConfigName > ( name: K ) : ConfigValue< K > {
+    return this.validate( name, process.env[ name ] ?? this.schema[ name ].default );
+  }
 }
