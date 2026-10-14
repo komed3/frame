@@ -1,6 +1,6 @@
+import { confirm, promptPassword } from '@/src/maintenance/utils/prompt';
 import { users } from '@/src/server/core/User';
 import { Command } from 'commander';
-import { promptPassword } from '@/src/maintenance/utils/prompt';
 
 
 const resolveUser = ( ref: string ) => {
@@ -46,11 +46,14 @@ export const registerUserCommands = ( program: Command ) : void => {
   userCommand
     .command( 'delete <user>' )
     .description( 'Delete a user by ID or username' )
-    .option( '--yes', 'Confirm deletion' )
-    .action( ( ref: string, options: { yes?: boolean } ) => {
-      if ( ! options.yes ) throw new Error( 'Deletion requires --yes' );
-
+    .option( '-y, --yes', 'Confirm deletion' )
+    .action( async ( ref: string, options: { yes?: boolean } ) => {
       const target = resolveUser( ref );
+
+      if ( ! options.yes && ! await confirm( `Delete user ${ target.username } (ID ${ target.id })?` ) ) {
+        console.log( 'Cancelled.' );
+        return;
+      }
 
       if ( target.isAdmin && ! target.disabledAt && users.list().filter(
         user => user.isAdmin && ! user.disabledAt
