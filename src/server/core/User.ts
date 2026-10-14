@@ -176,4 +176,9 @@ export class User {
       if ( disabled ) db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
     } );
   }
+
+  public async verifyPassword ( userId: number, password: string ) : Promise< boolean > {
+    const user = this.getRow( userId );
+    return !! user && await this.verifyHash( password, user.pw_hash );
+  }
 }
