@@ -1,4 +1,4 @@
-import { users } from '@/src/server/core/User';
+import { User, users } from '@/src/server/core/User';
 import { as, conn, db } from '@/src/server/core/Database';
 import type { AuthResult, SessionRow } from '@/src/shared/types/user';
 import { createHash, randomBytes } from 'node:crypto';
@@ -34,6 +34,30 @@ export class Auth {
   public logout ( token: string | null | undefined ) : void {
     if ( ! token ) return;
     conn.prepare( 'DELETE FROM sessions WHERE token_hash = ?' ).run( this.hashToken( token ) );
+  }
+
+  public validateSession ( token: string | null | undefined ) : ReturnType< User[ 'get' ] > {
+    if ( ! token ) return null;
+
+    const now = new Date();
+    const session = as< SessionRow | null >( conn.prepare(
+      'SELECT * FROM sessions WHERE token_hash = ? AND expires_at > ?'
+    ).get( this.hashToken( token ), now.toISOString() ) );
+
+    if ( ! session ) return null;
+
+    const user = users.get( session.user_id );
+
+    if ( ! user || user.disabledAt ) {
+      conn.prepare( 'DELETE FROM sessions WHERE id = ?' ).run( session.id );
+      return null;
+    }
+
+    if ( now.getTime() - Date.parse( session.last_seen_at ) >= 5 * 60 * 1000 ) conn.prepare(
+      'UPDATE sessions SET last_seen_at = ? WHERE id = ?'
+    ).run( now.toISOString(), session.id );
+
+    return user;
   }
 }
 
