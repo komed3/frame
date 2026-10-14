@@ -1,11 +1,25 @@
-export type ConfigDefinition =
-  | { type: 'string' | 'path'; default: string; description: string }
-  | { type: 'integer'; default: number; min: number; max?: number; description: string }
-  | { type: 'enum'; default: string; values: readonly string[]; description: string };
+export interface ConfigSchema {
+  NODE_ENV: 'dev' | 'development' | 'test' | 'prod' | 'production';
+  HOST: string;
+  PORT: number;
+  DB_PATH: string;
+  DB_BUSY_TIMEOUT_MS: number;
+  ASSETS_PATH: string;
+  SESSION_LIFETIME_MS: number;
+}
 
-export type ConfigName< T extends Record< string, ConfigDefinition > > = keyof T & string;
+export type ConfigName = keyof ConfigSchema;
+export type ConfigValue< K extends ConfigName > = ConfigSchema[ K ];
 
-export type ConfigValue< T extends ConfigDefinition > =
-  T extends { type: 'integer' } ? number :
-  T extends { type: 'enum'; values: readonly ( infer V )[] } ? V :
-  string;
+export type ConfigDefinition< T > = {
+  default: T;
+  description: string;
+} & (
+  T extends number
+    ? { type: 'integer'; min: number; max: number }
+    : { type: 'string' | 'path' | 'enum'; values?: readonly string[] }
+);
+
+export type ConfigTable = {
+  [ K in ConfigName ]: ConfigDefinition< ConfigSchema[ K ] >
+};
