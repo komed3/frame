@@ -49,4 +49,15 @@ export const registerEnvCommands = ( program: Command ) : void => {
       console.log( `Updated ${ key }=${ JSON.stringify( updated ) }` );
       console.log( 'Restart Frame for changes to take effect.' );
     } );
+
+  envCommand
+    .command( 'unset <name>' )
+    .description( 'Restore the default value' )
+    .action( ( name: string ) => {
+      const key = resolveName( name );
+      Config.reset( key );
+
+      console.log( `Reset ${ key } to ${ JSON.stringify( Config.get( key ) ) }` );
+      console.log( 'Restart Frame for changes to take effect.' );
+    } );
 }
