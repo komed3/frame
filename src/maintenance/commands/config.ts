@@ -38,4 +38,15 @@ export const registerEnvCommands = ( program: Command ) : void => {
       console.log( `${ key }=${ JSON.stringify( Config.get( key ) ) }` );
       console.log( def.desc );
     } );
+
+  envCommand
+    .command( 'set <name> <value>' )
+    .description( 'Set a configuration value' )
+    .action( ( name: string, value: string ) => {
+      const key = resolveName( name );
+      const updated = Config.set( key, Config.validate( key, value ) );
+
+      console.log( `Updated ${ key }=${ JSON.stringify( updated ) }` );
+      console.log( 'Restart Frame for changes to take effect.' );
+    } );
 }
