@@ -1,6 +1,6 @@
 import { conn } from '@/src/server/core/Database';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
-import { randomBytes, scrypt } from 'node:crypto';
+import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 
 export class User {
@@ -41,5 +41,23 @@ export class User {
         resolve( `scrypt$${ salt.toString( 'base64url' ) }$${ key.toString( 'base64url' ) }` );
       } );
     } );
+  }
+
+  private async verifyHash ( password: string, hash: string ) : Promise< boolean > {
+    const [ algorithm, saltValue, keyValue ] = hash.split( '$' );
+    if ( algorithm !== 'scrypt' || ! saltValue || ! keyValue ) return false;
+
+    const salt = Buffer.from( saltValue, 'base64url' );
+    const expected = Buffer.from( keyValue, 'base64url' );
+    if ( salt.length !== 16 || expected.length !== 64 ) return false;
+
+    const actual = await new Promise< Buffer >( ( resolve, reject ) => {
+      scrypt( password, salt, expected.length, ( err, key ) => {
+        if ( err ) return reject( err );
+        resolve( key );
+      } );
+    } );
+
+    return timingSafeEqual( actual, expected );
   }
 }
