@@ -1,5 +1,6 @@
 import { conn } from '@/src/server/core/Database';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
+import { randomBytes, scrypt } from 'node:crypto';
 
 
 export class User {
@@ -29,5 +30,16 @@ export class User {
     if ( ! /[A-Z]/.test( password ) ) throw new Error( 'Password must contain at least one uppercase letter' );
     if ( ! /[0-9]/.test( password ) ) throw new Error( 'Password must contain at least one number' );
     if ( ! /[^a-zA-Z0-9]/.test( password ) ) throw new Error( 'Password must contain at least one special character' );
+  }
+
+  private hashPassword ( password: string ) : Promise< string > {
+    const salt = randomBytes( 16 );
+
+    return new Promise( ( resolve, reject ) => {
+      scrypt( password, salt, 64, ( err, key ) => {
+        if ( err ) return reject( err );
+        resolve( `scrypt$${ salt.toString( 'base64url' ) }$${ key.toString( 'base64url' ) }` );
+      } );
+    } );
   }
 }
