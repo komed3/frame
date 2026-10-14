@@ -95,4 +95,26 @@ export const registerUserCommands = ( program: Command ) : void => {
         `for ${ target.username }`
       );
     } );
+
+  user
+    .command( 'disable <user>' )
+    .description( 'Disable a user and revoke their sessions' )
+    .requiredOption( '--actor <id>', 'ID of the acting administrator' )
+    .action( ( ref: string, options: { actor: string } ) => {
+      const target = resolveUser( ref );
+      users.setDisabled( resolveId( options.actor ), target.id, true );
+
+      console.log( `Disabled user ${ target.username } (ID ${ target.id })` );
+    } );
+
+  user
+    .command( 'enable <user>' )
+    .description( 'Enable a disabled user' )
+    .requiredOption( '--actor <id>', 'ID of the acting administrator' )
+    .action( ( ref: string, options: { actor: string } ) => {
+      const target = resolveUser( ref );
+      users.setDisabled( resolveId( options.actor ), target.id, false );
+
+      console.log( `Enabled user ${ target.username } (ID ${ target.id })` );
+    } );
 }
