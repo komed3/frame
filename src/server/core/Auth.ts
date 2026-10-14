@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { type User, users } from '@/src/server/core/User';
-import type { AuthResult, SessionRow } from '@/src/shared/types/user';
+import type { AuthResult, SessionRow } from '@/src/shared/types/auth';
 import { createHash, randomBytes } from 'node:crypto';
 
 
