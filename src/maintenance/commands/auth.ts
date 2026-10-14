@@ -24,4 +24,15 @@ export const registerAuthCommands = ( program: Command ) : void => {
         expiresAt: session.expiresAt
       } ) ) );
     } );
+
+  authCommand
+    .command( 'logout-all' )
+    .description( 'Revoke all sessions' )
+    .option( '--yes', 'Confirm revoking all sessions' )
+    .action( ( options: { yes?: boolean } ) => {
+      if ( ! options.yes ) throw new Error( 'Revoking all sessions requires --yes' );
+      const count = auth.logoutAll();
+
+      console.log( `Revoked ${ count } session(s).` );
+    } );
 }
