@@ -62,4 +62,8 @@ export class Config {
 
     return parsed;
   }
+
+  public static reset ( name: ConfigName ) : void {
+    this.set( name, this.schema[ name ].default as ConfigValue< typeof name > );
+  }
 }
