@@ -12,7 +12,7 @@ export class Config {
     return value;
   }
 
-  private static getInteger ( name: string, fallback: number, min: number, max: number ) : number {
+  private static getInteger ( name: string, fallback: number, min: number = 0, max: number = Infinity ) : number {
     const raw = process.env[ name ]?.trim();
     if ( ! raw ) return fallback;
 
@@ -26,7 +26,11 @@ export class Config {
   public static readonly NODE_ENV = Config.getNodeEnv();
   public static readonly HOST = process.env.HOST?.trim() || '0.0.0.0';
   public static readonly PORT = Config.getInteger( 'PORT', 3000, 1, 65535 );
+
   public static readonly DB_PATH = resolve( process.env.DB_PATH?.trim() || 'data/frame.sqlite' );
   public static readonly DB_BUSY_TIMEOUT_MS = Config.getInteger( 'DB_BUSY_TIMEOUT_MS', 5000, 0, 60000 );
+
   public static readonly ASSETS_PATH = resolve( process.env.ASSETS_PATH?.trim() || 'data/assets' );
+
+  public static readonly SESSION_LIFETIME_MS = Config.getInteger( 'SESSION_LIFETIME_MS', 2592000000 );
 }
