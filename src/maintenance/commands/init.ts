@@ -1,8 +1,8 @@
 import { prompt, promptPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
-import type { ConfigName, ConfigValue } from '@/src/shared/types/config';
 import { users } from '@/src/server/core/User';
+import type { ConfigName, ConfigValue } from '@/src/shared/types/config';
 import { Command } from 'commander';
 
 
@@ -70,4 +70,23 @@ const createAdmin = async () : Promise< void > => {
         username = await prompt( 'Administrator username:', username );
     }
   }
+};
+
+
+export const registerInitCommands = ( program: Command ) : void => {
+  program
+    .command( 'init' )
+    .description( 'Initialize Frame configuration and administrator account' )
+    .action( async () => {
+      ui.info( 'Welcome to Frame' );
+      ui.info( 'This command will guide you through the initial configuration of Frame.' );
+      ui.nl();
+
+      await configure();
+      await createAdmin();
+
+      ui.nl();
+      ui.success( 'Frame initialization complete.' );
+      ui.info( 'Start Frame and have fun watching your videos!' );
+    } );
 };
