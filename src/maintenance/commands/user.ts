@@ -66,4 +66,18 @@ export const registerUserCommands = ( program: Command ) : void => {
 
       console.log( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
     } );
+
+  user
+    .command( 'password <user>' )
+    .description( 'Change a user password' )
+    .requiredOption( '--actor <id>', 'ID of the acting user' )
+    .requiredOption( '--password <password>', 'New password' )
+    .option( '--current-password <password>', 'Current password when changing your own password' )
+    .action( async ( reference: string, options: { actor: string; password: string; currentPassword?: string } ) => {
+      const target = resolveUser( reference );
+      await users.changePassword( resolveId( options.actor ), target.id, options.password, options.currentPassword );
+
+      console.log( `Changed password for ${ target.username } (ID ${ target.id })` );
+      console.log( 'All sessions for this user have been revoked.' );
+    } );
 }
