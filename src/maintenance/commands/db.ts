@@ -24,6 +24,9 @@ export const registerDbCommands = ( program: Command ) : void => {
     .action( () => {
       const stats = db.getStats();
 
+      if ( stats.integrityCheck === 'ok' ) ui.success( 'Database integrity: ok' );
+      else ui.error( `Database integrity: ${ stats.integrityCheck }` );
+
       console.table( [
         { stat: 'Database path', value: stats.path },
         { stat: 'SQLite version', value: stats.sqliteVersion },
@@ -33,12 +36,7 @@ export const registerDbCommands = ( program: Command ) : void => {
         { stat: 'Disk usage', value: `${ stats.sizeBytes.toLocaleString() } bytes` },
         { stat: 'Pages', value: stats.pageCount },
         { stat: 'Page size', value: `${ stats.pageSize } bytes` },
-        { stat: 'Free pages', value: stats.freePages },
-        {
-          stat: 'Integrity check',
-          value: stats.integrityCheck === 'ok' ? ui.success( 'ok' ) ?? 'ok' :
-            ui.error( stats.integrityCheck ) ?? stats.integrityCheck
-        }
+        { stat: 'Free pages', value: stats.freePages }
       ] );
     } );
 
