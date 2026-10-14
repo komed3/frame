@@ -28,4 +28,14 @@ export const registerUserCommands = ( program: Command ) : void => {
       status: user.disabledAt ? 'disabled' : 'active',
       createdAt: user.createdAt
     } ) ) ) );
+
+  user
+    .command( 'create <username>' )
+    .description( 'Create a user' )
+    .requiredOption( '--password <password>', 'Initial password' )
+    .option( '--admin', 'Grant administrator privileges' )
+    .action( async ( username: string, options: { password: string; admin?: boolean } ) => {
+      const created = await users.create( username, options.password, !! options.admin );
+      console.log( `Created user ${ created.username } (ID ${ created.id })` );
+    } );
 }
