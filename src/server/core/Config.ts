@@ -57,7 +57,7 @@ export class Config {
       for ( const index of matches.slice( 1 ).reverse() ) lines.splice( index, 1 );
     } else lines.push( line );
 
-    writeFileSync( file, `${ lines.filter( ( l, i ) => i < lines.length - 1 || l !== '' ).join( '\n' ) }\n`, { mode: 0o600 } );
+    writeFileSync( file, `${ lines.filter( l => l.trim() !== '' ).join( '\n' ) }\n`, { mode: 0o600 } );
     chmodSync( file, 0o600 );
     process.env[ name ] = String( parsed );
 
