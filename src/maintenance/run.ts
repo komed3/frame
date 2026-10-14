@@ -3,6 +3,7 @@
 import { registerAuthCommands } from '@/src/maintenance/commands/auth';
 import { registerConfigCommands } from '@/src/maintenance/commands/config';
 import { registerUserCommands } from '@/src/maintenance/commands/user';
+import { ui } from '@/src/maintenance/utils/ui';
 import { db } from '@/src/server/core/Database';
 import { Command } from 'commander';
 
@@ -25,5 +26,8 @@ registerAuthCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
-catch ( err ) { console.error( err ), process.exitCode = 1 }
+catch ( err ) {
+  ui.error( err instanceof Error ? err.message : String( err ) );
+  process.exitCode = 1;
+}
 finally { db.close() }
