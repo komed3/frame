@@ -2,7 +2,10 @@ import chalk from 'chalk';
 
 
 export const ui = {
-  error: ( text: string ) => console.error( chalk.red( `[ERR] ${ text }` ) ),
+  success: ( text: string ) => console.log( `${ chalk.green( '[OK]' ) } ${ text }` ),
+  info: ( text: string ) => console.log( text ),
+  warning: ( text: string ) => console.log( `${ chalk.yellow( '[WARN]' ) } ${ text }` ),
+  error: ( text: string ) => console.error( `${ chalk.red( '[ERR]' ) } ${ text }` ),
 
   confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`,
   cancelled: () => console.log( chalk.yellow( 'Cancelled.' ) )
@@ -11,7 +14,6 @@ export const ui = {
 
 export const ui_old = {
   success: ( text: string ) => console.log( chalk.green( text ) ),
-  info: ( text: string ) => console.log( text ),
   warning: ( text: string ) => console.log( chalk.yellow( `[WARN] ${ text }` ) ),
   error: ( text: string ) => console.error( chalk.red( `[ERR] ${ text }` ) ),
   muted: ( text: string ) => chalk.gray( text ),

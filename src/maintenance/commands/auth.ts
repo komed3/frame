@@ -14,17 +14,11 @@ export const registerAuthCommands = ( program: Command ) : void => {
     .description( 'List active sessions' )
     .action( () => {
       const sessions = auth.listSessions();
-
-      if ( ! sessions.length ) {
-        ui.info( 'No active sessions.' );
-        return;
-      }
+      if ( ! sessions.length ) return ui.info( 'No active sessions.' );
 
       console.table( sessions.map( session => ( {
-        id: session.id, userId: session.userId, username: session.username,
-        admin: session.isAdmin ? ui.value( 'yes' ) : ui.muted( 'no' ),
-        createdAt: session.createdAt, lastSeenAt: session.lastSeenAt,
-        expiresAt: session.expiresAt
+        id: session.id, userId: session.userId, username: session.username, admin: session.isAdmin,
+        createdAt: session.createdAt, lastSeenAt: session.lastSeenAt, expiresAt: session.expiresAt
       } ) ) );
     } );
 
@@ -33,8 +27,7 @@ export const registerAuthCommands = ( program: Command ) : void => {
     .description( 'Revoke all sessions' )
     .option( '-y, --yes', 'Confirm revoking all sessions without prompting' )
     .action( async ( options: { yes?: boolean } ) => {
-      if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) )
-        return ui.cancelled();
+      if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) ) return ui.cancelled();
 
       const count = auth.logoutAll();
       ui.success( `Revoked ${ count } session(s).` );
