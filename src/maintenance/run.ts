@@ -7,5 +7,9 @@ const frame = new Command();
 
 frame
   .name( 'frame' )
-  .description( 'Frame, the private self-hosted video management platform.\nMaintenance script.' )
-  .version( 'Frame 2.0.0', '-v, --version', 'Output the version number' );
+  .version( 'Frame 2.0.0' )
+  .description(
+    'Frame, the private self-hosted video management platform.\n' +
+    'Copyright (c) 2026 komed3. MIT license.' +
+    'Maintenance script.'
+  );
