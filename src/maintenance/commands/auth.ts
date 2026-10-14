@@ -1,3 +1,4 @@
+import { confirm } from '@/src/maintenance/utils/prompt';
 import { auth } from '@/src/server/core/Auth';
 import { Command } from 'commander';
 
@@ -28,11 +29,14 @@ export const registerAuthCommands = ( program: Command ) : void => {
   authCommand
     .command( 'logout-all' )
     .description( 'Revoke all sessions' )
-    .option( '--yes', 'Confirm revoking all sessions' )
-    .action( ( options: { yes?: boolean } ) => {
-      if ( ! options.yes ) throw new Error( 'Revoking all sessions requires --yes' );
-      const count = auth.logoutAll();
+    .option( '-y, --yes', 'Confirm revoking all sessions without prompting' )
+    .action( async ( options: { yes?: boolean } ) => {
+      if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) ) {
+        console.log( 'Cancelled.' );
+        return;
+      }
 
+      const count = auth.logoutAll();
       console.log( `Revoked ${ count } session(s).` );
     } );
 }
