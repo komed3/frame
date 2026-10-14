@@ -45,13 +45,18 @@ const createAdmin = async () : Promise< void > => {
   ui.nl();
 
   let username = await prompt( 'Administrator username:', 'admin' );
+  let pw: string;
 
   while ( true ) {
-    const pw = await promptPassword( 'Password: ' );
-    const conf = await promptPassword( 'Confirm password: ' );
+    try {
+      pw = await promptPassword( 'Password: ' );
 
-    if ( pw !== conf ) {
-      ui.error( 'Passwords do not match.' );
+      if ( pw !== await promptPassword( 'Confirm password: ' ) ) {
+        ui.error( 'Passwords do not match.' );
+        continue;
+      }
+    } catch ( err ) {
+      ui.error( err instanceof Error ? err.message : String( err ) );
       continue;
     }
 
@@ -61,11 +66,12 @@ const createAdmin = async () : Promise< void > => {
       return;
     } catch ( err ) {
       const message = err instanceof Error ? err.message : String( err );
-      if ( ! message.startsWith( 'Username' ) && ! message.startsWith( 'Password' ) ) throw err;
 
+      if ( ! message.startsWith( 'Username' ) && ! message.startsWith( 'Password' ) ) throw err;
       ui.error( message );
 
-      if ( message.startsWith( 'Username' ) ) username = await prompt( 'Administrator username:', username );
+      if ( message.startsWith( 'Username' ) )
+        username = await prompt( 'Administrator username:', username );
     }
   }
 };
