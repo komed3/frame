@@ -1,4 +1,5 @@
 import { confirm } from '@/src/maintenance/utils/prompt';
+import { ui } from '@/src/maintenance/utils/ui';
 import { auth } from '@/src/server/core/Auth';
 import { Command } from 'commander';
 
@@ -15,13 +16,14 @@ export const registerAuthCommands = ( program: Command ) : void => {
       const sessions = auth.listSessions();
 
       if ( ! sessions.length ) {
-        console.log( 'No active sessions.' );
+        ui.info( 'No active sessions.' );
         return;
       }
 
       console.table( sessions.map( session => ( {
         id: session.id, userId: session.userId, username: session.username,
-        admin: session.isAdmin, createdAt: session.createdAt, lastSeenAt: session.lastSeenAt,
+        admin: session.isAdmin ? ui.value( 'yes' ) : ui.muted( 'no' ),
+        createdAt: session.createdAt, lastSeenAt: session.lastSeenAt,
         expiresAt: session.expiresAt
       } ) ) );
     } );
@@ -32,11 +34,11 @@ export const registerAuthCommands = ( program: Command ) : void => {
     .option( '-y, --yes', 'Confirm revoking all sessions without prompting' )
     .action( async ( options: { yes?: boolean } ) => {
       if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) ) {
-        console.log( 'Cancelled.' );
+        ui.info( 'Cancelled.' );
         return;
       }
 
       const count = auth.logoutAll();
-      console.log( `Revoked ${ count } session(s).` );
+      ui.success( `Revoked ${ count } session(s).` );
     } );
-}
+};
