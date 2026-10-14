@@ -16,11 +16,11 @@ const resolveId = ( value: string ) : number => {
 
 
 export const registerUserCommands = ( program: Command ) : void => {
-  const user = program
+  const userCommand = program
     .command( 'user' )
     .description( 'Manage users' );
 
-  user
+  userCommand
     .command( 'list' )
     .description( 'List all users' )
     .action( () => console.table( users.list().map( user => ( {
@@ -29,7 +29,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       createdAt: user.createdAt
     } ) ) ) );
 
-  user
+  userCommand
     .command( 'create <username>' )
     .description( 'Create a user' )
     .requiredOption( '--pw <password>', 'Initial password' )
@@ -39,7 +39,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       console.log( `Created user ${ created.username } (ID ${ created.id })` );
     } );
 
-  user
+  userCommand
     .command( 'delete <user>' )
     .description( 'Delete a user by ID or username' )
     .option( '--yes', 'Confirm deletion' )
@@ -56,7 +56,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       console.log( `Deleted user ${ target.username } (ID ${ target.id })` );
     } );
 
-  user
+  userCommand
     .command( 'rename <user> <username>' )
     .description( 'Change a username' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
@@ -67,7 +67,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       console.log( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
     } );
 
-  user
+  userCommand
     .command( 'password <user>' )
     .description( 'Change a user password' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
@@ -81,7 +81,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       console.log( 'All sessions for this user have been revoked.' );
     } );
 
-  user
+  userCommand
     .command( 'admin <user>' )
     .description( 'Grant or revoke administrator privileges' )
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
@@ -96,7 +96,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       );
     } );
 
-  user
+  userCommand
     .command( 'disable <user>' )
     .description( 'Disable a user and revoke their sessions' )
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
@@ -107,7 +107,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       console.log( `Disabled user ${ target.username } (ID ${ target.id })` );
     } );
 
-  user
+  userCommand
     .command( 'enable <user>' )
     .description( 'Enable a disabled user' )
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
