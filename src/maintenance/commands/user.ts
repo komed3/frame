@@ -38,4 +38,21 @@ export const registerUserCommands = ( program: Command ) : void => {
       const created = await users.create( username, options.password, !! options.admin );
       console.log( `Created user ${ created.username } (ID ${ created.id })` );
     } );
+
+  user
+    .command( 'delete <user>' )
+    .description( 'Delete a user by ID or username' )
+    .option( '--yes', 'Confirm deletion' )
+    .action( ( reference: string, options: { yes?: boolean } ) => {
+      if ( ! options.yes ) throw new Error( 'Deletion requires --yes' );
+
+      const target = resolveUser( reference );
+
+      if ( target.isAdmin && ! target.disabledAt && users.list().filter(
+        user => user.isAdmin && ! user.disabledAt
+      ).length <= 1 ) throw new Error( 'Cannot delete the last active administrator' );
+
+      users.delete( target.id );
+      console.log( `Deleted user ${ target.username } (ID ${ target.id })` );
+    } );
 }
