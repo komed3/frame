@@ -33,7 +33,7 @@ export const registerConfigCommands = ( program: Command ) : void => {
     .command( 'get <name>' )
     .description( 'Show a configuration value' )
     .action( ( name: string ) => {
-      const key = resolveName( name ), def = Config.schema[ name as ConfigName ];
+      const key = resolveName( name ), def = Config.schema[ key ];
 
       console.log( ui.muted( def.desc ) );
       console.log( `${ ui.key( key ) }=${ ui.value( JSON.stringify( Config.get( key ) ) ) }` );
