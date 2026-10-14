@@ -97,4 +97,22 @@ export class User {
 
     return row ? this.toRecord( row ) : null;
   }
+
+  public async create ( username: string, password: string, isAdmin = false ) : Promise< UserRecord > {
+    const name = this.validateUsername( username );
+    this.validatePassword( password );
+
+    if ( this.getByUsername( name ) ) throw new Error( 'Username is already taken' );
+    const hash = await this.hashPassword( password );
+
+    const result = conn.prepare( `
+      INSERT INTO users ( username, pw_hash, is_admin )
+      VALUES ( ?, ?, ? )
+    ` ).run( name, hash, isAdmin ? 1 : 0 );
+
+    const user = this.get( Number( result.lastInsertRowid ) );
+    if ( ! user ) throw new Error( 'Failed to create user' );
+
+    return user;
+  }
 }
