@@ -1,3 +1,4 @@
+import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
 import type { ConfigName } from '@/src/shared/types/config';
 import { Command } from 'commander';
@@ -22,10 +23,9 @@ export const registerConfigCommands = ( program: Command ) : void => {
 
       return {
         name: key, value: Config.get( key ), default: def.default,
-        type: def.type,
+        type: def.type, description: def.desc,
         min: def.type === 'integer' ? def.min : '',
-        max: def.type === 'integer' ? def.max : '',
-        desc: def.desc
+        max: def.type === 'integer' ? def.max : ''
       };
     } ) ) );
 
@@ -33,10 +33,10 @@ export const registerConfigCommands = ( program: Command ) : void => {
     .command( 'get <name>' )
     .description( 'Show a configuration value' )
     .action( ( name: string ) => {
-      const key = resolveName( name ), def = Config.schema[ key ];
+      const key = resolveName( name ), def = Config.schema[ name as ConfigName ];
 
-      console.log( `${ key }=${ JSON.stringify( Config.get( key ) ) }` );
-      console.log( def.desc );
+      console.log( ui.muted( def.desc ) );
+      console.log( `${ ui.key( key ) }=${ ui.value( JSON.stringify( Config.get( key ) ) ) }` );
     } );
 
   configCommand
@@ -46,8 +46,8 @@ export const registerConfigCommands = ( program: Command ) : void => {
       const key = resolveName( name );
       const updated = Config.set( key, Config.validate( key, value ) );
 
-      console.log( `Updated ${ key }=${ JSON.stringify( updated ) }` );
-      console.log( 'Restart Frame for changes to take effect.' );
+      ui.success( `Updated ${ key }=${ JSON.stringify( updated ) }` );
+      ui.warning( 'Restart Frame for changes to take effect.' );
     } );
 
   configCommand
@@ -57,7 +57,7 @@ export const registerConfigCommands = ( program: Command ) : void => {
       const key = resolveName( name );
       Config.reset( key );
 
-      console.log( `Reset ${ key } to ${ JSON.stringify( Config.get( key ) ) }` );
-      console.log( 'Restart Frame for changes to take effect.' );
+      ui.success( `Reset ${ key } to ${ JSON.stringify( Config.get( key ) ) }` );
+      ui.warning( 'Restart Frame for changes to take effect.' );
     } );
-}
+};
