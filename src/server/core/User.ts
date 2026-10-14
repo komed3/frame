@@ -60,4 +60,11 @@ export class User {
 
     return timingSafeEqual( actual, expected );
   }
+
+  private assertAdmin ( actorId: number ) : void {
+    const actor = this.getRow( actorId );
+
+    if ( ! actor || actor.disabled_at || actor.is_admin !== 1 )
+      throw new Error( 'Administrator privileges are required' );
+  }
 }
