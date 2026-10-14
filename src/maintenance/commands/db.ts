@@ -41,4 +41,20 @@ export const registerDbCommands = ( program: Command ) : void => {
         }
       ] );
     } );
+
+  dbCommand
+    .command( 'reset' )
+    .description( 'Delete the database and reapply migrations' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( options: { yes?: boolean } ) => {
+      if ( ! options.yes && ! await confirm(
+        'This permanently deletes all database data. Is Frame stopped, and do you want to continue?'
+      ) ) {
+        ui.info( 'Cancelled.' );
+        return;
+      }
+
+      const count = db.reset();
+      ui.success( `Database reset. Applied ${ count } migration(s).` );
+    } );
 }
