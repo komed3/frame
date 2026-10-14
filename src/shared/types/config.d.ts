@@ -13,11 +13,11 @@ export type ConfigValue< K extends ConfigName > = ConfigSchema[ K ];
 
 export type ConfigDefinition< T > = {
   default: T;
-  description: string;
+  desc: string;
 } & (
   T extends number
-    ? { type: 'integer'; min: number; max: number }
-    : { type: 'string' | 'path' | 'enum'; values?: readonly string[] }
+    ? { type: 'integer', min: number, max: number }
+    : { type: 'string' | 'path' | 'enum', values?: readonly string[] }
 );
 
 export type ConfigTable = {
