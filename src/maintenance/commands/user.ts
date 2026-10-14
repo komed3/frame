@@ -13,3 +13,10 @@ const resolveId = ( value: string ) : number => {
   if ( ! Number.isSafeInteger( id ) || id <= 0 ) throw new Error( `Invalid ID: ${ value }` );
   return id;
 };
+
+
+export const registerUserCommands = ( program: Command ) : void => {
+  const user = program
+    .command( 'user' )
+    .description( 'Manage users' );
+}
