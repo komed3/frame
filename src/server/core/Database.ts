@@ -1,6 +1,7 @@
 import { Config } from '@/src/server/core/Config';
+import type { AppliedMigration, DatabaseStats } from '@/src/shared/types/database';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
@@ -33,9 +34,9 @@ export class Database {
         continue;
       }
 
-      this.transaction( ( connection ) => {
-        connection.exec( sql );
-        connection.prepare( 'INSERT INTO schema_migrations ( name, checksum ) VALUES ( ?, ? )' ).run( name, checksum );
+      this.transaction( conn => {
+        conn.exec( sql );
+        conn.prepare( 'INSERT INTO schema_migrations ( name, checksum ) VALUES ( ?, ? )' ).run( name, checksum );
       } );
     }
   }
@@ -55,23 +56,23 @@ export class Database {
     const path = Config.get( 'DB_PATH' );
     if ( path !== ':memory:' ) mkdirSync( dirname( path ), { recursive: true } );
 
-    const connection = new DatabaseSync( path );
+    const conn = new DatabaseSync( path );
 
     try {
-      connection.exec( `
+      conn.exec( `
         PRAGMA foreign_keys = ON;
         PRAGMA busy_timeout = ${ Config.get( 'DB_BUSY_TIMEOUT_MS' ) };
         PRAGMA journal_mode = WAL;
         PRAGMA synchronous = NORMAL;
       ` );
 
-      this.connection = connection;
+      this.connection = conn;
       this.migrate();
 
       return this;
     } catch ( err ) {
       this.connection = null;
-      connection.close();
+      conn.close();
       throw err;
     }
   }
