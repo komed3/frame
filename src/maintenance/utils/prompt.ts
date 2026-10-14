@@ -9,12 +9,13 @@ const assertInteractive = () : void => {
 };
 
 
-export const prompt = async ( message: string ) : Promise< string > => {
+export const prompt = async ( message: string, defaultValue?: string ) : Promise< string > => {
   assertInteractive();
 
   const rl = createInterface( { input: process.stdin, output: process.stdout } );
+  const question = `${ message }${ defaultValue !== undefined ? ui.muted( ` [${ defaultValue }]` ) : '' } `;
 
-  try { return ( await rl.question( message ) ).trim() }
+  try { return ( await rl.question( question ) ).trim() || defaultValue || '' }
   finally { rl.close() }
 };
 
