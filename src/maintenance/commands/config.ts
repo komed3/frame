@@ -9,12 +9,12 @@ const resolveName = ( name: string ) : ConfigName => {
 };
 
 
-export const registerEnvCommands = ( program: Command ) : void => {
-  const envCommand = program
-    .command( 'env' )
+export const registerConfigCommands = ( program: Command ) : void => {
+  const configCommand = program
+    .command( 'config' )
     .description( 'Manage environment configuration' );
 
-  envCommand
+  configCommand
     .command( 'list' )
     .description( 'List configuration values' )
     .action( () => console.table( Object.keys( Config.schema ).map( name => {
@@ -29,7 +29,7 @@ export const registerEnvCommands = ( program: Command ) : void => {
       };
     } ) ) );
 
-  envCommand
+  configCommand
     .command( 'get <name>' )
     .description( 'Show a configuration value' )
     .action( ( name: string ) => {
@@ -39,7 +39,7 @@ export const registerEnvCommands = ( program: Command ) : void => {
       console.log( def.desc );
     } );
 
-  envCommand
+  configCommand
     .command( 'set <name> <value>' )
     .description( 'Set a configuration value' )
     .action( ( name: string, value: string ) => {
@@ -50,7 +50,7 @@ export const registerEnvCommands = ( program: Command ) : void => {
       console.log( 'Restart Frame for changes to take effect.' );
     } );
 
-  envCommand
+  configCommand
     .command( 'unset <name>' )
     .description( 'Restore the default value' )
     .action( ( name: string ) => {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { registerAuthCommands } from '@/src/maintenance/commands/auth';
-import { registerEnvCommands } from '@/src/maintenance/commands/env';
+import { registerConfigCommands } from '@/src/maintenance/commands/config';
 import { registerUserCommands } from '@/src/maintenance/commands/user';
 import { db } from '@/src/server/core/Database';
 import { Command } from 'commander';
@@ -19,7 +19,7 @@ frame
   );
 
 
-registerEnvCommands( frame );
+registerConfigCommands( frame );
 registerUserCommands( frame );
 registerAuthCommands( frame );
 
