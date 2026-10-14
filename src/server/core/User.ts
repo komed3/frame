@@ -1,11 +1,11 @@
-import { conn } from '@/src/server/core/Database';
+import { as, conn } from '@/src/server/core/Database';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 
 export class User {
   private getRow ( userId: number ) : UserRow | null {
-    return conn.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) as unknown as UserRow | null;
+    return as< UserRow | null >( conn.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
   }
 
   private toRecord ( row: UserRow ) : UserRecord {
@@ -79,14 +79,21 @@ export class User {
     return target;
   }
 
+  public list () : UserRecord[] {
+    return as< UserRow[] >( conn.prepare(
+      'SELECT * FROM users ORDER BY username COLLATE NOCASE'
+    ).all() ).map( row => this.toRecord( row ) );
+  }
+
   public get ( userId: number ) : UserRecord | null {
     const row = this.getRow( userId );
     return row ? this.toRecord( row ) : null;
   }
 
   public getByUsername ( username: string ) : UserRecord | null {
-    const row = conn.prepare( 'SELECT * FROM users WHERE username = ? COLLATE NOCASE' )
-      .get( username.trim() ) as unknown as UserRow | null;
+    const row = as< UserRow | null >( conn.prepare(
+      'SELECT * FROM users WHERE username = ? COLLATE NOCASE'
+    ).get( username.trim() ) );
 
     return row ? this.toRecord( row ) : null;
   }
