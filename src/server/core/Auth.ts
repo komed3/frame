@@ -79,6 +79,10 @@ export class Auth {
 
     return rows.map( row => ( { ...row, isAdmin: row.isAdmin === 1 } ) );
   }
+
+  public logoutAll () : number {
+    return Number( conn().prepare( 'DELETE FROM sessions' ).run().changes );
+  }
 }
 
 
