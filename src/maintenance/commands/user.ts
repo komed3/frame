@@ -1,4 +1,5 @@
 import { confirm, promptPassword } from '@/src/maintenance/utils/prompt';
+import { ui } from '@/src/maintenance/utils/ui';
 import { users } from '@/src/server/core/User';
 import { Command } from 'commander';
 
@@ -41,7 +42,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       if ( pw !== conf ) throw new Error( 'Passwords do not match' );
       const created = await users.create( username, pw, !! options.admin );
 
-      console.log( `Created user ${ created.username } (ID ${ created.id })` );
+      ui.success( `Created user ${ created.username } (ID ${ created.id })` );
     } );
 
   userCommand
@@ -52,7 +53,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       const target = resolveUser( ref );
 
       if ( ! options.yes && ! await confirm( `Delete user ${ target.username } (ID ${ target.id })?` ) ) {
-        console.log( 'Cancelled.' );
+        ui.info( 'Cancelled.' );
         return;
       }
 
@@ -61,7 +62,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       ).length <= 1 ) throw new Error( 'Cannot delete the last active administrator' );
 
       users.delete( target.id );
-      console.log( `Deleted user ${ target.username } (ID ${ target.id })` );
+      ui.success( `Deleted user ${ target.username } (ID ${ target.id })` );
     } );
 
   userCommand
@@ -72,7 +73,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       const target = resolveUser( ref );
       const updated = users.changeUsername( resolveId( options.actor ), target.id, username );
 
-      console.log( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
+      ui.success( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
     } );
 
   userCommand
@@ -90,8 +91,8 @@ export const registerUserCommands = ( program: Command ) : void => {
       if ( pw !== conf ) throw new Error( 'Passwords do not match' );
       await users.changePassword( actorId, target.id, pw, curPw );
 
-      console.log( `Changed password for ${ target.username } (ID ${ target.id })` );
-      console.log( 'All sessions for this user have been revoked.' );
+      ui.success( `Changed password for ${ target.username } (ID ${ target.id })` );
+      ui.info( 'All sessions for this user have been revoked.' );
     } );
 
   userCommand
@@ -103,10 +104,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       const target = resolveUser( ref );
       users.setAdmin( resolveId( options.actor ), target.id, ! options.revoke );
 
-      console.log(
-        `${ options.revoke ? 'Revoked' : 'Granted' } administrator privileges ` +
-        `for ${ target.username }`
-      );
+      ui.success( `${ options.revoke ? 'Revoked' : 'Granted' } administrator privileges for ${ target.username }` );
     } );
 
   userCommand
@@ -117,7 +115,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       const target = resolveUser( ref );
       users.setDisabled( resolveId( options.actor ), target.id, true );
 
-      console.log( `Disabled user ${ target.username } (ID ${ target.id })` );
+      ui.success( `Disabled user ${ target.username }` );
     } );
 
   userCommand
@@ -128,6 +126,6 @@ export const registerUserCommands = ( program: Command ) : void => {
       const target = resolveUser( ref );
       users.setDisabled( resolveId( options.actor ), target.id, false );
 
-      console.log( `Enabled user ${ target.username } (ID ${ target.id })` );
+      ui.success( `Enabled user ${ target.username }` );
     } );
-}
+};
