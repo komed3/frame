@@ -6,10 +6,15 @@ export class Config {
   private static getNodeEnv () : string {
     const value = process.env.NODE_ENV?.trim() || 'dev';
 
-    if ( ! [ 'development', 'dev', 'test', 'prod', 'production' ].includes( value ) )
+    if ( ! [ 'dev', 'development', 'test', 'prod', 'production' ].includes( value ) )
       throw new Error( `Invalid environment name: ${ value }` );
 
     return value;
+  }
+
+  private static getPath ( name: string, fallback: string ) : string {
+    const value = process.env[ name ]?.trim() || fallback;
+    return value === ':memory:' ? value : resolve( value );
   }
 
   private static getInteger ( name: string, fallback: number, min: number = 0, max: number = Infinity ) : number {
@@ -27,10 +32,10 @@ export class Config {
   public static readonly HOST = process.env.HOST?.trim() || '0.0.0.0';
   public static readonly PORT = Config.getInteger( 'PORT', 3000, 1, 65535 );
 
-  public static readonly DB_PATH = resolve( process.env.DB_PATH?.trim() || 'data/frame.sqlite' );
+  public static readonly DB_PATH = Config.getPath( 'DB_PATH', 'data/frame.sqlite' );
   public static readonly DB_BUSY_TIMEOUT_MS = Config.getInteger( 'DB_BUSY_TIMEOUT_MS', 5000, 0, 60000 );
 
-  public static readonly ASSETS_PATH = resolve( process.env.ASSETS_PATH?.trim() || 'data/assets' );
+  public static readonly ASSETS_PATH = Config.getPath( 'ASSETS_PATH', 'data/assets' );
 
   public static readonly SESSION_LIFETIME_MS = Config.getInteger( 'SESSION_LIFETIME_MS', 2592000000 );
 }
