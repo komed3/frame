@@ -61,13 +61,11 @@ const createAdmin = async () : Promise< void > => {
       return;
     } catch ( err ) {
       const message = err instanceof Error ? err.message : String( err );
-      if ( ! message.startsWith( 'Username' ) && ! message.startsWith( 'Password' ) )
-        throw err;
+      if ( ! message.startsWith( 'Username' ) && ! message.startsWith( 'Password' ) ) throw err;
 
       ui.error( message );
 
-      if ( message.startsWith( 'Username' ) )
-        username = await prompt( 'Administrator username:', username );
+      if ( message.startsWith( 'Username' ) ) username = await prompt( 'Administrator username:', username );
     }
   }
 };
@@ -86,7 +84,7 @@ export const registerInitCommands = ( program: Command ) : void => {
       await createAdmin();
 
       ui.nl();
-      ui.success( 'Frame initialization complete.' );
+      ui.info( 'Frame initialization complete.' );
       ui.info( 'Start Frame and have fun watching your videos!' );
     } );
 };
