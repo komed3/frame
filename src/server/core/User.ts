@@ -79,6 +79,12 @@ export class User {
     return target;
   }
 
+  private assertCanDestructive ( target: UserRow, errMsg: string ) : void {
+    if ( target.is_admin === 1 && ! target.disabled_at && as< { count: number } >( conn().prepare(
+      'SELECT COUNT(*) AS count FROM users WHERE is_admin = 1 AND disabled_at IS NULL'
+    ).get() ).count <= 1 ) throw new Error( errMsg );
+  }
+
   public list () : UserRecord[] {
     return as< UserRow[] >( conn().prepare(
       'SELECT * FROM users ORDER BY username COLLATE NOCASE'
@@ -116,10 +122,14 @@ export class User {
     return user;
   }
 
+  
   public delete ( userId: number ) : void {
-    if ( ! this.getRow( userId ) ) throw new Error( 'User does not exist' );
-
     db.transaction( db => {
+      const target = as< UserRow | null >( db.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
+      if ( ! target ) throw new Error( 'User does not exist' );
+
+      this.assertCanDestructive( target, 'Cannot delete the last active administrator' );
+
       db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
       db.prepare( 'DELETE FROM users WHERE id = ?' ).run( userId );
     } );
@@ -161,11 +171,7 @@ export class User {
     db.transaction( db => {
       const target = as< UserRow | null >( db.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
       if ( ! target ) throw new Error( 'User does not exist' );
-
-      if ( ! isAdmin && target.is_admin === 1 && as< { count: number } >( db.prepare(
-        'SELECT COUNT(*) AS count FROM users WHERE is_admin = 1 AND disabled_at IS NULL'
-      ).get() ).count <= 1 )
-        throw new Error( 'Cannot remove administrator privileges from the last active administrator' );
+      if ( ! isAdmin ) this.assertCanDestructive( target, 'Cannot remove privileges from the last active administrator' );
 
       db.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
     } );
