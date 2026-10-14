@@ -154,4 +154,11 @@ export class User {
       db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
     } );
   }
+
+  public setAdmin ( actorId: number, userId: number, isAdmin: boolean ) : void {
+    this.assertAdmin( actorId );
+    if ( ! this.getRow( userId ) ) throw new Error( 'User does not exist' );
+
+    conn.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
+  }
 }
