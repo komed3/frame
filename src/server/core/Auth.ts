@@ -17,7 +17,7 @@ export class Auth {
 
     const token = randomBytes( 32 ).toString( 'base64url' );
     const now = new Date(), createdAt = now.toISOString();
-    const expiresAt = new Date( now.getTime() + Config.SESSION_LIFETIME_MS ).toISOString();
+    const expiresAt = new Date( now.getTime() + Config.get( 'SESSION_LIFETIME_MS' ) ).toISOString();
 
     db.transaction( db => {
       db.prepare( 'DELETE FROM sessions WHERE expires_at <= ?' ).run( createdAt );

@@ -52,13 +52,15 @@ export class Database {
   public open () : this {
     if ( this.connection ) return this;
 
-    if ( Config.DB_PATH !== ':memory:' ) mkdirSync( dirname( resolve( Config.DB_PATH ) ), { recursive: true } );
-    const connection = new DatabaseSync( Config.DB_PATH );
+    const path = Config.get( 'DB_PATH' );
+    if ( path !== ':memory:' ) mkdirSync( dirname( path ), { recursive: true } );
+
+    const connection = new DatabaseSync( path );
 
     try {
       connection.exec( `
         PRAGMA foreign_keys = ON;
-        PRAGMA busy_timeout = ${ Config.DB_BUSY_TIMEOUT_MS };
+        PRAGMA busy_timeout = ${ Config.get( 'DB_BUSY_TIMEOUT_MS' ) };
         PRAGMA journal_mode = WAL;
         PRAGMA synchronous = NORMAL;
       ` );
