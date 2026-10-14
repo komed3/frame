@@ -1,0 +1,15 @@
+import chalk from 'chalk';
+
+
+export const ui = {
+  success: ( text: string ) => console.log( chalk.green( `✔ ${ text }` ) ),
+  info: ( text: string ) => console.log( chalk.cyan( `ℹ ${ text }` ) ),
+  warning: ( text: string ) => console.log( chalk.yellow( `⚠ ${ text }` ) ),
+  error: ( text: string ) => console.error( chalk.red( `✖ ${ text }` ) ),
+  muted: ( text: string ) => chalk.gray( text ),
+  key: ( text: string ) => chalk.bold( text ),
+  value: ( text: string ) => chalk.cyan( text ),
+  status: ( active: boolean ) => active ? chalk.green( 'active' ) : chalk.red( 'disabled' ),
+  prompt: ( text: string ) => chalk.cyan( text ),
+  confirm: ( text: string ) => `${ chalk.yellow( text ) } ${ chalk.gray( '[y/N] ' ) }`
+};
