@@ -55,4 +55,15 @@ export const registerUserCommands = ( program: Command ) : void => {
       users.delete( target.id );
       console.log( `Deleted user ${ target.username } (ID ${ target.id })` );
     } );
+
+  user
+    .command( 'rename <user> <username>' )
+    .description( 'Change a username' )
+    .requiredOption( '--actor <id>', 'ID of the acting user' )
+    .action( ( reference: string, username: string, options: { actor: string } ) => {
+      const target = resolveUser( reference );
+      const updated = users.changeUsername( resolveId( options.actor ), target.id, username );
+
+      console.log( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
+    } );
 }
