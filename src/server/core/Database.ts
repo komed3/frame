@@ -77,6 +77,16 @@ export class Database {
     }
   }
 
+  public close () : void {
+    if ( ! this.connection ) return;
+
+    if ( this.transactionActive )
+      throw new Error( 'Database cannot be closed while a transaction is running' );
+
+    this.connection.close();
+    this.connection = null;
+  }
+
   public listMigrations () : AppliedMigration[] {
     return as< AppliedMigration[] >( this.open().db.prepare( `
       SELECT name, checksum, applied_at AS appliedAt
@@ -120,14 +130,16 @@ export class Database {
     };
   }
 
-  public close () : void {
-    if ( ! this.connection ) return;
+  public reset () : number {
+    const path = Config.get( 'DB_PATH' );
+    this.close();
 
-    if ( this.transactionActive )
-      throw new Error( 'Database cannot be closed while a transaction is running' );
+    if ( path !== ':memory:' )
+      for ( const file of [ path, `${ path }-wal`, `${ path }-shm` ] )
+        rmSync( file, { force: true } );
 
-    this.connection.close();
-    this.connection = null;
+    this.open();
+    return this.listMigrations().length;
   }
 
   public transaction < T > ( callback: ( db: DatabaseSync ) => T ) : T {
@@ -156,6 +168,6 @@ export class Database {
 }
 
 
-export const as = < T > ( x: unknown ) : T => x as T;
+export const as = < T > ( value: unknown ) : T => value as T;
 export const db = new Database();
 export const conn = () => db.open().db;
