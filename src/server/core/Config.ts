@@ -43,4 +43,23 @@ export class Config {
   public static get < K extends ConfigName > ( name: K ) : ConfigValue< K > {
     return this.validate( name, process.env[ name ] ?? this.schema[ name ].default );
   }
+
+  public static set < K extends ConfigName > ( name: K, value: ConfigValue< K > ) : ConfigValue< K > {
+    const parsed = this.validate( name, value ), file = resolve( '.env' );
+    const lines = ( existsSync( file ) ? readFileSync( file, 'utf8' ) : '' ).split( /\r?\n/ );
+    const pattern = new RegExp( `^\\s*(?:export\\s+)?${ name }\\s*=` );
+    const matches = lines.reduce( ( idx, l, i ) => pattern.test( l ) ? [ ...idx, i ] : idx, [] as number[] );
+    const line = `${ name }=${ JSON.stringify( parsed ) }`;
+
+    if ( matches.length ) {
+      lines[ matches[ 0 ] ] = line;
+      for ( const index of matches.slice( 1 ).reverse() ) lines.splice( index, 1 );
+    } else lines.push( line );
+
+    writeFileSync( file, `${ lines.filter( ( l, i ) => i < lines.length - 1 || l !== '' ).join( '\n' ) }\n`, { mode: 0o600 } );
+    chmodSync( file, 0o600 );
+    process.env[ name ] = String( parsed );
+
+    return parsed;
+  }
 }
