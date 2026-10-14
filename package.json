@@ -1,9 +1,18 @@
 {
   "name": "frame",
+  "private": true,
   "description": "Private self-hosted video management platform",
   "version": "2.0.0",
   "license": "MIT",
-  "private": true,
+  "author": {
+    "name": "komed3 (Paul Köhler)",
+    "email": "webmaster@komed3.de",
+    "url": "https://komed3.de"
+  },
+  "homepage": "https://github.com/komed3/frame",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev tsx src/server/run.ts",
