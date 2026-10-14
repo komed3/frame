@@ -1,13 +1,13 @@
 import { Config } from '@/src/server/core/Config';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
 
 export class Database {
   private connection: DatabaseSync | null = null;
-  private transactionDepth = 0;
+  private transactionActive = false;
 
   private migrate () : void {
     const db = this.db;
@@ -21,42 +21,21 @@ export class Database {
       );
     ` );
 
-    if ( ! existsSync( migrationsPath ) )
-      throw new Error( `Migrations directory does not exist: ${ migrationsPath }` );
-
-    const files = readdirSync( migrationsPath )
-      .filter( ( name ) => /^\d+__.*\.sql$/i.test( name ) )
-      .sort( ( a, b ) => a.localeCompare( b, 'en' ) );
-
-    for ( const name of files ) {
-      const path = join( migrationsPath, name );
-      const sql = readFileSync( path, 'utf8' );
+    for ( const name of readdirSync( migrationsPath ).filter( ( name ) => /^.*\.sql$/i.test( name ) ).sort() ) {
+      const sql = readFileSync( join( migrationsPath, name ), 'utf8' );
       const checksum = createHash( 'sha256' ).update( sql ).digest( 'hex' );
-      const existing = db.prepare( `
-        SELECT checksum
-        FROM schema_migrations
-        WHERE name = ?
-      ` ).get( name );
+      const existing = db.prepare( 'SELECT checksum FROM schema_migrations WHERE name = ?' ).get( name );
 
-      if ( existing && typeof existing === 'object' && 'checksum' in existing ) {
-        if ( existing.checksum !== checksum )
+      if ( existing ) {
+        if ( typeof existing !== 'object' || ! ( 'checksum' in existing ) || existing.checksum !== checksum )
           throw new Error( `An already applied migration has been modified: ${ name }` );
 
         continue;
       }
 
-      const migration = sql
-        .replace( /^\s*PRAGMA\s+foreign_keys\s*=\s*ON\s*;\s*/gim, '' )
-        .replace( /^\s*BEGIN\s+IMMEDIATE\s*;\s*/gim, '' )
-        .replace( /^\s*COMMIT\s*;\s*$/gim, '' );
-
       this.transaction( ( connection ) => {
-        connection.exec( migration );
-
-        connection.prepare( `
-          INSERT INTO schema_migrations ( name, checksum )
-          VALUES ( ?, ? )
-        ` ).run( name, checksum );
+        connection.exec( sql );
+        connection.prepare( 'INSERT INTO schema_migrations ( name, checksum ) VALUES ( ?, ? )' ).run( name, checksum );
       } );
     }
   }
@@ -97,9 +76,7 @@ export class Database {
 
   public close () : void {
     if ( ! this.connection ) return;
-
-    if ( this.transactionDepth > 0 )
-      throw new Error( 'Database cannot be closed while a transaction is running' );
+    if ( this.transactionActive ) throw new Error( 'Database cannot be closed while a transaction is running' );
 
     this.connection.close();
     this.connection = null;
@@ -107,25 +84,23 @@ export class Database {
 
   public transaction < T > ( callback: ( db: DatabaseSync ) => T ) : T {
     const db = this.db;
-    if ( this.transactionDepth > 0 ) throw new Error( 'Nested transactions are not supported' );
+    if ( this.transactionActive ) throw new Error( 'Nested transactions are not supported' );
 
     db.exec( 'BEGIN IMMEDIATE' );
-    this.transactionDepth++;
+    this.transactionActive = true;
 
     try {
       const result = callback( db );
-
       if ( result && typeof result === 'object' && 'then' in result )
         throw new Error( 'Database transactions must execute synchronously' );
 
       db.exec( 'COMMIT' );
-
       return result;
-    } catch ( error ) {
-      db.exec( 'ROLLBACK' );
-      throw error;
+    } catch ( err ) {
+      db.exec( 'ROLLBACK' )
+      throw err;
     } finally {
-      this.transactionDepth--;
+      this.transactionActive = false;
     }
   }
 }
