@@ -10,7 +10,7 @@ export interface UserRow {
   id: number;
   username: string;
   pw_hash: string;
-  is_admin: number;
+  is_admin: 0 | 1;
   created_at: string;
   disabled_at: string | null;
 }
