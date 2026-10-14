@@ -28,4 +28,14 @@ export const registerEnvCommands = ( program: Command ) : void => {
         desc: def.desc
       };
     } ) ) );
+
+  envCommand
+    .command( 'get <name>' )
+    .description( 'Show a configuration value' )
+    .action( ( name: string ) => {
+      const key = resolveName( name ), def = Config.schema[ key ];
+
+      console.log( `${ key }=${ JSON.stringify( Config.get( key ) ) }` );
+      console.log( def.desc );
+    } );
 }
