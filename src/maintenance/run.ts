@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { registerAuthCommands } from '@/src/maintenance/commands/auth';
+import { registerUserCommands } from '@/src/maintenance/commands/user';
 import { db } from '@/src/server/core/Database';
 import { Command } from 'commander';
 
@@ -14,6 +16,10 @@ frame
     'Copyright (c) 2026 komed3. MIT license.\n\n' +
     'Maintenance script.'
   );
+
+
+registerUserCommands( frame );
+registerAuthCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
