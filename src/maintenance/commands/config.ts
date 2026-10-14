@@ -13,4 +13,19 @@ export const registerEnvCommands = ( program: Command ) : void => {
   const envCommand = program
     .command( 'env' )
     .description( 'Manage environment configuration' );
+
+  envCommand
+    .command( 'list' )
+    .description( 'List configuration values' )
+    .action( () => console.table( Object.keys( Config.schema ).map( name => {
+      const key = resolveName( name ), def = Config.schema[ key ];
+
+      return {
+        name: key, value: Config.get( key ), default: def.default,
+        type: def.type,
+        min: def.type === 'integer' ? def.min : '',
+        max: def.type === 'integer' ? def.max : '',
+        desc: def.desc
+      };
+    } ) ) );
 }
