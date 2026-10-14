@@ -107,3 +107,4 @@ export class Database {
 
 
 export const db = new Database();
+export const conn = db.open().db;
