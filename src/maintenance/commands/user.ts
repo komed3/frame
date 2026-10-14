@@ -32,10 +32,10 @@ export const registerUserCommands = ( program: Command ) : void => {
   user
     .command( 'create <username>' )
     .description( 'Create a user' )
-    .requiredOption( '--password <password>', 'Initial password' )
+    .requiredOption( '--pw <password>', 'Initial password' )
     .option( '--admin', 'Grant administrator privileges' )
-    .action( async ( username: string, options: { password: string; admin?: boolean } ) => {
-      const created = await users.create( username, options.password, !! options.admin );
+    .action( async ( username: string, options: { pw: string; admin?: boolean } ) => {
+      const created = await users.create( username, options.pw, !! options.admin );
       console.log( `Created user ${ created.username } (ID ${ created.id })` );
     } );
 
@@ -43,10 +43,10 @@ export const registerUserCommands = ( program: Command ) : void => {
     .command( 'delete <user>' )
     .description( 'Delete a user by ID or username' )
     .option( '--yes', 'Confirm deletion' )
-    .action( ( reference: string, options: { yes?: boolean } ) => {
+    .action( ( ref: string, options: { yes?: boolean } ) => {
       if ( ! options.yes ) throw new Error( 'Deletion requires --yes' );
 
-      const target = resolveUser( reference );
+      const target = resolveUser( ref );
 
       if ( target.isAdmin && ! target.disabledAt && users.list().filter(
         user => user.isAdmin && ! user.disabledAt
@@ -60,8 +60,8 @@ export const registerUserCommands = ( program: Command ) : void => {
     .command( 'rename <user> <username>' )
     .description( 'Change a username' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
-    .action( ( reference: string, username: string, options: { actor: string } ) => {
-      const target = resolveUser( reference );
+    .action( ( ref: string, username: string, options: { actor: string } ) => {
+      const target = resolveUser( ref );
       const updated = users.changeUsername( resolveId( options.actor ), target.id, username );
 
       console.log( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
@@ -71,11 +71,11 @@ export const registerUserCommands = ( program: Command ) : void => {
     .command( 'password <user>' )
     .description( 'Change a user password' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
-    .requiredOption( '--password <password>', 'New password' )
-    .option( '--current-password <password>', 'Current password when changing your own password' )
-    .action( async ( reference: string, options: { actor: string; password: string; currentPassword?: string } ) => {
-      const target = resolveUser( reference );
-      await users.changePassword( resolveId( options.actor ), target.id, options.password, options.currentPassword );
+    .requiredOption( '--pw <password>', 'New password' )
+    .option( '--current-pw <password>', 'Current password when changing your own password' )
+    .action( async ( ref: string, options: { actor: string; pw: string; currentPw?: string } ) => {
+      const target = resolveUser( ref );
+      await users.changePassword( resolveId( options.actor ), target.id, options.pw, options.currentPw );
 
       console.log( `Changed password for ${ target.username } (ID ${ target.id })` );
       console.log( 'All sessions for this user have been revoked.' );
