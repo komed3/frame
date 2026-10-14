@@ -80,4 +80,19 @@ export const registerUserCommands = ( program: Command ) : void => {
       console.log( `Changed password for ${ target.username } (ID ${ target.id })` );
       console.log( 'All sessions for this user have been revoked.' );
     } );
+
+  user
+    .command( 'admin <user>' )
+    .description( 'Grant or revoke administrator privileges' )
+    .requiredOption( '--actor <id>', 'ID of the acting administrator' )
+    .option( '--revoke', 'Revoke administrator privileges' )
+    .action( ( ref: string, options: { actor: string; revoke?: boolean } ) => {
+      const target = resolveUser( ref );
+      users.setAdmin( resolveId( options.actor ), target.id, ! options.revoke );
+
+      console.log(
+        `${ options.revoke ? 'Revoked' : 'Granted' } administrator privileges ` +
+        `for ${ target.username }`
+      );
+    } );
 }
