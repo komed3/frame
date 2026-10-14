@@ -124,4 +124,19 @@ export class User {
       db.prepare( 'DELETE FROM users WHERE id = ?' ).run( userId );
     } );
   }
+
+  public changeUsername ( actorId: number, userId: number, username: string ) : UserRecord {
+    const target = this.assertCanManage( actorId, userId );
+    const name = this.validateUsername( username );
+
+    const existing = this.getByUsername( name );
+    if ( existing && existing.id !== target.id ) throw new Error( 'Username is already taken' );
+
+    conn.prepare( 'UPDATE users SET username = ? WHERE id = ?' ).run( name, userId );
+
+    const user = this.get( userId );
+    if ( ! user ) throw new Error( 'User does not exist' );
+
+    return user;
+  }
 }
