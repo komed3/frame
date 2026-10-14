@@ -11,5 +11,6 @@ export const ui = {
   value: ( text: string ) => chalk.cyan( text ),
 
   confirm: ( text: string ) => `${ text } ${ chalk.gray( '[y/N] ' ) }`,
+  muted: ( text: string ) => chalk.gray( text ),
   cancelled: () => console.log( chalk.yellow( 'Cancelled.' ) )
 };
