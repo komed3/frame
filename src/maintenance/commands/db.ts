@@ -45,8 +45,10 @@ export const registerDbCommands = ( program: Command ) : void => {
     .description( 'Delete the database and reapply migrations' )
     .option( '-y, --yes', 'Skip confirmation' )
     .action( async ( options: { yes?: boolean } ) => {
-      if ( ! options.yes && ! await confirm( 'This permanently deletes all database data. Continue?' ) )
-        return ui.cancelled();
+      ui.warning( 'Please stop the server before resetting the database.' );
+      ui.warning( 'This will permanently delete all database data and cannot be undone.' );
+
+      if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
 
       const count = db.reset();
       ui.success( `Database reset. Applied ${ count } migration(s).` );
