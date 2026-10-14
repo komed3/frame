@@ -14,4 +14,29 @@ export class Config {
     ASSETS_PATH: { type: 'path', desc: 'Generated assets path', default: 'data/assets' },
     SESSION_LIFETIME_MS: { type: 'integer', desc: 'Session lifetime', default: 2592e6, min: 6e4, max: 31536e6 }
   } satisfies ConfigTable;
+
+  public static validate < K extends ConfigName > ( name: K, value: unknown ) : ConfigValue< K > {
+    const definition = this.schema[ name ];
+
+    if ( definition.type === 'integer' ) {
+      const parsed = typeof value === 'number' ? value : Number( value );
+
+      if ( ! Number.isInteger( parsed ) || parsed < definition.min || parsed > definition.max )
+        throw new Error( `${ name } must be an integer between ${ definition.min } and ${ definition.max }` );
+
+      return parsed as ConfigValue< K >;
+    }
+
+    if ( typeof value !== 'string' || ! value.trim() )
+      throw new Error( `${ name } must be a non-empty string` );
+
+    const parsed = value.trim();
+
+    if ( definition.type === 'enum' && ! definition.values.includes( parsed ) )
+      throw new Error( `Invalid value for ${ name }: ${ parsed }` );
+
+    return ( definition.type === 'path'
+      ? name === 'DB_PATH' && parsed === ':memory:' ? parsed : resolve( parsed )
+      : parsed ) as ConfigValue< K >;
+  }
 }
