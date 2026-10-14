@@ -7,8 +7,9 @@ import { Command } from 'commander';
 
 
 const configure = async () : Promise< void > => {
-  ui.info( 'Configure Frame' );
-  ui.info( 'Press Enter to accept the displayed default value.\n' );
+  ui.headline( 'Configure Frame', '[1/2]' );
+  ui.info( 'Press Enter to accept the displayed default value.' );
+  ui.nl();
 
   for ( const key of Object.keys( Config.schema ) as ConfigName[] ) {
     const def = Config.schema[ key ], cur = String( Config.get( key ) );
