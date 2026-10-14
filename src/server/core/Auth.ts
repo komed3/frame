@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { type User, users } from '@/src/server/core/User';
-import type { AuthResult, SessionRow } from '@/src/shared/types/auth';
+import type { ActiveSession, ActiveSessionRow, AuthResult, SessionRow } from '@/src/shared/types/auth';
 import { createHash, randomBytes } from 'node:crypto';
 
 
@@ -58,6 +58,26 @@ export class Auth {
     ).run( now.toISOString(), session.id );
 
     return user;
+  }
+
+  public listSessions () : ActiveSession[] {
+    const rows = as< ActiveSessionRow[] >( conn().prepare( `
+      SELECT
+        s.id,
+        s.user_id AS userId,
+        u.username,
+        u.is_admin AS isAdmin,
+        s.created_at AS createdAt,
+        s.expires_at AS expiresAt,
+        s.last_seen_at AS lastSeenAt
+      FROM sessions s
+      JOIN users u ON u.id = s.user_id
+      WHERE s.expires_at > ?
+        AND u.disabled_at IS NULL
+      ORDER BY s.last_seen_at DESC, s.created_at DESC
+    ` ).all( new Date().toISOString() ) );
+
+    return rows.map( row => ( { ...row, isAdmin: row.isAdmin === 1 } ) );
   }
 }
 
