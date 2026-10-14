@@ -155,21 +155,21 @@ export class User {
     } );
   }
 
-    public setAdmin ( actorId: number, userId: number, isAdmin: boolean ) : void {
-      this.assertAdmin( actorId );
+  public setAdmin ( actorId: number, userId: number, isAdmin: boolean ) : void {
+    this.assertAdmin( actorId );
 
-      db.transaction( db => {
-        const target = as< UserRow | null >( db.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
-        if ( ! target ) throw new Error( 'User does not exist' );
+    db.transaction( db => {
+      const target = as< UserRow | null >( db.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
+      if ( ! target ) throw new Error( 'User does not exist' );
 
-        if ( ! isAdmin && target.is_admin === 1 && as< { count: number } >( db.prepare(
-            'SELECT COUNT(*) AS count FROM users WHERE is_admin = 1 AND disabled_at IS NULL'
-          ).get() ).count <= 1 )
-          throw new Error( 'Cannot remove administrator privileges from the last active administrator' );
+      if ( ! isAdmin && target.is_admin === 1 && as< { count: number } >( db.prepare(
+        'SELECT COUNT(*) AS count FROM users WHERE is_admin = 1 AND disabled_at IS NULL'
+      ).get() ).count <= 1 )
+        throw new Error( 'Cannot remove administrator privileges from the last active administrator' );
 
-        db.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
-      } );
-    }
+      db.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
+    } );
+  }
 
   public setDisabled ( actorId: number, userId: number, disabled: boolean ) : void {
     this.assertAdmin( actorId );
