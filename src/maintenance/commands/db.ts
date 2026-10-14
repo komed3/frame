@@ -47,6 +47,7 @@ export const registerDbCommands = ( program: Command ) : void => {
     .action( async ( options: { yes?: boolean } ) => {
       ui.warning( 'Please stop the server before resetting the database.' );
       ui.warning( 'This will permanently delete all database data and cannot be undone.' );
+      ui.nl();
 
       if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
 

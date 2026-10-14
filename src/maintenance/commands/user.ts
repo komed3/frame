@@ -42,6 +42,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       if ( pw !== conf ) throw new Error( 'Passwords do not match' );
       const created = await users.create( username, pw, !! options.admin );
 
+      ui.nl();
       ui.success( `Created user ${ created.username } (ID ${ created.id })` );
     } );
 
@@ -89,6 +90,7 @@ export const registerUserCommands = ( program: Command ) : void => {
       if ( pw !== conf ) throw new Error( 'Passwords do not match' );
       await users.changePassword( actorId, target.id, pw, curPw );
 
+      ui.nl();
       ui.success( `Changed password for ${ target.username } (ID ${ target.id })` );
       ui.info( 'All sessions for this user have been revoked.' );
     } );
