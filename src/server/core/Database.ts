@@ -77,9 +77,19 @@ export class Database {
     }
   }
 
+  public listMigrations () : AppliedMigration[] {
+    return as< AppliedMigration[] >( this.open().db.prepare( `
+      SELECT name, checksum, applied_at AS appliedAt
+      FROM schema_migrations
+      ORDER BY applied_at, name
+    ` ).all() );
+  }
+
   public close () : void {
     if ( ! this.connection ) return;
-    if ( this.transactionActive ) throw new Error( 'Database cannot be closed while a transaction is running' );
+
+    if ( this.transactionActive )
+      throw new Error( 'Database cannot be closed while a transaction is running' );
 
     this.connection.close();
     this.connection = null;
