@@ -20,7 +20,7 @@
     "build:client": "vite build",
     "build": "npm run build:server && npm run build:client",
     "start": "cross-env NODE_ENV=production node dist/server/run.js",
-    "frame": "tsx scripts/frame.ts"
+    "frame:dev": "tsx src/maintenance/run.ts"
   },
   "dependencies": {
     "commander": "^15.0.0",
