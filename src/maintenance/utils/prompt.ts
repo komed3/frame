@@ -62,3 +62,9 @@ export const promptPassword = async ( message: string ) : Promise< string > => {
     stdin.on( 'keypress', onKeypress );
   } );
 };
+
+
+export const confirm = async ( message: string ) : Promise< boolean > => {
+  const answer = await prompt( `${ message } [y/N] ` );
+  return /^y(?:es)?$/i.test( answer );
+};
