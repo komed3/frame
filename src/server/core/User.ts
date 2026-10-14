@@ -24,26 +24,26 @@ export class User {
     return value;
   }
 
-  private validatePassword ( password: string ) : void {
-    if ( password.length < 12 ) throw new Error( 'Password must contain at least 12 characters' );
-    if ( ! /[a-z]/.test( password ) ) throw new Error( 'Password must contain at least one lowercase letter' );
-    if ( ! /[A-Z]/.test( password ) ) throw new Error( 'Password must contain at least one uppercase letter' );
-    if ( ! /[0-9]/.test( password ) ) throw new Error( 'Password must contain at least one number' );
-    if ( ! /[^a-zA-Z0-9]/.test( password ) ) throw new Error( 'Password must contain at least one special character' );
+  private validatePassword ( pw: string ) : void {
+    if ( pw.length < 12 ) throw new Error( 'Password must contain at least 12 characters' );
+    if ( ! /[a-z]/.test( pw ) ) throw new Error( 'Password must contain at least one lowercase letter' );
+    if ( ! /[A-Z]/.test( pw ) ) throw new Error( 'Password must contain at least one uppercase letter' );
+    if ( ! /[0-9]/.test( pw ) ) throw new Error( 'Password must contain at least one number' );
+    if ( ! /[^a-zA-Z0-9]/.test( pw ) ) throw new Error( 'Password must contain at least one special character' );
   }
 
-  private hashPassword ( password: string ) : Promise< string > {
+  private hashPassword ( pw: string ) : Promise< string > {
     const salt = randomBytes( 16 );
 
     return new Promise( ( resolve, reject ) => {
-      scrypt( password, salt, 64, ( err, key ) => {
+      scrypt( pw, salt, 64, ( err, key ) => {
         if ( err ) return reject( err );
         resolve( `scrypt$${ salt.toString( 'base64url' ) }$${ key.toString( 'base64url' ) }` );
       } );
     } );
   }
 
-  private async verifyHash ( password: string, hash: string ) : Promise< boolean > {
+  private async verifyHash ( pw: string, hash: string ) : Promise< boolean > {
     const [ algorithm, saltValue, keyValue ] = hash.split( '$' );
     if ( algorithm !== 'scrypt' || ! saltValue || ! keyValue ) return false;
 
@@ -52,7 +52,7 @@ export class User {
     if ( salt.length !== 16 || expected.length !== 64 ) return false;
 
     const actual = await new Promise< Buffer >( ( resolve, reject ) => {
-      scrypt( password, salt, expected.length, ( err, key ) => {
+      scrypt( pw, salt, expected.length, ( err, key ) => {
         if ( err ) return reject( err );
         resolve( key );
       } );
@@ -98,12 +98,12 @@ export class User {
     return row ? this.toRecord( row ) : null;
   }
 
-  public async create ( username: string, password: string, isAdmin = false ) : Promise< UserRecord > {
+  public async create ( username: string, pw: string, isAdmin = false ) : Promise< UserRecord > {
     const name = this.validateUsername( username );
-    this.validatePassword( password );
+    this.validatePassword( pw );
 
     if ( this.getByUsername( name ) ) throw new Error( 'Username is already taken' );
-    const hash = await this.hashPassword( password );
+    const hash = await this.hashPassword( pw );
 
     const result = conn.prepare( `
       INSERT INTO users ( username, pw_hash, is_admin )
@@ -138,5 +138,20 @@ export class User {
     if ( ! user ) throw new Error( 'User does not exist' );
 
     return user;
+  }
+
+  public async changePassword ( actorId: number, userId: number, newPw: string, curPw?: string ) : Promise< void > {
+    const target = this.assertCanManage( actorId, userId );
+    this.validatePassword( newPw );
+
+    if ( actorId === userId && ( ! curPw || ! await this.verifyHash( curPw, target.pw_hash ) ) )
+      throw new Error( 'Current password is incorrect' );
+
+    const hash = await this.hashPassword( newPw );
+
+    db.transaction( db => {
+      db.prepare( 'UPDATE users SET pw_hash = ? WHERE id = ?' ).run( hash, userId );
+      db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
+    } );
   }
 }
