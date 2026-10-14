@@ -97,7 +97,9 @@ export class Database {
       db.exec( 'COMMIT' );
       return result;
     } catch ( err ) {
-      db.exec( 'ROLLBACK' )
+      try { db.exec( 'ROLLBACK' ) }
+      catch { /** Preserve the original transaction error */ }
+
       throw err;
     } finally {
       this.transactionActive = false;
