@@ -20,6 +20,22 @@ export class Config {
   public static validate < K extends ConfigName > ( name: K, value: unknown ) : ConfigValue< K > {
     const definition = this.schema[ name ];
 
+    if ( definition.type === 'boolean' ) {
+      if ( typeof value === 'boolean' ) return value as ConfigValue< K >;
+
+      if ( typeof value === 'string' ) {
+        if ( value.trim().toLowerCase() === 'true' ) return true as ConfigValue< K >;
+        if ( value.trim().toLowerCase() === 'false' ) return false as ConfigValue< K >;
+      }
+
+      else if ( typeof value === 'number' ) {
+        if ( value === 1 ) return true as ConfigValue< K >;
+        else return false as ConfigValue< K >;
+      }
+
+      throw new Error( `${ name } must be true or false` );
+    }
+
     if ( definition.type === 'integer' ) {
       const parsed = typeof value === 'number' ? value : Number( value );
 
