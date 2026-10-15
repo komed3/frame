@@ -6,6 +6,7 @@ export interface ConfigSchema {
   DB_BUSY_TIMEOUT_MS: number;
   ASSETS_PATH: string;
   SESSION_LIFETIME_MS: number;
+  PASSWORD_STRICT: boolean;
 }
 
 export type ConfigName = keyof ConfigSchema;
@@ -15,9 +16,9 @@ export type ConfigDefinition< T > = {
   default: T;
   desc: string;
 } & (
-  T extends number
-    ? { type: 'integer', min: number, max: number }
-    : { type: 'string' | 'path' | 'enum', values?: readonly string[] }
+  T extends number ? { type: 'integer', min: number, max: number } :
+  T extends boolean ? { type: 'boolean' } :
+  { type: 'string' | 'path' | 'enum', values?: readonly string[] }
 );
 
 export type ConfigTable = {
