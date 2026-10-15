@@ -47,14 +47,9 @@ const createAdmin = async () : Promise< void > => {
   ui.nl();
 
   let username = await prompt( 'Administrator username:', 'admin' );
-  let pw: string;
 
   while ( true ) {
-    try { pw = await promptPassword( 'Password: ' ) }
-    catch ( err ) {
-      ui.error( err instanceof Error ? err.message : String( err ) );
-      continue;
-    }
+    const pw = await promptPassword( 'Password: ' );
 
     if ( pw !== await promptPassword( 'Confirm password: ' ) ) {
       ui.error( 'Passwords do not match.' );
