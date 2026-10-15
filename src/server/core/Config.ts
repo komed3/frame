@@ -18,9 +18,9 @@ export class Config {
   } satisfies ConfigTable;
 
   public static validate < K extends ConfigName > ( name: K, value: unknown ) : ConfigValue< K > {
-    const definition = this.schema[ name ];
+    const def = this.schema[ name ];
 
-    if ( definition.type === 'boolean' ) {
+    if ( def.type === 'boolean' ) {
       if ( typeof value === 'boolean' ) return value as ConfigValue< K >;
 
       if ( typeof value === 'string' ) {
@@ -28,7 +28,7 @@ export class Config {
         if ( value.trim().toLowerCase() === 'false' ) return false as ConfigValue< K >;
       }
 
-      else if ( typeof value === 'number' ) {
+      if ( typeof value === 'number' ) {
         if ( value === 1 ) return true as ConfigValue< K >;
         else return false as ConfigValue< K >;
       }
@@ -36,11 +36,11 @@ export class Config {
       throw new Error( `${ name } must be true or false` );
     }
 
-    if ( definition.type === 'integer' ) {
+    if ( def.type === 'integer' ) {
       const parsed = typeof value === 'number' ? value : Number( value );
 
-      if ( ! Number.isInteger( parsed ) || parsed < definition.min || parsed > definition.max )
-        throw new Error( `${ name } must be an integer between ${ definition.min } and ${ definition.max }` );
+      if ( ! Number.isInteger( parsed ) || parsed < def.min || parsed > def.max )
+        throw new Error( `${ name } must be an integer between ${ def.min } and ${ def.max }` );
 
       return parsed as ConfigValue< K >;
     }
@@ -50,10 +50,10 @@ export class Config {
 
     const parsed = value.trim();
 
-    if ( definition.type === 'enum' && ! definition.values.includes( parsed ) )
+    if ( def.type === 'enum' && ! def.values.includes( parsed ) )
       throw new Error( `Invalid value for ${ name }: ${ parsed }` );
 
-    return ( definition.type === 'path'
+    return ( def.type === 'path'
       ? name === 'DB_PATH' && parsed === ':memory:' ? parsed : resolve( parsed )
       : parsed ) as ConfigValue< K >;
   }
