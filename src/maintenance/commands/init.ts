@@ -10,7 +10,6 @@ import { resolve } from 'node:path';
 
 const configure = async () : Promise< void > => {
   ui.headline( 'Configure Frame', '[1/2]' );
-  ui.info( 'Press Enter to accept the displayed default value.' );
 
   for ( const key of Object.keys( Config.schema ) as ConfigName[] ) {
     const def = Config.schema[ key ], cur = String( Config.get( key ) );
@@ -77,6 +76,7 @@ export const registerInitCommands = ( program: Command ) : void => {
 
       ui.info( ui.key( 'Welcome to Frame' ) );
       ui.info( 'This command will guide you through the initial configuration of Frame.' );
+      ui.info( 'Press Enter to accept the displayed default value.' );
       ui.nl();
 
       await configure();
