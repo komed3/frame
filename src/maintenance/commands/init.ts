@@ -75,7 +75,7 @@ export const registerInitCommands = ( program: Command ) : void => {
       if ( existsSync( resolve( '.env' ) ) )
         throw new Error( 'Frame has already been initialized (.env already exists).' );
 
-      ui.info( 'Welcome to Frame' );
+      ui.info( ui.key( 'Welcome to Frame' ) );
       ui.info( 'This command will guide you through the initial configuration of Frame.' );
       ui.nl();
 
@@ -85,6 +85,6 @@ export const registerInitCommands = ( program: Command ) : void => {
       ui.nl();
       ui.info( 'Frame initialization complete.' );
       ui.info( 'Start Frame and have fun watching your videos!' );
-      ui.info( 'Run `npm run start` to start server.' );
+      ui.info( `Run ${ ui.value( 'npm run start' ) } to start server.` );
     } );
 };
