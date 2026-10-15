@@ -1,4 +1,4 @@
-import { prompt, promptPassword } from '@/src/maintenance/utils/prompt';
+import { prompt, promptConfirmedPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
 import { users } from '@/src/server/core/User';
@@ -49,27 +49,21 @@ const createAdmin = async () : Promise< void > => {
   let username = await prompt( 'Administrator username:', 'admin' );
 
   while ( true ) {
-    const pw = await promptPassword( 'Password: ' );
-
-    if ( pw !== await promptPassword( 'Confirm password: ' ) ) {
-      ui.error( 'Passwords do not match.' );
-      continue;
-    }
-
     try {
-      const admin = await users.create( username, pw, true );
-      ui.success( `Administrator ${ admin.username } created (ID ${ admin.id }).` );
-      return;
+      username = users.validateUsername( username );
+      if ( users.getByUsername( username ) ) throw new Error( 'Username is already taken' );
+      break;
     } catch ( err ) {
-      const message = err instanceof Error ? err.message : String( err );
-
-      if ( ! message.startsWith( 'Username' ) && ! message.startsWith( 'Password' ) ) throw err;
-      ui.error( message );
-
-      if ( message.startsWith( 'Username' ) )
-        username = await prompt( 'Administrator username:', username );
+      ui.error( err instanceof Error ? err.message : String( err ) );
+      username = await prompt( 'Administrator username:', username );
     }
   }
+
+  const pw = await promptConfirmedPassword( pw => users.validatePassword( pw ) );
+  const admin = await users.create( username, pw, true );
+
+  ui.nl();
+  ui.success( `Administrator ${ admin.username } created (ID ${ admin.id }).` );
 };
 
 
