@@ -20,6 +20,12 @@ export const prompt = async ( message: string, defaultValue?: string ) : Promise
 };
 
 
+export const confirm = async ( message: string ) : Promise< boolean > => {
+  const answer = await prompt( ui.confirm( message ) );
+  return /^y(?:es)?$/i.test( answer );
+};
+
+
 export const promptPassword = async ( message: string ) : Promise< string > => {
   assertInteractive();
   emitKeypressEvents( process.stdin );
@@ -78,7 +84,21 @@ export const promptPassword = async ( message: string ) : Promise< string > => {
 };
 
 
-export const confirm = async ( message: string ) : Promise< boolean > => {
-  const answer = await prompt( ui.confirm( message ) );
-  return /^y(?:es)?$/i.test( answer );
+export const promptConfirmedPassword = async ( validate: ( pw: string ) => void ) : Promise< string > => {
+  while ( true ) {
+    const pw = await promptPassword( 'Password: ' );
+
+    try { validate( pw ) }
+    catch ( err ) {
+      ui.error( err instanceof Error ? err.message : String( err ) );
+      continue;
+    }
+
+    if ( pw !== await promptPassword( 'Confirm password: ' ) ) {
+      ui.error( 'Passwords do not match.' );
+      continue;
+    }
+
+    return pw;
+  }
 };
