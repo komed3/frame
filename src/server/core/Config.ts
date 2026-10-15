@@ -13,7 +13,8 @@ export class Config {
     DB_PATH: { type: 'path', desc: 'SQLite database path', default: 'data/frame.sqlite' },
     DB_BUSY_TIMEOUT_MS: { type: 'integer', desc: 'SQLite busy timeout', default: 5000, min: 0, max: 6e4 },
     ASSETS_PATH: { type: 'path', desc: 'Generated assets path', default: 'data/assets' },
-    SESSION_LIFETIME_MS: { type: 'integer', desc: 'Session lifetime', default: 2592e6, min: 6e4, max: 31536e6 }
+    SESSION_LIFETIME_MS: { type: 'integer', desc: 'Session lifetime', default: 2592e6, min: 6e4, max: 31536e6 },
+    PASSWORD_STRICT: { type: 'boolean', desc: 'Enforce strong password requirements', default: true }
   } satisfies ConfigTable;
 
   public static validate < K extends ConfigName > ( name: K, value: unknown ) : ConfigValue< K > {
