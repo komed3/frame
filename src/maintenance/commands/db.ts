@@ -12,11 +12,16 @@ export const registerDbCommands = ( program: Command ) : void => {
   dbCommand
     .command( 'migrations' )
     .description( 'List applied database migrations' )
-    .action( () => console.table( db.listMigrations().map( migration => ( {
-      name: migration.name,
-      checksum: migration.checksum.slice( 0, 12 ),
-      appliedAt: migration.appliedAt
-    } ) ) ) );
+    .action( () => {
+      const migrations = db.listMigrations();
+      if ( ! migrations.length ) return ui.info( 'No applied migrations.' );
+
+      console.table( migrations.map( migration => ( {
+        name: migration.name,
+        checksum: migration.checksum.slice( 0, 12 ),
+        appliedAt: migration.appliedAt
+      } ) ) );
+    } );
 
   dbCommand
     .command( 'stats' )
