@@ -25,11 +25,16 @@ export const registerUserCommands = ( program: Command ) : void => {
   userCommand
     .command( 'list' )
     .description( 'List all users' )
-    .action( () => console.table( users.list().map( user => ( {
-      id: user.id, username: user.username, admin: user.isAdmin,
-      status: user.disabledAt ? 'disabled' : 'active',
-      createdAt: user.createdAt
-    } ) ) ) );
+    .action( () => {
+      const list = users.list();
+      if ( ! list.length ) return ui.info( 'No users found.' );
+
+      console.table( list.map( user => ( {
+        id: user.id, username: user.username, admin: user.isAdmin,
+        status: user.disabledAt ? 'disabled' : 'active',
+        createdAt: user.createdAt
+      } ) ) );
+    } );
 
   userCommand
     .command( 'create <username>' )
