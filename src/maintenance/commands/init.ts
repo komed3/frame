@@ -11,7 +11,6 @@ import { resolve } from 'node:path';
 const configure = async () : Promise< void > => {
   ui.headline( 'Configure Frame', '[1/2]' );
   ui.info( 'Press Enter to accept the displayed default value.' );
-  ui.nl();
 
   for ( const key of Object.keys( Config.schema ) as ConfigName[] ) {
     const def = Config.schema[ key ], cur = String( Config.get( key ) );
@@ -43,6 +42,7 @@ const createAdmin = async () : Promise< void > => {
   const activeAdmin = users.list().find( user => user.isAdmin && ! user.disabledAt );
   if ( activeAdmin ) return ui.info( `An active administrator already exists: ${ activeAdmin.username }` );
 
+  ui.nl();
   ui.headline( 'Create administrator account', '[2/2]' );
   ui.nl();
 
@@ -50,15 +50,14 @@ const createAdmin = async () : Promise< void > => {
   let pw: string;
 
   while ( true ) {
-    try {
-      pw = await promptPassword( 'Password: ' );
-
-      if ( pw !== await promptPassword( 'Confirm password: ' ) ) {
-        ui.error( 'Passwords do not match.' );
-        continue;
-      }
-    } catch ( err ) {
+    try { pw = await promptPassword( 'Password: ' ) }
+    catch ( err ) {
       ui.error( err instanceof Error ? err.message : String( err ) );
+      continue;
+    }
+
+    if ( pw !== await promptPassword( 'Confirm password: ' ) ) {
+      ui.error( 'Passwords do not match.' );
       continue;
     }
 
