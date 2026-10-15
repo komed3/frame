@@ -1,8 +1,9 @@
 import type { ConfigName, ConfigSchema, ConfigTable, ConfigValue } from '@/src/shared/types/config';
+import dotenv from 'dotenv';
 import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import 'dotenv/config';
+dotenv.config( { override: true, quiet: true } );
 
 
 export class Config {
