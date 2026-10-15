@@ -1,4 +1,4 @@
-import { confirm, promptPassword } from '@/src/maintenance/utils/prompt';
+import { confirm, promptConfirmedPassword, promptPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { users } from '@/src/server/core/User';
 import { Command } from 'commander';
@@ -41,11 +41,11 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Create a user' )
     .option( '--admin', 'Grant administrator privileges' )
     .action( async ( username: string, options: { admin?: boolean } ) => {
-      const pw = await promptPassword( 'Password: ' );
-      const conf = await promptPassword( 'Confirm password: ' );
+      const name = users.validateUsername( username );
+      if ( users.getByUsername( name ) ) throw new Error( 'Username is already taken' );
 
-      if ( pw !== conf ) throw new Error( 'Passwords do not match' );
-      const created = await users.create( username, pw, !! options.admin );
+      const pw = await promptConfirmedPassword( pw => users.validatePassword( pw ) );
+      const created = await users.create( name, pw, !! options.admin );
 
       ui.nl();
       ui.success( `Created user ${ created.username } (ID ${ created.id })` );
@@ -85,14 +85,10 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Change a user password' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
     .action( async ( ref: string, options: { actor: string } ) => {
-      const target = resolveUser( ref );
-      const actorId = resolveId( options.actor );
-
+      const target = resolveUser( ref ), actorId = resolveId( options.actor );
       const curPw = actorId === target.id ? await promptPassword( 'Current password: ' ) : undefined;
-      const pw = await promptPassword( 'Password: ' );
-      const conf = await promptPassword( 'Confirm password: ' );
+      const pw = await promptConfirmedPassword( pw => users.validatePassword( pw ) );
 
-      if ( pw !== conf ) throw new Error( 'Passwords do not match' );
       await users.changePassword( actorId, target.id, pw, curPw );
 
       ui.nl();
