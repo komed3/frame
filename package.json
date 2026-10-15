@@ -22,7 +22,8 @@
     "frame:dev": "tsx src/maintenance/run.ts",
     "build:server": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "build:client": "vite build",
-    "build": "npm run build:server && npm run build:client",
+    "format": "prettier --ignore-path \"\" --write \"./dist/**/*.js\" --log-level warn",
+    "build": "npm run build:server && npm run build:client && npm run format",
     "start": "cross-env NODE_ENV=production node dist/server/run.js",
     "frame": "node dist/maintenance/run.js"
   },
@@ -42,6 +43,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "autoprefixer": "^10.6.1",
     "cross-env": "^10.1.0",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.3.3",
     "tsc-alias": "^1.9.7",
     "tsx": "^4.23.15",
