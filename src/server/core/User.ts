@@ -1,5 +1,6 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
+import { Config } from '@/src/server/core/Config';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 
@@ -13,23 +14,6 @@ export class User {
       id: row.id, username: row.username, isAdmin: row.is_admin === 1,
       createdAt: row.created_at, disabledAt: row.disabled_at
     };
-  }
-
-  private validateUsername ( username: string ) : string {
-    const value = username.trim();
-    if ( ! value || value.length > 64 ) throw new Error( 'Username must contain between 1 and 64 characters' );
-    if ( ! /^[a-zA-Z0-9_]+$/.test( value ) ) throw new Error( 'Username can only contain letters, numbers and underscores' );
-    if ( ! /^[a-zA-Z]/.test( value ) ) throw new Error( 'Username must start with a letter' );
-
-    return value;
-  }
-
-  private validatePassword ( pw: string ) : void {
-    if ( pw.length < 12 ) throw new Error( 'Password must contain at least 12 characters' );
-    if ( ! /[a-z]/.test( pw ) ) throw new Error( 'Password must contain at least one lowercase letter' );
-    if ( ! /[A-Z]/.test( pw ) ) throw new Error( 'Password must contain at least one uppercase letter' );
-    if ( ! /[0-9]/.test( pw ) ) throw new Error( 'Password must contain at least one number' );
-    if ( ! /[^a-zA-Z0-9]/.test( pw ) ) throw new Error( 'Password must contain at least one special character' );
   }
 
   private hashPassword ( pw: string ) : Promise< string > {
@@ -85,6 +69,26 @@ export class User {
     ).get() ).count <= 1 ) throw new Error( errMsg );
   }
 
+  public validateUsername ( username: string ) : string {
+    const value = username.trim();
+    if ( ! value || value.length > 64 ) throw new Error( 'Username must contain between 1 and 64 characters' );
+    if ( ! /^[a-zA-Z0-9_]+$/.test( value ) ) throw new Error( 'Username can only contain letters, numbers and underscores' );
+    if ( ! /^[a-zA-Z]/.test( value ) ) throw new Error( 'Username must start with a letter' );
+
+    return value;
+  }
+
+  public validatePassword ( pw: string ) : void {
+    if ( ! pw ) throw new Error( 'Password must not be empty' );
+    if ( ! Config.get( 'PASSWORD_STRICT' ) ) return;
+
+    if ( pw.length < 12 ) throw new Error( 'Password must contain at least 12 characters' );
+    if ( ! /[a-z]/.test( pw ) ) throw new Error( 'Password must contain at least one lowercase letter' );
+    if ( ! /[A-Z]/.test( pw ) ) throw new Error( 'Password must contain at least one uppercase letter' );
+    if ( ! /[0-9]/.test( pw ) ) throw new Error( 'Password must contain at least one number' );
+    if ( ! /[^a-zA-Z0-9]/.test( pw ) ) throw new Error( 'Password must contain at least one special character' );
+  }
+
   public list () : UserRecord[] {
     return as< UserRow[] >( conn().prepare(
       'SELECT * FROM users ORDER BY username COLLATE NOCASE'
@@ -106,9 +110,9 @@ export class User {
 
   public async create ( username: string, pw: string, isAdmin = false ) : Promise< UserRecord > {
     const name = this.validateUsername( username );
-    this.validatePassword( pw );
-
     if ( this.getByUsername( name ) ) throw new Error( 'Username is already taken' );
+
+    this.validatePassword( pw );
     const hash = await this.hashPassword( pw );
 
     const result = conn().prepare( `
