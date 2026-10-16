@@ -1,6 +1,6 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, normalizeString } from '@/src/server/utils';
+import { normalizeString } from '@/src/server/utils';
 import type { MediaMetadataInput, MediaMetadataRecord, MediaMetadataSource } from '@/src/shared/types/metadata';
 
 
@@ -86,5 +86,21 @@ export class MediaMetadata {
     ).run( mediaId, normalize( key ), source );
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Metadata key does not exist: ${ key }` );
+  }
+
+  public static replaceScan ( mediaId: number, entries: MediaMetadataInput[] ) : void {
+    Media.assertMediaIdSafe( mediaId );
+    const normalizedEntries = MediaMetadata.normalizeEntries( entries );
+
+    db.transaction( tx => {
+      tx.prepare( 'DELETE FROM media_metadata WHERE media_id = ? AND source = ?' ).run( mediaId, 'scan' );
+
+      const insert = tx.prepare( `
+        INSERT INTO media_metadata ( media_id, key, value, source )
+        VALUES ( ?, ?, ?, 'scan' )
+      ` );
+
+      for ( const entry of normalizedEntries ) insert.run( mediaId, entry.key, entry.value );
+    } );
   }
 }
