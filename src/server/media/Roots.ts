@@ -24,7 +24,8 @@ export class MediaRoots {
 
     const row = as< MediaRootRow | undefined >( conn().prepare( `
       SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
-      FROM roots WHERE id = ?
+      FROM roots
+      WHERE id = ?
     ` ).get( id ) );
 
     if ( ! row ) throw new Error( `Media root ${ id } does not exist` );
@@ -33,6 +34,19 @@ export class MediaRoots {
 
   private mapRow ( row: MediaRootRow ) : MediaRoot {
     return { ...row, enabled: row.enabled === 1 };
+  }
+
+  public add ( path: string, enabled = true ) : number {
+    const canonicalPath = this.canonicalize( path );
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO roots ( path, enabled )
+      VALUES ( ?, ? )
+      ON CONFLICT ( path ) DO UPDATE SET enabled = 1
+      RETURNING id
+    ` ).get( canonicalPath, +!! enabled ) );
+
+    if ( ! row ) throw new Error( `Could not register media root: ${ canonicalPath }` );
+    return row.id;
   }
 }
 
