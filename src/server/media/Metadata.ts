@@ -56,4 +56,24 @@ export class MediaMetadata {
 
     return row ?? null;
   }
+
+  public static set ( mediaId: number, key: string, value: string, source: MediaMetadataSource = 'manual' ) : number {
+    Media.assertMediaIdSafe( mediaId );
+    MediaMetadata.assertSource( source );
+
+    const normalizedKey = normalize( key );
+    if ( typeof value !== 'string' ) throw new Error( `Invalid metadata value for key: ${ normalizedKey }` );
+
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO media_metadata ( media_id, key, value, source )
+      VALUES ( ?, ?, ?, ? )
+      ON CONFLICT ( media_id, key, source ) DO UPDATE SET
+        value = excluded.value,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      RETURNING id
+    ` ).get( mediaId, normalizedKey, value, source ) );
+
+    if ( ! row ) throw new Error( `Could not save metadata: ${ normalizedKey }` );
+    return row.id;
+  }
 }
