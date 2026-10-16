@@ -12,7 +12,7 @@ const ASSET_KINDS: MediaAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave', 'te
 
 
 export class MediaAssets {
-  private static assertKind ( kind?: MediaAssetKind, variant = 'default' ) {
+  private static assertKind ( kind?: MediaAssetKind, variant = 'default' ) : void {
     if ( kind && ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
     if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
   }
