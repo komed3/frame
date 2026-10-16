@@ -40,4 +40,22 @@ export class MediaAssets {
 
     return rows.map( row => MediaAssets.mapRow( row ) );
   }
+
+  public static get ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : MediaAssetRecord | null {
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
+    if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
+
+    const row = as< MediaAssetRow | undefined >( conn().prepare( `
+      SELECT
+        id, media_id AS mediaId, kind, variant, path, fingerprint,
+        mime_type AS mimeType, size_bytes AS sizeBytes, width, height,
+        data_json AS dataJson, created_at AS createdAt
+      FROM assets
+      WHERE media_id = ? AND kind = ? AND variant = ?
+    ` ).get( mediaId, kind, variant.trim() ) );
+
+    return row ? MediaAssets.mapRow( row ) : null;
+  }
 }
