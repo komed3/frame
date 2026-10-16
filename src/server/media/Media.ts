@@ -54,7 +54,7 @@ export class Media {
     Media.assertMediaId( id );
 
     const row = as< MediaRow | undefined >( conn().prepare( `${ SELECT_MEDIA } WHERE id = ?` ).get( id ) );
-    return row ? this.mapRow( row ) : null;
+    return row ? Media.mapRow( row ) : null;
   }
 
   public static getByPath ( rootId: number, path: string ) : MediaRecord | null {
@@ -65,6 +65,36 @@ export class Media {
       `${ SELECT_MEDIA } WHERE root_id = ? AND path = ?`
     ).get( rootId, path ) );
 
-    return row ? this.mapRow( row ) : null;
+    return row ? Media.mapRow( row ) : null;
+  }
+
+  public static list ( options: MediaListOptions = {} ) : MediaRecord[] {
+    const { rootId, type, availableOnly = false, limit = 100, offset = 0 } = options;
+    const conditions: string[] = [], values: ( string | number )[] = [];
+
+    if ( rootId !== undefined ) {
+      Media.assertRootId( rootId );
+
+      conditions.push( 'root_id = ?' );
+      values.push( rootId );
+    }
+
+    if ( type !== undefined ) {
+      if ( ! MEDIA_TYPES.includes( type ) ) throw new Error( `Invalid media type: ${ type }` );
+
+      conditions.push( 'type = ?' );
+      values.push( type );
+    }
+
+    if ( availableOnly ) conditions.push( 'available = 1' );
+    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid media limit: ${ limit }` );
+    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid media offset: ${ offset }` );
+
+    const where = conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '';
+    const rows = as< MediaRow[] >( conn().prepare(
+      `${ SELECT_MEDIA } ${ where } ORDER BY id LIMIT ? OFFSET ?`
+    ).all( ...values, limit, offset ) );
+
+    return rows.map( row => Media.mapRow( row ) );
   }
 }
