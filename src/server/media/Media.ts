@@ -49,4 +49,22 @@ export class Media {
 
     return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
   }
+
+  public static get ( id: number ) : MediaRecord | null {
+    Media.assertMediaId( id );
+
+    const row = as< MediaRow | undefined >( conn().prepare( `${ SELECT_MEDIA } WHERE id = ?` ).get( id ) );
+    return row ? this.mapRow( row ) : null;
+  }
+
+  public static getByPath ( rootId: number, path: string ) : MediaRecord | null {
+    Media.assertRootId( rootId );
+    Media.assertRelativePath( path );
+
+    const row = as< MediaRow | undefined >( conn().prepare(
+      `${ SELECT_MEDIA } WHERE root_id = ? AND path = ?`
+    ).get( rootId, path ) );
+
+    return row ? this.mapRow( row ) : null;
+  }
 }
