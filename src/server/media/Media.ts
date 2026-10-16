@@ -13,3 +13,12 @@ const SELECT_MEDIA = `
     scanned_at AS scannedAt, created_at AS createdAt, updated_at AS updatedAt
   FROM media
 `;
+
+const UPDATE_COLUMNS = {
+  fileHash: 'file_hash', fingerprint: 'fingerprint', title: 'title', description: 'description',
+  creator: 'creator', rating: 'rating', releasedAt: 'released_at', recordedAt: 'recorded_at',
+  language: 'language', durationMs: 'duration_ms', width: 'width', height: 'height', fps: 'fps',
+  bitrate: 'bitrate', container: 'container', videoCodec: 'video_codec', audioCodec: 'audio_codec',
+  sampleRate: 'sample_rate', channels: 'channels', encoding: 'encoding', data: 'data_json'
+} as const;
+
