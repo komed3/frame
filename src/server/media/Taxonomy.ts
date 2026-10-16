@@ -172,4 +172,11 @@ export class MediaTaxonomy {
     const result = conn().prepare( 'UPDATE categories SET parent_id = ? WHERE id = ?' ).run( parentId, id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
   }
+
+  public static deleteCategory ( id: number ) : void {
+    assertId( id, 'category' );
+
+    const result = conn().prepare( 'DELETE FROM categories WHERE id = ?' ).run( id );
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
+  }
 }
