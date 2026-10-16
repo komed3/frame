@@ -1,7 +1,7 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
 import { assertId } from '@/src/server/utils';
-import type { TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
+import type { CategoryRecord, TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 
 
 export class MediaTaxonomy {
@@ -38,6 +38,9 @@ export class MediaTaxonomy {
       for ( const id of uniqueIds ) insert.run( mediaId, id );
     } );
   }
+
+
+  // --- tags ---
 
   public static listTags () : TagRecord[] {
     return as< TagRecord[] >( conn().prepare(
@@ -95,5 +98,14 @@ export class MediaTaxonomy {
 
   public static setMediaTags ( mediaId: number, tagIds: number[] ) : void {
     MediaTaxonomy.replaceMediaRelations( mediaId, tagIds, 'tags' );
+  }
+
+
+  // --- categories ---
+
+  public static listCategories () : CategoryRecord[] {
+    return as< CategoryRecord[] >( conn().prepare(
+      'SELECT id, name, parent_id AS parentId FROM categories ORDER BY name COLLATE NOCASE, id'
+    ).all() );
   }
 }
