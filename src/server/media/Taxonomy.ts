@@ -191,4 +191,8 @@ export class MediaTaxonomy {
       ORDER BY c.name COLLATE NOCASE, c.id
     ` ).all( mediaId ) );
   }
+
+  public static setMediaCategories ( mediaId: number, categoryIds: number[] ) : void {
+    MediaTaxonomy.replaceMediaRelations( mediaId, categoryIds, 'categories' );
+  }
 }
