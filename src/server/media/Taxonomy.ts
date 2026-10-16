@@ -1,7 +1,7 @@
 import { as, conn, db } from '@/src/server/core/Database';
-import type { CategoryRecord, TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 import { Media } from '@/src/server/media/Media';
 import { assertId } from '@/src/server/utils';
+import type { TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 
 
 export class MediaTaxonomy {
@@ -40,12 +40,17 @@ export class MediaTaxonomy {
   }
 
   public static listTags () : TagRecord[] {
-    return as< TagRecord[] >( conn().prepare( 'SELECT id, name FROM tags ORDER BY name COLLATE NOCASE, id' ).all() );
+    return as< TagRecord[] >( conn().prepare(
+      'SELECT id, name FROM tags ORDER BY name COLLATE NOCASE, id'
+    ).all() );
   }
 
   public static getTag ( id: number ) : TagRecord | null {
     assertId( id, 'tag' );
-    return as< TagRecord | undefined >( conn().prepare( 'SELECT id, name FROM tags WHERE id = ?' ).get( id ) ) ?? null;
+
+    return as< TagRecord | undefined >( conn().prepare(
+      'SELECT id, name FROM tags WHERE id = ?'
+    ).get( id ) ) ?? null;
   }
 
   public static createTag ( name: string ) : number {
