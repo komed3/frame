@@ -85,6 +85,8 @@ export class MediaAssets {
 
   public static register ( mediaId: number, asset: MediaAssetInput ) : number {
     Media.assertMediaIdSafe( mediaId );
+    MediaAssets.assertKind( asset.kind, asset.variant ?? 'default' );
+    MediaAssets.resolvePath( asset.path );
 
     const row = as< { id: number } | undefined >( conn().prepare( `
       INSERT INTO assets (
