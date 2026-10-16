@@ -24,3 +24,13 @@ const UPDATE_COLUMNS = {
   sampleRate: 'sample_rate', channels: 'channels', encoding: 'encoding', data: 'data_json'
 } as const;
 
+
+export class Media {
+  private static validateId ( id: number ) : void {
+    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media ID: ${ id }` );
+  }
+
+  private static validateRootId ( rootId: number ) : void {
+    if ( ! Number.isSafeInteger( rootId ) || rootId < 1 ) throw new Error( `Invalid media root ID: ${ rootId }` );
+  }
+}
