@@ -13,6 +13,11 @@ export class MediaRoots {
 
     return canonicalPath;
   }
+
+  private isWithin ( root: string, target: string ) : boolean {
+    const rel = relative( root, target );
+    return rel === '' || ( rel !== '..' && ! rel.startsWith( `..${ sep }` ) && ! isAbsolute( rel ) );
+  }
 }
 
 
