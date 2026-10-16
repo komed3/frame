@@ -136,4 +136,13 @@ export class MediaTaxonomy {
     if ( ! row ) throw new Error( `Could not create category: ${ value }` );
     return row.id;
   }
+
+  public static renameCategory ( id: number, name: string ) : void {
+    assertId( id, 'category' );
+
+    const value = MediaTaxonomy.normalizeName( name );
+    const result = conn().prepare( 'UPDATE categories SET name = ? WHERE id = ?' ).run( value, id );
+
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
+  }
 }
