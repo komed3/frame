@@ -36,7 +36,7 @@ export class Media {
     return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
   }
 
-  public static getMediaIdSafe ( mediaId: number ) : void {
+  public static assertMediaIdSafe ( mediaId: number ) : void {
     assertId( mediaId, 'media' );
 
     if ( ! conn().prepare( 'SELECT id FROM media WHERE id = ?' ).get( mediaId ) )
