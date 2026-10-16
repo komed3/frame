@@ -1,6 +1,7 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import type { CategoryRecord, TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 import { Media } from '@/src/server/media/Media';
+import { assertId } from '@/src/server/utils';
 
 
 export class MediaTaxonomy {
@@ -11,15 +12,11 @@ export class MediaTaxonomy {
     return name.trim();
   }
 
-  private static assertId ( id: number, label: string ) : void {
-    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid ${ label } ID: ${ id }` );
-  }
-
   private static replaceMediaRelations ( mediaId: number, ids: number[], kind: TaxonomyKind ) : void {
     Media.getMediaIdSafe( mediaId );
 
     const uniqueIds = [ ...new Set( ids ) ];
-    uniqueIds.forEach( id => MediaTaxonomy.assertId( id, kind === 'tags' ? 'tag' : 'category' ) );
+    uniqueIds.forEach( id => assertId( id, kind === 'tags' ? 'tag' : 'category' ) );
 
     const table = kind === 'tags' ? 'tags' : 'categories';
     const joinTable = kind === 'tags' ? 'media_tags' : 'media_categories';
@@ -47,7 +44,7 @@ export class MediaTaxonomy {
   }
 
   public static getTag ( id: number ) : TagRecord | null {
-    MediaTaxonomy.assertId( id, 'tag' );
+    assertId( id, 'tag' );
     return as< TagRecord | undefined >( conn().prepare( 'SELECT id, name FROM tags WHERE id = ?' ).get( id ) ) ?? null;
   }
 
@@ -64,7 +61,7 @@ export class MediaTaxonomy {
   }
 
   public static renameTag ( id: number, name: string ) : void {
-    MediaTaxonomy.assertId( id, 'tag' );
+    assertId( id, 'tag' );
 
     const value = MediaTaxonomy.normalizeName( name );
     const result = conn().prepare( 'UPDATE tags SET name = ? WHERE id = ?' ).run( value, id );
@@ -73,7 +70,7 @@ export class MediaTaxonomy {
   }
 
   public static deleteTag ( id: number ) : void {
-    MediaTaxonomy.assertId( id, 'tag' );
+    assertId( id, 'tag' );
 
     const result = conn().prepare( 'DELETE FROM tags WHERE id = ?' ).run( id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
