@@ -19,5 +19,11 @@ export interface MediaTrackRecord {
   data: Record< string, unknown >;
 }
 
+export type MediaTrackRow = Omit< MediaTrackRecord, 'isDefault' | 'isForced' | 'data' > & {
+  isDefault: number;
+  isForced: number;
+  dataJson: string;
+};
+
 export type MediaTrackInput = Pick< MediaTrackRecord, 'streamIndex' | 'kind' > &
   Partial< Omit< MediaTrackRecord, 'id' | 'mediaId' | 'streamIndex' | 'kind' > >;
