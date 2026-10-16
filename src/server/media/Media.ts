@@ -50,6 +50,13 @@ export class Media {
     return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
   }
 
+  public static getMediaIdSave ( mediaId: number ) : void {
+    Media.assertMediaId( mediaId );
+
+    if ( ! conn().prepare( 'SELECT id FROM media WHERE id = ?' ).get( mediaId ) )
+      throw new Error( `Media ${ mediaId } does not exist` );
+  }
+
   public static get ( id: number ) : MediaRecord | null {
     Media.assertMediaId( id );
 
