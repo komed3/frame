@@ -145,4 +145,31 @@ export class MediaTaxonomy {
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
   }
+
+  public static setCategoryParent ( id: number, parentId: number | null ) : void {
+    assertId( id, 'category' );
+
+    if ( parentId !== null ) {
+      assertId( parentId, 'parent category' );
+
+      if ( ! MediaTaxonomy.getCategory( parentId ) )
+        throw new Error( `Parent category ${ parentId } does not exist` );
+
+      const cycle = conn().prepare( `
+        WITH RECURSIVE ancestors ( id, parent_id ) AS (
+          SELECT id, parent_id FROM categories WHERE id = ?
+          UNION ALL
+          SELECT c.id, c.parent_id
+          FROM categories c
+          JOIN ancestors a ON c.id = a.parent_id
+        )
+        SELECT 1 AS found FROM ancestors WHERE id = ? LIMIT 1
+      ` ).get( parentId, id );
+
+      if ( cycle ) throw new Error( 'Category hierarchy cannot contain a cycle' );
+    }
+
+    const result = conn().prepare( 'UPDATE categories SET parent_id = ? WHERE id = ?' ).run( parentId, id );
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
+  }
 }
