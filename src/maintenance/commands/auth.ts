@@ -1,6 +1,6 @@
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
-import { auth } from '@/src/server/core/Auth';
+import { Auth } from '@/src/server/core/Auth';
 import { Command } from 'commander';
 
 
@@ -13,7 +13,7 @@ export const registerAuthCommands = ( program: Command ) : void => {
     .command( 'sessions' )
     .description( 'List active sessions' )
     .action( () => {
-      const sessions = auth.listSessions();
+      const sessions = Auth.listSessions();
       if ( ! sessions.length ) return ui.info( 'No active sessions.' );
 
       console.table( sessions.map( session => ( {
@@ -29,7 +29,7 @@ export const registerAuthCommands = ( program: Command ) : void => {
     .action( async ( options: { yes?: boolean } ) => {
       if ( ! options.yes && ! await confirm( 'Revoke all active sessions?' ) ) return ui.cancelled();
 
-      const count = auth.logoutAll();
+      const count = Auth.logoutAll();
       ui.success( `Revoked ${ count } session(s).` );
     } );
 };

@@ -1,11 +1,11 @@
 import { confirm, promptConfirmedPassword, promptPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
-import { users } from '@/src/server/core/User';
+import { User } from '@/src/server/core/User';
 import { Command } from 'commander';
 
 
 const resolveUser = ( ref: string ) => {
-  const user = /^\d+$/.test( ref ) ? users.get( Number( ref ) ) : users.getByUsername( ref );
+  const user = /^\d+$/.test( ref ) ? User.get( Number( ref ) ) : User.getByUsername( ref );
   if ( ! user ) throw new Error( `User not found: ${ ref }` );
   return user;
 };
@@ -26,7 +26,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .command( 'list' )
     .description( 'List all users' )
     .action( () => {
-      const list = users.list();
+      const list = User.list();
       if ( ! list.length ) return ui.info( 'No users found.' );
 
       console.table( list.map( user => ( {
@@ -41,11 +41,11 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Create a user' )
     .option( '--admin', 'Grant administrator privileges' )
     .action( async ( username: string, options: { admin?: boolean } ) => {
-      const name = users.validateUsername( username );
-      if ( users.getByUsername( name ) ) throw new Error( 'Username is already taken' );
+      const name = User.validateUsername( username );
+      if ( User.getByUsername( name ) ) throw new Error( 'Username is already taken' );
 
-      const pw = await promptConfirmedPassword( pw => users.validatePassword( pw ) );
-      const created = await users.create( name, pw, !! options.admin );
+      const pw = await promptConfirmedPassword( pw => User.validatePassword( pw ) );
+      const created = await User.create( name, pw, !! options.admin );
 
       ui.nl();
       ui.success( `Created user ${ created.username } (ID ${ created.id })` );
@@ -61,11 +61,11 @@ export const registerUserCommands = ( program: Command ) : void => {
       if ( ! options.yes && ! await confirm( `Delete user ${ target.username } (ID ${ target.id })?` ) )
         return ui.cancelled();
 
-      if ( target.isAdmin && ! target.disabledAt && users.list().filter(
+      if ( target.isAdmin && ! target.disabledAt && User.list().filter(
         user => user.isAdmin && ! user.disabledAt
       ).length <= 1 ) throw new Error( 'Cannot delete the last active administrator' );
 
-      users.delete( target.id );
+      User.delete( target.id );
       ui.success( `Deleted user ${ target.username } (ID ${ target.id })` );
     } );
 
@@ -75,7 +75,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .requiredOption( '--actor <id>', 'ID of the acting user' )
     .action( ( ref: string, username: string, options: { actor: string } ) => {
       const target = resolveUser( ref );
-      const updated = users.changeUsername( resolveId( options.actor ), target.id, username );
+      const updated = User.changeUsername( resolveId( options.actor ), target.id, username );
 
       ui.success( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
     } );
@@ -87,9 +87,9 @@ export const registerUserCommands = ( program: Command ) : void => {
     .action( async ( ref: string, options: { actor: string } ) => {
       const target = resolveUser( ref ), actorId = resolveId( options.actor );
       const curPw = actorId === target.id ? await promptPassword( 'Current password: ' ) : undefined;
-      const pw = await promptConfirmedPassword( pw => users.validatePassword( pw ) );
+      const pw = await promptConfirmedPassword( pw => User.validatePassword( pw ) );
 
-      await users.changePassword( actorId, target.id, pw, curPw );
+      await User.changePassword( actorId, target.id, pw, curPw );
 
       ui.nl();
       ui.success( `Changed password for ${ target.username } (ID ${ target.id })` );
@@ -103,7 +103,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .option( '--revoke', 'Revoke administrator privileges' )
     .action( ( ref: string, options: { actor: string; revoke?: boolean } ) => {
       const target = resolveUser( ref );
-      users.setAdmin( resolveId( options.actor ), target.id, ! options.revoke );
+      User.setAdmin( resolveId( options.actor ), target.id, ! options.revoke );
 
       ui.success( `${ options.revoke ? 'Revoked' : 'Granted' } administrator privileges for ${ target.username }` );
     } );
@@ -114,7 +114,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
     .action( ( ref: string, options: { actor: string } ) => {
       const target = resolveUser( ref );
-      users.setDisabled( resolveId( options.actor ), target.id, true );
+      User.setDisabled( resolveId( options.actor ), target.id, true );
 
       ui.success( `Disabled user ${ target.username }` );
     } );
@@ -125,7 +125,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
     .action( ( ref: string, options: { actor: string } ) => {
       const target = resolveUser( ref );
-      users.setDisabled( resolveId( options.actor ), target.id, false );
+      User.setDisabled( resolveId( options.actor ), target.id, false );
 
       ui.success( `Enabled user ${ target.username }` );
     } );

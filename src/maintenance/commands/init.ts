@@ -1,7 +1,7 @@
 import { prompt, promptConfirmedPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
-import { users } from '@/src/server/core/User';
+import { User } from '@/src/server/core/User';
 import type { ConfigName, ConfigValue } from '@/src/shared/types/config';
 import { Command } from 'commander';
 import { existsSync } from 'node:fs';
@@ -38,7 +38,7 @@ const configure = async () : Promise< void > => {
 };
 
 const createAdmin = async () : Promise< void > => {
-  const activeAdmin = users.list().find( user => user.isAdmin && ! user.disabledAt );
+  const activeAdmin = User.list().find( user => user.isAdmin && ! user.disabledAt );
   if ( activeAdmin ) return ui.info( `An active administrator already exists: ${ activeAdmin.username }` );
 
   ui.nl();
@@ -49,8 +49,8 @@ const createAdmin = async () : Promise< void > => {
 
   while ( true ) {
     try {
-      username = users.validateUsername( username );
-      if ( users.getByUsername( username ) ) throw new Error( 'Username is already taken' );
+      username = User.validateUsername( username );
+      if ( User.getByUsername( username ) ) throw new Error( 'Username is already taken' );
       break;
     } catch ( err ) {
       ui.error( err instanceof Error ? err.message : String( err ) );
@@ -58,8 +58,8 @@ const createAdmin = async () : Promise< void > => {
     }
   }
 
-  const pw = await promptConfirmedPassword( pw => users.validatePassword( pw ) );
-  const admin = await users.create( username, pw, true );
+  const pw = await promptConfirmedPassword( pw => User.validatePassword( pw ) );
+  const admin = await User.create( username, pw, true );
 
   ui.nl();
   ui.success( `Administrator ${ admin.username } created (ID ${ admin.id }).` );
