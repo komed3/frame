@@ -1,4 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
+import { assertId, assertRelativePath } from '@/src/server/utils';
 import type { MediaFileInput, MediaListOptions, MediaRecord, MediaRow, MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
@@ -26,21 +27,6 @@ const UPDATE_COLUMNS = {
 
 
 export class Media {
-  private static assertMediaId ( id: number ) : void {
-    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media ID: ${ id }` );
-  }
-
-  private static assertRootId ( rootId: number ) : void {
-    if ( ! Number.isSafeInteger( rootId ) || rootId < 1 ) throw new Error( `Invalid media root ID: ${ rootId }` );
-  }
-
-  private static assertRelativePath ( path: string ) : void {
-    if (
-      typeof path !== 'string' || ! path || path.includes( '\0' ) || path.includes( '\\' ) ||
-      path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' )
-    ) throw new Error( `Invalid relative media path: ${ path }` );
-  }
-
   private static mapRow ( row: MediaRow ) : MediaRecord {
     const data = JSON.parse( row.dataJson ) as unknown;
 
@@ -51,22 +37,22 @@ export class Media {
   }
 
   public static getMediaIdSafe ( mediaId: number ) : void {
-    Media.assertMediaId( mediaId );
+    assertId( mediaId, 'media' );
 
     if ( ! conn().prepare( 'SELECT id FROM media WHERE id = ?' ).get( mediaId ) )
       throw new Error( `Media ${ mediaId } does not exist` );
   }
 
   public static get ( id: number ) : MediaRecord | null {
-    Media.assertMediaId( id );
+    assertId( id, 'media' );
 
     const row = as< MediaRow | undefined >( conn().prepare( `${ SELECT_MEDIA } WHERE id = ?` ).get( id ) );
     return row ? Media.mapRow( row ) : null;
   }
 
   public static getByPath ( rootId: number, path: string ) : MediaRecord | null {
-    Media.assertRootId( rootId );
-    Media.assertRelativePath( path );
+    assertId( rootId, 'media root' );
+    assertRelativePath( path, 'media' );
 
     const row = as< MediaRow | undefined >( conn().prepare(
       `${ SELECT_MEDIA } WHERE root_id = ? AND path = ?`
@@ -80,7 +66,7 @@ export class Media {
     const conditions: string[] = [], values: ( string | number )[] = [];
 
     if ( rootId !== undefined ) {
-      Media.assertRootId( rootId );
+      assertId( rootId, 'media root' );
 
       conditions.push( 'root_id = ?' );
       values.push( rootId );
@@ -106,8 +92,8 @@ export class Media {
   }
 
   public static registerFile ( input: MediaFileInput ) : number {
-    Media.assertRootId( input.rootId );
-    Media.assertRelativePath( input.path );
+    assertId( input.rootId, 'media root' );
+    assertRelativePath( input.path, 'media' );
 
     if ( ! input.fileName || input.fileName.includes( '/' ) || input.fileName.includes( '\\' ) )
       throw new Error( `Invalid media file name: ${ input.fileName }` );
@@ -158,7 +144,7 @@ export class Media {
   }
 
   public static update ( id: number, patch: MediaUpdate ) : void {
-    Media.assertMediaId( id );
+    assertId( id, 'media' );
 
     const columns = Object.entries( UPDATE_COLUMNS ) as [ keyof MediaUpdate, string ][];
     const assignments: string[] = [], values: ( string | number | null )[] = [];
