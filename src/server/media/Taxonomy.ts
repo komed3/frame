@@ -62,4 +62,13 @@ export class MediaTaxonomy {
     if ( ! row ) throw new Error( `Could not create tag: ${ value }` );
     return row.id;
   }
+
+  public static renameTag ( id: number, name: string ) : void {
+    MediaTaxonomy.assertId( id, 'tag' );
+
+    const value = MediaTaxonomy.normalizeName( name );
+    const result = conn().prepare( 'UPDATE tags SET name = ? WHERE id = ?' ).run( value, id );
+
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
+  }
 }
