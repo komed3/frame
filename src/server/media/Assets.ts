@@ -58,4 +58,34 @@ export class MediaAssets {
 
     return row ? MediaAssets.mapRow( row ) : null;
   }
+
+  public static register ( mediaId: number, asset: MediaAssetInput ) : number {
+    Media.assertMediaIdSafe( mediaId );
+
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO assets (
+        media_id, kind, variant, path, fingerprint, mime_type,
+        size_bytes, width, height, data_json
+      )
+      VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+      ON CONFLICT ( media_id, kind, variant ) DO UPDATE SET
+        path = excluded.path,
+        fingerprint = excluded.fingerprint,
+        mime_type = excluded.mime_type,
+        size_bytes = excluded.size_bytes,
+        width = excluded.width,
+        height = excluded.height,
+        data_json = excluded.data_json,
+        created_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      RETURNING id
+    ` ).get(
+      mediaId, asset.kind, asset.variant ?? 'default',
+      asset.path, asset.fingerprint ?? null, asset.mimeType ?? null,
+      asset.sizeBytes ?? null, asset.width ?? null,
+      asset.height ?? null, JSON.stringify( asset.data ?? {} )
+    ) );
+
+    if ( ! row ) throw new Error( `Could not register asset for media ${ mediaId }` );
+    return row.id;
+  }
 }
