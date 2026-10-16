@@ -155,6 +155,23 @@ export class MediaAssets {
     return id;
   }
 
+  public static async update (
+    mediaId: number, kind: MediaAssetKind, variant: string, content: Uint8Array,
+    changes: Partial< Pick< MediaAssetInput, 'path' | 'fingerprint' | 'mimeType' | 'width' | 'height' | 'data' > > = {}
+  ) : Promise< number > {
+    const previous = MediaAssets.get( mediaId, kind, variant );
+    if ( ! previous ) throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
+
+    return MediaAssets.write( mediaId, {
+      kind, variant, path: changes.path ?? previous.path,
+      fingerprint: changes.fingerprint === undefined ? previous.fingerprint : changes.fingerprint,
+      mimeType: changes.mimeType === undefined ? previous.mimeType : changes.mimeType,
+      width: changes.width === undefined ? previous.width : changes.width,
+      height: changes.height === undefined ? previous.height : changes.height,
+      data: changes.data === undefined ? previous.data : changes.data
+    }, content );
+  }
+
   public static delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : void {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( kind, variant );
