@@ -77,4 +77,20 @@ export class MediaTracks {
       return track;
     } );
   }
+
+  public static list ( mediaId: number ) : MediaTrackRecord[] {
+    Media.assertMediaIdSafe( mediaId );
+
+    const rows = as< MediaTrackRow[] >( conn().prepare( `
+      SELECT
+        id, media_id AS mediaId, stream_index AS streamIndex, kind, codec, language, title,
+        is_default AS isDefault, is_forced AS isForced, width, height, fps, bitrate,
+        sample_rate AS sampleRate, channels, data_json AS dataJson
+      FROM tracks
+      WHERE media_id = ?
+      ORDER BY stream_index, id
+    ` ).all( mediaId ) );
+
+    return rows.map( row => MediaTracks.mapRow( row ) );
+  }
 }
