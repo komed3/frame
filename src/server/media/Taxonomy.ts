@@ -41,4 +41,8 @@ export class MediaTaxonomy {
       for ( const id of uniqueIds ) insert.run( mediaId, id );
     } );
   }
+
+  public static listTags () : TagRecord[] {
+    return as< TagRecord[] >( conn().prepare( 'SELECT id, name FROM tags ORDER BY name COLLATE NOCASE, id' ).all() );
+  }
 }
