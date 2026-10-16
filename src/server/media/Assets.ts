@@ -174,15 +174,29 @@ export class MediaAssets {
     }, content );
   }
 
-  public static delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : void {
+  public static async delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : Promise< void > {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( kind, variant );
 
-    const result = conn().prepare(
-      'DELETE FROM assets WHERE media_id = ? AND kind = ? AND variant = ?'
-    ).run( mediaId, kind, variant.trim() );
+    const asset = MediaAssets.get( mediaId, kind, variant );
+    if ( ! asset ) throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
 
-    if ( Number( result.changes ) !== 1 )
-      throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
+    const path = MediaAssets.resolvePath( asset.path );
+    const backupPath = `${ path }.${ randomUUID() }.bak`;
+    const backedUp = await MediaAssets.moveIfExists( path, backupPath );
+
+    try {
+      const result = conn().prepare(
+        'DELETE FROM assets WHERE media_id = ? AND kind = ? AND variant = ?'
+      ).run( mediaId, kind, variant.trim() );
+
+      if ( Number( result.changes ) !== 1 )
+        throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
+    } catch ( error ) {
+      if ( backedUp ) await rename( backupPath, path );
+      throw error;
+    }
+
+    if ( backedUp ) await rm( backupPath, { force: true } );
   }
 }
