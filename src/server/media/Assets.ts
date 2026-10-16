@@ -18,4 +18,9 @@ export class MediaAssets {
 
     return { ...row, data: data as Record< string, unknown > };
   }
+
+  public static resolvePath ( path: string ) : string {
+    assertRelativePath( path, 'asset' );
+    return resolve( Config.get( 'ASSETS_PATH' ), path );
+  }
 }
