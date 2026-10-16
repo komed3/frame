@@ -45,4 +45,9 @@ export class MediaTaxonomy {
   public static listTags () : TagRecord[] {
     return as< TagRecord[] >( conn().prepare( 'SELECT id, name FROM tags ORDER BY name COLLATE NOCASE, id' ).all() );
   }
+
+  public static getTag ( id: number ) : TagRecord | null {
+    MediaTaxonomy.assertId( id, 'tag' );
+    return as< TagRecord | undefined >( conn().prepare( 'SELECT id, name FROM tags WHERE id = ?' ).get( id ) ) ?? null;
+  }
 }
