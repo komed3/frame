@@ -116,4 +116,24 @@ export class MediaTaxonomy {
       'SELECT id, name, parent_id AS parentId FROM categories WHERE id = ?'
     ).get( id ) ) ?? null;
   }
+
+  public static createCategory ( name: string, parentId: number | null = null ) : number {
+    const value = MediaTaxonomy.normalizeName( name );
+
+    if ( parentId !== null ) {
+      assertId( parentId, 'parent category' );
+
+      if ( ! MediaTaxonomy.getCategory( parentId ) )
+        throw new Error( `Parent category ${ parentId } does not exist` );
+    }
+
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO categories ( name, parent_id ) VALUES ( ?, ? )
+      ON CONFLICT ( name ) DO UPDATE SET name = categories.name
+      RETURNING id
+    ` ).get( value, parentId ) );
+
+    if ( ! row ) throw new Error( `Could not create category: ${ value }` );
+    return row.id;
+  }
 }
