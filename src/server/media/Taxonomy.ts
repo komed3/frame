@@ -108,4 +108,12 @@ export class MediaTaxonomy {
       'SELECT id, name, parent_id AS parentId FROM categories ORDER BY name COLLATE NOCASE, id'
     ).all() );
   }
+
+  public static getCategory ( id: number ) : CategoryRecord | null {
+    assertId( id, 'category' );
+
+    return as< CategoryRecord | undefined >( conn().prepare(
+      'SELECT id, name, parent_id AS parentId FROM categories WHERE id = ?'
+    ).get( id ) ) ?? null;
+  }
 }
