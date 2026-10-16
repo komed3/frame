@@ -50,4 +50,16 @@ export class MediaTaxonomy {
     MediaTaxonomy.assertId( id, 'tag' );
     return as< TagRecord | undefined >( conn().prepare( 'SELECT id, name FROM tags WHERE id = ?' ).get( id ) ) ?? null;
   }
+
+  public static createTag ( name: string ) : number {
+    const value = MediaTaxonomy.normalizeName( name );
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO tags ( name ) VALUES ( ? )
+      ON CONFLICT ( name ) DO UPDATE SET name = tags.name
+      RETURNING id
+    ` ).get( value ) );
+
+    if ( ! row ) throw new Error( `Could not create tag: ${ value }` );
+    return row.id;
+  }
 }
