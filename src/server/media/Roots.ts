@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { assertId } from '@/src/server/utils';
-import type { MediaRoot, MediaRootRow } from '@/src/shared/types/media';
+import type { MediaRoot, MediaRootRow } from '@/src/shared/types/roots';
 import { realpathSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep, win32 } from 'node:path';
 
