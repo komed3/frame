@@ -40,4 +40,13 @@ export class Media {
       path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' )
     ) throw new Error( `Invalid relative media path: ${ path }` );
   }
+
+  private static mapRow ( row: MediaRow ) : MediaRecord {
+    const data = JSON.parse( row.dataJson ) as unknown;
+
+    if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
+      throw new Error( `Invalid media data JSON for media ${ row.id }` );
+
+    return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
+  }
 }
