@@ -1,17 +1,10 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId } from '@/src/server/utils';
+import { assertId, normalizeString } from '@/src/server/utils';
 import type { CategoryRecord, TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 
 
 export class MediaTaxonomy {
-  private static normalizeName ( name: string ) : string {
-    if ( typeof name !== 'string' || ! name.trim() || name.includes( '\0' ) )
-      throw new Error( 'Name must not be empty' );
-
-    return name.trim();
-  }
-
   private static replaceMediaRelations ( mediaId: number, ids: number[], kind: TaxonomyKind ) : void {
     Media.assertMediaIdSafe( mediaId );
 
@@ -57,7 +50,7 @@ export class MediaTaxonomy {
   }
 
   public static createTag ( name: string ) : number {
-    const value = MediaTaxonomy.normalizeName( name );
+    const value = normalizeString( name, 'Tag' );
     const row = as< { id: number } | undefined >( conn().prepare( `
       INSERT INTO tags ( name ) VALUES ( ? )
       ON CONFLICT ( name ) DO UPDATE SET name = tags.name
@@ -71,7 +64,7 @@ export class MediaTaxonomy {
   public static renameTag ( id: number, name: string ) : void {
     assertId( id, 'tag' );
 
-    const value = MediaTaxonomy.normalizeName( name );
+    const value = normalizeString( name, 'Tag' );
     const result = conn().prepare( 'UPDATE tags SET name = ? WHERE id = ?' ).run( value, id );
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
@@ -118,7 +111,7 @@ export class MediaTaxonomy {
   }
 
   public static createCategory ( name: string, parentId: number | null = null ) : number {
-    const value = MediaTaxonomy.normalizeName( name );
+    const value = normalizeString( name, 'Category' );
 
     if ( parentId !== null ) {
       assertId( parentId, 'parent category' );
@@ -140,7 +133,7 @@ export class MediaTaxonomy {
   public static renameCategory ( id: number, name: string ) : void {
     assertId( id, 'category' );
 
-    const value = MediaTaxonomy.normalizeName( name );
+    const value = normalizeString( name, 'Category' );
     const result = conn().prepare( 'UPDATE categories SET name = ? WHERE id = ?' ).run( value, id );
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
