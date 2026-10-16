@@ -129,4 +129,9 @@ export class MediaTracks {
       );
     } );
   }
+
+  public static clear ( mediaId: number ) : void {
+    Media.assertMediaIdSafe( mediaId );
+    conn().prepare( 'DELETE FROM tracks WHERE media_id = ?' ).run( mediaId );
+  }
 }
