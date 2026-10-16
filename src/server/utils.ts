@@ -9,3 +9,11 @@ export function assertRelativePath ( path: string, label: string ) : void {
     path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' )
   ) throw new Error( `Invalid relative ${ label } path: ${ path }` );
 }
+
+
+export function normalizeString ( value: string, label: string ) : string {
+  if ( typeof value !== 'string' || ! value.trim() || value.includes( '\0' ) )
+    throw new Error( `${ label } must not be empty` );
+
+  return value.trim();
+}
