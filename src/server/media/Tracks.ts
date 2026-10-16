@@ -25,16 +25,12 @@ export class MediaTracks {
     const indexes = new Set< number >();
 
     return tracks.map( track => {
-      if ( ! Number.isSafeInteger( track.streamIndex ) || track.streamIndex < 0 )
-        throw new Error( `Invalid stream index: ${ track.streamIndex }` );
+      assertId( track.streamIndex, 'stream' );
 
-      if ( indexes.has( track.streamIndex ) )
-        throw new Error( `Duplicate stream index: ${ track.streamIndex }` );
-
+      if ( indexes.has( track.streamIndex ) ) throw new Error( `Duplicate stream index: ${ track.streamIndex }` );
       indexes.add( track.streamIndex );
 
-      if ( ! TRACK_KINDS.includes( track.kind ) )
-        throw new Error( `Invalid track kind: ${ track.kind }` );
+      if ( ! TRACK_KINDS.includes( track.kind ) ) throw new Error( `Invalid track kind: ${ track.kind }` );
 
       for ( const key of [ 'codec', 'language', 'title' ] as const ) {
         const value = track[ key ];
@@ -92,5 +88,21 @@ export class MediaTracks {
     ` ).all( mediaId ) );
 
     return rows.map( row => MediaTracks.mapRow( row ) );
+  }
+
+  public static get ( mediaId: number, streamIndex: number ) : MediaTrackRecord | null {
+    Media.assertMediaIdSafe( mediaId );
+    assertId( streamIndex, 'stream' );
+
+    const row = as< MediaTrackRow | undefined >( conn().prepare( `
+      SELECT
+        id, media_id AS mediaId, stream_index AS streamIndex, kind, codec, language, title,
+        is_default AS isDefault, is_forced AS isForced, width, height, fps, bitrate,
+        sample_rate AS sampleRate, channels, data_json AS dataJson
+      FROM tracks
+      WHERE media_id = ? AND stream_index = ?
+    ` ).get( mediaId, streamIndex ) );
+
+    return row ? MediaTracks.mapRow( row ) : null;
   }
 }
