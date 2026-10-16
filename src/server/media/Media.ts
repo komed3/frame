@@ -149,4 +149,34 @@ export class Media {
     if ( ! row ) throw new Error( `Could not register media file: ${ input.path }` );
     return row.id;
   }
+
+  public static update ( id: number, patch: MediaUpdate ) : void {
+    Media.assertMediaId( id );
+
+    const columns = Object.entries( UPDATE_COLUMNS ) as [ keyof MediaUpdate, string ][];
+    const assignments: string[] = [], values: ( string | number | null )[] = [];
+
+    for ( const [ key, column ] of columns ) {
+      const value = patch[ key ];
+      if ( value === undefined ) continue;
+
+      if ( key === 'data' ) {
+        if ( ! value || typeof value !== 'object' || Array.isArray( value ) )
+          throw new Error( 'Media data must be an object' );
+
+        values.push( JSON.stringify( value ) );
+      } else {
+        values.push( value as string | number | null );
+      }
+
+      assignments.push( `${ column } = ?` );
+    }
+
+    if ( ! assignments.length ) return;
+
+    assignments.push( `updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )` );
+    const result = conn().prepare( `UPDATE media SET ${ assignments.join( ', ' ) } WHERE id = ?` ).run( ...values, id );
+
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Media ${ id } does not exist` );
+  }
 }
