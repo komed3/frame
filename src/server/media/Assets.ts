@@ -113,6 +113,48 @@ export class MediaAssets {
     return row.id;
   }
 
+  public static async write ( mediaId: number, asset: MediaAssetInput, content: Uint8Array ) : Promise< number > {
+    Media.assertMediaIdSafe( mediaId );
+
+    const variant = asset.variant === undefined ? 'default' : asset.variant.trim();
+    MediaAssets.assertKind( asset.kind, variant );
+
+    const input = { ...asset, variant };
+    const path = MediaAssets.resolvePath( input.path );
+    const previous = MediaAssets.get( mediaId, input.kind, variant );
+    const previousPath = previous ? MediaAssets.resolvePath( previous.path ) : null;
+
+    MediaAssets.assertPathAvailable( input.path, mediaId, input.kind, variant );
+    await mkdir( dirname( path ), { recursive: true } );
+
+    const tempPath = `${ path }.${ randomUUID() }.tmp`;
+    const backupPath = `${ path }.${ randomUUID() }.bak`;
+    let backedUp = false;
+
+    try {
+      await writeFile( tempPath, content, { flag: 'wx' } );
+      backedUp = await MediaAssets.moveIfExists( path, backupPath );
+      await rename( tempPath, path );
+    } catch ( err ) {
+      await rm( tempPath, { force: true } );
+      if ( backedUp ) await rename( backupPath, path );
+      throw err;
+    }
+
+    let id: number;
+
+    try { id = MediaAssets.register( mediaId, { ...input, sizeBytes: content.byteLength } ) }
+    catch ( err ) {
+      await rm( path, { force: true } );
+      if ( backedUp ) await rename( backupPath, path );
+      throw err;
+    }
+
+    if ( backedUp ) await rm( backupPath, { force: true } );
+    if ( previousPath && previousPath !== path ) await rm( previousPath, { force: true } );
+    return id;
+  }
+
   public static delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : void {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( kind, variant );
