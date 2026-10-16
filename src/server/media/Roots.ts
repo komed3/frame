@@ -24,8 +24,7 @@ export class MediaRoots {
 
     const row = as< MediaRootRow | undefined >( conn().prepare( `
       SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
-      FROM roots
-      WHERE id = ?
+      FROM roots WHERE id = ?
     ` ).get( id ) );
 
     if ( ! row ) throw new Error( `Media root ${ id } does not exist` );
