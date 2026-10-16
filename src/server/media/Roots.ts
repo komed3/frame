@@ -1,4 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
+import { assertId } from '@/src/server/utils';
 import type { MediaRoot, MediaRootRow } from '@/src/shared/types/media';
 import { realpathSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep, win32 } from 'node:path';
@@ -20,7 +21,7 @@ export class MediaRoots {
   }
 
   private static getRow ( id: number ) : MediaRootRow {
-    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media root ID: ${ id }` );
+    assertId( id, 'media root' );
 
     const row = as< MediaRootRow | undefined >( conn().prepare( `
       SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
@@ -58,7 +59,7 @@ export class MediaRoots {
   }
 
   public static setEnabled ( id: number, enabled: boolean ) : void {
-    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media root ID: ${ id }` );
+    assertId( id, 'media root' );
 
     const result = conn().prepare( 'UPDATE roots SET enabled = ? WHERE id = ?' ).run( +!! enabled, id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Media root ${ id } does not exist` );
