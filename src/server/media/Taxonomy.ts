@@ -9,4 +9,8 @@ export class MediaTaxonomy {
 
     return name.trim();
   }
+
+  private static assertId ( id: number, label: string ) : void {
+    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid ${ label } ID: ${ id }` );
+  }
 }
