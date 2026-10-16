@@ -179,4 +179,16 @@ export class MediaTaxonomy {
     const result = conn().prepare( 'DELETE FROM categories WHERE id = ?' ).run( id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );
   }
+
+  public static getMediaCategories ( mediaId: number ) : CategoryRecord[] {
+    Media.assertMediaIdSafe( mediaId );
+
+    return as< CategoryRecord[] >( conn().prepare( `
+      SELECT c.id, c.name, c.parent_id AS parentId
+      FROM categories c
+      JOIN media_categories mc ON mc.category_id = c.id
+      WHERE mc.media_id = ?
+      ORDER BY c.name COLLATE NOCASE, c.id
+    ` ).all( mediaId ) );
+  }
 }
