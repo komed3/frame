@@ -63,6 +63,33 @@ export class MediaRoots {
     const result = conn().prepare( 'UPDATE roots SET enabled = ? WHERE id = ?' ).run( +!! enabled, id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Media root ${ id } does not exist` );
   }
+
+  public resolve ( id: number, relativePath: string ) : string {
+    const root = this.getRow( id );
+
+    if ( ! root.enabled ) throw new Error( `Media root ${ id } is disabled` );
+    if ( typeof relativePath !== 'string' || relativePath.includes( '\0' ) )
+      throw new Error( 'Invalid media path' );
+
+    if (
+      isAbsolute( relativePath ) || win32.isAbsolute( relativePath ) ||
+      relativePath.includes( '\\' ) || relativePath.split( '/' ).includes( '..' )
+    ) throw new Error( `Path traversal is not allowed: ${ relativePath }` );
+
+    const canonicalRoot = this.canonicalize( root.path );
+    if ( canonicalRoot !== root.path )
+      throw new Error( `Media root path changed since registration: ${ root.path }` );
+
+    const candidate = resolve( canonicalRoot, relativePath );
+    if ( ! this.isWithin( canonicalRoot, candidate ) )
+      throw new Error( `Path is outside media root: ${ relativePath }` );
+
+    const canonicalCandidate = realpathSync( candidate );
+    if ( ! this.isWithin( canonicalRoot, canonicalCandidate ) )
+      throw new Error( `Path resolves outside media root: ${ relativePath }` );
+
+    return canonicalCandidate;
+  }
 }
 
 
