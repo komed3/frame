@@ -10,6 +10,11 @@ const ASSET_KINDS: MediaAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave', 'te
 
 
 export class MediaAssets {
+  private static assertKind ( kind: MediaAssetKind, variant = 'default' ) {
+    if ( ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
+    if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
+  }
+
   private static mapRow ( row: MediaAssetRow ) : MediaAssetRecord {
     const data = JSON.parse( row.dataJson ) as unknown;
 
@@ -26,7 +31,7 @@ export class MediaAssets {
 
   public static list ( mediaId: number, kind?: MediaAssetKind ) : MediaAssetRecord[] {
     Media.assertMediaIdSafe( mediaId );
-    if ( kind !== undefined && ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
+    kind !== undefined && MediaAssets.assertKind( kind );
 
     const rows = as< MediaAssetRow[] >( conn().prepare( `
       SELECT
@@ -43,9 +48,7 @@ export class MediaAssets {
 
   public static get ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : MediaAssetRecord | null {
     Media.assertMediaIdSafe( mediaId );
-
-    if ( ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
-    if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
+    MediaAssets.assertKind( kind, variant );
 
     const row = as< MediaAssetRow | undefined >( conn().prepare( `
       SELECT
@@ -91,14 +94,11 @@ export class MediaAssets {
 
   public static delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : void {
     Media.assertMediaIdSafe( mediaId );
+    MediaAssets.assertKind( kind, variant );
 
-    if ( ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
-    if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
-
-    const result = conn().prepare( `
-      DELETE FROM assets
-      WHERE media_id = ? AND kind = ? AND variant = ?
-    ` ).run( mediaId, kind, variant.trim() );
+    const result = conn().prepare(
+      'DELETE FROM assets WHERE media_id = ? AND kind = ? AND variant = ?'
+    ).run( mediaId, kind, variant.trim() );
 
     if ( Number( result.changes ) !== 1 )
       throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
