@@ -71,4 +71,11 @@ export class MediaTaxonomy {
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
   }
+
+  public static deleteTag ( id: number ) : void {
+    MediaTaxonomy.assertId( id, 'tag' );
+
+    const result = conn().prepare( 'DELETE FROM tags WHERE id = ?' ).run( id );
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
+  }
 }
