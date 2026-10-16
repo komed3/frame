@@ -56,6 +56,13 @@ export class MediaRoots {
 
     return rows.map( row => this.mapRow( row ) );
   }
+
+  public setEnabled ( id: number, enabled: boolean ) : void {
+    if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media root ID: ${ id }` );
+
+    const result = conn().prepare( 'UPDATE roots SET enabled = ? WHERE id = ?' ).run( enabled ? 1 : 0, id );
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Media root ${ id } does not exist` );
+  }
 }
 
 
