@@ -30,6 +30,10 @@ export class MediaRoots {
     if ( ! row ) throw new Error( `Media root ${ id } does not exist` );
     return row;
   }
+
+  private mapRow ( row: MediaRootRow ) : MediaRoot {
+    return { ...row, enabled: row.enabled === 1 };
+  }
 }
 
 
