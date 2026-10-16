@@ -47,6 +47,15 @@ export class MediaRoots {
     if ( ! row ) throw new Error( `Could not register media root: ${ canonicalPath }` );
     return row.id;
   }
+
+  public list ( enabledOnly = false ) : MediaRoot[] {
+    const rows = as< MediaRootRow[] >( conn().prepare( `
+      SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
+      FROM roots ${ enabledOnly ? 'WHERE enabled = 1' : '' } ORDER BY id
+    ` ).all() );
+
+    return rows.map( row => this.mapRow( row ) );
+  }
 }
 
 
