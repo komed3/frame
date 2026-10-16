@@ -97,4 +97,56 @@ export class Media {
 
     return rows.map( row => Media.mapRow( row ) );
   }
+
+  public static registerFile ( input: MediaFileInput ) : number {
+    Media.assertRootId( input.rootId );
+    Media.assertRelativePath( input.path );
+
+    if ( ! input.fileName || input.fileName.includes( '/' ) || input.fileName.includes( '\\' ) )
+      throw new Error( `Invalid media file name: ${ input.fileName }` );
+
+    if ( ! MEDIA_TYPES.includes( input.type ) )
+      throw new Error( `Invalid media type: ${ input.type }` );
+
+    if ( ! Number.isSafeInteger( input.sizeBytes ) || input.sizeBytes < 0 )
+      throw new Error( `Invalid media file size: ${ input.sizeBytes }` );
+
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO media (
+        root_id, path, file_name, type, mime_type, size_bytes, modified_at, scanned_at
+      )
+      VALUES (
+        ?, ?, ?, ?, ?, ?, ?,
+        strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      )
+      ON CONFLICT ( root_id, path ) DO UPDATE SET
+        file_name = excluded.file_name,
+        type = excluded.type,
+        mime_type = excluded.mime_type,
+        file_hash = CASE
+          WHEN media.size_bytes IS NOT excluded.size_bytes
+            OR media.modified_at IS NOT excluded.modified_at
+          THEN NULL
+          ELSE media.file_hash
+        END,
+        fingerprint = CASE
+          WHEN media.size_bytes IS NOT excluded.size_bytes
+            OR media.modified_at IS NOT excluded.modified_at
+          THEN NULL
+          ELSE media.fingerprint
+        END,
+        size_bytes = excluded.size_bytes,
+        modified_at = excluded.modified_at,
+        available = 1,
+        scanned_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ),
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      RETURNING id
+    ` ).get(
+      input.rootId, input.path, input.fileName, input.type, input.mimeType ?? null,
+      input.sizeBytes, input.modifiedAt ?? null
+    ) );
+
+    if ( ! row ) throw new Error( `Could not register media file: ${ input.path }` );
+    return row.id;
+  }
 }
