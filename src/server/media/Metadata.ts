@@ -4,4 +4,8 @@ import { assertId, normalizeString } from '@/src/server/utils';
 import type { MediaMetadataInput, MediaMetadataRecord, MediaMetadataSource } from '@/src/shared/types/metadata';
 
 
-export class MediaMetadata {}
+export class MediaMetadata {
+  private static assertSource ( source: MediaMetadataSource ) : void {
+    if ( source !== 'manual' && source !== 'scan' ) throw new Error( `Invalid metadata source: ${ source }` );
+  }
+}
