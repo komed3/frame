@@ -76,4 +76,15 @@ export class MediaMetadata {
     if ( ! row ) throw new Error( `Could not save metadata: ${ normalizedKey }` );
     return row.id;
   }
+
+  public static delete ( mediaId: number, key: string, source: MediaMetadataSource = 'manual' ) : void {
+    Media.assertMediaIdSafe( mediaId );
+    MediaMetadata.assertSource( source );
+
+    const result = conn().prepare(
+      'DELETE FROM media_metadata WHERE media_id = ? AND key = ? AND source = ?'
+    ).run( mediaId, normalize( key ), source );
+
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Metadata key does not exist: ${ key }` );
+  }
 }
