@@ -5,7 +5,7 @@ import { isAbsolute, relative, resolve, sep, win32 } from 'node:path';
 
 
 export class MediaRoots {
-  private canonicalize ( path: string ) : string {
+  private static canonicalize ( path: string ) : string {
     const canonicalPath = realpathSync( path );
 
     if ( ! statSync( canonicalPath ).isDirectory() )
@@ -14,12 +14,12 @@ export class MediaRoots {
     return canonicalPath;
   }
 
-  private isWithin ( root: string, target: string ) : boolean {
+  private static isWithin ( root: string, target: string ) : boolean {
     const rel = relative( root, target );
     return rel === '' || ( rel !== '..' && ! rel.startsWith( `..${ sep }` ) && ! isAbsolute( rel ) );
   }
 
-  private getRow ( id: number ) : MediaRootRow {
+  private static getRow ( id: number ) : MediaRootRow {
     if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media root ID: ${ id }` );
 
     const row = as< MediaRootRow | undefined >( conn().prepare( `
@@ -31,12 +31,12 @@ export class MediaRoots {
     return row;
   }
 
-  private mapRow ( row: MediaRootRow ) : MediaRoot {
+  private static mapRow ( row: MediaRootRow ) : MediaRoot {
     return { ...row, enabled: row.enabled === 1 };
   }
 
-  public add ( path: string, enabled = true ) : number {
-    const canonicalPath = this.canonicalize( path );
+  public static add ( path: string, enabled = true ) : number {
+    const canonicalPath = MediaRoots.canonicalize( path );
     const row = as< { id: number } | undefined >( conn().prepare( `
       INSERT INTO roots ( path, enabled )
       VALUES ( ?, ? )
@@ -48,24 +48,24 @@ export class MediaRoots {
     return row.id;
   }
 
-  public list ( enabledOnly = false ) : MediaRoot[] {
+  public static list ( enabledOnly = false ) : MediaRoot[] {
     const rows = as< MediaRootRow[] >( conn().prepare( `
       SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
       FROM roots ${ enabledOnly ? 'WHERE enabled = 1' : '' } ORDER BY id
     ` ).all() );
 
-    return rows.map( row => this.mapRow( row ) );
+    return rows.map( row => MediaRoots.mapRow( row ) );
   }
 
-  public setEnabled ( id: number, enabled: boolean ) : void {
+  public static setEnabled ( id: number, enabled: boolean ) : void {
     if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media root ID: ${ id }` );
 
     const result = conn().prepare( 'UPDATE roots SET enabled = ? WHERE id = ?' ).run( +!! enabled, id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Media root ${ id } does not exist` );
   }
 
-  public resolve ( id: number, relativePath: string ) : string {
-    const root = this.getRow( id );
+  public static resolve ( id: number, relativePath: string ) : string {
+    const root = MediaRoots.getRow( id );
 
     if ( ! root.enabled ) throw new Error( `Media root ${ id } is disabled` );
     if ( typeof relativePath !== 'string' || relativePath.includes( '\0' ) )
@@ -76,21 +76,18 @@ export class MediaRoots {
       relativePath.includes( '\\' ) || relativePath.split( '/' ).includes( '..' )
     ) throw new Error( `Path traversal is not allowed: ${ relativePath }` );
 
-    const canonicalRoot = this.canonicalize( root.path );
+    const canonicalRoot = MediaRoots.canonicalize( root.path );
     if ( canonicalRoot !== root.path )
       throw new Error( `Media root path changed since registration: ${ root.path }` );
 
     const candidate = resolve( canonicalRoot, relativePath );
-    if ( ! this.isWithin( canonicalRoot, candidate ) )
+    if ( ! MediaRoots.isWithin( canonicalRoot, candidate ) )
       throw new Error( `Path is outside media root: ${ relativePath }` );
 
     const canonicalCandidate = realpathSync( candidate );
-    if ( ! this.isWithin( canonicalRoot, canonicalCandidate ) )
+    if ( ! MediaRoots.isWithin( canonicalRoot, canonicalCandidate ) )
       throw new Error( `Path resolves outside media root: ${ relativePath }` );
 
     return canonicalCandidate;
   }
 }
-
-
-export const mediaRoots = new MediaRoots();
