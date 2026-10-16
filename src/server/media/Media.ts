@@ -2,6 +2,8 @@ import { as, conn } from '@/src/server/core/Database';
 import type { MediaFileInput, MediaListOptions, MediaRecord, MediaRow, MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
+export const MEDIA_TYPES: MediaType[] = [ 'video', 'audio', 'image', 'text', 'other' ];
+
 const SELECT_MEDIA = `
   SELECT
     id, root_id AS rootId, path, file_name AS fileName, type, mime_type AS mimeType,
