@@ -120,15 +120,13 @@ export class MediaTracks {
         VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
       ` );
 
-      for ( const track of MediaTracks.normalize( tracks ) ) {
-        insert.run(
-          mediaId, track.streamIndex, track.kind, track.codec ?? null,
-          track.language ?? null, track.title ?? null, +( track.isDefault ?? false ),
-          +( track.isForced ?? false ), track.width ?? null, track.height ?? null,
-          track.fps ?? null, track.bitrate ?? null, track.sampleRate ?? null,
-          track.channels ?? null, JSON.stringify( track.data ?? {} )
-        );
-      }
+      for ( const track of MediaTracks.normalize( tracks ) ) insert.run(
+        mediaId, track.streamIndex, track.kind, track.codec ?? null,
+        track.language ?? null, track.title ?? null, +( track.isDefault ?? false ),
+        +( track.isForced ?? false ), track.width ?? null, track.height ?? null,
+        track.fps ?? null, track.bitrate ?? null, track.sampleRate ?? null,
+        track.channels ?? null, JSON.stringify( track.data ?? {} )
+      );
     } );
   }
 }
