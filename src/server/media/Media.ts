@@ -26,15 +26,15 @@ const UPDATE_COLUMNS = {
 
 
 export class Media {
-  private static validateId ( id: number ) : void {
+  private static assertMediaId ( id: number ) : void {
     if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid media ID: ${ id }` );
   }
 
-  private static validateRootId ( rootId: number ) : void {
+  private static assertRootId ( rootId: number ) : void {
     if ( ! Number.isSafeInteger( rootId ) || rootId < 1 ) throw new Error( `Invalid media root ID: ${ rootId }` );
   }
 
-  private static validateRelativePath ( path: string ) : void {
+  private static assertRelativePath ( path: string ) : void {
     if (
       typeof path !== 'string' || ! path || path.includes( '\0' ) || path.includes( '\\' ) ||
       path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' )
