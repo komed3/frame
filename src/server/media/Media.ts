@@ -33,4 +33,11 @@ export class Media {
   private static validateRootId ( rootId: number ) : void {
     if ( ! Number.isSafeInteger( rootId ) || rootId < 1 ) throw new Error( `Invalid media root ID: ${ rootId }` );
   }
+
+  private static validateRelativePath ( path: string ) : void {
+    if (
+      typeof path !== 'string' || ! path || path.includes( '\0' ) || path.includes( '\\' ) ||
+      path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' )
+    ) throw new Error( `Invalid relative media path: ${ path }` );
+  }
 }
