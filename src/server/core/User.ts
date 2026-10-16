@@ -118,7 +118,7 @@ export class User {
     const result = conn().prepare( `
       INSERT INTO users ( username, pw_hash, is_admin )
       VALUES ( ?, ?, ? )
-    ` ).run( name, hash, isAdmin ? 1 : 0 );
+    ` ).run( name, hash, +!! isAdmin );
 
     const user = this.get( Number( result.lastInsertRowid ) );
     if ( ! user ) throw new Error( 'Failed to create user' );
@@ -177,7 +177,7 @@ export class User {
       if ( ! target ) throw new Error( 'User does not exist' );
       if ( ! isAdmin ) this.assertCanDestructive( target, 'Cannot remove privileges from the last active administrator' );
 
-      db.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( isAdmin ? 1 : 0, userId );
+      db.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( +!! isAdmin, userId );
     } );
   }
 
