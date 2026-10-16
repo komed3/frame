@@ -17,6 +17,15 @@ export class MediaAssets {
     if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
   }
 
+  private static assertPathAvailable ( path: string, mediaId: number, kind: MediaAssetKind, variant: string ) : void {
+    const row = as< { mediaId: number, kind: MediaAssetKind, variant: string } | undefined >(
+      conn().prepare( 'SELECT media_id AS mediaId, kind, variant FROM assets WHERE path = ?' ).get( path )
+    );
+
+    if ( row && ( row.mediaId !== mediaId || row.kind !== kind || row.variant !== variant ) )
+      throw new Error( `Asset path is already in use: ${ path }` );
+  }
+
   private static mapRow ( row: MediaAssetRow ) : MediaAssetRecord {
     const data = JSON.parse( row.dataJson ) as unknown;
 
