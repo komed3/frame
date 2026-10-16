@@ -13,7 +13,7 @@ export class MediaTaxonomy {
   }
 
   private static replaceMediaRelations ( mediaId: number, ids: number[], kind: TaxonomyKind ) : void {
-    Media.getMediaIdSafe( mediaId );
+    Media.assertMediaIdSafe( mediaId );
 
     const uniqueIds = [ ...new Set( ids ) ];
     uniqueIds.forEach( id => assertId( id, kind === 'tags' ? 'tag' : 'category' ) );
@@ -79,5 +79,21 @@ export class MediaTaxonomy {
 
     const result = conn().prepare( 'DELETE FROM tags WHERE id = ?' ).run( id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
+  }
+
+  public static getMediaTags ( mediaId: number ) : TagRecord[] {
+    Media.assertMediaIdSafe( mediaId );
+
+    return as< TagRecord[] >( conn().prepare( `
+      SELECT t.id, t.name
+      FROM tags t
+      JOIN media_tags mt ON mt.tag_id = t.id
+      WHERE mt.media_id = ?
+      ORDER BY t.name COLLATE NOCASE, t.id
+    ` ).all( mediaId ) );
+  }
+
+  public static setMediaTags ( mediaId: number, tagIds: number[] ) : void {
+    MediaTaxonomy.replaceMediaRelations( mediaId, tagIds, 'tags' );
   }
 }
