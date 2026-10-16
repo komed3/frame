@@ -88,4 +88,19 @@ export class MediaAssets {
     if ( ! row ) throw new Error( `Could not register asset for media ${ mediaId }` );
     return row.id;
   }
+
+  public static delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : void {
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
+    if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
+
+    const result = conn().prepare( `
+      DELETE FROM assets
+      WHERE media_id = ? AND kind = ? AND variant = ?
+    ` ).run( mediaId, kind, variant.trim() );
+
+    if ( Number( result.changes ) !== 1 )
+      throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
+  }
 }
