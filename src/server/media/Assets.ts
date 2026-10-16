@@ -10,8 +10,8 @@ const ASSET_KINDS: MediaAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave', 'te
 
 
 export class MediaAssets {
-  private static assertKind ( kind: MediaAssetKind, variant = 'default' ) {
-    if ( ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
+  private static assertKind ( kind?: MediaAssetKind, variant = 'default' ) {
+    if ( kind && ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
     if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
   }
 
@@ -31,7 +31,7 @@ export class MediaAssets {
 
   public static list ( mediaId: number, kind?: MediaAssetKind ) : MediaAssetRecord[] {
     Media.assertMediaIdSafe( mediaId );
-    kind !== undefined && MediaAssets.assertKind( kind );
+    MediaAssets.assertKind( kind );
 
     const rows = as< MediaAssetRow[] >( conn().prepare( `
       SELECT
