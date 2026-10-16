@@ -40,7 +40,7 @@ export class MediaRoots {
     const row = as< { id: number } | undefined >( conn().prepare( `
       INSERT INTO roots ( path, enabled )
       VALUES ( ?, ? )
-      ON CONFLICT ( path ) DO UPDATE SET enabled = 1
+      ON CONFLICT ( path ) DO UPDATE SET enabled = excluded.enabled
       RETURNING id
     ` ).get( canonicalPath, +!! enabled ) );
 
