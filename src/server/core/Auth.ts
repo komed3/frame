@@ -1,18 +1,19 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { type User, users } from '@/src/server/core/User';
+import { User } from '@/src/server/core/User';
 import type { ActiveSession, ActiveSessionRow, AuthResult, SessionRow } from '@/src/shared/types/auth';
+import type { UserRecord } from '@/src/shared/types/user';
 import { createHash, randomBytes } from 'node:crypto';
 
 
 export class Auth {
-  private hashToken ( token: string ) : string {
+  private static hashToken ( token: string ) : string {
     return createHash( 'sha256' ).update( token ).digest( 'hex' );
   }
 
-  public async login ( username: string, pw: string ) : Promise< AuthResult > {
-    const user = users.getByUsername( username );
-    if ( ! user || user.disabledAt || ! await users.verifyPassword( user.id, pw ) )
+  public static async login ( username: string, pw: string ) : Promise< AuthResult > {
+    const user = User.getByUsername( username );
+    if ( ! user || user.disabledAt || ! await User.verifyPassword( user.id, pw ) )
       throw new Error( 'Invalid username or password' );
 
     const token = randomBytes( 32 ).toString( 'base64url' );
@@ -25,28 +26,28 @@ export class Auth {
       db.prepare( `
         INSERT INTO sessions ( user_id, token_hash, created_at, expires_at, last_seen_at )
         VALUES ( ?, ?, ?, ?, ? )
-      ` ).run( user.id, this.hashToken( token ), createdAt, expiresAt, createdAt );
+      ` ).run( user.id, Auth.hashToken( token ), createdAt, expiresAt, createdAt );
     } );
 
     return { token, expiresAt, user };
   }
 
-  public logout ( token: string | null | undefined ) : void {
+  public static logout ( token: string | null | undefined ) : void {
     if ( ! token ) return;
-    conn().prepare( 'DELETE FROM sessions WHERE token_hash = ?' ).run( this.hashToken( token ) );
+    conn().prepare( 'DELETE FROM sessions WHERE token_hash = ?' ).run( Auth.hashToken( token ) );
   }
 
-  public validateSession ( token: string | null | undefined ) : ReturnType< User[ 'get' ] > {
+  public static validateSession ( token: string | null | undefined ) : UserRecord | null {
     if ( ! token ) return null;
 
     const now = new Date();
     const session = as< SessionRow | null >( conn().prepare(
       'SELECT * FROM sessions WHERE token_hash = ? AND expires_at > ?'
-    ).get( this.hashToken( token ), now.toISOString() ) );
+    ).get( Auth.hashToken( token ), now.toISOString() ) );
 
     if ( ! session ) return null;
 
-    const user = users.get( session.user_id );
+    const user = User.get( session.user_id );
 
     if ( ! user || user.disabledAt ) {
       conn().prepare( 'DELETE FROM sessions WHERE id = ?' ).run( session.id );
@@ -60,7 +61,7 @@ export class Auth {
     return user;
   }
 
-  public listSessions () : ActiveSession[] {
+  public static listSessions () : ActiveSession[] {
     const rows = as< ActiveSessionRow[] >( conn().prepare( `
       SELECT
         s.id,
@@ -80,10 +81,7 @@ export class Auth {
     return rows.map( row => ( { ...row, isAdmin: row.isAdmin === 1 } ) );
   }
 
-  public logoutAll () : number {
+  public static logoutAll () : number {
     return Number( conn().prepare( 'DELETE FROM sessions' ).run().changes );
   }
 }
-
-
-export const auth = new Auth();
