@@ -23,4 +23,21 @@ export class MediaAssets {
     assertRelativePath( path, 'asset' );
     return resolve( Config.get( 'ASSETS_PATH' ), path );
   }
+
+  public static list ( mediaId: number, kind?: MediaAssetKind ) : MediaAssetRecord[] {
+    Media.assertMediaIdSafe( mediaId );
+    if ( kind !== undefined && ! ASSET_KINDS.includes( kind ) ) throw new Error( `Invalid asset kind: ${ kind }` );
+
+    const rows = as< MediaAssetRow[] >( conn().prepare( `
+      SELECT
+        id, media_id AS mediaId, kind, variant, path, fingerprint,
+        mime_type AS mimeType, size_bytes AS sizeBytes, width, height,
+        data_json AS dataJson, created_at AS createdAt
+      FROM assets
+      WHERE media_id = ? ${ kind === undefined ? '' : 'AND kind = ?' }
+      ORDER BY kind, variant, id
+    ` ).all( ...( kind === undefined ? [ mediaId ] : [ mediaId, kind ] ) ) );
+
+    return rows.map( row => MediaAssets.mapRow( row ) );
+  }
 }
