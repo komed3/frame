@@ -128,14 +128,14 @@ export class User {
 
   
   public static delete ( userId: number ) : void {
-    db.transaction( db => {
-      const target = as< UserRow | null >( db.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
+    db.transaction( tx => {
+      const target = as< UserRow | null >( tx.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
       if ( ! target ) throw new Error( 'User does not exist' );
 
       User.assertCanDestructive( target, 'Cannot delete the last active administrator' );
 
-      db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
-      db.prepare( 'DELETE FROM users WHERE id = ?' ).run( userId );
+      tx.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
+      tx.prepare( 'DELETE FROM users WHERE id = ?' ).run( userId );
     } );
   }
 
@@ -163,21 +163,21 @@ export class User {
 
     const hash = await User.hashPassword( newPw );
 
-    db.transaction( db => {
-      db.prepare( 'UPDATE users SET pw_hash = ? WHERE id = ?' ).run( hash, userId );
-      db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
+    db.transaction( tx => {
+      tx.prepare( 'UPDATE users SET pw_hash = ? WHERE id = ?' ).run( hash, userId );
+      tx.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
     } );
   }
 
   public static setAdmin ( actorId: number, userId: number, isAdmin: boolean ) : void {
     User.assertAdmin( actorId );
 
-    db.transaction( db => {
-      const target = as< UserRow | null >( db.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
+    db.transaction( tx => {
+      const target = as< UserRow | null >( tx.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
       if ( ! target ) throw new Error( 'User does not exist' );
       if ( ! isAdmin ) User.assertCanDestructive( target, 'Cannot remove privileges from the last active administrator' );
 
-      db.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( +!! isAdmin, userId );
+      tx.prepare( 'UPDATE users SET is_admin = ? WHERE id = ?' ).run( +!! isAdmin, userId );
     } );
   }
 
@@ -187,12 +187,12 @@ export class User {
     if ( actorId === userId ) throw new Error( 'You cannot disable your own account' );
     if ( ! User.getRow( userId ) ) throw new Error( 'User does not exist' );
 
-    db.transaction( db => {
-      db.prepare( 'UPDATE users SET disabled_at = ? WHERE id = ?' ).run(
+    db.transaction( tx => {
+      tx.prepare( 'UPDATE users SET disabled_at = ? WHERE id = ?' ).run(
         disabled ? new Date().toISOString() : null, userId
       );
 
-      if ( disabled ) db.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
+      if ( disabled ) tx.prepare( 'DELETE FROM sessions WHERE user_id = ?' ).run( userId );
     } );
   }
 

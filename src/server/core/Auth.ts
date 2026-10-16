@@ -20,10 +20,10 @@ export class Auth {
     const now = new Date(), createdAt = now.toISOString();
     const expiresAt = new Date( now.getTime() + Config.get( 'SESSION_LIFETIME_MS' ) ).toISOString();
 
-    db.transaction( db => {
-      db.prepare( 'DELETE FROM sessions WHERE expires_at <= ?' ).run( createdAt );
+    db.transaction( tx => {
+      tx.prepare( 'DELETE FROM sessions WHERE expires_at <= ?' ).run( createdAt );
 
-      db.prepare( `
+      tx.prepare( `
         INSERT INTO sessions ( user_id, token_hash, created_at, expires_at, last_seen_at )
         VALUES ( ?, ?, ?, ?, ? )
       ` ).run( user.id, Auth.hashToken( token ), createdAt, expiresAt, createdAt );
