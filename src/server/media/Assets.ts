@@ -26,6 +26,16 @@ export class MediaAssets {
     return { ...row, data: data as Record< string, unknown > };
   }
 
+  private static async moveIfExists ( path: string, target: string ) : Promise< boolean > {
+    try {
+      await rename( path, target );
+      return true;
+    } catch ( error ) {
+      if ( ( error as NodeJS.ErrnoException ).code === 'ENOENT' ) return false;
+      throw error;
+    }
+  }
+
   public static resolvePath ( path: string ) : string {
     assertRelativePath( path, 'asset' );
     return resolve( Config.get( 'ASSETS_PATH' ), path );
