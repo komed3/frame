@@ -57,4 +57,12 @@ export class Plays {
 
     return Number( result.lastInsertRowid );
   }
+
+  public static update ( userId: number, playId: number, watchedMs: number, completed = false ) : void {
+    Plays.updateRow( userId, playId, watchedMs, completed, false );
+  }
+
+  public static finish ( userId: number, playId: number, watchedMs: number, completed = false ) : void {
+    Plays.updateRow( userId, playId, watchedMs, completed, true );
+  }
 }
