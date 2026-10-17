@@ -23,4 +23,25 @@ export class Pref {
 
     return this.validate( name, value );
   }
+
+  public static validate < K extends PrefName > ( name: K, value: unknown ) : PrefValue< K > {
+    const def = this.schema[ name ];
+
+    if ( def.type === 'boolean' ) {
+      if ( typeof value !== 'boolean' ) throw new Error( `${ name } must be a boolean` );
+      return value as PrefValue< K >;
+    }
+
+    if ( def.type === 'number' ) {
+      if ( typeof value !== 'number' || ! Number.isFinite( value ) || value < def.min || value > def.max )
+        throw new Error( `${ name } must be a number between ${ def.min } and ${ def.max }` );
+
+      return value as PrefValue< K >;
+    }
+
+    if ( typeof value !== 'string' || ! def.values.some( option => option === value ) )
+      throw new Error( `Invalid value for ${ name }: ${ String( value ) }` );
+
+    return value as PrefValue< K >;
+  }
 }
