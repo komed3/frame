@@ -87,4 +87,17 @@ export class Playlists {
     const result = conn().prepare( 'DELETE FROM playlists WHERE id = ? AND user_id = ?' ).run( playlistId, userId );
     return Number( result.changes ) > 0;
   }
+
+  public static listItems ( userId: number, playlistId: number, limit = 100, offset = 0 ) : PlaylistItemRecord[] {
+    Playlists.assertOwned( userId, playlistId );
+    assertLimitOffset( limit, offset );
+
+    return as< PlaylistItemRecord[] >( conn().prepare( `
+      SELECT playlist_id AS playlistId, media_id AS mediaId, position, added_at AS addedAt
+      FROM playlist_items
+      WHERE playlist_id = ?
+      ORDER BY position, media_id
+      LIMIT ? OFFSET ?
+    ` ).all( playlistId, limit, offset ) );
+  }
 }
