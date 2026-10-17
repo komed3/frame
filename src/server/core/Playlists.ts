@@ -4,6 +4,17 @@ import { assertId, assertLimitOffset, normalizeString } from '@/src/server/utils
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 
 
+const ITEM_SELECT = ( dir: 'ASC' | 'DESC' ) : string => `
+  SELECT playlist_id AS playlistId, media_id AS mediaId, position, added_at AS addedAt
+  FROM playlist_items
+  WHERE playlist_id = ? AND position > (
+    SELECT position FROM playlist_items WHERE playlist_id = ? AND media_id = ?
+  )
+  ORDER BY position ${ dir }, media_id ${ dir }
+  LIMIT 1
+`;
+
+
 export class Playlists {
   private static assertOwned ( userId: number, playlistId: number ) : void {
     assertId( userId, 'user' );
@@ -107,6 +118,24 @@ export class Playlists {
       ORDER BY position, media_id
       LIMIT ? OFFSET ?
     ` ).all( playlistId, limit, offset ) );
+  }
+
+  public static nextItem ( userId: number, playlistId: number, mediaId: number ) : PlaylistItemRecord | null {
+    Playlists.assertOwned( userId, playlistId );
+    Media.assertMediaIdSafe( mediaId );
+
+    return as< PlaylistItemRecord | undefined >(
+      conn().prepare( ITEM_SELECT( 'ASC' ) ).get( playlistId, playlistId, mediaId )
+    ) ?? null;
+  }
+
+  public static prevItem ( userId: number, playlistId: number, mediaId: number ) : PlaylistItemRecord | null {
+    Playlists.assertOwned( userId, playlistId );
+    Media.assertMediaIdSafe( mediaId );
+
+    return as< PlaylistItemRecord | undefined >(
+      conn().prepare( ITEM_SELECT( 'DESC' ) ).get( playlistId, playlistId, mediaId )
+    ) ?? null;
   }
 
   public static addItem ( userId: number, playlistId: number, mediaId: number ) : void {
