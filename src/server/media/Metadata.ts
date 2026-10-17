@@ -33,9 +33,7 @@ export class MediaMetadata {
     if ( source !== undefined ) MediaMetadata.assertSource( source );
 
     return as< MediaMetadataRecord[] >( conn().prepare( `
-      SELECT
-        id, media_id AS mediaId, key, value, source,
-        updated_at AS updatedAt
+      SELECT id, media_id AS mediaId, key, value, source, updated_at AS updatedAt
       FROM media_metadata
       WHERE media_id = ? ${ source === undefined ? '' : 'AND source = ?' }
       ORDER BY key COLLATE NOCASE, source, id
@@ -47,9 +45,7 @@ export class MediaMetadata {
     MediaMetadata.assertSource( source );
 
     const row = as< MediaMetadataRecord | undefined >( conn().prepare( `
-      SELECT
-        id, media_id AS mediaId, key, value, source,
-        updated_at AS updatedAt
+      SELECT id, media_id AS mediaId, key, value, source, updated_at AS updatedAt
       FROM media_metadata
       WHERE media_id = ? AND key = ? AND source = ?
     ` ).get( mediaId, normalize( key ), source ) );
