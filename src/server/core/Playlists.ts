@@ -100,4 +100,31 @@ export class Playlists {
       LIMIT ? OFFSET ?
     ` ).all( playlistId, limit, offset ) );
   }
+
+  public static addItem ( userId: number, playlistId: number, mediaId: number ) : void {
+    Playlists.assertOwned( userId, playlistId );
+    Media.assertMediaIdSafe( mediaId );
+
+    conn().prepare( `
+      INSERT INTO playlist_items ( playlist_id, media_id, position )
+      VALUES ( ?, ?, (
+        SELECT COALESCE( MAX( position ) + 1, 0 )
+        FROM playlist_items WHERE playlist_id = ?
+      ) )
+    ` ).run( playlistId, mediaId, playlistId );
+
+    Playlists.touch( playlistId );
+  }
+
+  public static removeItem ( userId: number, playlistId: number, mediaId: number ) : boolean {
+    Playlists.assertOwned( userId, playlistId );
+    Media.assertMediaIdSafe( mediaId );
+
+    const result = conn().prepare(
+      'DELETE FROM playlist_items WHERE playlist_id = ? AND media_id = ?'
+    ).run( playlistId, mediaId );
+
+    if ( Number( result.changes ) > 0 ) Playlists.touch( playlistId );
+    return Number( result.changes ) > 0;
+  }
 }
