@@ -9,21 +9,6 @@ export class Progress {
     return { ...row, completed: row.completed === 1 };
   }
 
-  public static get ( userId: number, mediaId: number ) : ProgressRecord | null {
-    assertId( userId, 'user' );
-    Media.assertMediaIdSafe( mediaId );
-
-    const row = as< ProgressRow | undefined >( conn().prepare( `
-      SELECT
-        user_id AS userId, media_id AS mediaId, position_ms AS positionMs,
-        completed, updated_at AS updatedAt
-      FROM progress
-      WHERE user_id = ? AND media_id = ?
-    ` ).get( userId, mediaId ) );
-
-    return row ? Progress.mapRow( row ) : null;
-  }
-
   public static list ( userId: number, limit = 100, offset = 0 ) : ProgressRecord[] {
     assertId( userId, 'user' );
 
@@ -41,6 +26,21 @@ export class Progress {
     ` ).all( userId, limit, offset ) );
 
     return rows.map( row => Progress.mapRow( row ) );
+  }
+
+  public static get ( userId: number, mediaId: number ) : ProgressRecord | null {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    const row = as< ProgressRow | undefined >( conn().prepare( `
+      SELECT
+        user_id AS userId, media_id AS mediaId, position_ms AS positionMs,
+        completed, updated_at AS updatedAt
+      FROM progress
+      WHERE user_id = ? AND media_id = ?
+    ` ).get( userId, mediaId ) );
+
+    return row ? Progress.mapRow( row ) : null;
   }
 
   public static save ( userId: number, mediaId: number, positionMs: number, completed = false ) : ProgressRecord {
