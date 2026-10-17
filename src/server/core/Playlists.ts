@@ -170,4 +170,13 @@ export class Playlists {
       ` ).run( playlistId );
     } );
   }
+
+  public static clearItems ( userId: number, playlistId: number ) : number {
+    Playlists.assertOwned( userId, playlistId );
+
+    const result = conn().prepare( 'DELETE FROM playlist_items WHERE playlist_id = ?' ).run( playlistId );
+
+    if ( Number( result.changes ) > 0 ) Playlists.touch( playlistId );
+    return Number( result.changes );
+  }
 }
