@@ -44,4 +44,17 @@ export class Plays {
 
     return row ? Plays.mapRow( row ) : null;
   }
+
+  public static start ( userId: number, mediaId: number, sessionId: number | null = null ) : number {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( sessionId !== null ) assertId( sessionId, 'session' );
+
+    const result = conn().prepare(
+      'INSERT INTO plays ( user_id, media_id, session_id ) VALUES ( ?, ?, ? )'
+    ).run( userId, mediaId, sessionId );
+
+    return Number( result.lastInsertRowid );
+  }
 }
