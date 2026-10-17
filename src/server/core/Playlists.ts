@@ -61,6 +61,23 @@ export class Playlists {
     ` ).all( userId, limit, offset ) );
   }
 
+  public static mediaPlaylists ( userId: number, mediaId: number, limit = 100, offset = 0 ) : PlaylistRecord[] {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+    assertLimitOffset( limit, offset );
+
+    return as< PlaylistRecord[] >( conn().prepare( `
+      SELECT
+        p.id, p.user_id AS userId, p.name, p.description,
+        p.created_at AS createdAt, p.updated_at AS updatedAt
+      FROM playlists p
+      INNER JOIN playlist_items pi ON pi.playlist_id = p.id
+      WHERE p.user_id = ? AND pi.media_id = ?
+      ORDER BY p.updated_at DESC, p.id DESC
+      LIMIT ? OFFSET ?
+    ` ).all( userId, mediaId, limit, offset ) );
+  }
+
   public static create ( userId: number, name: string, description?: string ) : number {
     assertId( userId, 'user' );
 
