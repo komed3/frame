@@ -116,4 +116,19 @@ export class Markers {
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND id = ?' ).run( userId, markerId );
     return Number( result.changes ) > 0;
   }
+
+  public static clearMediaMarker ( userId: number, mediaId: number ) : number {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
+    return Number( result.changes );
+  }
+
+  public static clear ( userId: number ) : number {
+    assertId( userId, 'user' );
+
+    const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ?' ).run( userId );
+    return Number( result.changes );
+  }
 }
