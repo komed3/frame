@@ -52,4 +52,32 @@ export class Playlists {
 
     return Number( result.lastInsertRowid );
   }
+
+  public static update ( userId: number, playlistId: number, patch: PlaylistUpdate ) : void {
+    Playlists.assertOwned( userId, playlistId );
+
+    const assignments: string[] = [], values: ( string | null )[] = [];
+
+    if ( patch.name !== undefined ) {
+      assignments.push( 'name = ?' );
+      values.push( normalizeString( patch.name, 'Playlist name' ) );
+    }
+
+    if ( patch.description !== undefined ) {
+      assignments.push( 'description = ?' );
+      values.push( normalizeString( patch.description, 'Playlist description' ) );
+    }
+
+    if ( ! assignments.length ) return;
+    assignments.push( `updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )` );
+
+    const result = conn().prepare( `
+      UPDATE playlists
+      SET ${ assignments.join( ', ' ) }
+      WHERE id = ? AND user_id = ?
+    ` ).run( ...values, playlistId, userId );
+
+    if ( Number( result.changes ) !== 1 )
+      throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
+  }
 }
