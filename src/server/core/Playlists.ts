@@ -137,6 +137,15 @@ export class Playlists {
     ` ).all( playlistId, limit, offset ) );
   }
 
+  public static mediaInPlaylist ( userId: number, playlistId: number, mediaId: number ) : boolean {
+    Playlists.assertOwned( userId, playlistId );
+    Media.assertMediaIdSafe( mediaId );
+
+    return Boolean( conn().prepare(
+      'SELECT 1 FROM playlist_items WHERE playlist_id = ? AND media_id = ?'
+    ).get( playlistId, mediaId ) );
+  }
+
   public static nextItem ( userId: number, playlistId: number, mediaId: number ) : PlaylistItemRecord | null {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
