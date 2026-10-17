@@ -108,4 +108,12 @@ export class Markers {
     if ( Number( result.changes ) !== 1 )
       throw new Error( `Marker ${ markerId } does not exist for user ${ userId }` );
   }
+
+  public static delete ( userId: number, markerId: number ) : boolean {
+    assertId( userId, 'user' );
+    assertId( markerId, 'marker' );
+
+    const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND id = ?' ).run( userId, markerId );
+    return Number( result.changes ) > 0;
+  }
 }
