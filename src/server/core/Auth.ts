@@ -64,17 +64,11 @@ export class Auth {
   public static listSessions () : ActiveSession[] {
     const rows = as< ActiveSessionRow[] >( conn().prepare( `
       SELECT
-        s.id,
-        s.user_id AS userId,
-        u.username,
-        u.is_admin AS isAdmin,
-        s.created_at AS createdAt,
-        s.expires_at AS expiresAt,
-        s.last_seen_at AS lastSeenAt
+        s.id, s.user_id AS userId, u.username, u.is_admin AS isAdmin, s.created_at AS createdAt,
+        s.expires_at AS expiresAt, s.last_seen_at AS lastSeenAt
       FROM sessions s
       JOIN users u ON u.id = s.user_id
-      WHERE s.expires_at > ?
-        AND u.disabled_at IS NULL
+      WHERE s.expires_at > ? AND u.disabled_at IS NULL
       ORDER BY s.last_seen_at DESC, s.created_at DESC
     ` ).all( new Date().toISOString() ) );
 

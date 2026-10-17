@@ -97,11 +97,9 @@ export class Database {
 
   public getStats () : DatabaseStats {
     const db = this.open().db, path = Config.get( 'DB_PATH' );
-    const tables = as< { name: string }[] >( db.prepare( `
-      SELECT name
-      FROM sqlite_schema
-      WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-    ` ).all() );
+    const tables = as< { name: string }[] >( db.prepare(
+      `SELECT name FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'`
+    ).all() );
 
     const rowCount = tables.reduce( ( count, table ) => {
       const result = as< { count: number } >( db.prepare(
