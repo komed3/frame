@@ -11,6 +11,12 @@ export function assertRelativePath ( path: string, label: string ) : void {
 }
 
 
+export function assertLimitOffset ( limit: number, offset = 0 ) : void {
+  if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
+  if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
+}
+
+
 export function normalizeString ( value: unknown, label: string ) : string {
   if ( typeof value !== 'string' || ! value.trim() || value.includes( '\0' ) )
     throw new Error( `${ label } must not be empty` );
