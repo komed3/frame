@@ -83,4 +83,19 @@ export class Plays {
   public static finish ( userId: number, playId: number, watchedMs: number, completed = false ) : void {
     Plays.updateRow( userId, playId, watchedMs, completed, true );
   }
+
+  public static delete ( userId: number, playId: number ) : boolean {
+    assertId( userId, 'user' );
+    assertId( playId, 'play' );
+
+    const result = conn().prepare( 'DELETE FROM plays WHERE user_id = ? AND id = ?' ).run( userId, playId );
+    return Number( result.changes ) > 0;
+  }
+
+  public static clear ( userId: number ) : number {
+    assertId( userId, 'user' );
+
+    const result = conn().prepare( 'DELETE FROM plays WHERE user_id = ?' ).run( userId );
+    return Number( result.changes );
+  }
 }
