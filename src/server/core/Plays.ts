@@ -27,8 +27,7 @@ export class Plays {
     if ( Number( result.changes ) !== 1 ) throw new Error( `Play ${ playId } does not exist for user ${ userId }` );
   }
 
-  public static listByUser ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
-    assertId( userId, 'user' );
+  private static list ( where: string, limit: number, offset: number ) : PlayRecord[] {
     assertLimitOffset( limit, offset );
 
     const rows = as< PlayRow[] >( conn().prepare( `
@@ -37,49 +36,29 @@ export class Plays {
         started_at AS startedAt, ended_at AS endedAt, watched_ms AS watchedMs,
         completed
       FROM plays
-      WHERE user_id = ?
+      WHERE ${ where }
       ORDER BY started_at DESC, id DESC
       LIMIT ? OFFSET ?
-    ` ).all( userId, limit, offset ) );
+    ` ).all( limit, offset ) );
 
     return rows.map( row => Plays.mapRow( row ) );
   }
 
+  public static listByUser ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
+    assertId( userId, 'user' );
+    return Plays.list( `user_id = ${ userId }`, limit, offset );
+  }
+
   public static listByMedia ( mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     Media.assertMediaIdSafe( mediaId );
-    assertLimitOffset( limit, offset );
-
-    const rows = as< PlayRow[] >( conn().prepare( `
-      SELECT
-        id, user_id AS userId, media_id AS mediaId, session_id AS sessionId,
-        started_at AS startedAt, ended_at AS endedAt, watched_ms AS watchedMs,
-        completed
-      FROM plays
-      WHERE media_id = ?
-      ORDER BY started_at DESC, id DESC
-      LIMIT ? OFFSET ?
-    ` ).all( mediaId, limit, offset ) );
-
-    return rows.map( row => Plays.mapRow( row ) );
+    return Plays.list( `media_id = ${ mediaId }`, limit, offset );
   }
 
   public static listByUserAndMedia ( userId: number, mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
-    assertLimitOffset( limit, offset );
 
-    const rows = as< PlayRow[] >( conn().prepare( `
-      SELECT
-        id, user_id AS userId, media_id AS mediaId, session_id AS sessionId,
-        started_at AS startedAt, ended_at AS endedAt, watched_ms AS watchedMs,
-        completed
-      FROM plays
-      WHERE user_id = ? AND media_id = ?
-      ORDER BY started_at DESC, id DESC
-      LIMIT ? OFFSET ?
-    ` ).all( userId, mediaId, limit, offset ) );
-
-    return rows.map( row => Plays.mapRow( row ) );
+    return Plays.list( `user_id = ${ userId } AND media_id = ${ mediaId }`, limit, offset );
   }
 
   public static get ( userId: number, playId: number ) : PlayRecord | null {
