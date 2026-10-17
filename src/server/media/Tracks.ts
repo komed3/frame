@@ -4,7 +4,7 @@ import { assertId } from '@/src/server/utils';
 import type { MediaTrackInput, MediaTrackKind, MediaTrackRecord, MediaTrackRow } from '@/src/shared/types/tracks';
 
 
-const TRACK_KINDS: MediaTrackKind[] = [ 'video', 'audio', 'subtitle', 'data' ];
+export const TRACK_KINDS: MediaTrackKind[] = [ 'video', 'audio', 'subtitle', 'data' ];
 
 
 export class MediaTracks {
