@@ -25,6 +25,12 @@ export function normalizeString ( value: unknown, label: string ) : string {
 }
 
 
+export function normalizeOptionalString ( value: unknown, label: string ) : string | null {
+  if ( value === null || value === undefined ) return null;
+  return normalizeString( value, label );
+}
+
+
 export function resolveId ( value: unknown, label: string ) : number {
   const id = Number( value );
   assertId( id, label );
