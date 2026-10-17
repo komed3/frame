@@ -74,10 +74,11 @@ export class Config {
 
   public static all () : ConfigSchema {
     const result = Object.create( null ) as ConfigSchema;
+    const values = result as Record< ConfigName, ConfigSchema[ ConfigName ] >;
 
     for ( const name of Object.keys( this.schema ) ) {
       const key = this.resolveName( name );
-      result[ key ] = this.get( key );
+      values[ key ] = this.get( key );
     }
 
     return result;
