@@ -29,8 +29,7 @@ export class Config {
   }
 
   public static validate < K extends ConfigName > ( name: K, value: unknown ) : ConfigValue< K > {
-    const key = this.resolveName( name );
-    const def = this.schema[ key ];
+    const key = this.resolveName( name ), def = this.schema[ key ];
 
     if ( def.type === 'boolean' ) return validateBoolean( value, key, true ) as ConfigValue< K >;
     if ( def.type === 'integer' ) return validateNumber( value, key, def.min, def.max, true, true ) as ConfigValue< K >;
