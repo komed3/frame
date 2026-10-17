@@ -1,20 +1,8 @@
 import { confirm, promptConfirmedPassword, promptPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { User } from '@/src/server/core/User';
+import { resolveId } from '@/src/server/utils';
 import { Command } from 'commander';
-
-
-const resolveUser = ( ref: string ) => {
-  const user = /^\d+$/.test( ref ) ? User.get( Number( ref ) ) : User.getByUsername( ref );
-  if ( ! user ) throw new Error( `User not found: ${ ref }` );
-  return user;
-};
-
-const resolveId = ( value: string ) : number => {
-  const id = Number( value );
-  if ( ! Number.isSafeInteger( id ) || id <= 0 ) throw new Error( `Invalid ID: ${ value }` );
-  return id;
-};
 
 
 export const registerUserCommands = ( program: Command ) : void => {
@@ -56,7 +44,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Delete a user by ID or username' )
     .option( '-y, --yes', 'Confirm deletion' )
     .action( async ( ref: string, options: { yes?: boolean } ) => {
-      const target = resolveUser( ref );
+      const target = User.resolveUser( ref );
 
       if ( ! options.yes && ! await confirm( `Delete user ${ target.username } (ID ${ target.id })?` ) )
         return ui.cancelled();
@@ -74,8 +62,8 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Change a username' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
     .action( ( ref: string, username: string, options: { actor: string } ) => {
-      const target = resolveUser( ref );
-      const updated = User.changeUsername( resolveId( options.actor ), target.id, username );
+      const target = User.resolveUser( ref );
+      const updated = User.changeUsername( resolveId( options.actor, 'actor' ), target.id, username );
 
       ui.success( `Renamed user to ${ updated.username } (ID ${ updated.id })` );
     } );
@@ -85,7 +73,7 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Change a user password' )
     .requiredOption( '--actor <id>', 'ID of the acting user' )
     .action( async ( ref: string, options: { actor: string } ) => {
-      const target = resolveUser( ref ), actorId = resolveId( options.actor );
+      const target = User.resolveUser( ref ), actorId = resolveId( options.actor, 'actor' );
       const curPw = actorId === target.id ? await promptPassword( 'Current password: ' ) : undefined;
       const pw = await promptConfirmedPassword( pw => User.validatePassword( pw ) );
 
@@ -102,8 +90,8 @@ export const registerUserCommands = ( program: Command ) : void => {
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
     .option( '--revoke', 'Revoke administrator privileges' )
     .action( ( ref: string, options: { actor: string; revoke?: boolean } ) => {
-      const target = resolveUser( ref );
-      User.setAdmin( resolveId( options.actor ), target.id, ! options.revoke );
+      const target = User.resolveUser( ref );
+      User.setAdmin( resolveId( options.actor, 'actor' ), target.id, ! options.revoke );
 
       ui.success( `${ options.revoke ? 'Revoked' : 'Granted' } administrator privileges for ${ target.username }` );
     } );
@@ -113,8 +101,8 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Disable a user and revoke their sessions' )
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
     .action( ( ref: string, options: { actor: string } ) => {
-      const target = resolveUser( ref );
-      User.setDisabled( resolveId( options.actor ), target.id, true );
+      const target = User.resolveUser( ref );
+      User.setDisabled( resolveId( options.actor, 'actor' ), target.id, true );
 
       ui.success( `Disabled user ${ target.username }` );
     } );
@@ -124,8 +112,8 @@ export const registerUserCommands = ( program: Command ) : void => {
     .description( 'Enable a disabled user' )
     .requiredOption( '--actor <id>', 'ID of the acting administrator' )
     .action( ( ref: string, options: { actor: string } ) => {
-      const target = resolveUser( ref );
-      User.setDisabled( resolveId( options.actor ), target.id, false );
+      const target = User.resolveUser( ref );
+      User.setDisabled( resolveId( options.actor, 'actor' ), target.id, false );
 
       ui.success( `Enabled user ${ target.username }` );
     } );
