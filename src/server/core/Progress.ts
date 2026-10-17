@@ -62,4 +62,12 @@ export class Progress {
     if ( ! row ) throw new Error( `Could not save progress for media ${ mediaId }` );
     return Progress.mapRow( row );
   }
+
+  public static delete ( userId: number, mediaId: number ) : boolean {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
+    return Number( result.changes ) > 0;
+  }
 }
