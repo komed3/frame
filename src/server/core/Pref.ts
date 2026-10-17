@@ -69,4 +69,18 @@ export class Pref {
 
     return result;
   }
+
+  public static set < K extends PrefName > ( userId: number, name: K, value: PrefValue< K > ) : PrefValue< K > {
+    const parsed = this.validate( name, value ), valueJson = JSON.stringify( parsed );
+
+    conn().prepare( `
+      INSERT INTO user_preferences ( user_id, key, value_json )
+      VALUES ( ?, ?, ? )
+      ON CONFLICT ( user_id, key ) DO UPDATE SET
+        value_json = excluded.value_json,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+    ` ).run( userId, name, valueJson );
+
+    return parsed;
+  }
 }
