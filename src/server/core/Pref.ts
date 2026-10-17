@@ -1,4 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
+import { assertId, validateBoolean, validateEnum, validateNumber } from '@/src/server/utils';
 import type { PrefName, PrefRow, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
 
 
@@ -15,45 +16,42 @@ export class Pref {
     return Object.hasOwn( this.schema, name );
   }
 
+  public static resolveName ( name: string ) : PrefName {
+    if ( ! this.isName( name ) ) throw new Error( `Unknown preference key: ${ name }` );
+    return name;
+  }
+
   private static parseValue < K extends PrefName > ( name: K, valueJson: string ) : PrefValue< K > {
     let value: unknown;
 
-    try { value = JSON.parse( valueJson ) }
+    try { value = JSON.parse( valueJson) }
     catch { throw new Error( `Stored preference ${ name } contains invalid JSON` ) }
 
     return this.validate( name, value );
   }
 
   public static validate < K extends PrefName > ( name: K, value: unknown ) : PrefValue< K > {
-    const def = this.schema[ name ];
+    const key = this.resolveName( name ), def = this.schema[ key ];
 
-    if ( def.type === 'boolean' ) {
-      if ( typeof value !== 'boolean' ) throw new Error( `${ name } must be a boolean` );
-      return value as PrefValue< K >;
-    }
+    if ( def.type === 'boolean' ) return validateBoolean( value, key ) as PrefValue< K >;
+    if ( def.type === 'number' ) return validateNumber( value, key, def.min, def.max ) as PrefValue< K >;
 
-    if ( def.type === 'number' ) {
-      if ( typeof value !== 'number' || ! Number.isFinite( value ) || value < def.min || value > def.max )
-        throw new Error( `${ name } must be a number between ${ def.min } and ${ def.max }` );
-
-      return value as PrefValue< K >;
-    }
-
-    if ( typeof value !== 'string' || ! def.values.some( option => option === value ) )
-      throw new Error( `Invalid value for ${ name }: ${ String( value ) }` );
-
-    return value as PrefValue< K >;
+    return validateEnum( value, key, def.values ) as PrefValue< K >;
   }
 
   public static get < K extends PrefName > ( userId: number, name: K ) : PrefValue< K > {
-    const row = as< PrefRow | null >( conn().prepare(
-      'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ? AND key = ?'
-    ).get( userId, name ) );
+    assertId( userId, 'user' );
 
-    return row ? this.parseValue( name, row.value_json ) : this.schema[ name ].default as PrefValue< K >;
+    const key = this.resolveName( name ), row = as< PrefRow | null >( conn().prepare(
+      'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ? AND key = ?'
+    ).get( userId, key ) );
+
+    return row ? this.parseValue( key, row.value_json ) : this.schema[ key ].default as PrefValue< K >;
   }
 
   public static all ( userId: number ) : PrefSchema {
+    assertId( userId, 'user' );
+
     const result = Object.fromEntries( Object.entries( this.schema ).map(
       ( [ name, def ] ) => [ name, def.default ] )
     ) as unknown as PrefSchema;
@@ -64,14 +62,19 @@ export class Pref {
 
     for ( const row of rows ) {
       if ( ! this.isName( row.key ) ) continue;
-      Object.assign( result, { [ row.key ]: this.parseValue( row.key, row.value_json ) } );
+
+      const key = this.resolveName( row.key );
+      Object.assign( result, { [ key ]: this.parseValue( key, row.value_json ) } );
     }
 
     return result;
   }
 
   public static set < K extends PrefName > ( userId: number, name: K, value: PrefValue< K > ) : PrefValue< K > {
-    const parsed = this.validate( name, value ), valueJson = JSON.stringify( parsed );
+    assertId( userId, 'user' );
+
+    const key = this.resolveName( name );
+    const parsed = this.validate( key, value ) as PrefValue< K >;
 
     conn().prepare( `
       INSERT INTO user_preferences ( user_id, key, value_json )
@@ -79,17 +82,23 @@ export class Pref {
       ON CONFLICT ( user_id, key ) DO UPDATE SET
         value_json = excluded.value_json,
         updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
-    ` ).run( userId, name, valueJson );
+    ` ).run( userId, key, JSON.stringify( parsed ) );
 
     return parsed;
   }
 
   public static reset ( userId: number, name: PrefName ) : boolean {
-    const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ? AND key = ?' ).run( userId, name );
+    assertId( userId, 'user' );
+
+    const key = this.resolveName( name );
+    const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ? AND key = ?' ).run( userId, key );
+
     return Number( result.changes ) > 0;
   }
 
   public static resetAll ( userId: number ) : number {
+    assertId( userId, 'user' );
+
     const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
   }
