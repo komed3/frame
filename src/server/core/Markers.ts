@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset } from '@/src/server/utils';
+import { assertId, assertLimitOffset, normalizeOptionalString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
@@ -49,5 +49,27 @@ export class Markers {
       ORDER BY position_ms, id
       LIMIT ? OFFSET ?
     ` ).all( userId, mediaId, limit, offset ) );
+  }
+
+  public static create (
+    userId: number, mediaId: number, positionMs: number,
+    title: string | null = null, description: string | null = null
+  ) : number {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
+      throw new Error( `Invalid marker position: ${ positionMs }` );
+
+    const result = conn().prepare( `
+      INSERT INTO markers ( user_id, media_id, position_ms, title, description )
+      VALUES ( ?, ?, ?, ?, ? )
+    ` ).run(
+      userId, mediaId, positionMs,
+      normalizeOptionalString( title, 'Marker title' ),
+      normalizeOptionalString( description, 'Marker description' )
+    );
+
+    return Number( result.lastInsertRowid );
   }
 }
