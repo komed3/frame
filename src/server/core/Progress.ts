@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId } from '@/src/server/utils';
+import { assertId, assertLimitOffset } from '@/src/server/utils';
 import type { ProgressRecord, ProgressRow } from '@/src/shared/types/progress';
 
 
@@ -11,9 +11,7 @@ export class Progress {
 
   public static list ( userId: number, limit = 100, offset = 0 ) : ProgressRecord[] {
     assertId( userId, 'user' );
-
-    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid progress limit: ${ limit }` );
-    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid progress offset: ${ offset }` );
+    assertLimitOffset( limit, offset );
 
     const rows = as< ProgressRow[] >( conn().prepare( `
       SELECT

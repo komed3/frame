@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId } from '@/src/server/utils';
+import { assertId, assertLimitOffset } from '@/src/server/utils';
 import type { PlayRecord, PlayRow } from '@/src/shared/types/plays';
 
 
@@ -29,9 +29,7 @@ export class Plays {
 
   public static listByUser ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
-
-    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
-    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
+    assertLimitOffset( limit, offset );
 
     const rows = as< PlayRow[] >( conn().prepare( `
       SELECT
@@ -49,9 +47,7 @@ export class Plays {
 
   public static listByMedia ( mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     Media.assertMediaIdSafe( mediaId );
-
-    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
-    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
+    assertLimitOffset( limit, offset );
 
     const rows = as< PlayRow[] >( conn().prepare( `
       SELECT
@@ -70,9 +66,7 @@ export class Plays {
   public static listByUserAndMedia ( userId: number, mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
-
-    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
-    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
+    assertLimitOffset( limit, offset );
 
     const rows = as< PlayRow[] >( conn().prepare( `
       SELECT
