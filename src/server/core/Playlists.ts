@@ -41,4 +41,15 @@ export class Playlists {
       LIMIT ? OFFSET ?
     ` ).all( userId, limit, offset ) );
   }
+
+  public static create ( userId: number, name: string, description?: string ) : number {
+    assertId( userId, 'user' );
+
+    const desc = description ? normalizeString( description, 'Playlist description' ) : null;
+    const result = conn().prepare(
+      'INSERT INTO playlists ( user_id, name, description ) VALUES ( ?, ?, ? )'
+    ).run( userId, normalizeString( name, 'Playlist name' ), desc );
+
+    return Number( result.lastInsertRowid );
+  }
 }
