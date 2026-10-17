@@ -19,6 +19,14 @@ export function normalizeString ( value: unknown, label: string ) : string {
 }
 
 
+export function resolveId ( value: unknown, label: string ) : number {
+  const id = Number( value );
+  assertId( id, label );
+
+  return id;
+}
+
+
 export function validateBoolean ( value: unknown, label: string, coerce = false ) : boolean {
   if ( typeof value === 'boolean' ) return value;
 
