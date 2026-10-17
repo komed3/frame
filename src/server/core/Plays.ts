@@ -9,6 +9,24 @@ export class Plays {
     return { ...row, completed: row.completed === 1 };
   }
 
+  private static updateRow ( userId: number, playId: number, watchedMs: number, completed: boolean, finished: boolean ) : void {
+    assertId( userId, 'user' );
+    assertId( playId, 'play' );
+
+    const result = conn().prepare( `
+      UPDATE plays SET
+        watched_ms = ?,
+        completed = ?,
+        ended_at = CASE
+          WHEN ? = 1 THEN strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+          ELSE ended_at
+        END
+      WHERE user_id = ? AND id = ?
+    ` ).run( watchedMs, +!! completed, +finished, userId, playId );
+
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Play ${ playId } does not exist for user ${ userId }` );
+  }
+
   public static list ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
 
