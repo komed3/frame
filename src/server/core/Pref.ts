@@ -44,4 +44,12 @@ export class Pref {
 
     return value as PrefValue< K >;
   }
+
+  public static get < K extends PrefName > ( userId: number, name: K ) : PrefValue< K > {
+    const row = as< PrefRow | null >( conn().prepare(
+      'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ? AND key = ?'
+    ).get( userId, name ) );
+
+    return row ? this.parseValue( name, row.value_json ) : this.schema[ name ].default as PrefValue< K >;
+  }
 }
