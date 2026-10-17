@@ -17,3 +17,36 @@ export function normalizeString ( value: unknown, label: string ) : string {
 
   return value.trim();
 }
+
+
+export function validateBoolean ( value: unknown, label: string, coerce = false ) : boolean {
+  if ( typeof value === 'boolean' ) return value;
+
+  if ( coerce && typeof value === 'string' ) {
+    const parsed = value.trim().toLowerCase();
+
+    if ( parsed === 'true' || parsed === '1' ) return true;
+    if ( parsed === 'false' || parsed === '0' ) return false;
+  }
+
+  if ( coerce && ( value === 0 || value === 1 ) ) return !! value;
+  throw new Error( `${ label } must be true or false` );
+}
+
+
+export function validateNumber ( value: unknown, label: string, min: number, max: number, integer = false, coerce = false ) : number {
+  const parsed = typeof value === 'number' ? value : coerce && typeof value === 'string' && value.trim() ? Number( value ) : NaN;
+
+  if ( ! Number.isFinite( parsed ) || ( integer && ! Number.isInteger( parsed ) ) || parsed < min || parsed > max )
+    throw new Error( `${ label } must be ${ integer ? 'an integer' : 'a number' } between ${ min } and ${ max }` );
+
+  return parsed;
+}
+
+
+export function validateEnum < T extends string > ( value: unknown, label: string, values: readonly T[] ) : T {
+  if ( typeof value !== 'string' || ! values.includes( value as T ) )
+    throw new Error( `Invalid value for ${ label }: ${ String( value ) }` );
+
+  return value as T;
+}
