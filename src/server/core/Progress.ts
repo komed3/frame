@@ -42,4 +42,24 @@ export class Progress {
 
     return rows.map( row => Progress.mapRow( row ) );
   }
+
+  public static save ( userId: number, mediaId: number, positionMs: number, completed = false ) : ProgressRecord {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    const row = as< ProgressRow | undefined >( conn().prepare( `
+      INSERT INTO progress ( user_id, media_id, position_ms, completed )
+      VALUES ( ?, ?, ?, ? )
+      ON CONFLICT ( user_id, media_id ) DO UPDATE SET
+        position_ms = excluded.position_ms,
+        completed = excluded.completed,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      RETURNING
+        user_id AS userId, media_id AS mediaId, position_ms AS positionMs,
+        completed, updated_at AS updatedAt
+    ` ).get( userId, mediaId, positionMs, +!! completed ) );
+
+    if ( ! row ) throw new Error( `Could not save progress for media ${ mediaId }` );
+    return Progress.mapRow( row );
+  }
 }
