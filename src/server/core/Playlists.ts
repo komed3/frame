@@ -127,4 +127,47 @@ export class Playlists {
     if ( Number( result.changes ) > 0 ) Playlists.touch( playlistId );
     return Number( result.changes ) > 0;
   }
+
+  public static moveItem ( userId: number, playlistId: number, mediaId: number, position: number ) : void {
+    Playlists.assertOwned( userId, playlistId );
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( ! Number.isSafeInteger( position ) || position < 0 )
+      throw new Error( `Invalid playlist position: ${ position }` );
+
+    db.transaction( tx => {
+      const items = as< { mediaId: number; position: number }[] >( tx.prepare( `
+        SELECT media_id AS mediaId, position
+        FROM playlist_items
+        WHERE playlist_id = ?
+        ORDER BY position, media_id
+      ` ).all( playlistId ) );
+
+      const currentIndex = items.findIndex( item => item.mediaId === mediaId );
+
+      if ( currentIndex < 0 ) throw new Error( `Media ${ mediaId } does not exist in playlist ${ playlistId }` );
+      if ( position >= items.length ) throw new Error( `Invalid playlist position: ${ position }` );
+      if ( currentIndex === position ) return;
+
+      const [ item ] = items.splice( currentIndex, 1 );
+      items.splice( position, 0, item );
+
+      const maxPosition = items.reduce( ( max, item ) => Math.max( max, item.position ), 0 );
+      const updatePosition = tx.prepare(
+        'UPDATE playlist_items SET position = ? WHERE playlist_id = ? AND media_id = ?'
+      );
+
+      items.forEach( ( item, index ) => updatePosition.run(
+        maxPosition + items.length + index + 1, playlistId, item.mediaId
+      ) );
+
+      items.forEach( ( item, index ) => updatePosition.run( index, playlistId, item.mediaId ) );
+
+      tx.prepare( `
+        UPDATE playlists
+        SET updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE id = ?
+      ` ).run( playlistId );
+    } );
+  }
 }
