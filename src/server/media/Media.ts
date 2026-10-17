@@ -1,5 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
-import { assertId, assertRelativePath } from '@/src/server/utils';
+import { assertId, assertLimitOffset, assertRelativePath } from '@/src/server/utils';
 import type { MediaFileInput, MediaListOptions, MediaRecord, MediaRow, MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
@@ -80,8 +80,7 @@ export class Media {
     }
 
     if ( availableOnly ) conditions.push( 'available = 1' );
-    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid media limit: ${ limit }` );
-    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid media offset: ${ offset }` );
+    assertLimitOffset( limit, offset );
 
     const where = conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '';
     const rows = as< MediaRow[] >( conn().prepare(
