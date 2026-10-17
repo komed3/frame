@@ -1,6 +1,6 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, normalizeString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, normalizeOptionalString, normalizeString } from '@/src/server/utils';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 
 
@@ -81,10 +81,12 @@ export class Playlists {
   public static create ( userId: number, name: string, description?: string ) : number {
     assertId( userId, 'user' );
 
-    const desc = description ? normalizeString( description, 'Playlist description' ) : null;
     const result = conn().prepare(
       'INSERT INTO playlists ( user_id, name, description ) VALUES ( ?, ?, ? )'
-    ).run( userId, normalizeString( name, 'Playlist name' ), desc );
+    ).run(
+      userId, normalizeString( name, 'Playlist name' ),
+      normalizeOptionalString( description, 'Playlist description' )
+    );
 
     return Number( result.lastInsertRowid );
   }
