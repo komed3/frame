@@ -52,4 +52,21 @@ export class Pref {
 
     return row ? this.parseValue( name, row.value_json ) : this.schema[ name ].default as PrefValue< K >;
   }
+
+  public static all ( userId: number ) : PrefSchema {
+    const result = Object.fromEntries( Object.entries( this.schema ).map(
+      ( [ name, def ] ) => [ name, def.default ] )
+    ) as unknown as PrefSchema;
+
+    const rows = as< PrefRow[] >( conn().prepare(
+      'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ?'
+    ).all( userId ) );
+
+    for ( const row of rows ) {
+      if ( ! this.isName( row.key ) ) continue;
+      Object.assign( result, { [ row.key ]: this.parseValue( row.key, row.value_json ) } );
+    }
+
+    return result;
+  }
 }
