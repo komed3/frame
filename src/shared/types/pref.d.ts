@@ -15,7 +15,7 @@ export type PrefDefinition< T > = {
 } & (
   T extends number ? { type: 'number', min: number, max: number } :
   T extends boolean ? { type: 'boolean' } :
-  { type: 'enum', values: readonly T[] }
+  { type: 'enum', values: readonly string[] }
 );
 
 export type PrefTable = {
