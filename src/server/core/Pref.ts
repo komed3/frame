@@ -83,4 +83,14 @@ export class Pref {
 
     return parsed;
   }
+
+  public static reset ( userId: number, name: PrefName ) : boolean {
+    const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ? AND key = ?' ).run( userId, name );
+    return Number( result.changes ) > 0;
+  }
+
+  public static resetAll ( userId: number ) : number {
+    const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ?' ).run( userId );
+    return Number( result.changes );
+  }
 }
