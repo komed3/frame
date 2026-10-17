@@ -27,7 +27,7 @@ export class Plays {
     if ( Number( result.changes ) !== 1 ) throw new Error( `Play ${ playId } does not exist for user ${ userId }` );
   }
 
-  public static list ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
+  public static listByUser ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
 
     if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
@@ -43,6 +43,47 @@ export class Plays {
       ORDER BY started_at DESC, id DESC
       LIMIT ? OFFSET ?
     ` ).all( userId, limit, offset ) );
+
+    return rows.map( row => Plays.mapRow( row ) );
+  }
+
+  public static listByMedia ( mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
+    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
+
+    const rows = as< PlayRow[] >( conn().prepare( `
+      SELECT
+        id, user_id AS userId, media_id AS mediaId, session_id AS sessionId,
+        started_at AS startedAt, ended_at AS endedAt, watched_ms AS watchedMs,
+        completed
+      FROM plays
+      WHERE media_id = ?
+      ORDER BY started_at DESC, id DESC
+      LIMIT ? OFFSET ?
+    ` ).all( mediaId, limit, offset ) );
+
+    return rows.map( row => Plays.mapRow( row ) );
+  }
+
+  public static listByUserAndMedia ( userId: number, mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+
+    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
+    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
+
+    const rows = as< PlayRow[] >( conn().prepare( `
+      SELECT
+        id, user_id AS userId, media_id AS mediaId, session_id AS sessionId,
+        started_at AS startedAt, ended_at AS endedAt, watched_ms AS watchedMs,
+        completed
+      FROM plays
+      WHERE user_id = ? AND media_id = ?
+      ORDER BY started_at DESC, id DESC
+      LIMIT ? OFFSET ?
+    ` ).all( userId, mediaId, limit, offset ) );
 
     return rows.map( row => Plays.mapRow( row ) );
   }
