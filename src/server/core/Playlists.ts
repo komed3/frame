@@ -80,4 +80,11 @@ export class Playlists {
     if ( Number( result.changes ) !== 1 )
       throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
   }
+
+  public static delete ( userId: number, playlistId: number ) : boolean {
+    Playlists.assertOwned( userId, playlistId );
+
+    const result = conn().prepare( 'DELETE FROM playlists WHERE id = ? AND user_id = ?' ).run( playlistId, userId );
+    return Number( result.changes ) > 0;
+  }
 }
