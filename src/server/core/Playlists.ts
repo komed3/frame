@@ -14,8 +14,7 @@ export class Playlists {
   }
 
   public static get ( userId: number, playlistId: number ) : PlaylistRecord | null {
-    assertId( userId, 'user' );
-    assertId( playlistId, 'playlist' );
+    Playlists.assertOwned( userId, playlistId );
 
     const row = as< PlaylistRecord | undefined >( conn().prepare( `
       SELECT
