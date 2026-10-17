@@ -12,4 +12,19 @@ export class Playlists {
     if ( ! conn().prepare( 'SELECT 1 FROM playlists WHERE id = ? AND user_id = ?' ).get( playlistId, userId ) )
       throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
   }
+
+  public static get ( userId: number, playlistId: number ) : PlaylistRecord | null {
+    assertId( userId, 'user' );
+    assertId( playlistId, 'playlist' );
+
+    const row = as< PlaylistRecord | undefined >( conn().prepare( `
+      SELECT
+        id, user_id AS userId, name, description,
+        created_at AS createdAt, updated_at AS updatedAt
+      FROM playlists
+      WHERE id = ? AND user_id = ?
+    ` ).get( playlistId, userId ) );
+
+    return row ?? null;
+  }
 }
