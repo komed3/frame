@@ -46,7 +46,7 @@ export class Pref {
       'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ? AND key = ?'
     ).get( userId, key ) );
 
-    return row ? this.parseValue( key, row.value_json ) : this.schema[ key ].default as PrefValue< K >;
+    return ( row ? this.parseValue( key, row.value_json ) : this.schema[ key ].default ) as PrefValue< K >;
   }
 
   public static all ( userId: number ) : PrefSchema {
