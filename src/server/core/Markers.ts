@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, normalizeOptionalString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, normalizeOptionalString, normalizeString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
@@ -71,5 +71,41 @@ export class Markers {
     );
 
     return Number( result.lastInsertRowid );
+  }
+
+  public static update ( userId: number, markerId: number, patch: MarkerUpdate ) : void {
+    assertId( userId, 'user' );
+    assertId( markerId, 'marker' );
+
+    const assignments: string[] = [], values: ( number | string | null )[] = [];
+
+    if ( patch.positionMs !== undefined ) {
+      if ( ! Number.isSafeInteger( patch.positionMs ) || patch.positionMs < 0 )
+        throw new Error( `Invalid marker position: ${ patch.positionMs }` );
+
+      assignments.push( 'position_ms = ?' );
+      values.push( patch.positionMs );
+    }
+
+    if ( patch.title !== undefined ) {
+      assignments.push( 'title = ?' );
+      values.push( normalizeString( patch.title, 'Marker title' ) );
+    }
+
+    if ( patch.description !== undefined ) {
+      assignments.push( 'description = ?' );
+      values.push( normalizeString( patch.description, 'Marker description' ) );
+    }
+
+    if ( ! assignments.length ) return;
+
+    const result = conn().prepare( `
+      UPDATE markers
+      SET ${ assignments.join( ', ' ) }
+      WHERE user_id = ? AND id = ?
+    ` ).run( ...values, userId, markerId );
+
+    if ( Number( result.changes ) !== 1 )
+      throw new Error( `Marker ${ markerId } does not exist for user ${ userId }` );
   }
 }
