@@ -11,7 +11,7 @@ export function assertRelativePath ( path: string, label: string ) : void {
 }
 
 
-export function normalizeString ( value: string, label: string ) : string {
+export function normalizeString ( value: unknown, label: string ) : string {
   if ( typeof value !== 'string' || ! value.trim() || value.includes( '\0' ) )
     throw new Error( `${ label } must not be empty` );
 
