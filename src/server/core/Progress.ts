@@ -23,4 +23,23 @@ export class Progress {
 
     return row ? Progress.mapRow( row ) : null;
   }
+
+  public static list ( userId: number, limit = 100, offset = 0 ) : ProgressRecord[] {
+    assertId( userId, 'user' );
+
+    if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid progress limit: ${ limit }` );
+    if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid progress offset: ${ offset }` );
+
+    const rows = as< ProgressRow[] >( conn().prepare( `
+      SELECT
+        user_id AS userId, media_id AS mediaId, position_ms AS positionMs,
+        completed, updated_at AS updatedAt
+      FROM progress
+      WHERE user_id = ?
+      ORDER BY updated_at DESC, media_id
+      LIMIT ? OFFSET ?
+    ` ).all( userId, limit, offset ) );
+
+    return rows.map( row => Progress.mapRow( row ) );
+  }
 }
