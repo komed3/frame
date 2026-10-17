@@ -14,4 +14,13 @@ export class Pref {
   private static isName ( name: string ) : name is PrefName {
     return Object.hasOwn( this.schema, name );
   }
+
+  private static parseValue < K extends PrefName > ( name: K, valueJson: string ) : PrefValue< K > {
+    let value: unknown;
+
+    try { value = JSON.parse( valueJson ) }
+    catch { throw new Error( `Stored preference ${ name } contains invalid JSON` ) }
+
+    return this.validate( name, value );
+  }
 }
