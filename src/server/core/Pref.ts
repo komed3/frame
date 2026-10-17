@@ -10,4 +10,8 @@ export class Pref {
     PLAYER_AUTOPLAY_NEXT: { type: 'boolean', desc: 'Automatically play the next item', default: false },
     PLAYER_SUBTITLE_MODE: { type: 'enum', desc: 'Default subtitle behavior', default: 'auto', values: [ 'auto', 'on', 'off' ] }
   } satisfies PrefTable;
+
+  private static isName ( name: string ) : name is PrefName {
+    return Object.hasOwn( this.schema, name );
+  }
 }
