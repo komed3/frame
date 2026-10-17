@@ -70,4 +70,11 @@ export class Progress {
     const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
     return Number( result.changes ) > 0;
   }
+
+  public static clear ( userId: number ) : number {
+    assertId( userId, 'user' );
+
+    const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ?' ).run( userId );
+    return Number( result.changes );
+  }
 }
