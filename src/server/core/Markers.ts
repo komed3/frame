@@ -34,4 +34,20 @@ export class Markers {
       LIMIT ? OFFSET ?
     ` ).all( userId, limit, offset ) );
   }
+
+  public static mediaMarker ( userId: number, mediaId: number, limit = 100, offset = 0 ) : MarkerRecord[] {
+    assertId( userId, 'user' );
+    Media.assertMediaIdSafe( mediaId );
+    assertLimitOffset( limit, offset );
+
+    return as< MarkerRecord[] >( conn().prepare( `
+      SELECT
+        id, user_id AS userId, media_id AS mediaId, position_ms AS positionMs,
+        title, description, created_at AS createdAt
+      FROM markers
+      WHERE user_id = ? AND media_id = ?
+      ORDER BY position_ms, id
+      LIMIT ? OFFSET ?
+    ` ).all( userId, mediaId, limit, offset ) );
+  }
 }
