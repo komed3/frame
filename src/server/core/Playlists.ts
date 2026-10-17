@@ -13,6 +13,14 @@ export class Playlists {
       throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
   }
 
+  private static touch ( playlistId: number ) : void {
+    conn().prepare( `
+      UPDATE playlists
+      SET updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ?
+    ` ).run( playlistId );
+  }
+
   public static get ( userId: number, playlistId: number ) : PlaylistRecord | null {
     Playlists.assertOwned( userId, playlistId );
 
