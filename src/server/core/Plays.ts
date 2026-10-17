@@ -27,7 +27,7 @@ export class Plays {
     if ( Number( result.changes ) !== 1 ) throw new Error( `Play ${ playId } does not exist for user ${ userId }` );
   }
 
-  private static list ( where: string, limit: number, offset: number ) : PlayRecord[] {
+  private static list ( where: string, params: number[], limit: number, offset: number ) : PlayRecord[] {
     assertLimitOffset( limit, offset );
 
     const rows = as< PlayRow[] >( conn().prepare( `
@@ -39,26 +39,26 @@ export class Plays {
       WHERE ${ where }
       ORDER BY started_at DESC, id DESC
       LIMIT ? OFFSET ?
-    ` ).all( limit, offset ) );
+    ` ).all( ...params, limit, offset ) );
 
     return rows.map( row => Plays.mapRow( row ) );
   }
 
   public static listByUser ( userId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
-    return Plays.list( `user_id = ${ userId }`, limit, offset );
+    return Plays.list( 'user_id = ?', [ userId ], limit, offset );
   }
 
   public static listByMedia ( mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     Media.assertMediaIdSafe( mediaId );
-    return Plays.list( `media_id = ${ mediaId }`, limit, offset );
+    return Plays.list( 'media_id = ?', [ mediaId ], limit, offset );
   }
 
   public static listByUserAndMedia ( userId: number, mediaId: number, limit = 100, offset = 0 ) : PlayRecord[] {
     assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
-    return Plays.list( `user_id = ${ userId } AND media_id = ${ mediaId }`, limit, offset );
+    return Plays.list( 'user_id = ? AND media_id = ?', [ userId, mediaId ], limit, offset );
   }
 
   public static get ( userId: number, playId: number ) : PlayRecord | null {
