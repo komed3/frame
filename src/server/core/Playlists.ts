@@ -26,4 +26,19 @@ export class Playlists {
 
     return row ?? null;
   }
+
+  public static list ( userId: number, limit = 100, offset = 0 ) : PlaylistRecord[] {
+    assertId( userId, 'user' );
+    assertLimitOffset( limit, offset );
+
+    return as< PlaylistRecord[] >( conn().prepare( `
+      SELECT
+        id, user_id AS userId, name, description,
+        created_at AS createdAt, updated_at AS updatedAt
+      FROM playlists
+      WHERE user_id = ?
+      ORDER BY updated_at DESC, id DESC
+      LIMIT ? OFFSET ?
+    ` ).all( userId, limit, offset ) );
+  }
 }
