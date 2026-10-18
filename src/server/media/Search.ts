@@ -1,12 +1,13 @@
-import { assertId, normalizeString, validateEnum } from '@/src/server/utils';
+import { as, conn } from '@/src/server/core/Database';
+import { MEDIA_TYPES } from '@/src/server/media/Media';
+import { assertId, assertLimitOffset, normalizeString, validateEnum } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchDateFilter, MediaSearchFilterLike,
   MediaSearchMetadataFilter, MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchOptions,
-  MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField,
-  MediaSearchTrackFilter
+  MediaSearchQueryMode, MediaSearchResult, MediaSearchSort, MediaSearchStringFilter,
+  MediaSearchTextField, MediaSearchTrackFilter
 } from '@/src/shared/types/search';
-import { MEDIA_TYPES } from './Media';
 
 
 const MAX_LIMIT = 500;
