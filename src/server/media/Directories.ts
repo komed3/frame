@@ -71,4 +71,18 @@ export class MediaDirectories {
       ORDER BY d.name COLLATE NOCASE, d.id
     ` ).all( rootId, parentId, rootId, rootId, parentId ) );
   }
+
+  public static beginScan ( rootId: number ) : number {
+    assertId( rootId, 'media root' );
+
+    const row = as< { scanGeneration: number } | undefined >( conn().prepare( `
+      UPDATE roots
+      SET scan_generation = scan_generation + 1
+      WHERE id = ?
+      RETURNING scan_generation AS scanGeneration
+    ` ).get( rootId ) );
+
+    if ( ! row ) throw new Error( `Media root ${ rootId } does not exist` );
+    return row.scanGeneration;
+  }
 }
