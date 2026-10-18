@@ -229,7 +229,7 @@ export class MediaSearch {
         if ( filter[ key ] === undefined ) continue;
 
         parts.push( `t.${ columns[ key ] } = ? COLLATE NOCASE` );
-        values.push( filter[ key ]!.trim() );
+        values.push( filter[ key ].trim() );
       }
 
       for ( const key of [ 'isDefault', 'isForced' ] as const ) {
@@ -243,7 +243,7 @@ export class MediaSearch {
         if ( filter[ key ] === undefined ) continue;
 
         parts.push( `t.${ columns[ key ] } ${ key.startsWith( 'min' ) ? '>=' : '<=' } ?` );
-        values.push( filter[ key ]! );
+        values.push( filter[ key ] );
       }
 
       if ( parts.length ) cond.push( `
