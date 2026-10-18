@@ -65,19 +65,19 @@ export class Media {
     const { rootId, directoryId, type, availableOnly = false, limit = 100, offset = 0 } = options;
     const conditions: string[] = [], values: ( string | number )[] = [];
 
-    if ( rootId ) {
+    if ( rootId !== undefined ) {
       assertId( rootId, 'media root' );
       conditions.push( 'root_id = ?' );
       values.push( rootId );
     }
 
-    if ( directoryId ) {
+    if ( directoryId !== undefined && directoryId !== null ) {
       assertId( directoryId, 'media directory' );
       conditions.push( 'directory_id IS ?' );
       values.push( directoryId );
     }
 
-    if ( type ) {
+    if ( type !== undefined ) {
       if ( ! MEDIA_TYPES.includes( type ) ) throw new Error( `Invalid media type: ${ type }` );
       conditions.push( 'type = ?' );
       values.push( type );
@@ -94,9 +94,10 @@ export class Media {
     return rows.map( row => Media.mapRow( row ) );
   }
 
-  public static registerFile ( input: MediaFileInput ) : number {
+  public static registerFile ( input: MediaFileInput, directoryId: number | null ) : number {
     assertId( input.rootId, 'media root' );
     assertRelativePath( input.path, 'media' );
+    if ( directoryId !== null ) assertId( directoryId, 'directory' );
 
     if ( ! input.fileName || input.fileName.includes( '/' ) || input.fileName.includes( '\\' ) )
       throw new Error( `Invalid media file name: ${ input.fileName }` );
@@ -106,22 +107,6 @@ export class Media {
 
     if ( ! Number.isSafeInteger( input.sizeBytes ) || input.sizeBytes < 0 )
       throw new Error( `Invalid media file size: ${ input.sizeBytes }` );
-
-    const separator = input.path.lastIndexOf( '/' );
-    const directoryPath = separator < 0 ? null : input.path.slice( 0, separator );
-    let directoryId: number | null = null;
-
-    if ( directoryPath !== null ) {
-      const directory = as< { id: number } | undefined >( conn().prepare( `
-        SELECT d.id
-        FROM directories d
-        JOIN roots r ON r.id = d.root_id AND r.scan_generation = d.scan_generation
-        WHERE d.root_id = ? AND d.path = ?
-      ` ).get( input.rootId, directoryPath ) );
-
-      if ( ! directory ) throw new Error( `Media directory is not registered in the current scan: ${ directoryPath }` );
-      directoryId = directory.id;
-    }
 
     const row = as< { id: number } | undefined >( conn().prepare( `
       INSERT INTO media (
