@@ -1,5 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
-import { assertLimitOffset } from '@/src/server/utils';
+import { assertId, assertLimitOffset } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchDateFilter as DF, MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike,
@@ -275,7 +275,10 @@ export class MediaSearch {
 
   private static userFilters ( cond: string[], values: ( string | number )[], options: O ) : void {
     const { userId, favorite, played, progress } = options;
-    if ( userId === undefined ) return;
+
+    if ( favorite === undefined && played === undefined && progress === undefined ) return;
+    if ( userId === undefined ) throw new Error( 'userId is required for user-specific search filters' );
+    assertId( userId, 'user' );
 
     const exists = ( table: string, value: boolean ) => {
       cond.push( `${ value ? 'EXISTS' : 'NOT EXISTS' } (
