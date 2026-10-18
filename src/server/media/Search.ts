@@ -1,4 +1,7 @@
-import { MediaSearchDateField, MediaSearchNumberField, MediaSearchSort, MediaSearchTextField } from '@/src/shared/types/search';
+import {
+  MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchSort,
+  MediaSearchTextField
+} from '@/src/shared/types/search';
 
 
 const MAX_LIMIT = 500;
@@ -36,3 +39,5 @@ const SORT_COLUMNS: Record< Exclude< MediaSearchSort, 'relevance' >, string > = 
   encoding: 'm.encoding COLLATE NOCASE', scannedAt: 'm.scanned_at',
   createdAt: 'm.created_at', updatedAt: 'm.updated_at'
 };
+
+const ASSET_KINDS: MediaSearchAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle' ];
