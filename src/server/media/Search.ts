@@ -64,4 +64,8 @@ export class MediaSearch {
     if ( uniqueIds.length > 500 ) throw new Error( `${ label } cannot contain more than 500 IDs` );
     return uniqueIds;
   }
+
+  private static escapeLike ( value: string ) : string {
+    return value.replace( /[\\%_]/g, '\\$&' );
+  }
 }
