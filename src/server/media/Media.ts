@@ -7,9 +7,9 @@ export const MEDIA_TYPES: MediaType[] = [ 'video', 'audio', 'image', 'text', 'ot
 
 const SELECT_MEDIA = `
   SELECT
-    id, root_id AS rootId, path, file_name AS fileName, type, mime_type AS mimeType,
-    size_bytes AS sizeBytes, modified_at AS modifiedAt, file_hash AS fileHash, fingerprint,
-    available, title, description, creator, rating, released_at AS releasedAt,
+    id, root_id AS rootId, directory_id AS directoryId, path, file_name AS fileName, type,
+    mime_type AS mimeType, size_bytes AS sizeBytes, modified_at AS modifiedAt, file_hash AS fileHash,
+    fingerprint, available, title, description, creator, rating, released_at AS releasedAt,
     recorded_at AS recordedAt, language, duration_ms AS durationMs, width, height, fps,
     bitrate, container, video_codec AS videoCodec, audio_codec AS audioCodec,
     sample_rate AS sampleRate, channels, encoding, data_json AS dataJson,
@@ -103,15 +103,33 @@ export class Media {
     if ( ! Number.isSafeInteger( input.sizeBytes ) || input.sizeBytes < 0 )
       throw new Error( `Invalid media file size: ${ input.sizeBytes }` );
 
+    const separator = input.path.lastIndexOf( '/' );
+    const directoryPath = separator < 0 ? null : input.path.slice( 0, separator );
+    let directoryId: number | null = null;
+
+    if ( directoryPath !== null ) {
+      const directory = as< { id: number } | undefined >( conn().prepare( `
+        SELECT d.id
+        FROM directories d
+        JOIN roots r ON r.id = d.root_id AND r.scan_generation = d.scan_generation
+        WHERE d.root_id = ? AND d.path = ?
+      ` ).get( input.rootId, directoryPath ) );
+
+      if ( ! directory ) throw new Error( `Media directory is not registered in the current scan: ${ directoryPath }` );
+      directoryId = directory.id;
+    }
+
     const row = as< { id: number } | undefined >( conn().prepare( `
       INSERT INTO media (
-        root_id, path, file_name, type, mime_type, size_bytes, modified_at, scanned_at
+        root_id, directory_id, path, file_name, type, mime_type,
+        size_bytes, modified_at, scanned_at
       )
       VALUES (
-        ?, ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?, ?, ?,
         strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       )
       ON CONFLICT ( root_id, path ) DO UPDATE SET
+        directory_id = excluded.directory_id,
         file_name = excluded.file_name,
         type = excluded.type,
         mime_type = excluded.mime_type,
@@ -134,8 +152,8 @@ export class Media {
         updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       RETURNING id
     ` ).get(
-      input.rootId, input.path, input.fileName, input.type, input.mimeType ?? null,
-      input.sizeBytes, input.modifiedAt ?? null
+      input.rootId, directoryId, input.path, input.fileName, input.type,
+      input.mimeType ?? null, input.sizeBytes, input.modifiedAt ?? null
     ) );
 
     if ( ! row ) throw new Error( `Could not register media file: ${ input.path }` );
