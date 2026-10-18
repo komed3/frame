@@ -9,6 +9,17 @@ export class MediaDirectories {
     return directory;
   }
 
+  private static assertGeneration ( rootId: number, scanGeneration: number ) : void {
+    const root = as< { scanGeneration: number } | undefined >( conn().prepare(
+      'SELECT scan_generation AS scanGeneration FROM roots WHERE id = ?'
+    ).get( rootId ) );
+
+    if ( ! root ) throw new Error( `Media root ${ rootId } does not exist` );
+    if ( root.scanGeneration !== scanGeneration ) throw new Error(
+      `Scan generation ${ scanGeneration } is no longer active for media root ${ rootId }`
+    );
+  }
+
   public static get ( id: number ) : MediaDirectory | null {
     assertId( id, 'media directory' );
 
