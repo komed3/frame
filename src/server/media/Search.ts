@@ -3,7 +3,7 @@ import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchSort,
   MediaSearchTextField
 } from '@/src/shared/types/search';
-import { assertId } from '../utils';
+import { assertId, normalizeString } from '../utils';
 
 
 const MAX_LIMIT = 500;
@@ -63,6 +63,18 @@ export class MediaSearch {
 
     if ( uniqueIds.length > 500 ) throw new Error( `${ label } cannot contain more than 500 IDs` );
     return uniqueIds;
+  }
+
+  private static normalizeDate ( value: string, label: string, endOfDay = false ) : string {
+    const normalized = normalizeString( value, label );
+
+    if ( ! Number.isFinite( Date.parse( normalized ) ) )
+      throw new Error( `Invalid ${ label }: ${ normalized }` );
+
+    if ( /^\d{4}-\d{2}-\d{2}$/.test( normalized ) )
+      return `${ normalized }T${ endOfDay ? '23:59:59.999' : '00:00:00.000' }Z`;
+
+    return normalized;
   }
 
   private static escapeLike ( value: string ) : string {
