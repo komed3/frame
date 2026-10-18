@@ -50,10 +50,12 @@ const ASSET_KINDS: MediaSearchAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave
 
 export class MediaSearch {
   private static mapRow ( row: MediaRow ) : MediaRecord {
-    return {
-      ...row, available: Boolean( row.available ),
-      data: JSON.parse( row.dataJson ) as Record< string, unknown >
-    };
+    const data = JSON.parse( row.dataJson ) as unknown;
+
+    if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
+      throw new Error( `Invalid media data JSON for media ${ row.id }` );
+
+    return { ...row, available: Boolean( row.available ), data: data as Record< string, unknown > };
   }
 
   private static normalizeIds ( ids: number[] ) : number[] {
