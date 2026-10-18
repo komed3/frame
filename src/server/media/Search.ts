@@ -3,7 +3,8 @@ import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchDateFilter, MediaSearchFilterLike,
   MediaSearchMetadataFilter, MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchOptions,
-  MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
+  MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField,
+  MediaSearchTrackFilter
 } from '@/src/shared/types/search';
 
 
@@ -97,9 +98,11 @@ export class MediaSearch {
     return terms.map( term => `"${ term.replace( /"/g, '""' ) }"*` ).join( operator );
   }
 
-  private static filterNotNull (
-    cond: string[], filter: MediaSearchFilterLike, column: string, hasValue: boolean, label: string
-  ) : void {
+  private static assertFilterArray ( filters: unknown[] ) : void {
+    if ( ! Array.isArray( filters ) ) throw new Error( 'Track filters must be an array' );
+  }
+
+  private static filterNN ( cond: string[], filter: MediaSearchFilterLike, column: string, hasValue: boolean, label: string ) : void {
     if ( filter.isNull === undefined ) return;
     if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
     if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with text conditions` );
@@ -111,7 +114,7 @@ export class MediaSearch {
     cond: string[], values: ( string | number )[], column: string, filter: MediaSearchStringFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.contains, filter.startsWith, filter.endsWith ].some( v => v !== undefined );
-    MediaSearch.filterNotNull( cond, filter, column, hasValue, label );
+    MediaSearch.filterNN( cond, filter, column, hasValue, label );
 
     if ( filter.equals !== undefined ) {
       cond.push( `${ column } = ? COLLATE NOCASE` );
@@ -138,7 +141,7 @@ export class MediaSearch {
     cond: string[], values: ( string | number )[], column: string, filter: MediaSearchNumberFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.min, filter.max ].some( v => v !== undefined );
-    MediaSearch.filterNotNull( cond, filter, column, hasValue, label );
+    MediaSearch.filterNN( cond, filter, column, hasValue, label );
 
     for ( const [ k, v ] of [ [ 'equals', filter.equals ], [ 'min', filter.min ], [ 'max', filter.max ] ] as const ) {
       if ( v === undefined ) continue;
@@ -159,7 +162,7 @@ export class MediaSearch {
     cond: string[], values: ( string | number )[], column: string, filter: MediaSearchDateFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.from, filter.to ].some( v => v !== undefined );
-    MediaSearch.filterNotNull( cond, filter, column, hasValue, label );
+    MediaSearch.filterNN( cond, filter, column, hasValue, label );
 
     const equals = filter.equals === undefined ? undefined : MediaSearch.normalizeDate( filter.equals, label );
     const from = filter.from === undefined ? undefined : MediaSearch.normalizeDate( filter.from, `${ label }.from` );
@@ -226,7 +229,7 @@ export class MediaSearch {
   }
 
   private static appendMetaFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchMetadataFilter[] ) : void {
-    if ( ! Array.isArray( filters ) ) throw new Error( 'Metadata filters must be an array' );
+    MediaSearch.assertFilterArray( filters );
 
     for ( const filter of filters ) {
       const key = normalizeString( filter.key, 'Metadata key' );
@@ -258,6 +261,57 @@ export class MediaSearch {
           : `${ MediaSearch.escapeLike( value ) }%`
         );
       }
+    }
+  }
+
+  private static appendTrackFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchTrackFilter[] ) : void {
+    MediaSearch.assertFilterArray( filters );
+
+    for ( const filter of filters ) {
+      const parts: string[] = [];
+
+      if ( filter.kind !== undefined ) {
+        parts.push( 't.kind = ?' );
+        values.push( validateEnum( filter.kind, 'track kind', [ 'video', 'audio', 'subtitle', 'data' ] ) );
+      }
+
+      for ( const key of [ 'codec', 'language', 'title' ] as const ) {
+        const value = filter[ key ];
+        if ( value === undefined ) continue;
+
+        parts.push( `t.${ key } = ? COLLATE NOCASE` );
+        values.push( normalizeString( value, `track ${ key }` ) );
+      }
+
+      for ( const key of [ 'isDefault', 'isForced' ] as const ) {
+        const value = filter[ key ];
+        if ( value === undefined ) continue;
+        if ( typeof value !== 'boolean' ) throw new Error( `Track ${ key } must be a boolean` );
+
+        parts.push( `t.${ key === 'isDefault' ? 'is_default' : 'is_forced' } = ?` );
+        values.push( Number( value ) );
+      }
+
+      for ( const [ key, column ] of [
+        [ 'minWidth', 'width' ], [ 'maxWidth', 'width' ], [ 'minHeight', 'height' ],
+        [ 'maxHeight', 'height' ], [ 'minChannels', 'channels' ], [ 'maxChannels', 'channels' ]
+      ] as const ) {
+        const value = filter[ key ];
+        if ( value === undefined ) continue;
+        if ( ! Number.isFinite( value ) || value < 0 ) throw new Error( `Track ${ key } must be a non-negative number` );
+
+        parts.push( `t.${ column } ${ key.startsWith( 'min' ) ? '>=' : '<=' } ?` );
+        values.push( value );
+      }
+
+      if ( ! parts.length ) throw new Error( 'A track filter must contain at least one condition' );
+
+      cond.push( `
+        EXISTS (
+          SELECT 1 FROM tracks t
+          WHERE t.media_id = m.id AND ${ parts.join( ' AND ' ) }
+        )
+      ` );
     }
   }
 }
