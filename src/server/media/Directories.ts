@@ -22,4 +22,19 @@ export class MediaDirectories {
 
     return row ? MediaDirectories.mapRow( row ) : null;
   }
+
+  public static getByPath ( rootId: number, path: string ) : MediaDirectory | null {
+    assertId( rootId, 'media root' );
+    assertRelativePath( path, 'directory' );
+
+    const row = as< MediaDirectoryRow | undefined >( conn().prepare( `
+      SELECT
+        id, root_id AS rootId, parent_id AS parentId, path, name,
+        scan_generation AS scanGeneration, scanned_at AS scannedAt, created_at AS createdAt
+      FROM directories
+      WHERE root_id = ? AND path = ?
+    ` ).get( rootId, path ) );
+
+    return row ? MediaDirectories.mapRow( row ) : null;
+  }
 }
