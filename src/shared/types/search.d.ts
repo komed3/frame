@@ -1,3 +1,8 @@
+import type { MediaRecord, MediaType } from '@/src/shared/types/media';
+import type { MediaMetadataSource } from '@/src/shared/types/metadata';
+import type { MediaTrackKind } from '@/src/shared/types/tracks';
+
+
 export type MediaSearchSort =
   | 'id' | 'rootId' | 'type' | 'title' | 'fileName' | 'path' | 'mimeType' | 'sizeBytes'
   | 'modifiedAt' | 'fileHash' | 'fingerprint' | 'creator' | 'rating' | 'releasedAt'
