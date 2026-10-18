@@ -62,7 +62,7 @@ CREATE INDEX directories_parent_idx ON directories ( root_id, parent_id, name CO
 CREATE TABLE media (
   id INTEGER PRIMARY KEY,
   root_id INTEGER NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
-  directory_id INTEGER REFERENCES directories ( id ) ON DELETE SET NULL,
+  directory_id INTEGER,
   path TEXT NOT NULL,
   file_name TEXT NOT NULL,
 
@@ -104,7 +104,8 @@ CREATE TABLE media (
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
   updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
 
-  UNIQUE ( root_id, path )
+  UNIQUE ( root_id, path ),
+  FOREIGN KEY ( directory_id, root_id ) REFERENCES directories ( id, root_id ) ON DELETE RESTRICT,
 );
 
 CREATE INDEX media_type_available_idx ON media ( type, available );
