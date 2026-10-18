@@ -1,7 +1,7 @@
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchQueryMode,
-  MediaSearchSort, MediaSearchTextField
+  MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
 } from '@/src/shared/types/search';
 import { assertId, normalizeString } from '@/src/server/utils';
 
@@ -94,5 +94,39 @@ export class MediaSearch {
 
     const operator = mode === 'all' ? ' AND ' : ' OR ';
     return terms.map( term => `"${ term.replace( /"/g, '""' ) }"*` ).join( operator );
+  }
+
+  private static appendTextFilter (
+    conditions: string[], values: ( string | number )[], column: string,
+    filter: MediaSearchStringFilter, label: string
+  ) : void {
+    const hasValue = [ filter.equals, filter.contains, filter.startsWith, filter.endsWith ].some( v => v !== undefined );
+
+    if ( filter.isNull !== undefined ) {
+      if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
+      if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with text conditions` );
+
+      conditions.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
+    }
+
+    if ( filter.equals !== undefined ) {
+      conditions.push( `${ column } = ? COLLATE NOCASE` );
+      values.push( normalizeString( filter.equals, label ) );
+    }
+
+    if ( filter.contains !== undefined ) {
+      conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
+      values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.contains, label ) ) }%` );
+    }
+
+    if ( filter.startsWith !== undefined ) {
+      conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
+      values.push( `${ MediaSearch.escapeLike( normalizeString( filter.startsWith, label ) ) }%` );
+    }
+
+    if ( filter.endsWith !== undefined ) {
+      conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
+      values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.endsWith, label ) ) }` );
+    }
   }
 }
