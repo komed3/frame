@@ -128,4 +128,23 @@ export class MediaDirectories {
     if ( ! row ) throw new Error( `Could not register media directory: ${ path }` );
     return row.id;
   }
+
+  public static finishScan ( rootId: number, scanGeneration: number ) : void {
+    assertId( rootId, 'media root' );
+    assertId( scanGeneration, 'scan generation' );
+
+    db.transaction( tx => {
+      const root = as< { scanGeneration: number } | undefined >( tx.prepare(
+        'SELECT scan_generation AS scanGeneration FROM roots WHERE id = ?'
+      ).get( rootId ) );
+
+      if ( ! root ) throw new Error( `Media root ${ rootId } does not exist` );
+      if ( root.scanGeneration !== scanGeneration ) throw new Error(
+        `Scan generation ${ scanGeneration } is no longer active for media root ${ rootId }`
+      );
+
+      tx.prepare( 'DELETE FROM directories WHERE root_id = ? AND scan_generation <> ?' ).run( rootId, scanGeneration );
+      tx.prepare( `UPDATE roots SET scanned_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) WHERE id = ?` ).run( rootId );
+    } );
+  }
 }
