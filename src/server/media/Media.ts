@@ -62,19 +62,23 @@ export class Media {
   }
 
   public static list ( options: MediaListOptions = {} ) : MediaRecord[] {
-    const { rootId, type, availableOnly = false, limit = 100, offset = 0 } = options;
+    const { rootId, directoryId, type, availableOnly = false, limit = 100, offset = 0 } = options;
     const conditions: string[] = [], values: ( string | number )[] = [];
 
-    if ( rootId !== undefined ) {
+    if ( rootId ) {
       assertId( rootId, 'media root' );
-
       conditions.push( 'root_id = ?' );
       values.push( rootId );
     }
 
-    if ( type !== undefined ) {
-      if ( ! MEDIA_TYPES.includes( type ) ) throw new Error( `Invalid media type: ${ type }` );
+    if ( directoryId ) {
+      assertId( directoryId, 'media directory' );
+      conditions.push( 'directory_id IS ?' );
+      values.push( directoryId );
+    }
 
+    if ( type ) {
+      if ( ! MEDIA_TYPES.includes( type ) ) throw new Error( `Invalid media type: ${ type }` );
       conditions.push( 'type = ?' );
       values.push( type );
     }

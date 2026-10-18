@@ -3,7 +3,7 @@ export type MediaType = 'video' | 'audio' | 'image' | 'text' | 'other';
 export interface MediaRecord {
   id: number;
   rootId: number;
-  directoryId: number | null;
+  directoryId: number;
   path: string;
   fileName: string;
   type: MediaType;
