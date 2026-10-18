@@ -1,4 +1,5 @@
-import {
+import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
+import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchSort,
   MediaSearchTextField
 } from '@/src/shared/types/search';
@@ -41,3 +42,15 @@ const SORT_COLUMNS: Record< Exclude< MediaSearchSort, 'relevance' >, string > = 
 };
 
 const ASSET_KINDS: MediaSearchAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle' ];
+
+
+export class MediaSearch {
+  private static mapRow ( row: MediaRow ) : MediaRecord {
+    const data = JSON.parse( row.dataJson ) as unknown;
+
+    if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
+      throw new Error( `Invalid media data JSON for media ${ row.id }` );
+
+    return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
+  }
+}
