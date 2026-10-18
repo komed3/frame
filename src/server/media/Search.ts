@@ -1,8 +1,9 @@
 import { assertId, normalizeString } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
-  MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchNumberFilter,
-  MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
+  MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike, MediaSearchNumberField,
+  MediaSearchNumberFilter, MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter,
+  MediaSearchTextField
 } from '@/src/shared/types/search';
 
 
@@ -96,18 +97,23 @@ export class MediaSearch {
     return terms.map( term => `"${ term.replace( /"/g, '""' ) }"*` ).join( operator );
   }
 
+  private static filterNotNull (
+    conditions: string[], filter: MediaSearchFilterLike, column: string,
+    hasValue: boolean, label: string
+  ) : void {
+    if ( filter.isNull === undefined ) return;
+    if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
+    if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with text conditions` );
+
+    conditions.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
+  }
+
   private static appendTextFilter (
     conditions: string[], values: ( string | number )[], column: string,
     filter: MediaSearchStringFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.contains, filter.startsWith, filter.endsWith ].some( v => v !== undefined );
-
-    if ( filter.isNull !== undefined ) {
-      if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
-      if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with text conditions` );
-
-      conditions.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
-    }
+    MediaSearch.filterNotNull( conditions, filter, column, hasValue, label );
 
     if ( filter.equals !== undefined ) {
       conditions.push( `${ column } = ? COLLATE NOCASE` );
@@ -135,35 +141,20 @@ export class MediaSearch {
     filter: MediaSearchNumberFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.min, filter.max ].some( v => v !== undefined );
-
-    if ( filter.isNull !== undefined ) {
-      if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
-      if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with numeric conditions` );
-
-      conditions.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
-    }
+    MediaSearch.filterNotNull( conditions, filter, column, hasValue, label );
 
     for ( const [ k, v ] of [ [ 'equals', filter.equals ], [ 'min', filter.min ], [ 'max', filter.max ] ] as const ) {
       if ( v === undefined ) continue;
-      if ( typeof v !== 'number' || ! Number.isFinite( v ) ) throw new Error( `${ label }.${ k } must be a finite number` );
+
+      if ( typeof v !== 'number' || ! Number.isFinite( v ) )
+        throw new Error( `${ label }.${ k } must be a finite number` );
     }
 
     if ( filter.min !== undefined && filter.max !== undefined && filter.min > filter.max )
       throw new Error( `${ label }.min cannot exceed max` );
 
-    if ( filter.equals !== undefined ) {
-      conditions.push( `${ column } = ?` );
-      values.push( filter.equals );
-    }
-
-    if ( filter.min !== undefined ) {
-      conditions.push( `${ column } >= ?` );
-      values.push( filter.min );
-    }
-
-    if ( filter.max !== undefined ) {
-      conditions.push( `${ column } <= ?` );
-      values.push( filter.max );
-    }
+    if ( filter.equals !== undefined ) conditions.push( `${ column } = ?` ), values.push( filter.equals );
+    if ( filter.min !== undefined ) conditions.push( `${ column } >= ?` ), values.push( filter.min );
+    if ( filter.max !== undefined ) conditions.push( `${ column } <= ?` ), values.push( filter.max );
   }
 }
