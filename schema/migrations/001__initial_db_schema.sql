@@ -105,7 +105,7 @@ CREATE TABLE media (
   updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
 
   UNIQUE ( root_id, path ),
-  FOREIGN KEY ( directory_id, root_id ) REFERENCES directories ( id, root_id ) ON DELETE RESTRICT,
+  FOREIGN KEY ( directory_id, root_id ) REFERENCES directories ( id, root_id ) ON DELETE RESTRICT
 );
 
 CREATE INDEX media_type_available_idx ON media ( type, available );
