@@ -314,4 +314,30 @@ export class MediaSearch {
       ` );
     }
   }
+
+  private static appendAssetFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+    for ( const [ key, mode ] of [ [ 'assetKindsAny', 'any' ], [ 'assetKindsAll', 'all' ], [ 'missingAssetKinds', 'missing' ] ] as const ) {
+      const kinds = options[ key ];
+      if ( kinds === undefined ) continue;
+      if ( ! Array.isArray( kinds ) ) throw new Error( `${ key } must be an array` );
+
+      const uniqueKinds = [ ...new Set( kinds ) ].map( k => validateEnum( k, 'asset kind', ASSET_KINDS ) );
+      if ( ! uniqueKinds.length ) continue;
+
+      if ( mode === 'all' ) for ( const kind of uniqueKinds ) {
+        cond.push( 'EXISTS ( SELECT 1 FROM assets a WHERE a.media_id = m.id AND a.kind = ? )' );
+        values.push( kind );
+      }
+
+      else {
+        cond.push( `
+          ${ mode === 'any' ? 'EXISTS' : 'NOT EXISTS' } (
+            SELECT 1 FROM assets a
+            WHERE a.media_id = m.id AND a.kind IN ( ${ uniqueKinds.map( () => '?' ).join( ', ' ) } )
+          )
+        ` );
+        values.push( ...uniqueKinds );
+      }
+    }
+  }
 }
