@@ -2,8 +2,8 @@ import { assertId, normalizeString, validateEnum } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchDateFilter, MediaSearchFilterLike,
-  MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchOptions, MediaSearchQueryMode,
-  MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
+  MediaSearchMetadataFilter, MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchOptions,
+  MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
 } from '@/src/shared/types/search';
 
 
@@ -222,6 +222,42 @@ export class MediaSearch {
         exCatIds.map( () => '?' ).join( ', ' )
       } ) )` );
       values.push( ...exCatIds );
+    }
+  }
+
+  private static appendMetaFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchMetadataFilter[] ) : void {
+    if ( ! Array.isArray( filters ) ) throw new Error( 'Metadata filters must be an array' );
+
+    for ( const filter of filters ) {
+      const key = normalizeString( filter.key, 'Metadata key' );
+      const match = validateEnum( filter.match ?? 'exact', 'metadata match', [ 'exact', 'contains', 'startsWith' ] );
+
+      cond.push( `
+        EXISTS (
+          SELECT 1 FROM media_metadata mm
+          WHERE mm.media_id = m.id
+            AND mm.key = ? COLLATE NOCASE
+            ${ filter.source === undefined ? '' : 'AND mm.source = ?' }
+            ${ filter.value === undefined ? '' : match === 'exact'
+              ? 'AND mm.value = ? COLLATE NOCASE'
+              : 'AND mm.value LIKE ? ESCAPE \'\\\' COLLATE NOCASE' }
+        )
+      ` );
+
+      values.push( key );
+
+      if ( filter.source !== undefined ) values.push( validateEnum(
+        filter.source, 'metadata source', [ 'manual', 'scan' ]
+      ) );
+
+      if ( filter.value !== undefined ) {
+        const value = normalizeString( filter.value, 'Metadata value' );
+
+        values.push( match === 'exact' ? value : match === 'contains'
+          ? `%${ MediaSearch.escapeLike( value ) }%`
+          : `${ MediaSearch.escapeLike( value ) }%`
+        );
+      }
     }
   }
 }
