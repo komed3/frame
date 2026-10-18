@@ -32,6 +32,8 @@ export interface MediaSearchDateFilter {
   isNull?: boolean;
 }
 
+export type MediaSearchFilterLike = MediaSearchStringFilter | MediaSearchNumberFilter | MediaSearchDateFilter;
+
 export type MediaSearchTextField =
   | 'path' | 'fileName' | 'mimeType' | 'fileHash' | 'fingerprint' | 'title' | 'description'
   | 'creator' | 'language' | 'container' | 'videoCodec' | 'audioCodec' | 'encoding';
