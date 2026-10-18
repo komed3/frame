@@ -112,7 +112,7 @@ export class MediaSearch {
     cond.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
   }
 
-  private static appendTextFilter (
+  private static textFilter (
     cond: string[], values: ( string | number )[], column: string, filter: MediaSearchStringFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.contains, filter.startsWith, filter.endsWith ].some( v => v !== undefined );
@@ -139,7 +139,7 @@ export class MediaSearch {
     }
   }
 
-  private static appendNumberFilter (
+  private static numberFilter (
     cond: string[], values: ( string | number )[], column: string, filter: MediaSearchNumberFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.min, filter.max ].some( v => v !== undefined );
@@ -160,7 +160,7 @@ export class MediaSearch {
     if ( filter.max !== undefined ) cond.push( `${ column } <= ?` ), values.push( filter.max );
   }
 
-  private static appendDateFilter (
+  private static dateFilter (
     cond: string[], values: ( string | number )[], column: string, filter: MediaSearchDateFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.from, filter.to ].some( v => v !== undefined );
@@ -187,7 +187,7 @@ export class MediaSearch {
     values.push( ...items );
   }
 
-  private static appendTaxFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+  private static taxFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
     const tagIds = options.tagIds ? MediaSearch.normalizeIds( options.tagIds, 'tag' ) : [];
     const exTagIds = options.excludeTagIds ? MediaSearch.normalizeIds( options.excludeTagIds, 'tag' ) : [];
     const catIds = options.categoryIds ? MediaSearch.normalizeIds( options.categoryIds, 'category' ) : [];
@@ -230,7 +230,7 @@ export class MediaSearch {
     }
   }
 
-  private static appendMetaFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchMetadataFilter[] ) : void {
+  private static metaFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchMetadataFilter[] ) : void {
     MediaSearch.assertFilterArray( filters );
 
     for ( const filter of filters ) {
@@ -268,7 +268,7 @@ export class MediaSearch {
     }
   }
 
-  private static appendTrackFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchTrackFilter[] ) : void {
+  private static trackFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchTrackFilter[] ) : void {
     MediaSearch.assertFilterArray( filters );
 
     for ( const filter of filters ) {
@@ -321,7 +321,7 @@ export class MediaSearch {
     }
   }
 
-  private static appendAssetFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+  private static assetFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
     for ( const [ key, mode ] of [
       [ 'assetKindsAny', 'any' ], [ 'assetKindsAll', 'all' ], [ 'missingAssetKinds', 'missing' ]
     ] as const ) {
@@ -349,7 +349,7 @@ export class MediaSearch {
     }
   }
 
-  private static appendUserFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+  private static userFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
     const needsUser = options.favorite !== undefined || options.played !== undefined || options.progress !== undefined;
     if ( options.userId !== undefined ) assertId( options.userId, 'user' );
 
@@ -473,7 +473,7 @@ export class MediaSearch {
         if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
           throw new Error( `Invalid text filter: ${ field }` );
 
-        MediaSearch.appendTextFilter(
+        MediaSearch.textFilter(
           cond, values, TEXT_COLUMNS[ field as MediaSearchTextField ], filter, field
         );
       }
@@ -489,7 +489,7 @@ export class MediaSearch {
         if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
           throw new Error( `Invalid numeric filter: ${ field }` );
 
-        MediaSearch.appendNumberFilter(
+        MediaSearch.numberFilter(
           cond, values, NUMBER_COLUMNS[ field as MediaSearchNumberField ], filter, field
         );
       }
@@ -505,17 +505,17 @@ export class MediaSearch {
         if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
           throw new Error( `Invalid date filter: ${ field }` );
 
-        MediaSearch.appendDateFilter(
+        MediaSearch.dateFilter(
           cond, values, DATE_COLUMNS[ field as MediaSearchDateField ], filter, field
         );
       }
     }
 
-    MediaSearch.appendTaxFilters( cond, values, options );
-    if ( options.metadata !== undefined ) MediaSearch.appendMetaFilters( cond, values, options.metadata );
-    if ( options.tracks !== undefined ) MediaSearch.appendTrackFilters( cond, values, options.tracks );
-    MediaSearch.appendAssetFilters( cond, values, options );
-    MediaSearch.appendUserFilters( cond, values, options );
+    MediaSearch.taxFilters( cond, values, options );
+    if ( options.metadata !== undefined ) MediaSearch.metaFilters( cond, values, options.metadata );
+    if ( options.tracks !== undefined ) MediaSearch.trackFilters( cond, values, options.tracks );
+    MediaSearch.assetFilters( cond, values, options );
+    MediaSearch.userFilters( cond, values, options );
 
     return { where: cond.length ? `WHERE ${ cond.join( ' AND ' ) }` : '', values, hasQuery };
   }
