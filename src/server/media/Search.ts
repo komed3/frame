@@ -1,9 +1,9 @@
-import { assertId, normalizeString } from '@/src/server/utils';
+import { assertId, normalizeString, validateEnum } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchDateFilter, MediaSearchFilterLike,
-  MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchQueryMode, MediaSearchSort,
-  MediaSearchStringFilter, MediaSearchTextField
+  MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchOptions, MediaSearchQueryMode,
+  MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
 } from '@/src/shared/types/search';
 
 
@@ -98,50 +98,47 @@ export class MediaSearch {
   }
 
   private static filterNotNull (
-    conditions: string[], filter: MediaSearchFilterLike, column: string,
-    hasValue: boolean, label: string
+    cond: string[], filter: MediaSearchFilterLike, column: string, hasValue: boolean, label: string
   ) : void {
     if ( filter.isNull === undefined ) return;
     if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
     if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with text conditions` );
 
-    conditions.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
+    cond.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
   }
 
   private static appendTextFilter (
-    conditions: string[], values: ( string | number )[], column: string,
-    filter: MediaSearchStringFilter, label: string
+    cond: string[], values: ( string | number )[], column: string, filter: MediaSearchStringFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.contains, filter.startsWith, filter.endsWith ].some( v => v !== undefined );
-    MediaSearch.filterNotNull( conditions, filter, column, hasValue, label );
+    MediaSearch.filterNotNull( cond, filter, column, hasValue, label );
 
     if ( filter.equals !== undefined ) {
-      conditions.push( `${ column } = ? COLLATE NOCASE` );
+      cond.push( `${ column } = ? COLLATE NOCASE` );
       values.push( normalizeString( filter.equals, label ) );
     }
 
     if ( filter.contains !== undefined ) {
-      conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
+      cond.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
       values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.contains, label ) ) }%` );
     }
 
     if ( filter.startsWith !== undefined ) {
-      conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
+      cond.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
       values.push( `${ MediaSearch.escapeLike( normalizeString( filter.startsWith, label ) ) }%` );
     }
 
     if ( filter.endsWith !== undefined ) {
-      conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
+      cond.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
       values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.endsWith, label ) ) }` );
     }
   }
 
   private static appendNumberFilter (
-    conditions: string[], values: ( string | number )[], column: string,
-    filter: MediaSearchNumberFilter, label: string
+    cond: string[], values: ( string | number )[], column: string, filter: MediaSearchNumberFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.min, filter.max ].some( v => v !== undefined );
-    MediaSearch.filterNotNull( conditions, filter, column, hasValue, label );
+    MediaSearch.filterNotNull( cond, filter, column, hasValue, label );
 
     for ( const [ k, v ] of [ [ 'equals', filter.equals ], [ 'min', filter.min ], [ 'max', filter.max ] ] as const ) {
       if ( v === undefined ) continue;
@@ -153,17 +150,16 @@ export class MediaSearch {
     if ( filter.min !== undefined && filter.max !== undefined && filter.min > filter.max )
       throw new Error( `${ label }.min cannot exceed max` );
 
-    if ( filter.equals !== undefined ) conditions.push( `${ column } = ?` ), values.push( filter.equals );
-    if ( filter.min !== undefined ) conditions.push( `${ column } >= ?` ), values.push( filter.min );
-    if ( filter.max !== undefined ) conditions.push( `${ column } <= ?` ), values.push( filter.max );
+    if ( filter.equals !== undefined ) cond.push( `${ column } = ?` ), values.push( filter.equals );
+    if ( filter.min !== undefined ) cond.push( `${ column } >= ?` ), values.push( filter.min );
+    if ( filter.max !== undefined ) cond.push( `${ column } <= ?` ), values.push( filter.max );
   }
 
   private static appendDateFilter (
-    conditions: string[], values: ( string | number )[], column: string,
-    filter: MediaSearchDateFilter, label: string
+    cond: string[], values: ( string | number )[], column: string, filter: MediaSearchDateFilter, label: string
   ) : void {
     const hasValue = [ filter.equals, filter.from, filter.to ].some( v => v !== undefined );
-    MediaSearch.filterNotNull( conditions, filter, column, hasValue, label );
+    MediaSearch.filterNotNull( cond, filter, column, hasValue, label );
 
     const equals = filter.equals === undefined ? undefined : MediaSearch.normalizeDate( filter.equals, label );
     const from = filter.from === undefined ? undefined : MediaSearch.normalizeDate( filter.from, `${ label }.from` );
@@ -172,21 +168,17 @@ export class MediaSearch {
     if ( from !== undefined && to !== undefined && from > to )
       throw new Error( `${ label }.from cannot be after to` );
 
-    if ( equals !== undefined ) conditions.push( `${ column } = ?` ), values.push( equals );
-    if ( from !== undefined ) conditions.push( `${ column } >= ?` ), values.push( from );
-    if ( to !== undefined ) conditions.push( `${ column } <= ?` ), values.push( to );
+    if ( equals !== undefined ) cond.push( `${ column } = ?` ), values.push( equals );
+    if ( from !== undefined ) cond.push( `${ column } >= ?` ), values.push( from );
+    if ( to !== undefined ) cond.push( `${ column } <= ?` ), values.push( to );
   }
 
   private static appendIn (
-    conditions: string[], values: ( string | number )[], column: string,
-    items: ( string | number )[], negate = false
+    cond: string[], values: ( string | number )[], column: string, items: ( string | number )[], negate = false
   ) : void {
-    if ( ! items.length ) {
-      if ( ! negate ) conditions.push( '0 = 1' );
-      return;
-    }
+    if ( ! items.length ) { if ( ! negate ) cond.push( '0 = 1' ); return }
 
-    conditions.push( `${ column } ${ negate ? 'NOT IN' : 'IN' } ( ${ items.map( () => '?' ).join( ', ' ) } )` );
+    cond.push( `${ column } ${ negate ? 'NOT IN' : 'IN' } ( ${ items.map( () => '?' ).join( ', ' ) } )` );
     values.push( ...items );
   }
 }
