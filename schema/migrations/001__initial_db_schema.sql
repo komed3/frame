@@ -37,9 +37,27 @@ CREATE TABLE roots (
   id INTEGER PRIMARY KEY,
   path TEXT NOT NULL UNIQUE,
   enabled INTEGER NOT NULL DEFAULT 1 CHECK ( enabled IN ( 0, 1 ) ),
+  scan_generation INTEGER NOT NULL DEFAULT 0 CHECK ( scan_generation >= 0 ),
   scanned_at TEXT,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
 );
+
+CREATE TABLE directories (
+  id INTEGER PRIMARY KEY,
+  root_id INTEGER NOT NULL REFERENCES roots ( id ) ON DELETE CASCADE,
+  parent_id INTEGER,
+  path TEXT NOT NULL,
+  name TEXT NOT NULL,
+  scan_generation INTEGER NOT NULL DEFAULT 0 CHECK ( scan_generation >= 0 ),
+  scanned_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+  created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
+
+  UNIQUE ( root_id, path ),
+  UNIQUE ( id, root_id ),
+  FOREIGN KEY ( parent_id, root_id ) REFERENCES directories ( id, root_id ) ON DELETE CASCADE
+);
+
+CREATE INDEX directories_parent_idx ON directories ( root_id, parent_id, name COLLATE NOCASE );
 
 CREATE TABLE media (
   id INTEGER PRIMARY KEY,
