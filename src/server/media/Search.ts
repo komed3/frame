@@ -6,6 +6,7 @@ import type {
   MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField,
   MediaSearchTrackFilter
 } from '@/src/shared/types/search';
+import { MEDIA_TYPES } from './Media';
 
 
 const MAX_LIMIT = 500;
@@ -416,5 +417,105 @@ export class MediaSearch {
       cond.push( expression );
       values.push( options.userId! );
     }
+  }
+
+  private static buildWhere ( options: MediaSearchOptions ) : { where: string; values: ( string | number )[]; hasQuery: boolean } {
+    const cond: string[] = [], values: ( string | number )[] = [];
+    const hasQuery = options.query !== undefined && options.query.trim().length > 0;
+
+    if ( hasQuery ) {
+      cond.push( 'media_fts MATCH ?' );
+      values.push( MediaSearch.buildFtsQuery( options.query!, validateEnum(
+        options.queryMode ?? 'all', 'query mode', [ 'all', 'any', 'phrase' ]
+      ) ) );
+    }
+
+    if ( options.ids !== undefined ) MediaSearch.appendIn(
+      cond, values, 'm.id', MediaSearch.normalizeIds( options.ids, 'media' )
+    );
+
+    if ( options.excludeIds !== undefined ) MediaSearch.appendIn(
+      cond, values, 'm.id', MediaSearch.normalizeIds( options.excludeIds, 'media' ), true
+    );
+
+    if ( options.rootIds !== undefined ) MediaSearch.appendIn(
+      cond, values, 'm.root_id', MediaSearch.normalizeIds( options.rootIds, 'media root' )
+    );
+
+    if ( options.types !== undefined ) {
+      if ( ! Array.isArray( options.types ) ) throw new Error( 'types must be an array' );
+
+      MediaSearch.appendIn( cond, values, 'm.type', [ ...new Set( options.types ) ].map(
+        type => validateEnum( type, 'media type', MEDIA_TYPES )
+      ) );
+    }
+
+    if ( options.available !== undefined ) {
+      if ( typeof options.available !== 'boolean' ) throw new Error( 'available must be a boolean' );
+
+      cond.push( 'm.available = ?' );
+      values.push( Number( options.available ) );
+    }
+
+    if ( options.rootEnabled !== undefined ) {
+      if ( typeof options.rootEnabled !== 'boolean' ) throw new Error( 'rootEnabled must be a boolean' );
+
+      cond.push( 'r.enabled = ?' );
+      values.push( Number( options.rootEnabled ) );
+    }
+
+    if ( options.text !== undefined ) {
+      for ( const [ field, filter ] of Object.entries( options.text ) ) {
+        if ( filter === undefined ) continue;
+
+        if ( ! Object.hasOwn( TEXT_COLUMNS, field ) ) throw new Error( `Invalid text search field: ${ field }` );
+        if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
+          throw new Error( `Invalid text filter: ${ field }` );
+
+        MediaSearch.appendTextFilter(
+          cond, values, TEXT_COLUMNS[ field as MediaSearchTextField ], filter, field
+        );
+      }
+    }
+
+    if ( options.numbers !== undefined ) {
+      for ( const [ field, filter ] of Object.entries( options.numbers ) ) {
+        if ( filter === undefined ) continue;
+
+        if ( ! Object.hasOwn( NUMBER_COLUMNS, field ) )
+          throw new Error( `Invalid numeric search field: ${ field }` );
+
+        if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
+          throw new Error( `Invalid numeric filter: ${ field }` );
+
+        MediaSearch.appendNumberFilter(
+          cond, values, NUMBER_COLUMNS[ field as MediaSearchNumberField ], filter, field
+        );
+      }
+    }
+
+    if ( options.dates !== undefined ) {
+      for ( const [ field, filter ] of Object.entries( options.dates ) ) {
+        if ( filter === undefined ) continue;
+
+        if ( ! Object.hasOwn( DATE_COLUMNS, field ) )
+          throw new Error( `Invalid date search field: ${ field }` );
+
+        if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
+          throw new Error( `Invalid date filter: ${ field }` );
+
+        MediaSearch.appendDateFilter(
+          cond, values, DATE_COLUMNS[ field as MediaSearchDateField ], filter, field
+        );
+      }
+    }
+
+    MediaSearch.appendTaxFilters( cond, values, options );
+    if ( options.metadata !== undefined ) MediaSearch.appendMetaFilters( cond, values, options.metadata );
+    if ( options.tracks !== undefined ) MediaSearch.appendTrackFilters( cond, values, options.tracks );
+    MediaSearch.appendAssetFilters( cond, values, options );
+    MediaSearch.appendUserFilters( cond, values, options );
+
+    return { where: cond.length ? `WHERE ${ cond.join( ' AND ' ) }` : '', values, hasQuery };
   }
 }
