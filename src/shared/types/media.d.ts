@@ -3,6 +3,7 @@ export type MediaType = 'video' | 'audio' | 'image' | 'text' | 'other';
 export interface MediaRecord {
   id: number;
   rootId: number;
+  directoryId: number | null;
   path: string;
   fileName: string;
   type: MediaType;
@@ -59,6 +60,7 @@ export type MediaUpdate = Partial< Pick< MediaRecord,
 
 export interface MediaListOptions {
   rootId?: number;
+  directoryId?: number | null;
   type?: MediaType;
   availableOnly?: boolean;
   limit?: number;
