@@ -176,4 +176,17 @@ export class MediaSearch {
     if ( from !== undefined ) conditions.push( `${ column } >= ?` ), values.push( from );
     if ( to !== undefined ) conditions.push( `${ column } <= ?` ), values.push( to );
   }
+
+  private static appendIn (
+    conditions: string[], values: ( string | number )[], column: string,
+    items: ( string | number )[], negate = false
+  ) : void {
+    if ( ! items.length ) {
+      if ( ! negate ) conditions.push( '0 = 1' );
+      return;
+    }
+
+    conditions.push( `${ column } ${ negate ? 'NOT IN' : 'IN' } ( ${ items.map( () => '?' ).join( ', ' ) } )` );
+    values.push( ...items );
+  }
 }
