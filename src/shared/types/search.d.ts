@@ -10,7 +10,6 @@ export type MediaSearchQueryMode = 'all' | 'any' | 'phrase';
 export type MediaSearchProgress = 'not-started' | 'started' | 'in-progress' | 'completed';
 export type MediaSearchAssetKind = 'poster' | 'thumb' | 'frames' | 'wave' | 'text' | 'subtitle';
 
-
 export interface MediaSearchStringFilter {
   equals?: string;
   contains?: string;
