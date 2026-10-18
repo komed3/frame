@@ -123,10 +123,17 @@ export class MediaSearch {
     MediaSearch.filterNotNull( cond, filter, column );
 
     for ( const [ key, operator ] of [ [ 'equals', '=' ], [ 'from', '>=' ], [ 'to', '<=' ] ] as const ) {
-      if ( filter[ key ] === undefined ) continue;
+      const value = filter[ key ];
+      if ( value === undefined ) continue;
+
+      if ( key === 'equals' && /^\d{4}-\d{2}-\d{2}$/.test( value.trim() ) ) {
+        cond.push( `( ${ column } >= ? AND ${ column } <= ? )` );
+        values.push( MediaSearch.normalizeDate( value ), MediaSearch.normalizeDate( value, true ) );
+        continue;
+      }
 
       cond.push( `${ column } ${ operator } ?` );
-      values.push( MediaSearch.normalizeDate( filter[ key ], key === 'to' ) );
+      values.push( MediaSearch.normalizeDate( value, key === 'to' ) );
     }
   }
 
