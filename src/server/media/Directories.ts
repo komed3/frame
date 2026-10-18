@@ -5,8 +5,10 @@ import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow } from '@/s
 
 export class MediaDirectories {
   private static mapRow ( row: MediaDirectoryRow ) : MediaDirectory {
-    const { scanGeneration, ...directory } = row;
-    return directory;
+    return {
+      id: row.id, rootId: row.rootId, parentId: row.parentId, path: row.path,
+      name: row.name, scannedAt: row.scannedAt, createdAt: row.createdAt
+    };
   }
 
   private static assertGeneration ( rootId: number, scanGeneration: number ) : void {
