@@ -519,4 +519,51 @@ export class MediaSearch {
 
     return { where: cond.length ? `WHERE ${ cond.join( ' AND ' ) }` : '', values, hasQuery };
   }
+
+  public static search ( options: MediaSearchOptions = {} ) : MediaSearchResult {
+    const { limit = 100, offset = 0, sortBy = 'title', sortDirection = 'asc' } = options;
+    assertLimitOffset( limit, offset );
+    if ( limit > MAX_LIMIT ) throw new Error( `Search limit cannot exceed ${ MAX_LIMIT }` );
+
+    const direction = validateEnum( sortDirection, 'sort direction', [ 'asc', 'desc' ] );
+    const sort = validateEnum( sortBy, 'sort field', [ ...Object.keys( SORT_COLUMNS ), 'relevance' ] ) as MediaSearchSort;
+    const { where, values, hasQuery } = MediaSearch.buildWhere( options );
+
+    if ( sort === 'relevance' && ! hasQuery ) throw new Error( 'Relevance sorting requires a full-text search query' );
+
+    const from = `
+      FROM media m
+      JOIN roots r ON r.id = m.root_id
+      ${ hasQuery ? 'JOIN media_fts ON media_fts.rowid = m.id' : '' }
+    `;
+
+    const totalRow = as< { total: number } >( conn().prepare(
+      `SELECT COUNT(*) AS total ${ from } ${ where }`
+    ).get( ...values ) );
+
+    const sortExpression = sort === 'relevance' ? 'bm25( media_fts )' : SORT_COLUMNS[ sort ];
+    const orderBy = `
+      ORDER BY
+        CASE WHEN ( ${ sortExpression } ) IS NULL THEN 1 ELSE 0 END ASC,
+        ${ sortExpression } ${ direction },
+        m.id ASC
+    `;
+
+    const rows = as< MediaRow[] >( conn().prepare( `
+      SELECT
+        m.id, m.root_id AS rootId, m.path, m.file_name AS fileName, m.type,
+        m.mime_type AS mimeType, m.size_bytes AS sizeBytes,
+        m.modified_at AS modifiedAt, m.file_hash AS fileHash, m.fingerprint,
+        m.available, m.title, m.description, m.creator, m.rating,
+        m.released_at AS releasedAt, m.recorded_at AS recordedAt, m.language,
+        m.duration_ms AS durationMs, m.width, m.height, m.fps, m.bitrate,
+        m.container, m.video_codec AS videoCodec, m.audio_codec AS audioCodec,
+        m.sample_rate AS sampleRate, m.channels, m.encoding,
+        m.data_json AS dataJson, m.scanned_at AS scannedAt,
+        m.created_at AS createdAt, m.updated_at AS updatedAt
+      ${ from } ${ where } ${ orderBy } LIMIT ? OFFSET ?
+    ` ).all( ...values, limit, offset ) );
+
+    return { items: rows.map( r => MediaSearch.mapRow( r ) ), total: totalRow.total, limit, offset };
+  }
 }
