@@ -181,4 +181,47 @@ export class MediaSearch {
     cond.push( `${ column } ${ negate ? 'NOT IN' : 'IN' } ( ${ items.map( () => '?' ).join( ', ' ) } )` );
     values.push( ...items );
   }
+
+  private static appendTaxFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+    const tagIds = options.tagIds ? MediaSearch.normalizeIds( options.tagIds, 'tag' ) : [];
+    const exTagIds = options.excludeTagIds ? MediaSearch.normalizeIds( options.excludeTagIds, 'tag' ) : [];
+    const catIds = options.categoryIds ? MediaSearch.normalizeIds( options.categoryIds, 'category' ) : [];
+    const exCatIds = options.excludeCategoryIds ? MediaSearch.normalizeIds( options.excludeCategoryIds, 'category' ) : [];
+
+    const appendExists = ( ids: ( string | number )[], table: string, mode: string ) => {
+      if ( mode === 'all' ) ids.forEach( id => {
+        cond.push( `EXISTS ( SELECT 1 FROM ${ table } WHERE media_id = m.id AND id = ? )` );
+        values.push( id );
+      } );
+
+      else {
+        cond.push( `EXISTS ( SELECT 1 FROM ${ table } WHERE media_id = m.id AND id IN ( ${
+          ids.map( () => '?' ).join( ', ' )
+        } ) )` );
+        values.push( ...ids );
+      }
+    };
+
+    if ( tagIds.length ) appendExists( tagIds, 'media_tags', validateEnum(
+      options.tagMode ?? 'any', 'tag mode', [ 'any', 'all' ]
+    ) );
+
+    if ( exTagIds.length ) {
+      cond.push( `NOT EXISTS ( SELECT 1 FROM media_tags WHERE media_id = m.id AND tag_id IN ( ${
+        exTagIds.map( () => '?' ).join( ', ' )
+      } ) )` );
+      values.push( ...exTagIds );
+    }
+
+    if ( catIds.length ) appendExists( catIds, 'media_categories', validateEnum(
+      options.categoryMode ?? 'any', 'category mode', ['any', 'all']
+    ) );
+
+    if ( exCatIds.length ) {
+      cond.push( `NOT EXISTS ( SELECT 1 FROM media_categories WHERE media_id = m.id AND category_id IN ( ${
+        exCatIds.map( () => '?' ).join( ', ' )
+      } ) )` );
+      values.push( ...exCatIds );
+    }
+  }
 }
