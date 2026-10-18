@@ -233,7 +233,9 @@ export class MediaSearch {
 
     for ( const filter of filters ) {
       const key = normalizeString( filter.key, 'Metadata key' );
-      const match = validateEnum( filter.match ?? 'exact', 'metadata match', [ 'exact', 'contains', 'startsWith' ] );
+      const match = validateEnum( filter.match ?? 'exact', 'metadata match', [
+        'exact', 'contains', 'startsWith'
+      ] );
 
       cond.push( `
         EXISTS (
@@ -297,8 +299,10 @@ export class MediaSearch {
         [ 'maxHeight', 'height' ], [ 'minChannels', 'channels' ], [ 'maxChannels', 'channels' ]
       ] as const ) {
         const value = filter[ key ];
+
         if ( value === undefined ) continue;
-        if ( ! Number.isFinite( value ) || value < 0 ) throw new Error( `Track ${ key } must be a non-negative number` );
+        if ( ! Number.isFinite( value ) || value < 0 )
+          throw new Error( `Track ${ key } must be a non-negative number` );
 
         parts.push( `t.${ column } ${ key.startsWith( 'min' ) ? '>=' : '<=' } ?` );
         values.push( value );
@@ -316,7 +320,9 @@ export class MediaSearch {
   }
 
   private static appendAssetFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
-    for ( const [ key, mode ] of [ [ 'assetKindsAny', 'any' ], [ 'assetKindsAll', 'all' ], [ 'missingAssetKinds', 'missing' ] ] as const ) {
+    for ( const [ key, mode ] of [
+      [ 'assetKindsAny', 'any' ], [ 'assetKindsAll', 'all' ], [ 'missingAssetKinds', 'missing' ]
+    ] as const ) {
       const kinds = options[ key ];
       if ( kinds === undefined ) continue;
       if ( ! Array.isArray( kinds ) ) throw new Error( `${ key } must be an array` );
@@ -338,6 +344,77 @@ export class MediaSearch {
         ` );
         values.push( ...uniqueKinds );
       }
+    }
+  }
+
+  private static appendUserFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+    const needsUser = options.favorite !== undefined || options.played !== undefined || options.progress !== undefined;
+    if ( options.userId !== undefined ) assertId( options.userId, 'user' );
+
+    if ( needsUser && options.userId === undefined )
+      throw new Error( 'userId is required for favorite, played or progress filters' );
+
+    if ( options.favorite !== undefined ) {
+      if ( typeof options.favorite !== 'boolean' ) throw new Error( 'favorite must be a boolean' );
+
+      cond.push( `
+        ${ options.favorite ? 'EXISTS' : 'NOT EXISTS' } (
+          SELECT 1 FROM favorites f
+          WHERE f.user_id = ? AND f.media_id = m.id
+        )
+      ` );
+      values.push( options.userId! );
+    }
+
+    if ( options.played !== undefined ) {
+      if ( typeof options.played !== 'boolean' ) throw new Error( 'played must be a boolean' );
+
+      cond.push( `
+        ${ options.played ? 'EXISTS' : 'NOT EXISTS' } (
+          SELECT 1 FROM plays p
+          WHERE p.user_id = ? AND p.media_id = m.id
+        )
+      ` );
+      values.push( options.userId! );
+    }
+
+    if ( options.progress !== undefined ) {
+      const progress = validateEnum( options.progress, 'progress', [
+        'not-started', 'started', 'in-progress', 'completed'
+      ] );
+
+      const expression = {
+        'not-started': `
+          NOT EXISTS (
+            SELECT 1 FROM progress p
+            WHERE p.user_id = ? AND p.media_id = m.id
+              AND ( p.position_ms > 0 OR p.completed = 1 )
+          )
+        `,
+        started: `
+          EXISTS (
+            SELECT 1 FROM progress p
+            WHERE p.user_id = ? AND p.media_id = m.id
+              AND ( p.position_ms > 0 OR p.completed = 1 )
+          )
+        `,
+        'in-progress': `
+          EXISTS (
+            SELECT 1 FROM progress p
+            WHERE p.user_id = ? AND p.media_id = m.id
+              AND p.position_ms > 0 AND p.completed = 0
+          )
+        `,
+        completed: `
+          EXISTS (
+            SELECT 1 FROM progress p
+            WHERE p.user_id = ? AND p.media_id = m.id AND p.completed = 1
+          )
+        `
+      }[ progress ];
+
+      cond.push( expression );
+      values.push( options.userId! );
     }
   }
 }
