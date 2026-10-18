@@ -62,6 +62,7 @@ CREATE INDEX directories_parent_idx ON directories ( root_id, parent_id, name CO
 CREATE TABLE media (
   id INTEGER PRIMARY KEY,
   root_id INTEGER NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
+  directory_id INTEGER REFERENCES directories ( id ) ON DELETE SET NULL,
   path TEXT NOT NULL,
   file_name TEXT NOT NULL,
 
@@ -108,6 +109,7 @@ CREATE TABLE media (
 
 CREATE INDEX media_type_available_idx ON media ( type, available );
 CREATE INDEX media_root_idx ON media ( root_id );
+CREATE INDEX media_directory_idx ON media ( root_id, directory_id );
 CREATE INDEX media_file_name_idx ON media ( file_name COLLATE NOCASE );
 CREATE INDEX media_title_idx ON media ( title COLLATE NOCASE );
 CREATE INDEX media_creator_idx ON media ( creator COLLATE NOCASE );
