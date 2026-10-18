@@ -1,9 +1,9 @@
 import { assertId, normalizeString } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
-  MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike, MediaSearchNumberField,
-  MediaSearchNumberFilter, MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter,
-  MediaSearchTextField
+  MediaSearchAssetKind, MediaSearchDateField, MediaSearchDateFilter, MediaSearchFilterLike,
+  MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchQueryMode, MediaSearchSort,
+  MediaSearchStringFilter, MediaSearchTextField
 } from '@/src/shared/types/search';
 
 
@@ -156,5 +156,24 @@ export class MediaSearch {
     if ( filter.equals !== undefined ) conditions.push( `${ column } = ?` ), values.push( filter.equals );
     if ( filter.min !== undefined ) conditions.push( `${ column } >= ?` ), values.push( filter.min );
     if ( filter.max !== undefined ) conditions.push( `${ column } <= ?` ), values.push( filter.max );
+  }
+
+  private static appendDateFilter (
+    conditions: string[], values: ( string | number )[], column: string,
+    filter: MediaSearchDateFilter, label: string
+  ) : void {
+    const hasValue = [ filter.equals, filter.from, filter.to ].some( v => v !== undefined );
+    MediaSearch.filterNotNull( conditions, filter, column, hasValue, label );
+
+    const equals = filter.equals === undefined ? undefined : MediaSearch.normalizeDate( filter.equals, label );
+    const from = filter.from === undefined ? undefined : MediaSearch.normalizeDate( filter.from, `${ label }.from` );
+    const to = filter.to === undefined ? undefined : MediaSearch.normalizeDate( filter.to, `${ label }.to`, true );
+
+    if ( from !== undefined && to !== undefined && from > to )
+      throw new Error( `${ label }.from cannot be after to` );
+
+    if ( equals !== undefined ) conditions.push( `${ column } = ?` ), values.push( equals );
+    if ( from !== undefined ) conditions.push( `${ column } >= ?` ), values.push( from );
+    if ( to !== undefined ) conditions.push( `${ column } <= ?` ), values.push( to );
   }
 }
