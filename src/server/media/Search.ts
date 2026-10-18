@@ -391,15 +391,13 @@ export class MediaSearch {
 
     const rows = as< MediaRow[] >( conn().prepare( `
       SELECT
-        m.id, m.root_id AS rootId, m.path, m.file_name AS fileName, m.type,
-        m.mime_type AS mimeType, m.size_bytes AS sizeBytes,
-        m.modified_at AS modifiedAt, m.file_hash AS fileHash, m.fingerprint,
-        m.available, m.title, m.description, m.creator, m.rating,
-        m.released_at AS releasedAt, m.recorded_at AS recordedAt, m.language,
-        m.duration_ms AS durationMs, m.width, m.height, m.fps, m.bitrate,
-        m.container, m.video_codec AS videoCodec, m.audio_codec AS audioCodec,
-        m.sample_rate AS sampleRate, m.channels, m.encoding,
-        m.data_json AS dataJson, m.scanned_at AS scannedAt,
+        m.id, m.root_id AS rootId, m.directory_id AS directoryId, m.path, m.file_name AS fileName,
+        m.type, m.mime_type AS mimeType, m.size_bytes AS sizeBytes, m.modified_at AS modifiedAt,
+        m.file_hash AS fileHash, m.fingerprint, m.available, m.title, m.description, m.creator,
+        m.rating, m.released_at AS releasedAt, m.recorded_at AS recordedAt, m.language,
+        m.duration_ms AS durationMs, m.width, m.height, m.fps, m.bitrate, m.container,
+        m.video_codec AS videoCodec, m.audio_codec AS audioCodec, m.sample_rate AS sampleRate,
+        m.channels, m.encoding, m.data_json AS dataJson, m.scanned_at AS scannedAt,
         m.created_at AS createdAt, m.updated_at AS updatedAt
       ${ from } ${ where }
       ORDER BY
