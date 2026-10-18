@@ -37,4 +37,38 @@ export class MediaDirectories {
 
     return row ? MediaDirectories.mapRow( row ) : null;
   }
+
+  public static list ( rootId: number, parentId: number | null = null ) : MediaDirectoryEntry[] {
+    assertId( rootId, 'media root' );
+    if ( parentId !== null ) assertId( parentId, 'media directory' );
+
+    return as< MediaDirectoryEntry[] >( conn().prepare( `
+      WITH RECURSIVE tree ( id, top_id ) AS (
+        SELECT id, id
+        FROM directories
+        WHERE root_id = ? AND parent_id IS ?
+
+        UNION ALL
+
+        SELECT d.id, tree.top_id
+        FROM directories d
+        JOIN tree ON d.parent_id = tree.id
+        WHERE d.root_id = ?
+      ),
+      counts AS (
+        SELECT tree.top_id AS directoryId, COUNT( m.id ) AS mediaCount
+        FROM tree
+        LEFT JOIN media m ON m.directory_id = tree.id
+        GROUP BY tree.top_id
+      )
+      SELECT
+        d.id, d.root_id AS rootId, d.parent_id AS parentId, d.path, d.name,
+        d.scanned_at AS scannedAt, d.created_at AS createdAt,
+        COALESCE( counts.mediaCount, 0 ) AS mediaCount
+      FROM directories d
+      LEFT JOIN counts ON counts.directoryId = d.id
+      WHERE d.root_id = ? AND d.parent_id IS ?
+      ORDER BY d.name COLLATE NOCASE, d.id
+    ` ).all( rootId, parentId, rootId, rootId, parentId ) );
+  }
 }
