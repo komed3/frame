@@ -1,9 +1,9 @@
+import { assertId, normalizeString } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
-  MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchQueryMode,
-  MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
+  MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchNumberFilter,
+  MediaSearchQueryMode, MediaSearchSort, MediaSearchStringFilter, MediaSearchTextField
 } from '@/src/shared/types/search';
-import { assertId, normalizeString } from '@/src/server/utils';
 
 
 const MAX_LIMIT = 500;
@@ -127,6 +127,43 @@ export class MediaSearch {
     if ( filter.endsWith !== undefined ) {
       conditions.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
       values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.endsWith, label ) ) }` );
+    }
+  }
+
+  private static appendNumberFilter (
+    conditions: string[], values: ( string | number )[], column: string,
+    filter: MediaSearchNumberFilter, label: string
+  ) : void {
+    const hasValue = [ filter.equals, filter.min, filter.max ].some( v => v !== undefined );
+
+    if ( filter.isNull !== undefined ) {
+      if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
+      if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with numeric conditions` );
+
+      conditions.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
+    }
+
+    for ( const [ k, v ] of [ [ 'equals', filter.equals ], [ 'min', filter.min ], [ 'max', filter.max ] ] as const ) {
+      if ( v === undefined ) continue;
+      if ( typeof v !== 'number' || ! Number.isFinite( v ) ) throw new Error( `${ label }.${ k } must be a finite number` );
+    }
+
+    if ( filter.min !== undefined && filter.max !== undefined && filter.min > filter.max )
+      throw new Error( `${ label }.min cannot exceed max` );
+
+    if ( filter.equals !== undefined ) {
+      conditions.push( `${ column } = ?` );
+      values.push( filter.equals );
+    }
+
+    if ( filter.min !== undefined ) {
+      conditions.push( `${ column } >= ?` );
+      values.push( filter.min );
+    }
+
+    if ( filter.max !== undefined ) {
+      conditions.push( `${ column } <= ?` );
+      values.push( filter.max );
     }
   }
 }
