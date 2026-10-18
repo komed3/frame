@@ -3,6 +3,7 @@ import type {
   MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchSort,
   MediaSearchTextField
 } from '@/src/shared/types/search';
+import { assertId } from '../utils';
 
 
 const MAX_LIMIT = 500;
@@ -52,5 +53,15 @@ export class MediaSearch {
       throw new Error( `Invalid media data JSON for media ${ row.id }` );
 
     return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
+  }
+
+  private static normalizeIds ( ids: number[], label: string ) : number[] {
+    if ( ! Array.isArray( ids ) ) throw new Error( `${ label } must be an array` );
+
+    const uniqueIds = [ ...new Set( ids ) ];
+    uniqueIds.forEach( id => assertId( id, label ) );
+
+    if ( uniqueIds.length > 500 ) throw new Error( `${ label } cannot contain more than 500 IDs` );
+    return uniqueIds;
   }
 }
