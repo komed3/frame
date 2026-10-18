@@ -1,4 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
+import { assertLimitOffset } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchDateFilter as DF, MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike,
@@ -355,9 +356,11 @@ export class MediaSearch {
   }
 
   public static search ( options: O = {} ) : MediaSearchResult {
-    const limit = Math.min( MAX_LIMIT, Math.max( 1, options.limit ?? 100 ) );
-    const offset = Math.max( 0, options.offset ?? 0 ), sortBy = options.sortBy ?? 'title';
-    const direction = options.sortDirection === 'desc' ? 'DESC' : 'ASC';
+    let limit = options.limit ?? 100, offset = options.offset ?? 0;
+    assertLimitOffset( limit, offset );
+
+    limit = Math.min( MAX_LIMIT, limit );
+    const sortBy = options.sortBy ?? 'title', direction = options.sortDirection === 'desc' ? 'DESC' : 'ASC';
     const { where, values, hasQuery } = MediaSearch.buildWhere( options );
 
     const sortExpression = sortBy === 'relevance' && hasQuery ? 'bm25( media_fts )'
