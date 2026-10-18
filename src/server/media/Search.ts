@@ -60,13 +60,15 @@ export class MediaSearch {
     return [ ...new Set( ids ) ];
   }
 
-  private static normalizeDate ( value: string | number, endOfDay = false ) : string {
-    if ( typeof value === 'number' ) return new Date( value ).toISOString();
-
+  private static normalizeDate ( value: string, endOfDay = false ) : string {
     const d = value.trim().replace( ' ', 'T' );
-    if ( /^\d{4}-\d{2}-\d{2}$/.test( d ) ) return `${ d }T${ endOfDay ? '23:59:59.999' : '00:00:00.000' }Z`;
+    const date = /^\d{4}-\d{2}-\d{2}/.exec( d )?.[ 0 ];
 
-    return new Date( Date.parse( /(?:Z|[+-]\d{2}:?\d{2})$/i.test( d ) ? d : `${ d }Z` ) ).toISOString();
+    if ( date && new Date( `${ date }T00:00:00.000Z` ).toISOString().slice( 0, 10 ) !== date ) 
+      throw new Error( `Invalid date: ${ value }` );
+
+    return /^\d{4}-\d{2}-\d{2}$/.test( d ) ? `${ d }T${ endOfDay ? '23:59:59.999' : '00:00:00.000' }Z`
+      : new Date( Date.parse( /(?:Z|[+-]\d{2}:?\d{2})$/i.test( d ) ? d : `${ d }Z` ) ).toISOString();
   }
 
   private static escapeLike ( value: string ) : string {
