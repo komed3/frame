@@ -51,7 +51,6 @@ const ASSET_KINDS: MediaSearchAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave
 export class MediaSearch {
   private static mapRow ( row: MediaRow ) : MediaRecord {
     const data = JSON.parse( row.dataJson ) as unknown;
-
     if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
       throw new Error( `Invalid media data JSON for media ${ row.id }` );
 
