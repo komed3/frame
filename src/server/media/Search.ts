@@ -1,12 +1,10 @@
 import { as, conn } from '@/src/server/core/Database';
-import { MEDIA_TYPES } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, normalizeString, validateEnum } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
-  MediaSearchAssetKind, MediaSearchDateField, MediaSearchDateFilter, MediaSearchFilterLike,
-  MediaSearchMetadataFilter, MediaSearchNumberField, MediaSearchNumberFilter, MediaSearchOptions,
-  MediaSearchQueryMode, MediaSearchResult, MediaSearchSort, MediaSearchStringFilter,
-  MediaSearchTextField, MediaSearchTrackFilter
+  MediaSearchDateFilter as DF, MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike,
+  MediaSearchNumberField, MediaSearchQueryMode, MediaSearchResult, MediaSearchSort, MediaSearchTextField,
+  MediaSearchMetadataFilter as MF, MediaSearchNumberFilter as NF, MediaSearchOptions as O,
+  MediaSearchStringFilter as SF, MediaSearchTrackFilter as TF
 } from '@/src/shared/types/search';
 
 
@@ -51,34 +49,23 @@ const ASSET_KINDS: MediaSearchAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave
 
 export class MediaSearch {
   private static mapRow ( row: MediaRow ) : MediaRecord {
-    const data = JSON.parse( row.dataJson ) as unknown;
-
-    if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
-      throw new Error( `Invalid media data JSON for media ${ row.id }` );
-
-    return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
+    return {
+      ...row, available: Boolean( row.available ),
+      data: JSON.parse( row.dataJson ) as Record< string, unknown >
+    };
   }
 
-  private static normalizeIds ( ids: number[], label: string ) : number[] {
-    if ( ! Array.isArray( ids ) ) throw new Error( `${ label } must be an array` );
-
-    const uniqueIds = [ ...new Set( ids ) ];
-    uniqueIds.forEach( id => assertId( id, label ) );
-
-    if ( uniqueIds.length > 500 ) throw new Error( `${ label } cannot contain more than 500 IDs` );
-    return uniqueIds;
+  private static normalizeIds ( ids: number[] ) : number[] {
+    return [ ...new Set( ids ) ];
   }
 
-  private static normalizeDate ( value: string, label: string, endOfDay = false ) : string {
-    const normalized = normalizeString( value, label );
+  private static normalizeDate ( value: string | number, endOfDay = false ) : string {
+    if ( typeof value === 'number' ) return new Date( value ).toISOString();
 
-    if ( ! Number.isFinite( Date.parse( normalized ) ) )
-      throw new Error( `Invalid ${ label }: ${ normalized }` );
+    const d = value.trim().replace( ' ', 'T' );
+    if ( /^\d{4}-\d{2}-\d{2}$/.test( d ) ) return `${ d }T${ endOfDay ? '23:59:59.999' : '00:00:00.000' }Z`;
 
-    if ( /^\d{4}-\d{2}-\d{2}$/.test( normalized ) )
-      return `${ normalized }T${ endOfDay ? '23:59:59.999' : '00:00:00.000' }Z`;
-
-    return normalized;
+    return new Date( Date.parse( /(?:Z|[+-]\d{2}:?\d{2})$/i.test( d ) ? d : `${ d }Z` ) ).toISOString();
   }
 
   private static escapeLike ( value: string ) : string {
@@ -86,100 +73,63 @@ export class MediaSearch {
   }
 
   private static buildFtsQuery ( query: string, mode: MediaSearchQueryMode ) : string {
-    const value = normalizeString( query, 'Search query' );
+    const value = query.trim();
+    if ( ! value ) return '';
 
-    if ( mode === 'phrase' ) {
-      if ( ! /[\p{L}\p{N}]/u.test( value ) ) throw new Error( 'Search query contains no searchable terms' );
-      return `"${ value.replace( /"/g, '""' ) }"`;
-    }
+    if ( mode === 'phrase' ) return /[\p{L}\p{N}]/u.test( value ) ? `"${ value.replace( /"/g, '""' ) }"` : '';
 
     const terms = value.match( /[\p{L}\p{N}_]+/gu ) ?? [];
-    if ( ! terms.length ) throw new Error( 'Search query contains no searchable terms' );
-
-    const operator = mode === 'all' ? ' AND ' : ' OR ';
-    return terms.map( term => `"${ term.replace( /"/g, '""' ) }"*` ).join( operator );
+    return terms.map( term => `"${ term }"*` ).join( mode === 'any' ? ' OR ' : ' AND ' );
   }
 
-  private static assertFilterArray ( filters: unknown[] ) : void {
-    if ( ! Array.isArray( filters ) ) throw new Error( 'Track filters must be an array' );
+  private static filterNotNull ( cond: string[], filter: MediaSearchFilterLike, column: string ) : void {
+    if ( filter.isNull !== undefined ) cond.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
   }
 
-  private static filterNN ( cond: string[], filter: MediaSearchFilterLike, column: string, hasValue: boolean, label: string ) : void {
-    if ( filter.isNull === undefined ) return;
-    if ( typeof filter.isNull !== 'boolean' ) throw new Error( `${ label }.isNull must be a boolean` );
-    if ( filter.isNull && hasValue ) throw new Error( `${ label } cannot combine isNull with text conditions` );
+  private static textFilter ( cond: string[], values: ( string | number )[], column: string, filter: SF ) : void {
+    MediaSearch.filterNotNull( cond, filter, column );
 
-    cond.push( `${ column } IS ${ filter.isNull ? '' : 'NOT ' }NULL` );
-  }
+    for ( const key of [ 'equals', 'contains', 'startsWith', 'endsWith' ] as const ) {
+      if ( filter[ key ] === undefined ) continue;
 
-  private static textFilter (
-    cond: string[], values: ( string | number )[], column: string, filter: MediaSearchStringFilter, label: string
-  ) : void {
-    const hasValue = [ filter.equals, filter.contains, filter.startsWith, filter.endsWith ].some( v => v !== undefined );
-    MediaSearch.filterNN( cond, filter, column, hasValue, label );
+      const value = filter[ key ];
+      const escaped = MediaSearch.escapeLike( value.trim() );
 
-    if ( filter.equals !== undefined ) {
-      cond.push( `${ column } = ? COLLATE NOCASE` );
-      values.push( normalizeString( filter.equals, label ) );
-    }
+      cond.push( key === 'equals' ? `${ column } = ? COLLATE NOCASE`
+        : `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE`
+      );
 
-    if ( filter.contains !== undefined ) {
-      cond.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
-      values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.contains, label ) ) }%` );
-    }
-
-    if ( filter.startsWith !== undefined ) {
-      cond.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
-      values.push( `${ MediaSearch.escapeLike( normalizeString( filter.startsWith, label ) ) }%` );
-    }
-
-    if ( filter.endsWith !== undefined ) {
-      cond.push( `${ column } LIKE ? ESCAPE '\\' COLLATE NOCASE` );
-      values.push( `%${ MediaSearch.escapeLike( normalizeString( filter.endsWith, label ) ) }` );
+      values.push( key === 'equals' ? value.trim() : key === 'contains' ? `%${ escaped }%`
+        : key === 'startsWith' ? `${ escaped }%` : `%${ escaped }`
+      );
     }
   }
 
-  private static numberFilter (
-    cond: string[], values: ( string | number )[], column: string, filter: MediaSearchNumberFilter, label: string
-  ) : void {
-    const hasValue = [ filter.equals, filter.min, filter.max ].some( v => v !== undefined );
-    MediaSearch.filterNN( cond, filter, column, hasValue, label );
+  private static numberFilter ( cond: string[], values: ( string | number )[], column: string, filter: NF ) : void {
+    MediaSearch.filterNotNull( cond, filter, column );
 
-    for ( const [ k, v ] of [ [ 'equals', filter.equals ], [ 'min', filter.min ], [ 'max', filter.max ] ] as const ) {
-      if ( v === undefined ) continue;
+    for ( const [ key, operator ] of [ [ 'equals', '=' ], [ 'min', '>=' ], [ 'max', '<=' ] ] as const ) {
+      if ( filter[ key ] === undefined ) continue;
 
-      if ( typeof v !== 'number' || ! Number.isFinite( v ) )
-        throw new Error( `${ label }.${ k } must be a finite number` );
+      cond.push( `${ column } ${ operator } ?` );
+      values.push( filter[ key ] );
     }
-
-    if ( filter.min !== undefined && filter.max !== undefined && filter.min > filter.max )
-      throw new Error( `${ label }.min cannot exceed max` );
-
-    if ( filter.equals !== undefined ) cond.push( `${ column } = ?` ), values.push( filter.equals );
-    if ( filter.min !== undefined ) cond.push( `${ column } >= ?` ), values.push( filter.min );
-    if ( filter.max !== undefined ) cond.push( `${ column } <= ?` ), values.push( filter.max );
   }
 
-  private static dateFilter (
-    cond: string[], values: ( string | number )[], column: string, filter: MediaSearchDateFilter, label: string
-  ) : void {
-    const hasValue = [ filter.equals, filter.from, filter.to ].some( v => v !== undefined );
-    MediaSearch.filterNN( cond, filter, column, hasValue, label );
+  private static dateFilter ( cond: string[], values: ( string | number )[], column: string, filter: DF ) : void {
+    MediaSearch.filterNotNull( cond, filter, column );
 
-    const equals = filter.equals === undefined ? undefined : MediaSearch.normalizeDate( filter.equals, label );
-    const from = filter.from === undefined ? undefined : MediaSearch.normalizeDate( filter.from, `${ label }.from` );
-    const to = filter.to === undefined ? undefined : MediaSearch.normalizeDate( filter.to, `${ label }.to`, true );
+    for ( const [ key, operator ] of [ [ 'equals', '=' ], [ 'from', '>=' ], [ 'to', '<=' ] ] as const ) {
+      if ( filter[ key ] === undefined ) continue;
 
-    if ( from !== undefined && to !== undefined && from > to )
-      throw new Error( `${ label }.from cannot be after to` );
-
-    if ( equals !== undefined ) cond.push( `${ column } = ?` ), values.push( equals );
-    if ( from !== undefined ) cond.push( `${ column } >= ?` ), values.push( from );
-    if ( to !== undefined ) cond.push( `${ column } <= ?` ), values.push( to );
+      cond.push( `${ column } ${ operator } ?` );
+      values.push( MediaSearch.normalizeDate( filter[ key ], key === 'to' ) );
+    }
   }
 
   private static appendIn (
-    cond: string[], values: ( string | number )[], column: string, items: ( string | number )[], negate = false
+    cond: string[], values: ( string | number )[], column: string,
+    items: ( string | number )[], negate = false
   ) : void {
     if ( ! items.length ) { if ( ! negate ) cond.push( '0 = 1' ); return }
 
@@ -187,57 +137,46 @@ export class MediaSearch {
     values.push( ...items );
   }
 
-  private static taxFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
-    const tagIds = options.tagIds ? MediaSearch.normalizeIds( options.tagIds, 'tag' ) : [];
-    const exTagIds = options.excludeTagIds ? MediaSearch.normalizeIds( options.excludeTagIds, 'tag' ) : [];
-    const catIds = options.categoryIds ? MediaSearch.normalizeIds( options.categoryIds, 'category' ) : [];
-    const exCatIds = options.excludeCategoryIds ? MediaSearch.normalizeIds( options.excludeCategoryIds, 'category' ) : [];
+  private static taxFilters ( cond: string[], values: ( string | number )[], options: O ) : void {
+    const append = ( ids: number[] | undefined, table: string, key: string, mode: string ) => {
+      if ( ! ids?.length ) return;
+      const uniqueIds = MediaSearch.normalizeIds( ids );
 
-    const appendExists = ( ids: ( string | number )[], table: string, mode: string ) => {
-      if ( mode === 'all' ) ids.forEach( id => {
-        cond.push( `EXISTS ( SELECT 1 FROM ${ table } WHERE media_id = m.id AND id = ? )` );
+      if ( mode === 'all' ) uniqueIds.forEach( id => {
+        cond.push( `EXISTS ( SELECT 1 FROM ${ table } WHERE media_id = m.id AND ${ key } = ? )` );
         values.push( id );
       } );
 
       else {
-        cond.push( `EXISTS ( SELECT 1 FROM ${ table } WHERE media_id = m.id AND id IN ( ${
-          ids.map( () => '?' ).join( ', ' )
-        } ) )` );
-        values.push( ...ids );
+        cond.push( `EXISTS (
+          SELECT 1 FROM ${ table }
+          WHERE media_id = m.id AND ${ key } IN ( ${ uniqueIds.map( () => '?' ).join( ', ' ) } )
+        )` );
+        values.push( ...uniqueIds );
       }
     };
 
-    if ( tagIds.length ) appendExists( tagIds, 'media_tags', validateEnum(
-      options.tagMode ?? 'any', 'tag mode', [ 'any', 'all' ]
-    ) );
+    append( options.tagIds, 'media_tags', 'tag_id', options.tagMode ?? 'any' );
+    append( options.categoryIds, 'media_categories', 'category_id', options.categoryMode ?? 'any' );
 
-    if ( exTagIds.length ) {
-      cond.push( `NOT EXISTS ( SELECT 1 FROM media_tags WHERE media_id = m.id AND tag_id IN ( ${
-        exTagIds.map( () => '?' ).join( ', ' )
-      } ) )` );
-      values.push( ...exTagIds );
-    }
+    for ( const [ ids, table, key ] of [
+      [ options.excludeTagIds, 'media_tags', 'tag_id' ],
+      [ options.excludeCategoryIds, 'media_categories', 'category_id' ]
+    ] as const ) {
+      if ( ! ids?.length ) continue;
+      const uniqueIds = MediaSearch.normalizeIds( ids );
 
-    if ( catIds.length ) appendExists( catIds, 'media_categories', validateEnum(
-      options.categoryMode ?? 'any', 'category mode', ['any', 'all']
-    ) );
-
-    if ( exCatIds.length ) {
-      cond.push( `NOT EXISTS ( SELECT 1 FROM media_categories WHERE media_id = m.id AND category_id IN ( ${
-        exCatIds.map( () => '?' ).join( ', ' )
-      } ) )` );
-      values.push( ...exCatIds );
+      cond.push( `NOT EXISTS (
+        SELECT 1 FROM ${ table }
+        WHERE media_id = m.id AND ${ key } IN ( ${ uniqueIds.map( () => '?' ).join( ', ' ) } )
+      )` );
+      values.push( ...uniqueIds );
     }
   }
 
-  private static metaFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchMetadataFilter[] ) : void {
-    MediaSearch.assertFilterArray( filters );
-
+  private static metaFilters ( cond: string[], values: ( string | number )[], filters: MF[] ) : void {
     for ( const filter of filters ) {
-      const key = normalizeString( filter.key, 'Metadata key' );
-      const match = validateEnum( filter.match ?? 'exact', 'metadata match', [
-        'exact', 'contains', 'startsWith'
-      ] );
+      const match = filter.match ?? 'exact';
 
       cond.push( `
         EXISTS (
@@ -251,68 +190,52 @@ export class MediaSearch {
         )
       ` );
 
-      values.push( key );
-
-      if ( filter.source !== undefined ) values.push( validateEnum(
-        filter.source, 'metadata source', [ 'manual', 'scan' ]
-      ) );
+      values.push( filter.key.trim() );
+      if ( filter.source !== undefined ) values.push( filter.source );
 
       if ( filter.value !== undefined ) {
-        const value = normalizeString( filter.value, 'Metadata value' );
-
-        values.push( match === 'exact' ? value : match === 'contains'
-          ? `%${ MediaSearch.escapeLike( value ) }%`
-          : `${ MediaSearch.escapeLike( value ) }%`
+        const value = MediaSearch.escapeLike( filter.value.trim() );
+        values.push( match === 'exact' ? filter.value.trim()
+          : match === 'contains' ? `%${ value }%` : `${ value }%`
         );
       }
     }
   }
 
-  private static trackFilters ( cond: string[], values: ( string | number )[], filters: MediaSearchTrackFilter[] ) : void {
-    MediaSearch.assertFilterArray( filters );
+  private static trackFilters ( cond: string[], values: ( string | number )[], filters: TF[] ) : void {
+    const columns = {
+      codec: 'codec', language: 'language', title: 'title', isDefault: 'is_default',
+      isForced: 'is_forced', minWidth: 'width', maxWidth: 'width', minHeight: 'height',
+      maxHeight: 'height', minChannels: 'channels', maxChannels: 'channels'
+    } as const;
 
     for ( const filter of filters ) {
       const parts: string[] = [];
 
-      if ( filter.kind !== undefined ) {
-        parts.push( 't.kind = ?' );
-        values.push( validateEnum( filter.kind, 'track kind', [ 'video', 'audio', 'subtitle', 'data' ] ) );
-      }
+      if ( filter.kind !== undefined ) parts.push( 't.kind = ?' ), values.push( filter.kind );
 
       for ( const key of [ 'codec', 'language', 'title' ] as const ) {
-        const value = filter[ key ];
-        if ( value === undefined ) continue;
+        if ( filter[ key ] === undefined ) continue;
 
-        parts.push( `t.${ key } = ? COLLATE NOCASE` );
-        values.push( normalizeString( value, `track ${ key }` ) );
+        parts.push( `t.${ columns[ key ] } = ? COLLATE NOCASE` );
+        values.push( filter[ key ]!.trim() );
       }
 
       for ( const key of [ 'isDefault', 'isForced' ] as const ) {
-        const value = filter[ key ];
-        if ( value === undefined ) continue;
-        if ( typeof value !== 'boolean' ) throw new Error( `Track ${ key } must be a boolean` );
+        if ( filter[ key ] === undefined ) continue;
 
-        parts.push( `t.${ key === 'isDefault' ? 'is_default' : 'is_forced' } = ?` );
-        values.push( Number( value ) );
+        parts.push( `t.${ columns[ key ] } = ?` );
+        values.push( Number( filter[ key ] ) );
       }
 
-      for ( const [ key, column ] of [
-        [ 'minWidth', 'width' ], [ 'maxWidth', 'width' ], [ 'minHeight', 'height' ],
-        [ 'maxHeight', 'height' ], [ 'minChannels', 'channels' ], [ 'maxChannels', 'channels' ]
-      ] as const ) {
-        const value = filter[ key ];
+      for ( const key of [ 'minWidth', 'maxWidth', 'minHeight', 'maxHeight', 'minChannels', 'maxChannels' ] as const ) {
+        if ( filter[ key ] === undefined ) continue;
 
-        if ( value === undefined ) continue;
-        if ( ! Number.isFinite( value ) || value < 0 )
-          throw new Error( `Track ${ key } must be a non-negative number` );
-
-        parts.push( `t.${ column } ${ key.startsWith( 'min' ) ? '>=' : '<=' } ?` );
-        values.push( value );
+        parts.push( `t.${ columns[ key ] } ${ key.startsWith( 'min' ) ? '>=' : '<=' } ?` );
+        values.push( filter[ key ]! );
       }
 
-      if ( ! parts.length ) throw new Error( 'A track filter must contain at least one condition' );
-
-      cond.push( `
+      if ( parts.length ) cond.push( `
         EXISTS (
           SELECT 1 FROM tracks t
           WHERE t.media_id = m.id AND ${ parts.join( ' AND ' ) }
@@ -321,22 +244,22 @@ export class MediaSearch {
     }
   }
 
-  private static assetFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
+  private static assetFilters ( cond: string[], values: ( string | number )[], options: O ) : void {
     for ( const [ key, mode ] of [
       [ 'assetKindsAny', 'any' ], [ 'assetKindsAll', 'all' ], [ 'missingAssetKinds', 'missing' ]
     ] as const ) {
       const kinds = options[ key ];
-      if ( kinds === undefined ) continue;
-      if ( ! Array.isArray( kinds ) ) throw new Error( `${ key } must be an array` );
+      if ( ! kinds?.length ) continue;
 
-      const uniqueKinds = [ ...new Set( kinds ) ].map( k => validateEnum( k, 'asset kind', ASSET_KINDS ) );
+      const uniqueKinds = [ ...new Set( kinds ) ].filter( kind => ASSET_KINDS.includes( kind ) );
       if ( ! uniqueKinds.length ) continue;
 
-      if ( mode === 'all' ) for ( const kind of uniqueKinds ) {
+      const append = ( kind: string ) => {
         cond.push( 'EXISTS ( SELECT 1 FROM assets a WHERE a.media_id = m.id AND a.kind = ? )' );
         values.push( kind );
-      }
+      };
 
+      if ( mode === 'all' ) uniqueKinds.forEach( append );
       else {
         cond.push( `
           ${ mode === 'any' ? 'EXISTS' : 'NOT EXISTS' } (
@@ -349,205 +272,105 @@ export class MediaSearch {
     }
   }
 
-  private static userFilters ( cond: string[], values: ( string | number )[], options: MediaSearchOptions ) : void {
-    const needsUser = options.favorite !== undefined || options.played !== undefined || options.progress !== undefined;
-    if ( options.userId !== undefined ) assertId( options.userId, 'user' );
+  private static userFilters ( cond: string[], values: ( string | number )[], options: O ) : void {
+    const { userId, favorite, played, progress } = options;
+    if ( userId === undefined ) return;
 
-    if ( needsUser && options.userId === undefined )
-      throw new Error( 'userId is required for favorite, played or progress filters' );
+    const exists = ( table: string, value: boolean ) => {
+      cond.push( `${ value ? 'EXISTS' : 'NOT EXISTS' } (
+        SELECT 1 FROM ${ table }
+        WHERE user_id = ? AND media_id = m.id
+      )` );
+      values.push( userId );
+    };
 
-    if ( options.favorite !== undefined ) {
-      if ( typeof options.favorite !== 'boolean' ) throw new Error( 'favorite must be a boolean' );
+    if ( favorite !== undefined ) exists( 'favorites', favorite );
+    if ( played !== undefined ) exists( 'plays', played );
 
-      cond.push( `
-        ${ options.favorite ? 'EXISTS' : 'NOT EXISTS' } (
-          SELECT 1 FROM favorites f
-          WHERE f.user_id = ? AND f.media_id = m.id
-        )
-      ` );
-      values.push( options.userId! );
-    }
+    if ( progress !== undefined ) {
+      const expressions = {
+        'not-started': 'NOT EXISTS ( SELECT 1 FROM progress p WHERE p.user_id = ? AND p.media_id = m.id AND ( p.position_ms > 0 OR p.completed = 1 ) )',
+        started: 'EXISTS ( SELECT 1 FROM progress p WHERE p.user_id = ? AND p.media_id = m.id AND ( p.position_ms > 0 OR p.completed = 1 ) )',
+        'in-progress': 'EXISTS ( SELECT 1 FROM progress p WHERE p.user_id = ? AND p.media_id = m.id AND p.position_ms > 0 AND p.completed = 0 )',
+        completed: 'EXISTS ( SELECT 1 FROM progress p WHERE p.user_id = ? AND p.media_id = m.id AND p.completed = 1 )'
+      } as const;
 
-    if ( options.played !== undefined ) {
-      if ( typeof options.played !== 'boolean' ) throw new Error( 'played must be a boolean' );
-
-      cond.push( `
-        ${ options.played ? 'EXISTS' : 'NOT EXISTS' } (
-          SELECT 1 FROM plays p
-          WHERE p.user_id = ? AND p.media_id = m.id
-        )
-      ` );
-      values.push( options.userId! );
-    }
-
-    if ( options.progress !== undefined ) {
-      const progress = validateEnum( options.progress, 'progress', [
-        'not-started', 'started', 'in-progress', 'completed'
-      ] );
-
-      const expression = {
-        'not-started': `
-          NOT EXISTS (
-            SELECT 1 FROM progress p
-            WHERE p.user_id = ? AND p.media_id = m.id
-              AND ( p.position_ms > 0 OR p.completed = 1 )
-          )
-        `,
-        started: `
-          EXISTS (
-            SELECT 1 FROM progress p
-            WHERE p.user_id = ? AND p.media_id = m.id
-              AND ( p.position_ms > 0 OR p.completed = 1 )
-          )
-        `,
-        'in-progress': `
-          EXISTS (
-            SELECT 1 FROM progress p
-            WHERE p.user_id = ? AND p.media_id = m.id
-              AND p.position_ms > 0 AND p.completed = 0
-          )
-        `,
-        completed: `
-          EXISTS (
-            SELECT 1 FROM progress p
-            WHERE p.user_id = ? AND p.media_id = m.id AND p.completed = 1
-          )
-        `
-      }[ progress ];
-
-      cond.push( expression );
-      values.push( options.userId! );
+      const expression = expressions[ progress ];
+      if ( expression ) cond.push( expression ), values.push( userId );
     }
   }
 
-  private static buildWhere ( options: MediaSearchOptions ) : { where: string; values: ( string | number )[]; hasQuery: boolean } {
+  private static buildWhere ( options: O ) : { where: string; values: ( string | number )[]; hasQuery: boolean } {
     const cond: string[] = [], values: ( string | number )[] = [];
-    const hasQuery = options.query !== undefined && options.query.trim().length > 0;
+    const query = options.query?.trim() ?? '', queryMode = options.queryMode ?? 'all';
+    const ftsQuery = query ? MediaSearch.buildFtsQuery( query, queryMode ) : '';
+    const hasQuery = Boolean( ftsQuery );
 
-    if ( hasQuery ) {
-      cond.push( 'media_fts MATCH ?' );
-      values.push( MediaSearch.buildFtsQuery( options.query!, validateEnum(
-        options.queryMode ?? 'all', 'query mode', [ 'all', 'any', 'phrase' ]
-      ) ) );
-    }
+    if ( hasQuery ) cond.push( 'media_fts MATCH ?' ), values.push( ftsQuery );
 
-    if ( options.ids !== undefined ) MediaSearch.appendIn(
-      cond, values, 'm.id', MediaSearch.normalizeIds( options.ids, 'media' )
-    );
+    if ( options.ids !== undefined )
+      MediaSearch.appendIn( cond, values, 'm.id', MediaSearch.normalizeIds( options.ids ) );
 
-    if ( options.excludeIds !== undefined ) MediaSearch.appendIn(
-      cond, values, 'm.id', MediaSearch.normalizeIds( options.excludeIds, 'media' ), true
-    );
+    if ( options.excludeIds !== undefined )
+      MediaSearch.appendIn( cond, values, 'm.id', MediaSearch.normalizeIds( options.excludeIds ), true );
 
-    if ( options.rootIds !== undefined ) MediaSearch.appendIn(
-      cond, values, 'm.root_id', MediaSearch.normalizeIds( options.rootIds, 'media root' )
-    );
+    if ( options.rootIds !== undefined )
+      MediaSearch.appendIn( cond, values, 'm.root_id', MediaSearch.normalizeIds( options.rootIds ) );
 
-    if ( options.types !== undefined ) {
-      if ( ! Array.isArray( options.types ) ) throw new Error( 'types must be an array' );
-
-      MediaSearch.appendIn( cond, values, 'm.type', [ ...new Set( options.types ) ].map(
-        type => validateEnum( type, 'media type', MEDIA_TYPES )
-      ) );
-    }
+    if ( options.types !== undefined )
+      MediaSearch.appendIn( cond, values, 'm.type', options.types );
 
     if ( options.available !== undefined ) {
-      if ( typeof options.available !== 'boolean' ) throw new Error( 'available must be a boolean' );
-
       cond.push( 'm.available = ?' );
       values.push( Number( options.available ) );
     }
 
     if ( options.rootEnabled !== undefined ) {
-      if ( typeof options.rootEnabled !== 'boolean' ) throw new Error( 'rootEnabled must be a boolean' );
-
       cond.push( 'r.enabled = ?' );
       values.push( Number( options.rootEnabled ) );
     }
 
-    if ( options.text !== undefined ) {
-      for ( const [ field, filter ] of Object.entries( options.text ) ) {
-        if ( filter === undefined ) continue;
-
-        if ( ! Object.hasOwn( TEXT_COLUMNS, field ) ) throw new Error( `Invalid text search field: ${ field }` );
-        if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
-          throw new Error( `Invalid text filter: ${ field }` );
-
-        MediaSearch.textFilter(
-          cond, values, TEXT_COLUMNS[ field as MediaSearchTextField ], filter, field
-        );
-      }
+    for ( const [ field, filter ] of Object.entries( options.text ?? {} ) ) {
+      if ( filter === undefined || ! Object.hasOwn( TEXT_COLUMNS, field ) ) continue;
+      MediaSearch.textFilter( cond, values, TEXT_COLUMNS[ field as MediaSearchTextField ], filter );
     }
 
-    if ( options.numbers !== undefined ) {
-      for ( const [ field, filter ] of Object.entries( options.numbers ) ) {
-        if ( filter === undefined ) continue;
-
-        if ( ! Object.hasOwn( NUMBER_COLUMNS, field ) )
-          throw new Error( `Invalid numeric search field: ${ field }` );
-
-        if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
-          throw new Error( `Invalid numeric filter: ${ field }` );
-
-        MediaSearch.numberFilter(
-          cond, values, NUMBER_COLUMNS[ field as MediaSearchNumberField ], filter, field
-        );
-      }
+    for ( const [ field, filter ] of Object.entries( options.numbers ?? {} ) ) {
+      if ( filter === undefined || ! Object.hasOwn( NUMBER_COLUMNS, field ) ) continue;
+      MediaSearch.numberFilter( cond, values, NUMBER_COLUMNS[ field as MediaSearchNumberField ], filter );
     }
 
-    if ( options.dates !== undefined ) {
-      for ( const [ field, filter ] of Object.entries( options.dates ) ) {
-        if ( filter === undefined ) continue;
-
-        if ( ! Object.hasOwn( DATE_COLUMNS, field ) )
-          throw new Error( `Invalid date search field: ${ field }` );
-
-        if ( ! filter || typeof filter !== 'object' || Array.isArray( filter ) )
-          throw new Error( `Invalid date filter: ${ field }` );
-
-        MediaSearch.dateFilter(
-          cond, values, DATE_COLUMNS[ field as MediaSearchDateField ], filter, field
-        );
-      }
+    for ( const [ field, filter ] of Object.entries( options.dates ?? {} ) ) {
+      if ( filter === undefined || ! Object.hasOwn( DATE_COLUMNS, field ) ) continue;
+      MediaSearch.dateFilter( cond, values, DATE_COLUMNS[ field as MediaSearchDateField ], filter );
     }
 
     MediaSearch.taxFilters( cond, values, options );
-    if ( options.metadata !== undefined ) MediaSearch.metaFilters( cond, values, options.metadata );
-    if ( options.tracks !== undefined ) MediaSearch.trackFilters( cond, values, options.tracks );
+    if ( options.metadata?.length ) MediaSearch.metaFilters( cond, values, options.metadata );
+    if ( options.tracks?.length ) MediaSearch.trackFilters( cond, values, options.tracks );
     MediaSearch.assetFilters( cond, values, options );
     MediaSearch.userFilters( cond, values, options );
 
     return { where: cond.length ? `WHERE ${ cond.join( ' AND ' ) }` : '', values, hasQuery };
   }
 
-  public static search ( options: MediaSearchOptions = {} ) : MediaSearchResult {
-    const { limit = 100, offset = 0, sortBy = 'title', sortDirection = 'asc' } = options;
-    assertLimitOffset( limit, offset );
-    if ( limit > MAX_LIMIT ) throw new Error( `Search limit cannot exceed ${ MAX_LIMIT }` );
-
-    const direction = validateEnum( sortDirection, 'sort direction', [ 'asc', 'desc' ] );
-    const sort = validateEnum( sortBy, 'sort field', [ ...Object.keys( SORT_COLUMNS ), 'relevance' ] ) as MediaSearchSort;
+  public static search ( options: O = {} ) : MediaSearchResult {
+    const limit = Math.min( MAX_LIMIT, Math.max( 1, options.limit ?? 100 ) );
+    const offset = Math.max( 0, options.offset ?? 0 ), sortBy = options.sortBy ?? 'title';
+    const direction = options.sortDirection === 'desc' ? 'DESC' : 'ASC';
     const { where, values, hasQuery } = MediaSearch.buildWhere( options );
 
-    if ( sort === 'relevance' && ! hasQuery ) throw new Error( 'Relevance sorting requires a full-text search query' );
+    const sortExpression = sortBy === 'relevance' && hasQuery ? 'bm25( media_fts )'
+      : SORT_COLUMNS[ sortBy as Exclude< MediaSearchSort, 'relevance' > ] ?? SORT_COLUMNS.title;
 
     const from = `
-      FROM media m
-      JOIN roots r ON r.id = m.root_id
+      FROM media m JOIN roots r ON r.id = m.root_id
       ${ hasQuery ? 'JOIN media_fts ON media_fts.rowid = m.id' : '' }
     `;
 
     const totalRow = as< { total: number } >( conn().prepare(
       `SELECT COUNT(*) AS total ${ from } ${ where }`
     ).get( ...values ) );
-
-    const sortExpression = sort === 'relevance' ? 'bm25( media_fts )' : SORT_COLUMNS[ sort ];
-    const orderBy = `
-      ORDER BY
-        CASE WHEN ( ${ sortExpression } ) IS NULL THEN 1 ELSE 0 END ASC,
-        ${ sortExpression } ${ direction },
-        m.id ASC
-    `;
 
     const rows = as< MediaRow[] >( conn().prepare( `
       SELECT
@@ -561,9 +384,17 @@ export class MediaSearch {
         m.sample_rate AS sampleRate, m.channels, m.encoding,
         m.data_json AS dataJson, m.scanned_at AS scannedAt,
         m.created_at AS createdAt, m.updated_at AS updatedAt
-      ${ from } ${ where } ${ orderBy } LIMIT ? OFFSET ?
+      ${ from } ${ where }
+      ORDER BY
+        CASE WHEN ( ${ sortExpression } ) IS NULL THEN 1 ELSE 0 END,
+        ${ sortExpression } ${ direction },
+        m.id ASC
+      LIMIT ? OFFSET ?
     ` ).all( ...values, limit, offset ) );
 
-    return { items: rows.map( r => MediaSearch.mapRow( r ) ), total: totalRow.total, limit, offset };
+    return {
+      items: rows.map( row => MediaSearch.mapRow( row ) ),
+      total: totalRow.total, limit, offset
+    };
   }
 }
