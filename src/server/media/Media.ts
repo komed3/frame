@@ -67,18 +67,21 @@ export class Media {
 
     if ( rootId !== undefined ) {
       assertId( rootId, 'media root' );
+
       conditions.push( 'root_id = ?' );
       values.push( rootId );
     }
 
-    if ( directoryId !== undefined && directoryId !== null ) {
-      assertId( directoryId, 'media directory' );
+    if ( directoryId !== undefined ) {
+      if ( directoryId !== null ) assertId( directoryId, 'media directory' );
+
       conditions.push( 'directory_id IS ?' );
-      values.push( directoryId );
+      values.push( directoryId! );
     }
 
     if ( type !== undefined ) {
       if ( ! MEDIA_TYPES.includes( type ) ) throw new Error( `Invalid media type: ${ type }` );
+
       conditions.push( 'type = ?' );
       values.push( type );
     }
