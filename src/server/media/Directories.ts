@@ -85,4 +85,47 @@ export class MediaDirectories {
     if ( ! row ) throw new Error( `Media root ${ rootId } does not exist` );
     return row.scanGeneration;
   }
+
+  public static register ( rootId: number, path: string, scanGeneration: number ) : number {
+    assertId( rootId, 'media root' );
+    assertId( scanGeneration, 'scan generation' );
+    assertRelativePath( path, 'directory' );
+
+    const root = as< { scanGeneration: number } | undefined >( conn().prepare(
+      'SELECT scan_generation AS scanGeneration FROM roots WHERE id = ?'
+    ).get( rootId ) );
+
+    if ( ! root ) throw new Error( `Media root ${ rootId } does not exist` );
+    if ( root.scanGeneration !== scanGeneration ) throw new Error(
+      `Scan generation ${ scanGeneration } is no longer active for media root ${ rootId }`
+    );
+
+    const separator = path.lastIndexOf( '/' );
+    const parentPath = separator < 0 ? null : path.slice( 0, separator );
+    const name = separator < 0 ? path : path.slice( separator + 1 );
+    let parentId: number | null = null;
+
+    if ( parentPath !== null ) {
+      const parent = as< { id: number } | undefined >( conn().prepare(
+        'SELECT id FROM directories WHERE root_id = ? AND path = ? AND scan_generation = ?'
+      ).get( rootId, parentPath, scanGeneration ) );
+
+      if ( ! parent ) throw new Error( `Parent directory must be registered before ${ path }` );
+      parentId = parent.id;
+    }
+
+    const row = as< { id: number } | undefined >( conn().prepare( `
+      INSERT INTO directories ( root_id, parent_id, path, name, scan_generation, scanned_at )
+      VALUES ( ?, ?, ?, ?, ?, strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+      ON CONFLICT ( root_id, path ) DO UPDATE SET
+        parent_id = excluded.parent_id,
+        name = excluded.name,
+        scan_generation = excluded.scan_generation,
+        scanned_at = excluded.scanned_at
+      RETURNING id
+    ` ).get( rootId, parentId, path, name, scanGeneration ) );
+
+    if ( ! row ) throw new Error( `Could not register media directory: ${ path }` );
+    return row.id;
+  }
 }
