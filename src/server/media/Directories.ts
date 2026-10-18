@@ -101,15 +101,7 @@ export class MediaDirectories {
     assertId( rootId, 'media root' );
     assertId( scanGeneration, 'scan generation' );
     assertRelativePath( path, 'directory' );
-
-    const root = as< { scanGeneration: number } | undefined >( conn().prepare(
-      'SELECT scan_generation AS scanGeneration FROM roots WHERE id = ?'
-    ).get( rootId ) );
-
-    if ( ! root ) throw new Error( `Media root ${ rootId } does not exist` );
-    if ( root.scanGeneration !== scanGeneration ) throw new Error(
-      `Scan generation ${ scanGeneration } is no longer active for media root ${ rootId }`
-    );
+    MediaDirectories.assertGeneration( rootId, scanGeneration );
 
     const separator = path.lastIndexOf( '/' );
     const parentPath = separator < 0 ? null : path.slice( 0, separator );
@@ -143,17 +135,9 @@ export class MediaDirectories {
   public static finishScan ( rootId: number, scanGeneration: number ) : void {
     assertId( rootId, 'media root' );
     assertId( scanGeneration, 'scan generation' );
+    MediaDirectories.assertGeneration( rootId, scanGeneration );
 
     db.transaction( tx => {
-      const root = as< { scanGeneration: number } | undefined >( tx.prepare(
-        'SELECT scan_generation AS scanGeneration FROM roots WHERE id = ?'
-      ).get( rootId ) );
-
-      if ( ! root ) throw new Error( `Media root ${ rootId } does not exist` );
-      if ( root.scanGeneration !== scanGeneration ) throw new Error(
-        `Scan generation ${ scanGeneration } is no longer active for media root ${ rootId }`
-      );
-
       tx.prepare( 'DELETE FROM directories WHERE root_id = ? AND scan_generation <> ?' ).run( rootId, scanGeneration );
       tx.prepare( `UPDATE roots SET scanned_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) WHERE id = ?` ).run( rootId );
     } );
