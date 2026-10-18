@@ -1,9 +1,9 @@
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
-  MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchSort,
-  MediaSearchTextField
+  MediaSearchAssetKind, MediaSearchDateField, MediaSearchNumberField, MediaSearchQueryMode,
+  MediaSearchSort, MediaSearchTextField
 } from '@/src/shared/types/search';
-import { assertId, normalizeString } from '../utils';
+import { assertId, normalizeString } from '@/src/server/utils';
 
 
 const MAX_LIMIT = 500;
@@ -79,5 +79,20 @@ export class MediaSearch {
 
   private static escapeLike ( value: string ) : string {
     return value.replace( /[\\%_]/g, '\\$&' );
+  }
+
+  private static buildFtsQuery ( query: string, mode: MediaSearchQueryMode ) : string {
+    const value = normalizeString( query, 'Search query' );
+
+    if ( mode === 'phrase' ) {
+      if ( ! /[\p{L}\p{N}]/u.test( value ) ) throw new Error( 'Search query contains no searchable terms' );
+      return `"${ value.replace( /"/g, '""' ) }"`;
+    }
+
+    const terms = value.match( /[\p{L}\p{N}_]+/gu ) ?? [];
+    if ( ! terms.length ) throw new Error( 'Search query contains no searchable terms' );
+
+    const operator = mode === 'all' ? ' AND ' : ' OR ';
+    return terms.map( term => `"${ term.replace( /"/g, '""' ) }"*` ).join( operator );
   }
 }
