@@ -308,6 +308,7 @@ export class MediaSearch {
     const hasQuery = Boolean( ftsQuery );
 
     if ( hasQuery ) cond.push( 'media_fts MATCH ?' ), values.push( ftsQuery );
+    else if ( query ) cond.push( '0 = 1' );
 
     if ( options.ids !== undefined )
       MediaSearch.appendIn( cond, values, 'm.id', MediaSearch.normalizeIds( options.ids ) );
