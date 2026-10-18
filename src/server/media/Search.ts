@@ -1,4 +1,4 @@
-import { MediaSearchDateField, MediaSearchNumberField, MediaSearchTextField } from '@/src/shared/types/search';
+import { MediaSearchDateField, MediaSearchNumberField, MediaSearchSort, MediaSearchTextField } from '@/src/shared/types/search';
 
 
 const MAX_LIMIT = 500;
@@ -19,4 +19,20 @@ const NUMBER_COLUMNS: Record< MediaSearchNumberField, string > = {
 const DATE_COLUMNS: Record< MediaSearchDateField, string > = {
   modifiedAt: 'm.modified_at', releasedAt: 'm.released_at', recordedAt: 'm.recorded_at',
   scannedAt: 'm.scanned_at', createdAt: 'm.created_at', updatedAt: 'm.updated_at'
+};
+
+const SORT_COLUMNS: Record< Exclude< MediaSearchSort, 'relevance' >, string > = {
+  id: 'm.id', rootId: 'm.root_id', type: 'm.type',
+  title: 'COALESCE( NULLIF( m.title, \'\' ), m.file_name ) COLLATE NOCASE',
+  fileName: 'm.file_name COLLATE NOCASE', path: 'm.path COLLATE NOCASE',
+  mimeType: 'm.mime_type COLLATE NOCASE', sizeBytes: 'm.size_bytes',
+  modifiedAt: 'm.modified_at', fileHash: 'm.file_hash', fingerprint: 'm.fingerprint',
+  creator: 'm.creator COLLATE NOCASE', rating: 'm.rating', releasedAt: 'm.released_at',
+  recordedAt: 'm.recorded_at', language: 'm.language COLLATE NOCASE',
+  durationMs: 'm.duration_ms', width: 'm.width', height: 'm.height', fps: 'm.fps',
+  bitrate: 'm.bitrate', container: 'm.container COLLATE NOCASE',
+  videoCodec: 'm.video_codec COLLATE NOCASE', audioCodec: 'm.audio_codec COLLATE NOCASE',
+  sampleRate: 'm.sample_rate', channels: 'm.channels',
+  encoding: 'm.encoding COLLATE NOCASE', scannedAt: 'm.scanned_at',
+  createdAt: 'm.created_at', updatedAt: 'm.updated_at'
 };
