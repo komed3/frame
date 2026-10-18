@@ -140,11 +140,39 @@ export class MediaDirectories {
   public static finishScan ( rootId: number, scanGeneration: number ) : void {
     assertId( rootId, 'media root' );
     assertId( scanGeneration, 'scan generation' );
-    MediaDirectories.assertGeneration( rootId, scanGeneration );
 
     db.transaction( tx => {
+      MediaDirectories.assertGeneration( rootId, scanGeneration );
+
+      tx.prepare( `
+        WITH RECURSIVE stale ( id ) AS (
+          SELECT id
+          FROM directories
+          WHERE root_id = ? AND scan_generation <> ?
+
+          UNION
+
+          SELECT d.id
+          FROM directories d
+          JOIN stale s ON d.parent_id = s.id
+          WHERE d.root_id = ?
+        )
+        UPDATE media
+        SET directory_id = NULL
+        WHERE root_id = ? AND directory_id IN ( SELECT id FROM stale )
+      ` ).run( rootId, scanGeneration, rootId, rootId );
+
       tx.prepare( 'DELETE FROM directories WHERE root_id = ? AND scan_generation <> ?' ).run( rootId, scanGeneration );
-      tx.prepare( `UPDATE roots SET scanned_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) WHERE id = ?` ).run( rootId );
+
+      const result = tx.prepare( `
+        UPDATE roots
+        SET scanned_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE id = ? AND scan_generation = ?
+      ` ).run( rootId, scanGeneration );
+
+      if ( Number( result.changes ) !== 1 ) throw new Error(
+        `Scan generation ${ scanGeneration } is no longer active for media root ${ rootId }`
+      );
     } );
   }
 }
