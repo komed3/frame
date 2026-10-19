@@ -12,6 +12,10 @@ export interface MediaDirectoryEntry extends MediaDirectory {
   mediaCount: number;
 }
 
+export interface MediaDirectoryTree extends MediaDirectoryEntry {
+  children: MediaDirectoryTree[];
+}
+
 export interface MediaDirectoryRow extends MediaDirectory {
   scanGeneration: number;
 }
