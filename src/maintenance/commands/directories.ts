@@ -8,7 +8,7 @@ import { Command } from 'commander';
 const printTree = ( nodes: MediaDirectoryTree[], prefix = '' ) : void => {
   nodes.forEach( ( { name, id, mediaCount, children }, i ) => {
     const last = i === nodes.length - 1, branch = last ? '└── ' : '├── ';
-    console.log( `${ prefix }${ branch }${ name } [${ id }] (${ mediaCount })` );
+    ui.info( `${ prefix }${ branch }${ name } [${ id }] (${ mediaCount })` );
 
     if ( children.length ) printTree( children, `${ prefix }${ last ? '    ' : '│   ' }` );
   } );
