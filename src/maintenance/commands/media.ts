@@ -54,22 +54,14 @@ export const registerMediaCommands = ( program: Command ) : void => {
     } );
 
   mediaCommand
-    .command( 'get <id>' )
-    .description( 'Show media details' )
-    .action( ( id: string ) => {
-      const media = Media.get( resolveId( id, 'media' ) );
-      if ( ! media ) throw new Error( `Media ${ id } does not exist` );
+    .command( 'get <id-or-root> [path]' )
+    .description( 'Show media details by ID or root ID and relative path' )
+    .action( ( idOrRoot: string, path?: string ) => {
+      const media = path === undefined ? Media.get( resolveId( idOrRoot, 'media' ) )
+        : Media.getByPath( resolveId( idOrRoot, 'media root' ), path );
 
-      for ( const [ key, value ] of Object.entries( media ) )
-        console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
-    } );
-
-  mediaCommand
-    .command( 'get-by-path <root> <path>' )
-    .description( 'Find media by root ID and relative path' )
-    .action( ( root: string, path: string ) => {
-      const media = Media.getByPath( resolveId( root, 'media root' ), path );
-      if ( ! media ) throw new Error( `No media found at ${ path }` );
+      if ( ! media ) throw new Error( path === undefined ? `Media ${ idOrRoot } does not exist`
+        : `No media found at ${ path } in root ${ idOrRoot }` );
 
       for ( const [ key, value ] of Object.entries( media ) )
         console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
