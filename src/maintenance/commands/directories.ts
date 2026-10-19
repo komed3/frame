@@ -20,4 +20,14 @@ export const registerDirectoryCommands = ( program: Command ) : void => {
     .command( 'directory' )
     .alias( 'dir' )
     .description( 'Inspect media directories' );
+
+  directoryCommand
+    .command( 'list <root>' )
+    .description( 'List directories in a media root' )
+    .action( ( root: string ) => {
+      const directories = MediaDirectories.list( resolveId( root, 'media root' ) );
+
+      if ( ! directories.length ) return ui.info( 'No directories found.' );
+      console.table( directories );
+    } );
 }
