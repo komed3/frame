@@ -1,3 +1,4 @@
+import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Media, MEDIA_TYPES } from '@/src/server/media/Media';
 import { resolveId, validateNumber } from '@/src/server/utils';
@@ -72,5 +73,20 @@ export const registerMediaCommands = ( program: Command ) : void => {
 
       for ( const [ key, value ] of Object.entries( media ) )
         console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
+    } );
+
+  mediaCommand
+    .command( 'clean' )
+    .description( 'Delete unavailable media records' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( options: { yes?: boolean } ) => {
+      ui.warning( 'This will permanently delete all unavailable media records.' );
+      ui.warning( 'Related database records will be deleted as well.' );
+      ui.nl();
+
+      if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
+      const count = Media.deleteUnavailable();
+
+      ui.success( `Deleted ${ count } unavailable media record(s).` );
     } );
 }
