@@ -1,7 +1,7 @@
 import { ui } from '@/src/maintenance/utils/ui';
 import { MediaDirectories } from '@/src/server/media/Directories';
-import { MediaRoots } from '@/src/server/media/Roots';
 import { resolveId } from '@/src/server/utils';
+import type { MediaDirectoryTree } from '@/src/shared/types/directories';
 import { Command } from 'commander';
 
 
