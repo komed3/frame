@@ -51,4 +51,15 @@ export const registerMediaCommands = ( program: Command ) : void => {
         sizeBytes: item.sizeBytes, durationMs: item.durationMs, path: item.path
       } ) ) );
     } );
+
+  mediaCommand
+    .command( 'get <id>' )
+    .description( 'Show media details' )
+    .action( ( id: string ) => {
+      const media = Media.get( resolveId( id, 'media' ) );
+      if ( ! media ) throw new Error( `Media ${ id } does not exist` );
+
+      for ( const [ key, value ] of Object.entries( media ) )
+        console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
+    } );
 }
