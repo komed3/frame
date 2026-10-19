@@ -26,8 +26,8 @@ export const registerDirectoryCommands = ( program: Command ) : void => {
     .description( 'List directories in a media root' )
     .action( ( root: string ) => {
       const directories = MediaDirectories.list( resolveId( root, 'media root' ) );
-
       if ( ! directories.length ) return ui.info( 'No directories found.' );
+
       console.table( directories );
     } );
 
@@ -40,5 +40,15 @@ export const registerDirectoryCommands = ( program: Command ) : void => {
 
       for ( const [ key, value ] of Object.entries( directory ) )
         console.log( `${ ui.key( key )}: ${ ui.value( value === null ? '—' : String( value ) ) }` );
+    } );
+
+  directoryCommand
+    .command( 'tree <root>' )
+    .description( 'Show the directory tree' )
+    .action( ( root: string ) => {
+      const tree = MediaDirectories.tree( resolveId( root, 'media root' ) );
+      if ( ! tree.length ) return ui.info( 'No directories found.' );
+
+      printTree( tree );
     } );
 }
