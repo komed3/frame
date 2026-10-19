@@ -181,4 +181,9 @@ export class Media {
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Media ${ id } does not exist` );
   }
+
+    public static deleteUnavailable () : number {
+      const result = conn().prepare( 'DELETE FROM media WHERE available = 0' ).run();
+      return Number( result.changes );
+    }
 }
