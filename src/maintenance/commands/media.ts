@@ -74,6 +74,8 @@ export const registerMediaCommands = ( program: Command ) : void => {
     .action( async ( options: { yes?: boolean } ) => {
       ui.warning( 'This will permanently delete all unavailable media records.' );
       ui.warning( 'Related database records will be deleted as well.' );
+      ui.warning( `Related physical assets will NOT be deleted. Please run ${ ui.value( 'frame assets clean' ) }` );
+      ui.warning( `This cannot be undone!` );
       ui.nl();
 
       if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
