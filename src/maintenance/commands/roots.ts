@@ -43,4 +43,14 @@ export const registerRootCommands = ( program: Command ) : void => {
 
       ui.success( `Enabled media root ${ rootId }` );
     } );
+
+  rootCommand
+    .command( 'disable <id>' )
+    .description( 'Disable a media root' )
+    .action( ( id: string ) => {
+      const rootId = resolveId( id, 'media root' );
+      MediaRoots.setEnabled( rootId, false );
+
+      ui.success( `Disabled media root ${ rootId }` );
+    } );
 }
