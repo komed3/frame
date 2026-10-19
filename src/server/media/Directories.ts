@@ -86,11 +86,10 @@ export class MediaDirectories {
       ORDER BY d.path COLLATE NOCASE, d.id
     ` ).all( rootId ) );
 
-    const nodes = new Map<number, MediaDirectoryTree>();
+    const nodes = new Map< number, MediaDirectoryTree >();
+    const tree: MediaDirectoryTree[] = [];
 
     for ( const row of rows ) nodes.set( row.id, { ...row, children: [] } );
-
-    const tree: MediaDirectoryTree[] = [];
 
     for ( const node of nodes.values() ) {
       const parent = node.parentId === null ? undefined : nodes.get( node.parentId );
