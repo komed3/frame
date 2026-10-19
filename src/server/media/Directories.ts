@@ -1,6 +1,9 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { assertId, assertRelativePath } from '@/src/server/utils';
-import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow } from '@/src/shared/types/directories';
+import type {
+  MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow,
+  MediaDirectoryTree
+} from '@/src/shared/types/directories';
 
 
 export class MediaDirectories {
@@ -56,33 +59,47 @@ export class MediaDirectories {
     if ( parentId !== null ) assertId( parentId, 'media directory' );
 
     return as< MediaDirectoryEntry[] >( conn().prepare( `
-      WITH RECURSIVE tree ( id, top_id ) AS (
-        SELECT id, id
-        FROM directories
-        WHERE root_id = ? AND parent_id IS ?
-
-        UNION ALL
-
-        SELECT d.id, tree.top_id
-        FROM directories d
-        JOIN tree ON d.parent_id = tree.id
-        WHERE d.root_id = ?
-      ),
-      counts AS (
-        SELECT tree.top_id AS directoryId, COUNT( m.id ) AS mediaCount
-        FROM tree
-        LEFT JOIN media m ON m.directory_id = tree.id
-        GROUP BY tree.top_id
-      )
       SELECT
         d.id, d.root_id AS rootId, d.parent_id AS parentId, d.path, d.name,
         d.scanned_at AS scannedAt, d.created_at AS createdAt,
-        COALESCE( counts.mediaCount, 0 ) AS mediaCount
+        COUNT( m.id ) AS mediaCount
       FROM directories d
-      LEFT JOIN counts ON counts.directoryId = d.id
+      LEFT JOIN media m ON m.directory_id = d.id
       WHERE d.root_id = ? AND d.parent_id IS ?
+      GROUP BY d.id
       ORDER BY d.name COLLATE NOCASE, d.id
-    ` ).all( rootId, parentId, rootId, rootId, parentId ) );
+    ` ).all( rootId, parentId ) );
+  }
+
+  public static tree ( rootId: number ) : MediaDirectoryTree[] {
+    assertId( rootId, 'media root' );
+
+    const rows = as< MediaDirectoryEntry[] >( conn().prepare( `
+      SELECT
+        d.id, d.root_id AS rootId, d.parent_id AS parentId, d.path, d.name,
+        d.scanned_at AS scannedAt, d.created_at AS createdAt,
+        COUNT( m.id ) AS mediaCount
+      FROM directories d
+      LEFT JOIN media m ON m.directory_id = d.id
+      WHERE d.root_id = ?
+      GROUP BY d.id
+      ORDER BY d.path COLLATE NOCASE, d.id
+    ` ).all( rootId ) );
+
+    const nodes = new Map<number, MediaDirectoryTree>();
+
+    for ( const row of rows ) nodes.set( row.id, { ...row, children: [] } );
+
+    const tree: MediaDirectoryTree[] = [];
+
+    for ( const node of nodes.values() ) {
+      const parent = node.parentId === null ? undefined : nodes.get( node.parentId );
+
+      if ( parent ) parent.children.push( node );
+      else tree.push( node );
+    }
+
+    return tree;
   }
 
   public static beginScan ( rootId: number ) : number {
