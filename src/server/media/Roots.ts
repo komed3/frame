@@ -51,8 +51,11 @@ export class MediaRoots {
 
   public static list ( enabledOnly = false ) : MediaRoot[] {
     const rows = as< MediaRootRow[] >( conn().prepare( `
-      SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
-      FROM roots ${ enabledOnly ? 'WHERE enabled = 1' : '' } ORDER BY id
+      SELECT
+        id, path, enabled, scan_generation AS scanGeneration,
+        scanned_at AS scannedAt, created_at AS createdAt
+      FROM roots ${ enabledOnly ? 'WHERE enabled = 1' : '' }
+      ORDER BY id
     ` ).all() );
 
     return rows.map( row => MediaRoots.mapRow( row ) );
