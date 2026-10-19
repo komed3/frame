@@ -30,4 +30,15 @@ export const registerDirectoryCommands = ( program: Command ) : void => {
       if ( ! directories.length ) return ui.info( 'No directories found.' );
       console.table( directories );
     } );
+
+  directoryCommand
+    .command( 'show <id>' )
+    .description( 'Show directory details' )
+    .action( ( id: string ) => {
+      const directory = MediaDirectories.get( resolveId( id, 'media directory' ) );
+      if ( ! directory ) throw new Error( `Media directory ${ id } does not exist` );
+
+      for ( const [ key, value ] of Object.entries( directory ) )
+        console.log( `${ ui.key( key )}: ${ ui.value( value === null ? '—' : String( value ) ) }` );
+    } );
 }
