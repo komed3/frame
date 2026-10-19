@@ -24,13 +24,16 @@ frame
   );
 
 
+frame.commandsGroup( 'Configuration:' );
 registerInitCommands( frame );
 registerConfigCommands( frame );
 registerDbCommands( frame );
 
+frame.commandsGroup( 'Account Administration:' );
 registerUserCommands( frame );
 registerAuthCommands( frame );
 
+frame.commandsGroup( 'Content Management:' );
 registerRootCommands( frame );
 registerDirectoryCommands( frame );
 
