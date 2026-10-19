@@ -22,4 +22,15 @@ export const registerRootCommands = ( program: Command ) : void => {
         scannedAt: root.scannedAt, createdAt: root.createdAt
       } ) ) );
     } );
+
+  rootCommand
+    .command( 'add <path>' )
+    .description( 'Register an existing media root' )
+    .option( '--disabled', 'Register the root as disabled' )
+    .action( ( path: string, options: { disabled?: boolean } ) => {
+      const id = MediaRoots.add( path, ! options.disabled );
+
+      ui.success( `Registered media root ${ id }: ${ ui.value( path ) }` );
+      ui.info( `The registered root was ${ options.disabled ? 'disabled' : 'enabled' }.` );
+    } );
 }
