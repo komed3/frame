@@ -4,6 +4,7 @@ import { registerAuthCommands } from '@/src/maintenance/commands/auth';
 import { registerConfigCommands } from '@/src/maintenance/commands/config';
 import { registerDbCommands } from '@/src/maintenance/commands/db';
 import { registerInitCommands } from '@/src/maintenance/commands/init';
+import { registerRootCommands } from '@/src/maintenance/commands/roots';
 import { registerUserCommands } from '@/src/maintenance/commands/user';
 import { ui } from '@/src/maintenance/utils/ui';
 import { db } from '@/src/server/core/Database';
@@ -25,8 +26,11 @@ frame
 registerInitCommands( frame );
 registerConfigCommands( frame );
 registerDbCommands( frame );
+
 registerUserCommands( frame );
 registerAuthCommands( frame );
+
+registerRootCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
