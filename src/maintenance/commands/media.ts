@@ -62,4 +62,15 @@ export const registerMediaCommands = ( program: Command ) : void => {
       for ( const [ key, value ] of Object.entries( media ) )
         console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
     } );
+
+  mediaCommand
+    .command( 'get-by-path <root> <path>' )
+    .description( 'Find media by root ID and relative path' )
+    .action( ( root: string, path: string ) => {
+      const media = Media.getByPath( resolveId( root, 'media root' ), path );
+      if ( ! media ) throw new Error( `No media found at ${ path }` );
+
+      for ( const [ key, value ] of Object.entries( media ) )
+        console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
+    } );
 }
