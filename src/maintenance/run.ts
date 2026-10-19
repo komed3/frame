@@ -5,6 +5,7 @@ import { registerConfigCommands } from '@/src/maintenance/commands/config';
 import { registerDbCommands } from '@/src/maintenance/commands/db';
 import { registerDirectoryCommands } from '@/src/maintenance/commands/directories';
 import { registerInitCommands } from '@/src/maintenance/commands/init';
+import { registerMediaCommands } from '@/src/maintenance/commands/media';
 import { registerRootCommands } from '@/src/maintenance/commands/roots';
 import { registerUserCommands } from '@/src/maintenance/commands/user';
 import { ui } from '@/src/maintenance/utils/ui';
@@ -36,6 +37,7 @@ registerAuthCommands( frame );
 frame.commandsGroup( 'Content Management:' );
 registerRootCommands( frame );
 registerDirectoryCommands( frame );
+registerMediaCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
