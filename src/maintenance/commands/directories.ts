@@ -32,7 +32,7 @@ export const registerDirectoryCommands = ( program: Command ) : void => {
     } );
 
   directoryCommand
-    .command( 'show <id>' )
+    .command( 'get <id>' )
     .description( 'Show directory details' )
     .action( ( id: string ) => {
       const directory = MediaDirectories.get( resolveId( id, 'media directory' ) );
