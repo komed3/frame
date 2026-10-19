@@ -7,6 +7,7 @@ import { registerDirectoryCommands } from '@/src/maintenance/commands/directorie
 import { registerInitCommands } from '@/src/maintenance/commands/init';
 import { registerMediaCommands } from '@/src/maintenance/commands/media';
 import { registerRootCommands } from '@/src/maintenance/commands/roots';
+import { registerSearchCommands } from '@/src/maintenance/commands/search';
 import { registerUserCommands } from '@/src/maintenance/commands/user';
 import { ui } from '@/src/maintenance/utils/ui';
 import { db } from '@/src/server/core/Database';
@@ -38,6 +39,7 @@ frame.commandsGroup( 'Content Management:' );
 registerRootCommands( frame );
 registerDirectoryCommands( frame );
 registerMediaCommands( frame );
+registerSearchCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
