@@ -46,4 +46,15 @@ export const registerCategoryCommands = ( program: Command ) : void => {
       MediaTaxonomy.renameCategory( resolveId( id, 'category' ), name );
       ui.success( `Renamed category ${ id } to ${ name }.` );
     } );
+
+  categoryCommand
+    .command( 'set-parent <id> [parent]' )
+    .description( 'Set a parent category or make the category a root' )
+    .action( ( id: string, parent?: string ) => {
+      MediaTaxonomy.setCategoryParent( resolveId( id, 'category' ),
+        parent === undefined ? null : resolveId( parent, 'parent category' )
+      );
+
+      ui.success( `Updated parent for category ${ id }.` );
+    } );
 }
