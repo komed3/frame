@@ -12,7 +12,6 @@ const parseNumber = ( value: string, label: string, min = 0 ) : number =>
 export const registerFavoriteCommands = ( program: Command ) : void => {
   const favoriteCommand = program
     .command( 'favorite' )
-    .alias( 'favorites' )
     .description( 'Manage user favorites' );
 
   favoriteCommand
