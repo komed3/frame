@@ -15,4 +15,17 @@ export const registerPrefCommands = ( program: Command ) : void => {
   const prefCommand = program
     .command( 'pref' )
     .description( 'Manage user preferences' );
+
+  prefCommand
+    .command( 'list <user>' )
+    .description( 'List all preferences and their current values' )
+    .action( ( user: string ) => {
+      const userId = resolveId( user, 'user' );
+      const values = Pref.all( userId );
+
+      console.table( Object.entries( Pref.schema ).map( ( [ name, definition ] ) => ( {
+        key: name, value: values[ name as PrefName ], type: definition.type,
+        default: definition.default, description: definition.desc
+      } ) ) );
+    } );
 }
