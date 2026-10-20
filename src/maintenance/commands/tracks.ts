@@ -9,4 +9,13 @@ export const registerTrackCommands = ( program: Command ) : void => {
     .command( 'track' )
     .alias( 'tracks' )
     .description( 'Inspect media tracks' );
+
+  trackCommand
+    .command( 'list <media>' )
+    .description( 'List tracks for a media record' )
+    .action( ( media: string ) => {
+      const tracks = MediaTracks.list( resolveId( media, 'media' ) );
+      if ( ! tracks.length ) return ui.info( 'No tracks found.' );
+      console.table( tracks );
+    } );
 }
