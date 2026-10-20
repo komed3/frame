@@ -107,4 +107,30 @@ export const registerMarkerCommands = ( program: Command ) : void => {
 
       ui.success( `Deleted marker ${ markerId }.` );
     } );
+
+  markerCommand
+    .command( 'clear-media <user> <media>' )
+    .description( 'Delete all markers for one media record' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, media: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' ), mediaId = resolveId( media, 'media' );
+      if ( ! options.yes && ! await confirm( `Delete all markers for media ${ mediaId } and user ${ userId }?` ) )
+        return ui.cancelled();
+
+      const count = Markers.clearMediaMarker( userId, mediaId );
+      ui.success( `Deleted ${ count } marker(s).` );
+    } );
+
+  markerCommand
+    .command( 'clear <user>' )
+    .description( 'Delete all markers for a user' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' );
+      if ( ! options.yes && ! await confirm( `Delete all markers for user ${ userId }?` ) )
+        return ui.cancelled();
+
+      const count = Markers.clear( userId );
+      ui.success( `Deleted ${ count } marker(s).` );
+    } );
 }
