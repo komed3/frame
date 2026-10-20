@@ -6,3 +6,11 @@ import { Command } from 'commander';
 
 
 const resolveKind = ( value: string ) : MediaAssetKind => validateEnum( value, 'asset kind', ASSET_KINDS );
+
+
+export const registerAssetCommands = ( program: Command ) : void => {
+  const assetCommand = program
+    .command( 'asset' )
+    .alias( 'assets' )
+    .description( 'Inspect generated media assets' );
+}
