@@ -29,4 +29,13 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
       if ( ! playlists.length ) return ui.info( 'No playlists found.' );
       console.table( playlists );
     } );
+
+  playlistCommand
+    .command( 'get <user> <playlist>' )
+    .description( 'Show playlist details' )
+    .action( ( user: string, playlist: string ) => {
+      const record = Playlists.get( resolveId( user, 'user' ), resolveId( playlist, 'playlist' ) );
+      if ( ! record ) throw new Error( `Playlist ${ playlist } does not exist` );
+      console.table( [ record ] );
+    } );
 }
