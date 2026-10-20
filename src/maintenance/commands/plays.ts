@@ -13,7 +13,7 @@ const showPlays = ( records: ReturnType< typeof Plays.listByUser > ) : void => {
 
 export const registerPlayCommands = ( program: Command ) : void => {
   const playCommand = program
-    .command( 'plays' )
+    .command( 'plays' ).alias( 'history' )
     .description( 'Inspect playback history' );
 
   playCommand
