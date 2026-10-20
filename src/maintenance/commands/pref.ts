@@ -9,3 +9,10 @@ const parseValue = ( value: string ) : unknown => {
   try { return JSON.parse( value ) }
   catch { return value }
 };
+
+
+export const registerPrefCommands = ( program: Command ) : void => {
+  const prefCommand = program
+    .command( 'pref' )
+    .description( 'Manage user preferences' );
+}
