@@ -27,4 +27,16 @@ export const registerMetadataCommands = ( program: Command ) : void => {
       if ( ! entries.length ) return ui.info( 'No metadata found.' );
       console.table( entries );
     } );
+
+  metadataCommand
+    .command( 'get <media> <key>' )
+    .description( 'Get one metadata value' )
+    .option( '--source <source>', 'Metadata source: manual or scan', 'manual' )
+    .action( ( media: string, key: string, options: { source: string } ) => {
+      const entry = MediaMetadata.get( resolveId( media, 'media' ), key, resolveSource( options.source ) );
+      if ( ! entry ) throw new Error( `Metadata key does not exist: ${ key }` );
+
+      for ( const [ name, value ] of Object.entries( entry ) )
+        console.log( `${ ui.key( name ) }: ${ ui.value( String( value ) ) }` );
+    } );
 }
