@@ -36,4 +36,16 @@ export const registerPrefCommands = ( program: Command ) : void => {
       const key = Pref.resolveName( name ), value = Pref.get( resolveId( user, 'user' ), key );
       ui.info( `${ ui.key( key ) }: ${ ui.value( JSON.stringify( value ) ) }` );
     } );
+
+  prefCommand
+    .command( 'set <user> <key> <value>' )
+    .description( 'Set a preference' )
+    .action( ( user: string, name: string, rawValue: string ) => {
+      const userId = resolveId( user, 'user' );
+      const key = Pref.resolveName( name );
+      const value = parseValue( rawValue );
+
+      Pref.set( userId, key, value as PrefValue< typeof key > );
+      ui.success( `Updated ${ key } for user ${ userId }.` );
+    } );
 }
