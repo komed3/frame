@@ -4,8 +4,8 @@ import { Media } from '@/src/server/media/Media';
 import { assertRelativePath } from '@/src/server/utils';
 import type { MediaAssetInput, MediaAssetKind, MediaAssetRecord, MediaAssetRow } from '@/src/shared/types/assets';
 import { randomUUID } from 'node:crypto';
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { dirname, relative, resolve, sep } from 'node:path';
 
 
 export const ASSET_KINDS: MediaAssetKind[] = [ 'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle' ];
@@ -198,5 +198,41 @@ export class MediaAssets {
     }
 
     if ( backedUp ) await rm( backupPath, { force: true } );
+  }
+
+  public static async clean () : Promise< number > {
+    const root = Config.get( 'ASSETS_PATH' );
+    const reg = new Set( as< { path: string }[] >( conn().prepare( 'SELECT path FROM assets' ).all() ).map( a => a.path ) );
+    let removed = 0;
+
+    const cleanDirectory = async ( directory: string ) : Promise< void > => {
+      let entries;
+
+      try { entries = await readdir( directory, { withFileTypes: true } ) }
+      catch ( err ) {
+        if ( ( err as NodeJS.ErrnoException ).code === 'ENOENT' ) return;
+        throw err;
+      }
+
+      for ( const entry of entries ) {
+        const path = resolve( directory, entry.name );
+
+        if ( entry.isDirectory() ) {
+          await cleanDirectory( path );
+          continue;
+        }
+
+        if ( ! entry.isFile() ) continue;
+
+        const relativePath = relative( root, path ).split( sep ).join( '/' );
+        if ( reg.has( relativePath ) ) continue;
+
+        await rm( path );
+        removed++;
+      }
+    };
+
+    await cleanDirectory( root );
+    return removed;
   }
 }
