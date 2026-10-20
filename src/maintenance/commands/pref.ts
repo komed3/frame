@@ -28,4 +28,12 @@ export const registerPrefCommands = ( program: Command ) : void => {
         default: definition.default, description: definition.desc
       } ) ) );
     } );
+
+  prefCommand
+    .command( 'get <user> <key>' )
+    .description( 'Get one preference' )
+    .action( ( user: string, name: string ) => {
+      const key = Pref.resolveName( name ), value = Pref.get( resolveId( user, 'user' ), key );
+      ui.info( `${ ui.key( key ) }: ${ ui.value( JSON.stringify( value ) ) }` );
+    } );
 }
