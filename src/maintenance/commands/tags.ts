@@ -43,4 +43,19 @@ export const registerTagCommands = ( program: Command ) : void => {
       MediaTaxonomy.renameTag( resolveId( id, 'tag' ), name );
       ui.success( `Renamed tag ${ id } to ${ name }.` );
     } );
+
+  tagCommand
+    .command( 'delete <id>' )
+    .description( 'Delete a tag and its media assignments' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( id: string, options: { yes?: boolean } ) => {
+      const tagId = resolveId( id, 'tag' ), tag = MediaTaxonomy.getTag( tagId );
+      if ( ! tag ) throw new Error( `Tag ${ tagId } does not exist` );
+
+      if ( ! options.yes && ! await confirm( `Delete tag "${ tag.name }" and its assignments?` ) )
+        return ui.cancelled();
+
+      MediaTaxonomy.deleteTag( tagId );
+      ui.success( `Deleted tag ${ tag.name } (ID ${ tagId }).` );
+    } );
 }
