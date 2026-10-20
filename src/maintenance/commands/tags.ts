@@ -35,4 +35,12 @@ export const registerTagCommands = ( program: Command ) : void => {
       const id = MediaTaxonomy.createTag( name );
       ui.success( `Saved tag ${ name } (ID ${ id }).` );
     } );
+
+  tagCommand
+    .command( 'rename <id> <name>' )
+    .description( 'Rename a tag' )
+    .action( ( id: string, name: string ) => {
+      MediaTaxonomy.renameTag( resolveId( id, 'tag' ), name );
+      ui.success( `Renamed tag ${ id } to ${ name }.` );
+    } );
 }
