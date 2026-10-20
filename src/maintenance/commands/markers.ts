@@ -53,4 +53,22 @@ export const registerMarkerCommands = ( program: Command ) : void => {
       if ( ! markers.length ) return ui.info( 'No markers found for this media.' );
       console.table( markers );
     } );
+
+  markerCommand
+    .command( 'create <user> <media> <position-ms>' )
+    .description( 'Create a marker' )
+    .option( '--title <title>', 'Marker title' )
+    .option( '--description <text>', 'Marker description' )
+    .action( (
+      user: string, media: string, position: string,
+      options: { title?: string; description?: string }
+    ) => {
+      const id = Markers.create(
+        resolveId( user, 'user' ), resolveId( media, 'media' ),
+        parseNumber( position, 'position' ), options.title ?? null,
+        options.description ?? null
+      );
+
+      ui.success( `Created marker ${ id }.` );
+    } );
 }
