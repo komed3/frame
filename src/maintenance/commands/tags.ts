@@ -67,4 +67,12 @@ export const registerTagCommands = ( program: Command ) : void => {
       if ( ! tags.length ) return ui.info( 'No tags assigned.' );
       console.table( tags );
     } );
+
+  tagCommand
+    .command( 'media-set <media> [tags...]' )
+    .description( 'Replace tag assignments for a media record' )
+    .action( ( media: string, tags: string[] = [] ) => {
+      MediaTaxonomy.setMediaTags( resolveId( media, 'media' ), tags.map( id => resolveId( id, 'tag' ) ) );
+      ui.success( `Updated tag assignments for media ${ media }.` );
+    } );
 }
