@@ -8,3 +8,10 @@ const showPlays = ( records: ReturnType< typeof Plays.listByUser > ) : void => {
   if ( ! records.length ) return ui.info( 'No playback history found.' );
   console.table( records );
 };
+
+
+export const registerPlayCommands = ( program: Command ) : void => {
+  const playCommand = program
+    .command( 'plays' )
+    .description( 'Inspect playback history' );
+}
