@@ -9,6 +9,7 @@ import { registerMediaCommands } from '@/src/maintenance/commands/media';
 import { registerMetadataCommands } from '@/src/maintenance/commands/metadata';
 import { registerRootCommands } from '@/src/maintenance/commands/roots';
 import { registerSearchCommands } from '@/src/maintenance/commands/search';
+import { registerTagCommands } from '@/src/maintenance/commands/tags';
 import { registerTrackCommands } from '@/src/maintenance/commands/tracks';
 import { registerUserCommands } from '@/src/maintenance/commands/user';
 import { ui } from '@/src/maintenance/utils/ui';
@@ -33,17 +34,20 @@ registerInitCommands( frame );
 registerConfigCommands( frame );
 registerDbCommands( frame );
 
-frame.commandsGroup( 'Account Administration:' );
+frame.commandsGroup( 'Users & Accounts:' );
 registerUserCommands( frame );
 registerAuthCommands( frame );
 
-frame.commandsGroup( 'Content Management:' );
+frame.commandsGroup( 'Media:' );
 registerSearchCommands( frame );
 registerRootCommands( frame );
 registerDirectoryCommands( frame );
 registerMediaCommands( frame );
 registerMetadataCommands( frame );
 registerTrackCommands( frame );
+
+frame.commandsGroup( 'Taxonomies:' );
+registerTagCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
