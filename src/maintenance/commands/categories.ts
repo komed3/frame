@@ -57,4 +57,19 @@ export const registerCategoryCommands = ( program: Command ) : void => {
 
       ui.success( `Updated parent for category ${ id }.` );
     } );
+
+  categoryCommand
+    .command( 'delete <id>' )
+    .description( 'Delete a category and its media assignments' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( id: string, options: { yes?: boolean } ) => {
+      const categoryId = resolveId( id, 'category' ), category = MediaTaxonomy.getCategory( categoryId );
+      if ( ! category ) throw new Error( `Category ${ categoryId } does not exist` );
+
+      if ( ! options.yes && ! await confirm( `Delete category "${ category.name }" and its assignments?` ) )
+        return ui.cancelled();
+
+      MediaTaxonomy.deleteCategory( categoryId );
+      ui.success( `Deleted category ${ category.name } (ID ${ categoryId }).` );
+    } );
 }
