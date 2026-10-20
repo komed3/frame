@@ -21,8 +21,7 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
     .option( '--offset <number>', 'Skip results', '0' )
     .action( ( user: string, options: { limit: string; offset: string } ) => {
       const playlists = Playlists.list(
-        resolveId( user, 'user' ),
-        parseNumber( options.limit, 'limit', 1 ),
+        resolveId( user, 'user' ), parseNumber( options.limit, 'limit', 1 ),
         parseNumber( options.offset, 'offset' )
       );
 
@@ -90,5 +89,30 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
 
       if ( ! items.length ) return ui.info( 'No playlist entries found.' );
       console.table( items );
+    } );
+
+  playlistCommand
+    .command( 'add <user> <playlist> <media>' )
+    .description( 'Add a media record to a playlist' )
+    .action( ( user: string, playlist: string, media: string ) => {
+      Playlists.addItem(
+        resolveId( user, 'user' ), resolveId( playlist, 'playlist' ),
+        resolveId( media, 'media' )
+      );
+
+      ui.success( `Added media ${ media } to playlist ${ playlist }.` );
+    } );
+
+  playlistCommand
+    .command( 'remove <user> <playlist> <media>' )
+    .description( 'Remove a media record from a playlist' )
+    .action( ( user: string, playlist: string, media: string ) => {
+      const removed = Playlists.removeItem(
+        resolveId( user, 'user' ), resolveId( playlist, 'playlist' ),
+        resolveId( media, 'media' )
+      );
+
+      if ( ! removed ) return ui.info( 'Media was not in the playlist.' );
+      ui.success( `Removed media ${ media } from playlist ${ playlist }.` );
     } );
 }
