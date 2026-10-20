@@ -59,10 +59,9 @@ export const registerMarkerCommands = ( program: Command ) : void => {
     .description( 'Create a marker' )
     .option( '--title <title>', 'Marker title' )
     .option( '--description <text>', 'Marker description' )
-    .action( (
-      user: string, media: string, position: string,
-      options: { title?: string; description?: string }
-    ) => {
+    .action( ( user: string, media: string, position: string, options: {
+      title?: string; description?: string
+    } ) => {
       const id = Markers.create(
         resolveId( user, 'user' ), resolveId( media, 'media' ),
         parseNumber( position, 'position' ), options.title ?? null,
@@ -70,5 +69,27 @@ export const registerMarkerCommands = ( program: Command ) : void => {
       );
 
       ui.success( `Created marker ${ id }.` );
+    } );
+
+  markerCommand
+    .command( 'update <user> <marker>' )
+    .description( 'Update a marker' )
+    .option( '--position <ms>', 'New position in milliseconds' )
+    .option( '--title <title>', 'New title' )
+    .option( '--description <text>', 'New description' )
+    .action( ( user: string, marker: string, options: {
+      position?: string; title?: string; description?: string
+    } ) => {
+      if (
+        options.position === undefined && options.title === undefined &&
+        options.description === undefined
+      ) throw new Error( 'Specify --position, --title or --description' );
+
+      Markers.update( resolveId( user, 'user' ), resolveId( marker, 'marker' ), {
+        positionMs: options.position === undefined ? undefined : parseNumber( options.position, 'position' ),
+        title: options.title, description: options.description
+      } );
+
+      ui.success( `Updated marker ${ marker }.` );
     } );
 }
