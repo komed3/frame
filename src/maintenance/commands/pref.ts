@@ -1,15 +1,10 @@
+import { parseJSON } from '@/src/maintenance/utils/format';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Pref } from '@/src/server/core/Pref';
 import { resolveId } from '@/src/server/utils';
 import type { PrefName, PrefValue } from '@/src/shared/types/pref';
 import { Command } from 'commander';
-
-
-const parseValue = ( value: string ) : unknown => {
-  try { return JSON.parse( value ) }
-  catch { return value }
-};
 
 
 export const registerPrefCommands = ( program: Command ) : void => {
@@ -44,7 +39,7 @@ export const registerPrefCommands = ( program: Command ) : void => {
     .action( ( user: string, name: string, rawValue: string ) => {
       const userId = resolveId( user, 'user' );
       const key = Pref.resolveName( name );
-      const value = parseValue( rawValue );
+      const value = parseJSON( rawValue );
 
       Pref.set( userId, key, value as PrefValue< typeof key > );
       ui.success( `Updated ${ key } for user ${ userId }.` );
