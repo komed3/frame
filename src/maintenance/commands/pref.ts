@@ -1,3 +1,4 @@
+import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Pref } from '@/src/server/core/Pref';
 import { resolveId } from '@/src/server/utils';
@@ -58,5 +59,19 @@ export const registerPrefCommands = ( program: Command ) : void => {
 
       Pref.reset( userId, key );
       ui.success( `Reset ${ key } to its default for user ${ userId }.` );
+    } );
+
+  prefCommand
+    .command( 'reset-all <user>' )
+    .description( 'Reset all preferences for a user' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' );
+
+      if ( ! options.yes && ! await confirm( `Reset all preferences for user ${ userId }?` ) )
+        return ui.cancelled();
+
+      const count = Pref.resetAll( userId );
+      ui.success( `Reset ${ count } preference(s) for user ${ userId }.` );
     } );
 }
