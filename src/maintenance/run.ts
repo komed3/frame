@@ -9,6 +9,7 @@ import { registerDirectoryCommands } from '@/src/maintenance/commands/directorie
 import { registerInitCommands } from '@/src/maintenance/commands/init';
 import { registerMediaCommands } from '@/src/maintenance/commands/media';
 import { registerMetadataCommands } from '@/src/maintenance/commands/metadata';
+import { registerPlaylistCommands } from '@/src/maintenance/commands/playlists';
 import { registerPrefCommands } from '@/src/maintenance/commands/pref';
 import { registerRootCommands } from '@/src/maintenance/commands/roots';
 import { registerSearchCommands } from '@/src/maintenance/commands/search';
@@ -54,6 +55,9 @@ registerAssetCommands( frame );
 frame.commandsGroup( 'Taxonomies:' );
 registerCategoryCommands( frame );
 registerTagCommands( frame );
+
+frame.commandsGroup( 'User Data:' );
+registerPlaylistCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
