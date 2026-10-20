@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { registerAuthCommands } from '@/src/maintenance/commands/auth';
+import { registerCategoryCommands } from '@/src/maintenance/commands/categories';
 import { registerConfigCommands } from '@/src/maintenance/commands/config';
 import { registerDbCommands } from '@/src/maintenance/commands/db';
 import { registerDirectoryCommands } from '@/src/maintenance/commands/directories';
@@ -47,6 +48,7 @@ registerMetadataCommands( frame );
 registerTrackCommands( frame );
 
 frame.commandsGroup( 'Taxonomies:' );
+registerCategoryCommands( frame );
 registerTagCommands( frame );
 
 
