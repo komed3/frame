@@ -45,4 +45,18 @@ export const registerFavoriteCommands = ( program: Command ) : void => {
       const removed = Favorites.remove( resolveId( user, 'user' ), resolveId( media, 'media' ) );
       ui.info( removed ? 'Favorite removed.' : 'Media was not a favorite.' );
     } );
+
+  favoriteCommand
+    .command( 'clear <user>' )
+    .description( 'Remove all favorites for a user' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' );
+
+      if ( ! options.yes && ! await confirm( `Remove all favorites for user ${ userId }?` ) )
+        return ui.cancelled();
+
+      const count = Favorites.clear( userId );
+      ui.success( `Removed ${ count } favorite(s) for user ${ userId }.` );
+    } );
 }
