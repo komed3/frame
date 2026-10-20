@@ -76,4 +76,19 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
       Playlists.delete( userId, playlistId );
       ui.success( `Deleted playlist ${ playlistId }.` );
     } );
+
+  playlistCommand
+    .command( 'items <user> <playlist>' )
+    .description( 'List entries in a playlist' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( user: string, playlist: string, options: { limit: string; offset: string } ) => {
+      const items = Playlists.listItems(
+        resolveId( user, 'user' ), resolveId( playlist, 'playlist' ),
+        parseNumber( options.limit, 'limit', 1 ), parseNumber( options.offset, 'offset' )
+      );
+
+      if ( ! items.length ) return ui.info( 'No playlist entries found.' );
+      console.table( items );
+    } );
 }
