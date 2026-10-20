@@ -13,4 +13,17 @@ export const registerAssetCommands = ( program: Command ) : void => {
     .command( 'asset' )
     .alias( 'assets' )
     .description( 'Inspect generated media assets' );
+
+  assetCommand
+    .command( 'list <media>' )
+    .description( 'List generated assets for a media record' )
+    .option( '--kind <kind>', 'Filter by asset kind' )
+    .action( ( media: string, options: { kind?: string } ) => {
+      const assets = MediaAssets.list( resolveId( media, 'media' ),
+        options.kind === undefined ? undefined : resolveKind( options.kind )
+      );
+
+      if ( ! assets.length ) return ui.info( 'No assets found.' );
+      console.table( assets );
+    } );
 }
