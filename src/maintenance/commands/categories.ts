@@ -9,4 +9,13 @@ export const registerCategoryCommands = ( program: Command ) : void => {
   const categoryCommand = program
     .command( 'category' ).alias( 'categories' )
     .description( 'Manage categories and media assignments' );
+
+  categoryCommand
+    .command( 'list' )
+    .description( 'List all categories' )
+    .action( () => {
+      const categories = MediaTaxonomy.listCategories();
+      if ( ! categories.length ) return ui.info( 'No categories found.' );
+      console.table( categories );
+    } );
 }
