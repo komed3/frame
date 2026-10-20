@@ -38,4 +38,14 @@ export const registerAssetCommands = ( program: Command ) : void => {
         value === null ? '—' : typeof value === 'object' ? JSON.stringify( value ) : String( value )
       ) }` );
     } );
+
+  assetCommand
+    .command( 'get-path <media> <kind> [variant]' )
+    .description( 'Show the file system path of one asset by kind and optional variant' )
+    .action( ( media: string, kind: string, variant = 'default' ) => {
+      const asset = MediaAssets.get( resolveId( media, 'media' ), resolveKind( kind ), variant );
+      if ( ! asset ) throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ media }` );
+
+      console.log( MediaAssets.resolvePath( asset.path ) );
+    } );
 }
