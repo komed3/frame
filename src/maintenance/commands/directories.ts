@@ -17,8 +17,7 @@ const printTree = ( nodes: MediaDirectoryTree[], prefix = '' ) : void => {
 
 export const registerDirectoryCommands = ( program: Command ) : void => {
   const directoryCommand = program
-    .command( 'directory' )
-    .alias( 'dir' )
+    .command( 'directory' ).alias( 'dir' )
     .description( 'Inspect media directories' );
 
   directoryCommand
