@@ -13,4 +13,20 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
   const playlistCommand = program
     .command( 'playlist' )
     .description( 'Manage user playlists' );
+
+  playlistCommand
+    .command( 'list <user>' )
+    .description( 'List playlists for a user' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( user: string, options: { limit: string; offset: string } ) => {
+      const playlists = Playlists.list(
+        resolveId( user, 'user' ),
+        parseNumber( options.limit, 'limit', 1 ),
+        parseNumber( options.offset, 'offset' )
+      );
+
+      if ( ! playlists.length ) return ui.info( 'No playlists found.' );
+      console.table( playlists );
+    } );
 }
