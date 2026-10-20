@@ -27,4 +27,16 @@ export const registerPlayCommands = ( program: Command ) : void => {
         parseNumber( options.offset, 'offset' )
       ) );
     } );
+
+  playCommand
+    .command( 'list-media <media>' )
+    .description( 'List playback history for a media record' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( media: string, options: { limit: string; offset: string } ) => {
+      showPlays( Plays.listByMedia(
+        resolveId( media, 'media' ), parseNumber( options.limit, 'limit', 1 ),
+        parseNumber( options.offset, 'offset' )
+      ) );
+    } );
 }
