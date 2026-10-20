@@ -39,4 +39,16 @@ export const registerPlayCommands = ( program: Command ) : void => {
         parseNumber( options.offset, 'offset' )
       ) );
     } );
+
+  playCommand
+    .command( 'list-user-media <user> <media>' )
+    .description( 'List playback history for one user and media record' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( user: string, media: string, options: { limit: string; offset: string } ) => {
+      showPlays( Plays.listByUserAndMedia(
+        resolveId( user, 'user' ), resolveId( media, 'media' ),
+        parseNumber( options.limit, 'limit', 1 ), parseNumber( options.offset, 'offset' )
+      ) );
+    } );
 }
