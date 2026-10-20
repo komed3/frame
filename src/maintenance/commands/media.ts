@@ -1,17 +1,10 @@
+import { formatValue, parseNumber } from '@/src/maintenance/utils/format';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Media, MEDIA_TYPES } from '@/src/server/media/Media';
-import { resolveId, validateNumber } from '@/src/server/utils';
+import { resolveId } from '@/src/server/utils';
 import type { MediaType } from '@/src/shared/types/media';
 import { Command } from 'commander';
-
-
-const parseNumber = ( value: string, label: string, min = 0 ) : number =>
-  validateNumber( value, label, min, Number.MAX_SAFE_INTEGER, true, true );
-
-const formatValue = ( value: unknown ) : string => value === null ? '—'
-  : typeof value === 'object' ? JSON.stringify( value )
-  : String( value );
 
 
 export const registerMediaCommands = ( program: Command ) : void => {
