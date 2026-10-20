@@ -39,4 +39,13 @@ export const registerMetadataCommands = ( program: Command ) : void => {
       for ( const [ name, value ] of Object.entries( entry ) )
         console.log( `${ ui.key( name ) }: ${ ui.value( String( value ) ) }` );
     } );
+
+  metadataCommand
+    .command( 'set <media> <key> <value>' )
+    .description( 'Set a metadata value' )
+    .option( '--source <source>', 'Metadata source: manual or scan', 'manual' )
+    .action( ( media: string, key: string, value: string, options: { source: string } ) => {
+      const id = MediaMetadata.set( resolveId( media, 'media' ), key, value, resolveSource( options.source ) );
+      ui.success( `Saved metadata ${ key } (ID ${ id }).` );
+    } );
 }
