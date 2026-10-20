@@ -29,4 +29,12 @@ export const registerFavoriteCommands = ( program: Command ) : void => {
       if ( ! favorites.length ) return ui.info( 'No favorites found.' );
       console.table( favorites );
     } );
+
+  favoriteCommand
+    .command( 'add <user> <media>' )
+    .description( 'Add a media record to favorites' )
+    .action( ( user: string, media: string ) => {
+      const added = Favorites.add( resolveId( user, 'user' ), resolveId( media, 'media' ) );
+      ui.info( added ? 'Favorite added.' : 'Media is already a favorite.' );
+    } );
 }
