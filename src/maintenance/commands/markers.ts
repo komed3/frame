@@ -12,7 +12,6 @@ import { Command } from 'commander';
 export const registerMarkerCommands = ( program: Command ) : void => {
   const markerCommand = program
     .command( 'marker' )
-    .alias( 'markers' )
     .description( 'Manage user markers' );
 
   markerCommand
