@@ -26,4 +26,16 @@ export const registerAssetCommands = ( program: Command ) : void => {
       if ( ! assets.length ) return ui.info( 'No assets found.' );
       console.table( assets );
     } );
+
+  assetCommand
+    .command( 'get <media> <kind> [variant]' )
+    .description( 'Show one asset by kind and optional variant' )
+    .action( ( media: string, kind: string, variant = 'default' ) => {
+      const asset = MediaAssets.get( resolveId( media, 'media' ), resolveKind( kind ), variant );
+      if ( ! asset ) throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ media }` );
+
+      for ( const [ key, value ] of Object.entries( asset ) ) console.log( `${ ui.key( key ) }: ${ ui.value(
+        value === null ? '—' : typeof value === 'object' ? JSON.stringify( value ) : String( value )
+      ) }` );
+    } );
 }
