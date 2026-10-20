@@ -11,9 +11,8 @@ const resolveSource = ( value?: string ) : MediaMetadataSource =>
 
 export const registerMetadataCommands = ( program: Command ) : void => {
   const metadataCommand = program
-    .command( 'metadata' )
-    .alias( 'meta' )
-    .description( 'Manage media metadata' );
+    .command( 'metadata' ).alias( 'meta' )
+    .description( 'Manage manual media metadata' );
 
   metadataCommand
     .command( 'list <media>' )
@@ -42,19 +41,17 @@ export const registerMetadataCommands = ( program: Command ) : void => {
 
   metadataCommand
     .command( 'set <media> <key> <value>' )
-    .description( 'Set a metadata value' )
-    .option( '--source <source>', 'Metadata source: manual or scan', 'manual' )
-    .action( ( media: string, key: string, value: string, options: { source: string } ) => {
-      const id = MediaMetadata.set( resolveId( media, 'media' ), key, value, resolveSource( options.source ) );
-      ui.success( `Saved metadata ${ key } (ID ${ id }).` );
+    .description( 'Set a manual metadata value' )
+    .action( ( media: string, key: string, value: string ) => {
+      const id = MediaMetadata.set( resolveId( media, 'media' ), key, value, 'manual' );
+      ui.success( `Saved manual metadata ${ key } (ID ${ id }).` );
     } );
 
   metadataCommand
     .command( 'delete <media> <key>' )
-    .description( 'Delete a metadata value' )
-    .option( '--source <source>', 'Metadata source: manual or scan', 'manual' )
-    .action( ( media: string, key: string, options: { source: string } ) => {
-      MediaMetadata.delete( resolveId( media, 'media' ), key, resolveSource( options.source ) );
-      ui.success( `Deleted metadata ${ key }.` );
+    .description( 'Delete a manual metadata value' )
+    .action( ( media: string, key: string ) => {
+      MediaMetadata.delete( resolveId( media, 'media' ), key, 'manual' );
+      ui.success( `Deleted manual metadata ${ key }.` );
     } );
 }
