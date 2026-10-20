@@ -48,4 +48,15 @@ export const registerPrefCommands = ( program: Command ) : void => {
       Pref.set( userId, key, value as PrefValue< typeof key > );
       ui.success( `Updated ${ key } for user ${ userId }.` );
     } );
+
+  prefCommand
+    .command( 'reset <user> <key>' )
+    .description( 'Reset one preference to its default' )
+    .action( ( user: string, name: string ) => {
+      const userId = resolveId( user, 'user' );
+      const key = Pref.resolveName( name );
+
+      Pref.reset( userId, key );
+      ui.success( `Reset ${ key } to its default for user ${ userId }.` );
+    } );
 }
