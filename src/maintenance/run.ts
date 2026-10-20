@@ -9,6 +9,7 @@ import { registerDirectoryCommands } from '@/src/maintenance/commands/directorie
 import { registerInitCommands } from '@/src/maintenance/commands/init';
 import { registerMediaCommands } from '@/src/maintenance/commands/media';
 import { registerMetadataCommands } from '@/src/maintenance/commands/metadata';
+import { registerPrefCommands } from '@/src/maintenance/commands/pref';
 import { registerRootCommands } from '@/src/maintenance/commands/roots';
 import { registerSearchCommands } from '@/src/maintenance/commands/search';
 import { registerTagCommands } from '@/src/maintenance/commands/tags';
@@ -39,6 +40,7 @@ registerDbCommands( frame );
 frame.commandsGroup( 'Users & Accounts:' );
 registerUserCommands( frame );
 registerAuthCommands( frame );
+registerPrefCommands( frame );
 
 frame.commandsGroup( 'Media:' );
 registerSearchCommands( frame );
