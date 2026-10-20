@@ -18,4 +18,13 @@ export const registerTagCommands = ( program: Command ) : void => {
       if ( ! tags.length ) return ui.info( 'No tags found.' );
       console.table( tags );
     } );
+
+  tagCommand
+    .command( 'get <id>' )
+    .description( 'Show tag details' )
+    .action( ( id: string ) => {
+      const tag = MediaTaxonomy.getTag( resolveId( id, 'tag' ) );
+      if ( ! tag ) throw new Error( `Tag ${ id } does not exist` );
+      console.table( [ tag ] );
+    } );
 }
