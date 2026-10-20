@@ -47,4 +47,20 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
       const id = Playlists.create( resolveId( user, 'user' ), name, options.description );
       ui.success( `Created playlist ${ name } (ID ${ id }).` );
     } );
+
+  playlistCommand
+    .command( 'update <user> <playlist>' )
+    .description( 'Update a playlist' )
+    .option( '--name <name>', 'New playlist name' )
+    .option( '--description <text>', 'New playlist description' )
+    .action( ( user: string, playlist: string, options: { name?: string; description?: string } ) => {
+      if ( options.name === undefined && options.description === undefined )
+        throw new Error( 'Specify --name or --description' );
+
+      Playlists.update( resolveId( user, 'user' ), resolveId( playlist, 'playlist' ), {
+        name: options.name, description: options.description
+      } );
+
+      ui.success( `Updated playlist ${ playlist }.` );
+    } );
 }
