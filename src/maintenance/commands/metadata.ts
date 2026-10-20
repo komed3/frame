@@ -48,4 +48,13 @@ export const registerMetadataCommands = ( program: Command ) : void => {
       const id = MediaMetadata.set( resolveId( media, 'media' ), key, value, resolveSource( options.source ) );
       ui.success( `Saved metadata ${ key } (ID ${ id }).` );
     } );
+
+  metadataCommand
+    .command( 'delete <media> <key>' )
+    .description( 'Delete a metadata value' )
+    .option( '--source <source>', 'Metadata source: manual or scan', 'manual' )
+    .action( ( media: string, key: string, options: { source: string } ) => {
+      MediaMetadata.delete( resolveId( media, 'media' ), key, resolveSource( options.source ) );
+      ui.success( `Deleted metadata ${ key }.` );
+    } );
 }
