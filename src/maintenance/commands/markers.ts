@@ -92,4 +92,19 @@ export const registerMarkerCommands = ( program: Command ) : void => {
 
       ui.success( `Updated marker ${ marker }.` );
     } );
+
+  markerCommand
+    .command( 'delete <user> <marker>' )
+    .description( 'Delete a marker' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, marker: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' ), markerId = resolveId( marker, 'marker' );
+      if ( ! options.yes && ! await confirm( `Delete marker ${ markerId } for user ${ userId }?` ) )
+        return ui.cancelled();
+
+      const deleted = Markers.delete( userId, markerId );
+      if ( ! deleted ) return ui.info( 'Marker was not found.' );
+
+      ui.success( `Deleted marker ${ markerId }.` );
+    } );
 }
