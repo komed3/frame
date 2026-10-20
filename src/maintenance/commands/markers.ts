@@ -29,4 +29,13 @@ export const registerMarkerCommands = ( program: Command ) : void => {
       if ( ! markers.length ) return ui.info( 'No markers found.' );
       console.table( markers );
     } );
+
+  markerCommand
+    .command( 'get <user> <marker>' )
+    .description( 'Show marker details' )
+    .action( ( user: string, marker: string ) => {
+      const record = Markers.get( resolveId( user, 'user' ), resolveId( marker, 'marker' ) );
+      if ( ! record ) throw new Error( `Marker ${ marker } does not exist for user ${ user }` );
+      console.table( [ record ] );
+    } );
 }
