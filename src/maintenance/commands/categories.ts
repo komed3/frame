@@ -81,4 +81,14 @@ export const registerCategoryCommands = ( program: Command ) : void => {
       if ( ! categories.length ) return ui.info( 'No categories assigned.' );
       console.table( categories );
     } );
+
+  categoryCommand
+    .command( 'media-set <media> [categories...]' )
+    .description( 'Replace category assignments for a media record' )
+    .action( ( media: string, categories: string[] = [] ) => {
+      MediaTaxonomy.setMediaCategories( resolveId( media, 'media' ),
+        categories.map( id => resolveId( id, 'category' ) ) );
+
+      ui.success( `Updated category assignments for media ${ media }.` );
+    } );
 }
