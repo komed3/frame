@@ -38,4 +38,13 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
       if ( ! record ) throw new Error( `Playlist ${ playlist } does not exist` );
       console.table( [ record ] );
     } );
+
+  playlistCommand
+    .command( 'create <user> <name>' )
+    .description( 'Create a playlist' )
+    .option( '--description <text>', 'Playlist description' )
+    .action( ( user: string, name: string, options: { description?: string } ) => {
+      const id = Playlists.create( resolveId( user, 'user' ), name, options.description );
+      ui.success( `Created playlist ${ name } (ID ${ id }).` );
+    } );
 }
