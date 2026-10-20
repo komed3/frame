@@ -115,4 +115,16 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
       if ( ! removed ) return ui.info( 'Media was not in the playlist.' );
       ui.success( `Removed media ${ media } from playlist ${ playlist }.` );
     } );
+
+  playlistCommand
+    .command( 'move <user> <playlist> <media> <position>' )
+    .description( 'Move a playlist entry to a zero-based position' )
+    .action( ( user: string, playlist: string, media: string, position: string ) => {
+      Playlists.moveItem(
+        resolveId( user, 'user' ), resolveId( playlist, 'playlist' ),
+        resolveId( media, 'media' ), parseNumber( position, 'position' )
+      );
+
+      ui.success( `Moved media ${ media } in playlist ${ playlist }.` );
+    } );
 }
