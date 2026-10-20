@@ -127,4 +127,17 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
 
       ui.success( `Moved media ${ media } in playlist ${ playlist }.` );
     } );
+
+  playlistCommand
+    .command( 'clear <user> <playlist>' )
+    .description( 'Remove all entries from a playlist' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, playlist: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' ), playlistId = resolveId( playlist, 'playlist' );
+      if ( ! options.yes && ! await confirm( `Remove all entries from playlist ${ playlistId }?` ) )
+        return ui.cancelled();
+
+      const count = Playlists.clearItems( userId, playlistId );
+      ui.success( `Removed ${ count } playlist entr(y/ies).` );
+    } );
 }
