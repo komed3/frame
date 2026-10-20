@@ -48,4 +48,9 @@ export const registerAssetCommands = ( program: Command ) : void => {
 
       console.log( MediaAssets.resolvePath( asset.path ) );
     } );
+
+  assetCommand
+    .command( 'clean' )
+    .description( 'Remove orphaned assets from the file system' )
+    .action( () => {} );
 }
