@@ -18,4 +18,13 @@ export const registerCategoryCommands = ( program: Command ) : void => {
       if ( ! categories.length ) return ui.info( 'No categories found.' );
       console.table( categories );
     } );
+
+  categoryCommand
+    .command( 'get <id>' )
+    .description( 'Show category details' )
+    .action( ( id: string ) => {
+      const category = MediaTaxonomy.getCategory( resolveId( id, 'category' ) );
+      if ( ! category ) throw new Error( `Category ${ id } does not exist` );
+      console.table( [ category ] );
+    } );
 }
