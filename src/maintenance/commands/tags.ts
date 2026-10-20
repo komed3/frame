@@ -9,4 +9,13 @@ export const registerTagCommands = ( program: Command ) : void => {
   const tagCommand = program
     .command( 'tag' ).alias( 'tags' )
     .description( 'Manage tags and media assignments' );
+
+  tagCommand
+    .command( 'list' )
+    .description( 'List all tags' )
+    .action( () => {
+      const tags = MediaTaxonomy.listTags();
+      if ( ! tags.length ) return ui.info( 'No tags found.' );
+      console.table( tags );
+    } );
 }
