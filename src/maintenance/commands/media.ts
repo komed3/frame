@@ -70,7 +70,7 @@ export const registerMediaCommands = ( program: Command ) : void => {
       ui.nl();
 
       if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
-      const count = Media.deleteUnavailable();
+      const count = Media.clean();
 
       ui.success( `Deleted ${ count } unavailable media record(s).` );
       if ( count ) ui.warning( `Related physical assets have NOT been deleted. Please run ${
