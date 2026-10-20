@@ -27,4 +27,12 @@ export const registerTagCommands = ( program: Command ) : void => {
       if ( ! tag ) throw new Error( `Tag ${ id } does not exist` );
       console.table( [ tag ] );
     } );
+
+  tagCommand
+    .command( 'create <name>' )
+    .description( 'Create a tag or return the existing tag ID' )
+    .action( ( name: string ) => {
+      const id = MediaTaxonomy.createTag( name );
+      ui.success( `Saved tag ${ name } (ID ${ id }).` );
+    } );
 }
