@@ -14,4 +14,17 @@ export const registerMetadataCommands = ( program: Command ) : void => {
     .command( 'metadata' )
     .alias( 'meta' )
     .description( 'Manage media metadata' );
+
+  metadataCommand
+    .command( 'list <media>' )
+    .description( 'List metadata for a media record' )
+    .option( '--source <source>', 'Filter by source: manual or scan' )
+    .action( ( media: string, options: { source?: string } ) => {
+      const entries = MediaMetadata.list( resolveId( media, 'media' ),
+        options.source === undefined ? undefined : resolveSource( options.source )
+      );
+
+      if ( ! entries.length ) return ui.info( 'No metadata found.' );
+      console.table( entries );
+    } );
 }
