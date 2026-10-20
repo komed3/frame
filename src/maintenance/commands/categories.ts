@@ -38,4 +38,12 @@ export const registerCategoryCommands = ( program: Command ) : void => {
 
       ui.success( `Saved category ${ name } (ID ${ id }).` );
     } );
+
+  categoryCommand
+    .command( 'rename <id> <name>' )
+    .description( 'Rename a category' )
+    .action( ( id: string, name: string ) => {
+      MediaTaxonomy.renameCategory( resolveId( id, 'category' ), name );
+      ui.success( `Renamed category ${ id } to ${ name }.` );
+    } );
 }
