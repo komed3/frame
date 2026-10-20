@@ -1,4 +1,4 @@
-import { parseNumber } from '@/src/maintenance/utils/format';
+import { parseNumber } from '@/src/maintenance/utils/parse';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Favorites } from '@/src/server/core/Favorites';

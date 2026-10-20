@@ -1,4 +1,4 @@
-import { formatValue, parseNumber } from '@/src/maintenance/utils/format';
+import { parseNumber, parseValue } from '@/src/maintenance/utils/parse';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Media, MEDIA_TYPES } from '@/src/server/media/Media';
@@ -57,7 +57,7 @@ export const registerMediaCommands = ( program: Command ) : void => {
         : `No media found at ${ path } in root ${ idOrRoot }` );
 
       for ( const [ key, value ] of Object.entries( media ) )
-        console.log( `${ ui.key( key ) }: ${ ui.value( formatValue( value ) ) }` );
+        console.log( `${ ui.key( key ) }: ${ ui.value( parseValue( value ) ) }` );
     } );
 
   mediaCommand

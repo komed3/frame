@@ -1,4 +1,4 @@
-import { parseJSON } from '@/src/maintenance/utils/format';
+import { parseJSON } from '@/src/maintenance/utils/parse';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Pref } from '@/src/server/core/Pref';
