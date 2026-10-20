@@ -37,4 +37,12 @@ export const registerFavoriteCommands = ( program: Command ) : void => {
       const added = Favorites.add( resolveId( user, 'user' ), resolveId( media, 'media' ) );
       ui.info( added ? 'Favorite added.' : 'Media is already a favorite.' );
     } );
+
+  favoriteCommand
+    .command( 'remove <user> <media>' )
+    .description( 'Remove a media record from favorites' )
+    .action( ( user: string, media: string ) => {
+      const removed = Favorites.remove( resolveId( user, 'user' ), resolveId( media, 'media' ) );
+      ui.info( removed ? 'Favorite removed.' : 'Media was not a favorite.' );
+    } );
 }
