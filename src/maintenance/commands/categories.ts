@@ -72,4 +72,13 @@ export const registerCategoryCommands = ( program: Command ) : void => {
       MediaTaxonomy.deleteCategory( categoryId );
       ui.success( `Deleted category ${ category.name } (ID ${ categoryId }).` );
     } );
+
+  categoryCommand
+    .command( 'media-list <media>' )
+    .description( 'List categories assigned to a media record' )
+    .action( ( media: string ) => {
+      const categories = MediaTaxonomy.getMediaCategories( resolveId( media, 'media' ) );
+      if ( ! categories.length ) return ui.info( 'No categories assigned.' );
+      console.table( categories );
+    } );
 }
