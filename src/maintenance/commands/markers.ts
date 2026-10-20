@@ -14,4 +14,19 @@ export const registerMarkerCommands = ( program: Command ) : void => {
     .command( 'marker' )
     .alias( 'markers' )
     .description( 'Manage user markers' );
+
+  markerCommand
+    .command( 'list <user>' )
+    .description( 'List markers for a user' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( user: string, options: { limit: string; offset: string } ) => {
+      const markers = Markers.list(
+        resolveId( user, 'user' ), parseNumber( options.limit, 'limit', 1 ),
+        parseNumber( options.offset, 'offset' )
+      );
+
+      if ( ! markers.length ) return ui.info( 'No markers found.' );
+      console.table( markers );
+    } );
 }
