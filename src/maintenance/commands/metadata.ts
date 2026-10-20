@@ -7,3 +7,11 @@ import { Command } from 'commander';
 
 const resolveSource = ( value?: string ) : MediaMetadataSource =>
   validateEnum( value ?? 'manual', 'metadata source', [ 'manual', 'scan' ] );
+
+
+export const registerMetadataCommands = ( program: Command ) : void => {
+  const metadataCommand = program
+    .command( 'metadata' )
+    .alias( 'meta' )
+    .description( 'Manage media metadata' );
+}
