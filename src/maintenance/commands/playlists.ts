@@ -63,4 +63,17 @@ export const registerPlaylistCommands = ( program: Command ) : void => {
 
       ui.success( `Updated playlist ${ playlist }.` );
     } );
+
+  playlistCommand
+    .command( 'delete <user> <playlist>' )
+    .description( 'Delete a playlist and its entries' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( user: string, playlist: string, options: { yes?: boolean } ) => {
+      const userId = resolveId( user, 'user' ), playlistId = resolveId( playlist, 'playlist' );
+      if ( ! options.yes && ! await confirm( `Delete playlist ${ playlistId } for user ${ userId }?` ) )
+        return ui.cancelled();
+
+      Playlists.delete( userId, playlistId );
+      ui.success( `Deleted playlist ${ playlistId }.` );
+    } );
 }
