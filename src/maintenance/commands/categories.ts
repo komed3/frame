@@ -27,4 +27,15 @@ export const registerCategoryCommands = ( program: Command ) : void => {
       if ( ! category ) throw new Error( `Category ${ id } does not exist` );
       console.table( [ category ] );
     } );
+
+  categoryCommand
+    .command( 'create <name>' )
+    .description( 'Create a category or return the existing category ID' )
+    .option( '--parent <id>', 'Parent category ID' )
+    .action( ( name: string, options: { parent?: string } ) => {
+      const id = MediaTaxonomy.createCategory( name, options.parent === undefined ? null
+        : resolveId( options.parent, 'parent category' ) );
+
+      ui.success( `Saved category ${ name } (ID ${ id }).` );
+    } );
 }
