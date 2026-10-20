@@ -14,4 +14,19 @@ export const registerFavoriteCommands = ( program: Command ) : void => {
     .command( 'favorite' )
     .alias( 'favorites' )
     .description( 'Manage user favorites' );
+
+  favoriteCommand
+    .command( 'list <user>' )
+    .description( 'List favorites for a user' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( user: string, options: { limit: string; offset: string } ) => {
+      const favorites = Favorites.list(
+        resolveId( user, 'user' ), parseNumber( options.limit, 'limit', 1 ),
+        parseNumber( options.offset, 'offset' )
+      );
+
+      if ( ! favorites.length ) return ui.info( 'No favorites found.' );
+      console.table( favorites );
+    } );
 }
