@@ -38,4 +38,19 @@ export const registerMarkerCommands = ( program: Command ) : void => {
       if ( ! record ) throw new Error( `Marker ${ marker } does not exist for user ${ user }` );
       console.table( [ record ] );
     } );
+
+  markerCommand
+    .command( 'media-list <user> <media>' )
+    .description( 'List markers for one media record' )
+    .option( '--limit <number>', 'Maximum number of results', '100' )
+    .option( '--offset <number>', 'Skip results', '0' )
+    .action( ( user: string, media: string, options: { limit: string; offset: string } ) => {
+      const markers = Markers.mediaMarker(
+        resolveId( user, 'user' ), resolveId( media, 'media' ),
+        parseNumber( options.limit, 'limit', 1 ), parseNumber( options.offset, 'offset' )
+      );
+
+      if ( ! markers.length ) return ui.info( 'No markers found for this media.' );
+      console.table( markers );
+    } );
 }
