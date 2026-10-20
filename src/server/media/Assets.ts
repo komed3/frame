@@ -36,12 +36,9 @@ export class MediaAssets {
   }
 
   private static async moveIfExists ( path: string, target: string ) : Promise< boolean > {
-    try {
-      await rename( path, target );
-      return true;
-    } catch ( error ) {
-      if ( ( error as NodeJS.ErrnoException ).code === 'ENOENT' ) return false;
-      throw error;
+    try { await rename( path, target ); return true } catch ( err ) {
+      if ( ( err as NodeJS.ErrnoException ).code === 'ENOENT' ) return false;
+      throw err;
     }
   }
 
