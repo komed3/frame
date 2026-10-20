@@ -51,4 +51,13 @@ export const registerPlayCommands = ( program: Command ) : void => {
         parseNumber( options.limit, 'limit', 1 ), parseNumber( options.offset, 'offset' )
       ) );
     } );
+
+  playCommand
+    .command( 'get <user> <play>' )
+    .description( 'Show one playback history record' )
+    .action( ( user: string, play: string ) => {
+      const record = Plays.get( resolveId( user, 'user' ), resolveId( play, 'play' ) );
+      if ( ! record ) throw new Error( `Play ${ play } does not exist for user ${ user }` );
+      console.table( [ record ] );
+    } );
 }
