@@ -58,4 +58,13 @@ export const registerTagCommands = ( program: Command ) : void => {
       MediaTaxonomy.deleteTag( tagId );
       ui.success( `Deleted tag ${ tag.name } (ID ${ tagId }).` );
     } );
+
+  tagCommand
+    .command( 'media-list <media>' )
+    .description( 'List tags assigned to a media record' )
+    .action( ( media: string ) => {
+      const tags = MediaTaxonomy.getMediaTags( resolveId( media, 'media' ) );
+      if ( ! tags.length ) return ui.info( 'No tags assigned.' );
+      console.table( tags );
+    } );
 }
