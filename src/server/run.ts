@@ -19,4 +19,8 @@ async function run () : Promise< void > {
 
   let server: Server | undefined, vite: ViteDevServer | undefined;
   const worker = new Worker();
+
+  app.disable( 'x-powered-by' );
+  app.use( express.json( { limit: '32kb' } ) );
+  app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
 }
