@@ -50,6 +50,12 @@ export interface JobHandler {
   execute ( context: JobContext ) : Promise< void | JobResult >;
 }
 
+export interface JobListFilters {
+  kind?: JobKind;
+  rootId?: number;
+  mediaId?: number;
+}
+
 export interface WorkerOptions {
   concurrency?: number;
   pollIntervalMs?: number;
