@@ -21,3 +21,6 @@ export class JobRegistry {
     return this;
   }
 }
+
+
+export const registry = new JobRegistry();
