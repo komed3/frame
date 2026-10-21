@@ -25,6 +25,13 @@ export class JobQueue {
     return { ...job, payload: payload as Record< string, unknown > };
   }
 
+  public static get ( id: number ) : JobRecord | null {
+    assertId( id, 'job' );
+
+    const row = as< JobRow | undefined >( conn().prepare( `${ SELECT_JOB } WHERE id = ?` ).get( id ) );
+    return row ? JobQueue.mapRow( row ) : null;
+  }
+
   public static enqueue ( input: EnqueueJob ) : number {
     if ( ! JOB_KINDS.includes( input.kind ) ) throw new Error( `Invalid job kind: ${ input.kind }` );
     if ( input.rootId !== undefined ) assertId( input.rootId, 'root' );
