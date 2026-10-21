@@ -1,6 +1,5 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { JobQueue } from '@/src/server/job/Queue';
-import { registry } from '@/src/server/job/Registry';
 import { MediaDirectories } from '@/src/server/media/Directories';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
@@ -337,6 +336,3 @@ export class ScanJob implements JobHandler {
     );
   }
 }
-
-
-registry.register( 'scan', new ScanJob() );
