@@ -60,4 +60,35 @@ async function run () : Promise< void > {
   } );
 
   console.info( `[Frame] Server listening on ${ host }:${ port }` );
+
+
+  // --- Shutdown ---
+
+  let shuttingDown = false;
+
+  const shutdown = async () => {
+    if ( shuttingDown ) return;
+    shuttingDown = true;
+
+    console.info( '[Frame] Shutting down...' );
+
+    try {
+      await worker.stop();
+
+      if ( server?.listening ) await new Promise< void >( ( resolve, reject ) => {
+        server!.close( err => err ? reject( err ) : resolve() );
+      } );
+
+      await vite?.close();
+      db.close();
+
+      console.info( '[Frame] Server stopped.' );
+    } catch ( err ) {
+      console.error( '[Frame] Shutdown failed:', err );
+      process.exitCode = 1;
+    }
+  };
+
+  process.once( 'SIGINT', () => void shutdown() );
+  process.once( 'SIGTERM', () => void shutdown() );
 }
