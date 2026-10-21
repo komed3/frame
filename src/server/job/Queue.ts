@@ -25,6 +25,21 @@ export class JobQueue {
     return { ...job, payload: payload as Record< string, unknown > };
   }
 
+  public static list ( status?: JobStatus, limit = 100, offset = 0 ) : JobRecord[] {
+    if ( status !== undefined && ! [ 'pending', 'running', 'done', 'failed', 'cancelled' ].includes( status ) )
+      throw new Error( `Invalid job status: ${ status }` );
+
+    validateNumber( limit, 'Job limit', 1, 1000, true );
+    validateNumber( offset, 'Job offset', 0, Number.MAX_SAFE_INTEGER, true );
+
+    const rows = as< JobRow[] >( conn().prepare( `
+      ${ SELECT_JOB } ${ status === undefined ? '' : 'WHERE status = ?' }
+      ORDER BY priority DESC, created_at, id LIMIT ? OFFSET ?
+    ` ).all( ...( status === undefined ? [ limit, offset ] : [ status, limit, offset ] ) ) );
+
+    return rows.map( JobQueue.mapRow );
+  }
+
   public static get ( id: number ) : JobRecord | null {
     assertId( id, 'job' );
 
