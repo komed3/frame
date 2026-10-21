@@ -227,4 +227,27 @@ export class JobQueue {
     if ( ! job ) throw new Error( `Job ${ id } does not exist` );
     throw new Error( `Cannot cancel job ${ id } with status '${ job.status }'` );
   }
+
+  public static retryNow ( id: number ) : void {
+    assertId( id, 'job' );
+
+    const result = conn().prepare( `
+      UPDATE jobs SET
+        status = 'pending',
+        attempts = 0,
+        run_after_ms = ?,
+        locked_at_ms = NULL,
+        worker = NULL,
+        error = NULL,
+        finished_at = NULL,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'failed'
+    ` ).run( Date.now(), id );
+
+    if ( Number( result.changes ) === 1 ) return;
+
+    const job = JobQueue.get( id );
+    if ( ! job ) throw new Error( `Job ${ id } does not exist` );
+    throw new Error( `Cannot retry job ${ id } with status '${ job.status }'` );
+  }
 }
