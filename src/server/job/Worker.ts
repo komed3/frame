@@ -39,40 +39,28 @@ export class Worker {
       const handler = registry.get( job.kind );
       const result = await handler.execute( { job, signal } );
 
-      if ( signal.aborted ) {
-        JobQueue.release( job.id, workerId );
-        return;
-      }
-
+      if ( signal.aborted ) return JobQueue.release( job.id, workerId );
       if ( result?.commit ) await result.commit();
 
       JobQueue.complete( job.id, workerId );
       console.info( `[Worker] Job ${ job.id } (${ job.kind }) completed.` );
-    } catch ( error ) {
+    } catch ( err ) {
       if ( signal.aborted ) {
         try { JobQueue.release( job.id, workerId ) }
-        catch ( releaseError ) {
-          console.error( `[Worker] Could not release job ${ job.id }:`, releaseError );
-        }
-
+        catch ( E ) { console.error( `[Worker] Could not release job ${ job.id }:`, E ) }
         return;
       }
 
-      const delay = Math.min(
-        this.retryDelayMs * 2 ** Math.min( job.attempts - 1, 30 ),
-        this.maxRetryDelayMs
-      );
+      const delay = Math.min( this.retryDelayMs * 2 ** Math.min( job.attempts - 1, 30 ), this.maxRetryDelayMs );
 
       try {
-        JobQueue.retry( job.id, workerId, error, delay );
+        JobQueue.retry( job.id, workerId, err, delay );
         const current = JobQueue.get( job.id );
 
-        if ( current?.status === 'failed' )
-          console.error( `[Worker] Job ${ job.id } failed permanently:`, error );
-        else
-          console.warn( `[Worker] Job ${ job.id } failed; retry scheduled.`, error );
-      } catch ( queueError ) {
-        console.error( `[Worker] Could not update failed job ${ job.id }:`, queueError );
+        if ( current?.status === 'failed' ) console.error( `[Worker] Job ${ job.id } failed permanently:`, err );
+        else console.warn( `[Worker] Job ${ job.id } failed; retry scheduled.`, err );
+      } catch ( err ) {
+        console.error( `[Worker] Could not update failed job ${ job.id }:`, err );
       }
     }
   }
