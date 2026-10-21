@@ -80,4 +80,33 @@ export class JobQueue {
     if ( existing ) return existing.id;
     throw new Error( `Could not enqueue job: ${ input.kind }` );
   }
+
+  public static claim ( workerId: string ) : JobRecord | null {
+    return db.transaction( tx => {
+      const row = as< JobRow | undefined >( tx.prepare( `
+        ${ SELECT_JOB }
+        WHERE status = 'pending' AND run_after_ms <= ?
+        ORDER BY priority DESC, run_after_ms, id
+        LIMIT 1
+      ` ).get( Date.now() ) );
+
+      if ( ! row ) return null;
+
+      const result = tx.prepare( `
+        UPDATE jobs SET
+          status = 'running',
+          attempts = attempts + 1,
+          locked_at_ms = ?,
+          worker = ?,
+          error = NULL,
+          updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE id = ? AND status = 'pending'
+      ` ).run( Date.now(), workerId, row.id );
+
+      if ( Number( result.changes ) !== 1 ) return null;
+
+      const claimed = as< JobRow | undefined >( tx.prepare( `${ SELECT_JOB } WHERE id = ?` ).get( row.id ) );
+      return claimed ? JobQueue.mapRow( claimed ) : null;
+    } );
+  }
 }
