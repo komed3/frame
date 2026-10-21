@@ -1,6 +1,6 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { assertId, validateNumber } from '@/src/server/utils';
-import type { EnqueueJob, JobKind, JobRecord, JobStatus } from '@/src/shared/types/job';
+import type { EnqueueJob, JobKind, JobRecord, JobRow, JobStatus } from '@/src/shared/types/job';
 
 
 export const JOB_KINDS: JobKind[] = [ 'scan', 'metadata', 'preview', 'frames', 'wave', 'text' ];
@@ -13,3 +13,15 @@ const SELECT_JOB = `
     created_at AS createdAt, updated_at AS updatedAt, finished_at AS finishedAt
   FROM jobs
 `;
+
+
+export class JobQueue {
+  private static mapRow ( row: JobRow ) : JobRecord {
+    const payload = JSON.parse( row.payloadJson ) as unknown;
+    if ( ! payload || typeof payload !== 'object' || Array.isArray( payload ) )
+      throw new Error( `Invalid payload for job ${ row.id }` );
+
+    const { payloadJson: _, ...job } = row;
+    return { ...job, payload: payload as Record< string, unknown > };
+  }
+}
