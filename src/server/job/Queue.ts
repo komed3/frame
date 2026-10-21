@@ -24,4 +24,38 @@ export class JobQueue {
     const { payloadJson: _, ...job } = row;
     return { ...job, payload: payload as Record< string, unknown > };
   }
+
+  public static enqueue ( input: EnqueueJob ) : number {
+    if ( ! JOB_KINDS.includes( input.kind ) ) throw new Error( `Invalid job kind: ${ input.kind }` );
+    if ( input.rootId !== undefined ) assertId( input.rootId, 'root' );
+    if ( input.mediaId !== undefined ) assertId( input.mediaId, 'media' );
+    if ( input.rootId !== undefined && input.mediaId !== undefined )
+      throw new Error( 'A job cannot target both a root and a media record' );
+
+    const priority = validateNumber( input.priority ?? 0, 'Job priority', -1e6, 1e6, true );
+    const maxAttempts = validateNumber( input.maxAttempts ?? 3, 'Maximum job attempts', 1, 100, true );
+    const runAfterMs = validateNumber( input.runAfterMs ?? Date.now(), 'Job run time', 0, Number.MAX_SAFE_INTEGER, true );
+    const payload = input.payload ?? {};
+
+    if ( ! payload || typeof payload !== 'object' || Array.isArray( payload ) )
+      throw new Error( 'Job payload must be an object' );
+
+    const result = conn().prepare( `
+      INSERT OR IGNORE INTO jobs ( root_id, media_id, kind, priority, max_attempts, run_after_ms, payload_json )
+      VALUES ( ?, ?, ?, ?, ?, ?, ? )
+    ` ).run(
+      input.rootId ?? null, input.mediaId ?? null, input.kind, priority,
+      maxAttempts, runAfterMs, JSON.stringify( payload )
+    );
+
+    if ( Number( result.changes ) === 1 ) return Number( result.lastInsertRowid );
+
+    const existing = as< { id: number } | undefined >( conn().prepare( `
+      SELECT id FROM jobs
+      WHERE kind = ? AND root_id IS ? AND media_id IS ? AND status IN ( 'pending', 'running' )
+    ` ).get( input.kind, input.rootId ?? null, input.mediaId ?? null ) );
+
+    if ( existing ) return existing.id;
+    throw new Error( `Could not enqueue job: ${ input.kind }` );
+  }
 }
