@@ -29,3 +29,16 @@ export interface EnqueueJob {
   runAfterMs?: number;
   payload?: Record< string, unknown >;
 }
+
+export interface JobContext {
+  job: JobRecord;
+  signal: AbortSignal;
+}
+
+export interface JobResult {
+  commit?: () => void | Promise< void >;
+}
+
+export interface JobHandler {
+  execute ( context: JobContext ) : Promise< void | JobResult >;
+}
