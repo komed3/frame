@@ -124,4 +124,30 @@ export class JobQueue {
 
     if ( Number( result.changes ) !== 1 ) throw new Error( `Could not complete job ${ id }: worker ownership was lost` );
   }
+
+  public static retry ( id: number, workerId: string, error: unknown, delayMs: number ) : void {
+    const job = JobQueue.get( id );
+    if ( ! job || job.status !== 'running' || job.worker !== workerId )
+      throw new Error( `Could not retry job ${ id }: worker ownership was lost` );
+
+    const failed = job.attempts >= job.maxAttempts;
+    const message = error instanceof Error ? error.message : String( error );
+
+    conn().prepare( `
+      UPDATE jobs SET
+        status = ?,
+        run_after_ms = ?,
+        locked_at_ms = NULL,
+        worker = NULL,
+        error = ?,
+        finished_at = CASE WHEN ? = 'failed'
+          THEN strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+          ELSE NULL END,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'running' AND worker = ?
+    ` ).run(
+      failed ? 'failed' : 'pending', Date.now() + delayMs, message.slice( 0, 8000 ),
+      failed ? 'failed' : 'pending', id, workerId
+    );
+  }
 }
