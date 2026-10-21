@@ -9,3 +9,6 @@ import type { MediaRoot } from '@/src/shared/types/roots';
 import { createHash } from 'node:crypto';
 import { open, readdir, stat } from 'node:fs/promises';
 import { basename, extname, join, relative, sep } from 'node:path';
+
+
+const hashVersion = 'partial-sha256-v1', sampleSize = 64 * 1024;
