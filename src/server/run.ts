@@ -24,7 +24,7 @@ async function run () : Promise< void > {
   app.disable( 'x-powered-by' );
   app.use( express.json( { limit: '32kb' } ) );
   app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
-  app.use( 'api/', api );
+  app.use( '/api', api );
 
 
   // --- react ---
