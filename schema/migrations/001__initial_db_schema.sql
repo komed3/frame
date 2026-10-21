@@ -241,7 +241,7 @@ CREATE TABLE jobs (
   media_id INTEGER REFERENCES media ( id ) ON DELETE CASCADE,
 
   kind TEXT NOT NULL CHECK ( kind IN (
-    'scan', 'metadata', 'preview', 'frames', 'wave', 'text'
+    'scan', 'metadata', 'tracks', 'preview', 'frames', 'wave', 'text'
   ) ),
   status TEXT NOT NULL DEFAULT 'pending' CHECK ( status IN (
     'pending', 'running', 'done', 'failed', 'cancelled'
