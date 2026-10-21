@@ -14,10 +14,7 @@ export class Worker {
   private loops: Promise< void >[] = [];
   private started = false;
 
-  public constructor (
-    private readonly registry: JobRegistry,
-    options: WorkerOptions = {}
-  ) {
+  public constructor ( options: WorkerOptions = {} ) {
     this.concurrency = options.concurrency ?? 1;
     this.pollIntervalMs = options.pollIntervalMs ?? 1000;
     this.retryDelayMs = options.retryDelayMs ?? 1000;
