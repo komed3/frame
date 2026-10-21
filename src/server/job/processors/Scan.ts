@@ -172,4 +172,19 @@ export class ScanJob implements JobHandler {
       }
     }
   }
+
+  private enqueueMediaJobs ( mediaId: number, type: MediaType ) : void {
+    JobQueue.enqueue( { kind: 'metadata', mediaId } );
+
+    if ( type === 'video' || type === 'audio' ) {
+      JobQueue.enqueue( { kind: 'tracks', mediaId } );
+      JobQueue.enqueue( { kind: 'wave', mediaId } );
+    }
+
+    if ( type === 'video' || type === 'image' || type === 'audio' )
+      JobQueue.enqueue( { kind: 'preview', mediaId } );
+
+    if ( type === 'video' ) JobQueue.enqueue( { kind: 'frames', mediaId } );
+    if ( type === 'text' ) JobQueue.enqueue( { kind: 'text', mediaId } );
+  }
 }
