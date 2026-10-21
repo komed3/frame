@@ -3,6 +3,8 @@ import { assertId, validateNumber } from '@/src/server/utils';
 import type { EnqueueJob, JobKind, JobRecord, JobStatus } from '@/src/shared/types/job';
 
 
+export const JOB_KINDS: JobKind[] = [ 'scan', 'metadata', 'preview', 'frames', 'wave', 'text' ];
+
 const SELECT_JOB = `
   SELECT
     id, root_id AS rootId, media_id AS mediaId, kind, status, priority,
