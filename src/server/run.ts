@@ -8,3 +8,6 @@ import type { Server } from 'node:http';
 import type { ViteDevServer } from 'vite';
 
 import '@/src/server/job/handler';
+
+
+const __dirname = dirname( fileURLToPath( import.meta.url ) );
