@@ -23,4 +23,27 @@ async function run () : Promise< void > {
   app.disable( 'x-powered-by' );
   app.use( express.json( { limit: '32kb' } ) );
   app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
+
+  // --- react ---
+
+  if ( Config.get( 'NODE_ENV' ) === 'dev' || Config.get( 'NODE_ENV' ) === 'development' ) {
+    const { createServer } = await import( 'vite' );
+
+    vite = await createServer( {
+      configFile: resolve( process.cwd(), 'vite.config.ts' ),
+      server: { middlewareMode: true }, appType: 'spa'
+    } );
+
+    app.use( vite.middlewares );
+  } else {
+    const clientDist = resolve( __dirname, '../client' );
+    app.use( express.static( clientDist, { index: false, redirect: false } ) );
+
+    app.use( ( req, res, next ) => {
+      if ( req.method !== 'GET' && req.method !== 'HEAD' ) return next();
+      if ( req.path === '/' ) return res.sendFile( join( clientDist, 'index.html' ) );
+
+      res.redirect( 301, '/' );
+    } );
+  }
 }
