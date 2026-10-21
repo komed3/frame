@@ -59,7 +59,7 @@ export class JobQueue {
     if ( input.rootId !== undefined && input.mediaId !== undefined )
       throw new Error( 'A job cannot target both a root and a media record' );
 
-    const priority = validateNumber( input.priority ?? 0, 'Job priority', -1e6, 1e6, true );
+    const priority = validateNumber( input.priority ?? JOB_PRIORITIES[ input.kind ], 'Job priority', -1e6, 1e6, true );
     const maxAttempts = validateNumber( input.maxAttempts ?? 3, 'Maximum job attempts', 1, 100, true );
     const runAfterMs = validateNumber( input.runAfterMs ?? Date.now(), 'Job run time', 0, Number.MAX_SAFE_INTEGER, true );
     const payload = input.payload ?? {};
