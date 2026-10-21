@@ -1,3 +1,6 @@
+import type { MediaType } from '@/src/shared/types/media';
+
+
 export type JobKind = 'scan' | 'metadata' | 'tracks' | 'preview' | 'frames' | 'wave' | 'text';
 export type JobStatus = 'pending' | 'running' | 'done' | 'failed' | 'cancelled';
 
@@ -53,4 +56,37 @@ export interface WorkerOptions {
   retryDelayMs?: number;
   maxRetryDelayMs?: number;
   workerId?: string;
+}
+
+// --- scan ---
+
+interface ExistingMedia {
+  id: number;
+  path: string;
+  fileName: string;
+  type: MediaType;
+  mimeType: string | null;
+  sizeBytes: number;
+  modifiedAt: string | null;
+  fingerprint: string | null;
+  available: number;
+  title: string | null;
+}
+
+interface ScannedFile {
+  absolutePath: string;
+  path: string;
+  fileName: string;
+  type: MediaType;
+  mimeType: string;
+  sizeBytes: number;
+  mtimeMs: number;
+  modifiedAt: string;
+  fingerprint: string;
+}
+
+interface ScanStats {
+  discovered: number;
+  ignored: number;
+  errors: number;
 }
