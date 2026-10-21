@@ -1,9 +1,9 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { JobQueue } from '@/src/server/job/Queue';
-import { Media } from '@/src/server/media/Media';
 import { MediaDirectories } from '@/src/server/media/Directories';
+import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
-import type { ExistingMedia, JobContext, JobHandler, JobKind, ScannedFile, ScanStats } from '@/src/shared/types/job';
+import type { ExistingMedia, JobContext, JobHandler, ScannedFile, ScanStats } from '@/src/shared/types/job';
 import type { MediaType } from '@/src/shared/types/media';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import { createHash } from 'node:crypto';
@@ -316,5 +316,23 @@ export class ScanJob implements JobHandler {
     MediaDirectories.finishScan( root.id, generation );
 
     return stats;
+  }
+
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {
+    if ( job.kind !== 'scan' || job.rootId === null || job.mediaId !== null ) throw new Error( 'Invalid scan job' );
+
+    signal.throwIfAborted();
+    const root = MediaRoots.list().find( root => root.id === job.rootId );
+
+    if ( ! root ) throw new Error( `Media root ${ job.rootId } does not exist` );
+    if ( ! root.enabled ) return console.warn( `[Scan] Skipping disabled root ${ root.id }.` );
+
+    const result = await this.scan( root, signal );
+    signal.throwIfAborted();
+
+    console.info(
+      `[Scan] Root ${ root.id } finished: ${ result.discovered } files found, ` +
+      `${ result.ignored } ignored.`
+    );
   }
 }
