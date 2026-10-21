@@ -11,3 +11,9 @@ import '@/src/server/job/handler';
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
+
+
+async function run () : Promise< void > {
+  const host = Config.get( 'HOST' ), port = Config.get( 'PORT' );
+  const app = express();
+}
