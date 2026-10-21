@@ -46,4 +46,9 @@ async function run () : Promise< void > {
       res.redirect( 301, '/' );
     } );
   }
+
+  // --- start ---
+
+  db.open();
+  worker.start();
 }
