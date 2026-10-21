@@ -44,4 +44,15 @@ export const registerJobCommands = ( program: Command ) : void => {
         createdAt: job.createdAt
       } ) ) );
     } );
+
+  jobCommand
+    .command( 'get <id>' )
+    .description( 'Show job details' )
+    .action( ( id: string ) => {
+      const job = JobQueue.get( resolveId( id, 'job' ) );
+      if ( ! job ) throw new Error( `Job ${ id } does not exist` );
+
+      for ( const [ key, value ] of Object.entries( job ) )
+        console.log( `${ ui.key( key ) }: ${ ui.value( parseValue( value ) ) }` );
+    } );
 }
