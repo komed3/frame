@@ -209,4 +209,22 @@ export class JobQueue {
       return Number( result.changes );
     } );
   }
+
+  public static cancel ( id: number ) : void {
+    assertId( id, 'job' );
+
+    const result = conn().prepare( `
+      UPDATE jobs SET
+        status = 'cancelled',
+        finished_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ),
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'pending'
+    ` ).run( id );
+
+    if ( Number( result.changes ) === 1 ) return;
+
+    const job = JobQueue.get( id );
+    if ( ! job ) throw new Error( `Job ${ id } does not exist` );
+    throw new Error( `Cannot cancel job ${ id } with status '${ job.status }'` );
+  }
 }
