@@ -55,4 +55,33 @@ export const registerJobCommands = ( program: Command ) : void => {
       for ( const [ key, value ] of Object.entries( job ) )
         console.log( `${ ui.key( key ) }: ${ ui.value( parseValue( value ) ) }` );
     } );
+
+  jobCommand
+    .command( 'add <kind> <target-id>' )
+    .description( 'Enqueue a job for a root or media record' )
+    .option( '--priority <number>', 'Override the default priority' )
+    .option( '--attempts <number>', 'Maximum number of attempts', '3' )
+    .action( ( kindValue: string, target: string, options: { priority?: string, attempts: string } ) => {
+      const kind = validateEnum( kindValue, 'job kind', JOB_KINDS ) as JobKind;
+      const targetId = resolveId( target, kind === 'scan' ? 'media root' : 'media' );
+      const priority = options.priority === undefined ? undefined : parseNumber( options.priority, 'priority' );
+      const maxAttempts = parseNumber( options.attempts, 'attempts', 1 );
+
+      if ( kind === 'scan' ) {
+        const root = MediaRoots.list().find( root => root.id === targetId );
+
+        if ( ! root ) throw new Error( `Media root ${ targetId } does not exist` );
+        if ( ! root.enabled ) throw new Error( `Media root ${ targetId } is disabled` );
+
+        const id = JobQueue.enqueue( { kind, rootId: targetId, priority, maxAttempts } );
+        return ui.success( `Scan job ${ id } queued for root ${ targetId }.` );
+      }
+
+      const media = Media.get( targetId );
+      if ( ! media ) throw new Error( `Media ${ targetId } does not exist` );
+      if ( ! media.available ) throw new Error( `Media ${ targetId } is unavailable` );
+
+      const id = JobQueue.enqueue( { kind, mediaId: targetId, priority, maxAttempts } );
+      ui.success( `Job ${ id } (${ kind }) queued for media ${ targetId }.` );
+    } );
 }
