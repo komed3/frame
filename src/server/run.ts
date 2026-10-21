@@ -51,4 +51,13 @@ async function run () : Promise< void > {
 
   db.open();
   worker.start();
+
+  server = app.listen( port, host );
+
+  await new Promise< void >( ( resolve, reject ) => {
+    server!.once( 'listening', resolve );
+    server!.once( 'error', reject );
+  } );
+
+  console.info( `[Frame] Server listening on ${ host }:${ port }` );
 }
