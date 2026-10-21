@@ -1,6 +1,6 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { assertId, validateNumber } from '@/src/server/utils';
-import type { EnqueueJob, JobKind, JobRecord, JobRow, JobStatus } from '@/src/shared/types/job';
+import type { EnqueueJob, JobKind, JobListFilters, JobRecord, JobRow, JobStatus } from '@/src/shared/types/job';
 
 
 export const JOB_PRIORITIES: Record< JobKind, number > = {
@@ -30,17 +30,32 @@ export class JobQueue {
     return { ...job, payload: payload as Record< string, unknown > };
   }
 
-  public static list ( status?: JobStatus, limit = 100, offset = 0 ) : JobRecord[] {
+  public static list ( status?: JobStatus, limit = 100, offset = 0, filters: JobListFilters = {} ) : JobRecord[] {
     if ( status !== undefined && ! [ 'pending', 'running', 'done', 'failed', 'cancelled' ].includes( status ) )
       throw new Error( `Invalid job status: ${ status }` );
+
+    if ( filters.kind !== undefined && ! JOB_KINDS.includes( filters.kind ) )
+      throw new Error( `Invalid job kind: ${ filters.kind }` );
+
+    if ( filters.rootId !== undefined ) assertId( filters.rootId, 'root' );
+    if ( filters.mediaId !== undefined ) assertId( filters.mediaId, 'media' );
+    if ( filters.rootId !== undefined && filters.mediaId !== undefined )
+      throw new Error( 'A job list cannot target both a root and a media record' );
 
     validateNumber( limit, 'Job limit', 1, 1000, true );
     validateNumber( offset, 'Job offset', 0, Number.MAX_SAFE_INTEGER, true );
 
+    const conditions: string[] = [], values: ( string | number )[] = [];
+
+    if ( status !== undefined ) conditions.push( 'status = ?' ), values.push( status );
+    if ( filters.rootId !== undefined ) conditions.push( 'root_id = ?' ), values.push( filters.rootId );
+    if ( filters.mediaId !== undefined ) conditions.push( 'media_id = ?' ), values.push( filters.mediaId );
+    if ( filters.kind !== undefined ) conditions.push( 'kind = ?' ), values.push( filters.kind );
+
     const rows = as< JobRow[] >( conn().prepare( `
-      ${ SELECT_JOB } ${ status === undefined ? '' : 'WHERE status = ?' }
+      ${ SELECT_JOB } ${ conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '' }
       ORDER BY priority DESC, created_at, id LIMIT ? OFFSET ?
-    ` ).all( ...( status === undefined ? [ limit, offset ] : [ status, limit, offset ] ) ) );
+    ` ).all( ...values, limit, offset ) );
 
     return rows.map( JobQueue.mapRow );
   }
