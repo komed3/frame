@@ -94,3 +94,10 @@ async function run () : Promise< void > {
   process.once( 'SIGINT', () => void shutdown() );
   process.once( 'SIGTERM', () => void shutdown() );
 }
+
+
+run().catch( err => {
+  console.error( '[Frame] Failed to start:', err );
+  db.close();
+  process.exitCode = 1;
+} );
