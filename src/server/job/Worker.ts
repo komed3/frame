@@ -32,6 +32,51 @@ export class Worker {
   private loops: Promise< void >[] = [];
   private started = false;
 
+  private async process ( job: JobRecord, workerId: string ) : Promise< void > {
+    const { signal } = this.controller;
+
+    try {
+      const handler = registry.get( job.kind );
+      const result = await handler.execute( { job, signal } );
+
+      if ( signal.aborted ) {
+        JobQueue.release( job.id, workerId );
+        return;
+      }
+
+      if ( result?.commit ) await result.commit();
+
+      JobQueue.complete( job.id, workerId );
+      console.info( `[Worker] Job ${ job.id } (${ job.kind }) completed.` );
+    } catch ( error ) {
+      if ( signal.aborted ) {
+        try { JobQueue.release( job.id, workerId ) }
+        catch ( releaseError ) {
+          console.error( `[Worker] Could not release job ${ job.id }:`, releaseError );
+        }
+
+        return;
+      }
+
+      const delay = Math.min(
+        this.retryDelayMs * 2 ** Math.min( job.attempts - 1, 30 ),
+        this.maxRetryDelayMs
+      );
+
+      try {
+        JobQueue.retry( job.id, workerId, error, delay );
+        const current = JobQueue.get( job.id );
+
+        if ( current?.status === 'failed' )
+          console.error( `[Worker] Job ${ job.id } failed permanently:`, error );
+        else
+          console.warn( `[Worker] Job ${ job.id } failed; retry scheduled.`, error );
+      } catch ( queueError ) {
+        console.error( `[Worker] Could not update failed job ${ job.id }:`, queueError );
+      }
+    }
+  }
+
   private async runLoop ( workerId: string ) : Promise< void > {
     const { signal } = this.controller;
 
