@@ -10,6 +10,10 @@ export class JobRegistry {
     return handler;
   }
 
+  public has ( kind: JobKind ) : boolean {
+    return this.handlers.has( kind );
+  }
+
   public register ( kind: JobKind, handler: JobHandler ) : this {
     if ( this.handlers.has( kind ) ) throw new Error( `A handler is already registered for job kind: ${ kind }` );
 
