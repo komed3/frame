@@ -109,4 +109,19 @@ export class JobQueue {
       return claimed ? JobQueue.mapRow( claimed ) : null;
     } );
   }
+
+  public static complete ( id: number, workerId: string ) : void {
+    const result = conn().prepare( `
+      UPDATE jobs SET
+        status = 'done',
+        locked_at_ms = NULL,
+        worker = NULL,
+        error = NULL,
+        finished_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ),
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'running' AND worker = ?
+    ` ).run( id, workerId );
+
+    if ( Number( result.changes ) !== 1 ) throw new Error( `Could not complete job ${ id }: worker ownership was lost` );
+  }
 }
