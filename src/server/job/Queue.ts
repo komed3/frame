@@ -122,7 +122,8 @@ export class JobQueue {
       WHERE id = ? AND status = 'running' AND worker = ?
     ` ).run( id, workerId );
 
-    if ( Number( result.changes ) !== 1 ) throw new Error( `Could not complete job ${ id }: worker ownership was lost` );
+    if ( Number( result.changes ) !== 1 )
+      throw new Error( `Could not complete job ${ id }: worker ownership was lost` );
   }
 
   public static retry ( id: number, workerId: string, error: unknown, delayMs: number ) : void {
@@ -149,5 +150,21 @@ export class JobQueue {
       failed ? 'failed' : 'pending', Date.now() + delayMs, message.slice( 0, 8000 ),
       failed ? 'failed' : 'pending', id, workerId
     );
+  }
+
+  public static release ( id: number, workerId: string ) : void {
+    const result = conn().prepare( `
+      UPDATE jobs SET
+        status = 'pending',
+        attempts = MAX( 0, attempts - 1 ),
+        run_after_ms = ?,
+        locked_at_ms = NULL,
+        worker = NULL,
+        updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+      WHERE id = ? AND status = 'running' AND worker = ?
+    ` ).run( Date.now(), id, workerId );
+
+    if ( Number( result.changes ) !== 1 )
+      throw new Error( `Could not release job ${ id }: worker ownership was lost` );
   }
 }
