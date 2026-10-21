@@ -94,4 +94,14 @@ export const registerJobCommands = ( program: Command ) : void => {
 
       ui.success( `Cancelled job ${ jobId }.` );
     } );
+
+  jobCommand
+    .command( 'retry <id>' )
+    .description( 'Retry a failed job immediately' )
+    .action( ( id: string ) => {
+      const jobId = resolveId( id, 'job' );
+      JobQueue.retryNow( jobId );
+
+      ui.success( `Requeued job ${ jobId }.` );
+    } );
 }
