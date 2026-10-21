@@ -32,7 +32,7 @@ export class JobQueue {
   }
 
   public static list ( status?: JobStatus, limit = 100, offset = 0, filters: JobListFilters = {} ) : JobRecord[] {
-    if ( status !== undefined && ! [ 'pending', 'running', 'done', 'failed', 'cancelled' ].includes( status ) )
+    if ( status !== undefined && ! JOB_STATUSES.includes( status ) )
       throw new Error( `Invalid job status: ${ status }` );
 
     if ( filters.kind !== undefined && ! JOB_KINDS.includes( filters.kind ) )
