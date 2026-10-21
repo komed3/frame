@@ -19,3 +19,13 @@ export interface JobRecord {
   updatedAt: string;
   finishedAt: string | null;
 }
+
+export interface EnqueueJob {
+  kind: JobKind;
+  rootId?: number;
+  mediaId?: number;
+  priority?: number;
+  maxAttempts?: number;
+  runAfterMs?: number;
+  payload?: Record< string, unknown >;
+}
