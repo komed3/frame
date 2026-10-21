@@ -187,4 +187,134 @@ export class ScanJob implements JobHandler {
     if ( type === 'video' ) JobQueue.enqueue( { kind: 'frames', mediaId } );
     if ( type === 'text' ) JobQueue.enqueue( { kind: 'text', mediaId } );
   }
+
+  private async scan ( root: MediaRoot, signal: AbortSignal ) : Promise< ScanStats > {
+    const existing = as< ExistingMedia[] >( conn().prepare( `
+      SELECT
+        id, path, file_name AS fileName, type, mime_type AS mimeType,
+        size_bytes AS sizeBytes, modified_at AS modifiedAt, fingerprint,
+        available, title
+      FROM media
+      WHERE root_id = ?
+    ` ).all( root.id ) );
+
+    signal.throwIfAborted();
+
+    const existingByPath = new Map( existing.map( media => [ media.path, media ] ) );
+    const files: ScannedFile[] = [], directories: string[] = [];
+    const stats: ScanStats = { discovered: 0, ignored: 0, errors: 0 };
+
+    await this.scanDirectory( root, root.path, existingByPath, files, directories, stats, { count: 0 }, signal );
+    signal.throwIfAborted();
+
+    if ( stats.errors > 0 ) throw new Error(
+      `Scan of root ${ root.id } found ${ stats.errors } error(s); database was not updated`
+    );
+
+    const scannedPaths = new Set( files.map( file => file.path ) );
+    const hashCounts = new Map< string, number >();
+    const existingHashCounts = new Map< string, number >();
+    const existingByFingerprint = new Map< string, ExistingMedia[] >();
+
+    for ( const file of files ) hashCounts.set( file.fingerprint, ( hashCounts.get( file.fingerprint ) ?? 0 ) + 1 );
+
+    for ( const media of existing ) {
+      if ( ! media.fingerprint?.startsWith( `${ hashVersion }:` ) ) continue;
+
+      existingHashCounts.set( media.fingerprint, ( existingHashCounts.get( media.fingerprint ) ?? 0 ) + 1 );
+      const matches = existingByFingerprint.get( media.fingerprint ) ?? [];
+      matches.push( media );
+      existingByFingerprint.set( media.fingerprint, matches );
+    }
+
+    const matchedIds = new Set< number >();
+    const matchedFiles = new Map< ScannedFile, ExistingMedia >();
+
+    for ( const file of files ) {
+      const previous = existingByPath.get( file.path );
+
+      if ( previous ) {
+        matchedIds.add( previous.id );
+        matchedFiles.set( file, previous );
+      }
+    }
+
+    for ( const file of files ) {
+      signal.throwIfAborted();
+
+      if ( matchedFiles.has( file ) ) continue;
+      if ( hashCounts.get( file.fingerprint ) !== 1 ) continue;
+      if ( existingHashCounts.get( file.fingerprint ) !== 1 ) continue;
+
+      const previous = existingByFingerprint.get( file.fingerprint )?.find( media =>
+        ! scannedPaths.has( media.path ) && ! matchedIds.has( media.id )
+      );
+
+      if ( ! previous ) continue;
+
+      matchedIds.add( previous.id );
+      matchedFiles.set( file, previous );
+    }
+
+    signal.throwIfAborted();
+
+    const generation = MediaDirectories.beginScan( root.id );
+    const directoryIds = new Map< string, number >();
+
+    for ( const path of directories ) {
+      signal.throwIfAborted();
+      directoryIds.set( path, MediaDirectories.register( root.id, path, generation ) );
+    }
+
+    signal.throwIfAborted();
+
+    db.transaction( tx => {
+      const updatePath = tx.prepare( 'UPDATE media SET path = ? WHERE id = ?' );
+      const markUnavailable = tx.prepare( `
+        UPDATE media SET
+          available = 0,
+          updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE id = ? AND available = 1
+      ` );
+
+      for ( const media of existing ) {
+        signal.throwIfAborted();
+
+        if ( ! scannedPaths.has( media.path ) && ! matchedIds.has( media.id ) )
+          markUnavailable.run( media.id );
+      }
+
+      for ( const file of files ) {
+        signal.throwIfAborted();
+
+        const previous = matchedFiles.get( file );
+        if ( previous && previous.path !== file.path ) updatePath.run( file.path, previous.id );
+
+        const separator = file.path.lastIndexOf( '/' );
+        const directoryPath = separator < 0 ? null : file.path.slice( 0, separator );
+        const directoryId = directoryPath === null ? null : directoryIds.get( directoryPath ) ?? null;
+
+        const mediaId = Media.registerFile( {
+          rootId: root.id, path: file.path, fileName: file.fileName, type: file.type,
+          mimeType: file.mimeType, sizeBytes: file.sizeBytes, modifiedAt: file.modifiedAt
+        }, directoryId );
+
+        const metadataChanged = ! previous || previous.sizeBytes !== file.sizeBytes ||
+          previous.modifiedAt !== file.modifiedAt || previous.fingerprint !== file.fingerprint ||
+          previous.type !== file.type || previous.mimeType !== file.mimeType ||
+          previous.available !== 1;
+
+        Media.update( mediaId, { fingerprint: file.fingerprint, ...(
+          ! previous?.title ? { title: basename( file.fileName, extname( file.fileName ) ) } : {}
+        ) } );
+
+        if ( metadataChanged ) this.enqueueMediaJobs( mediaId, file.type );
+      }
+    } );
+
+    signal.throwIfAborted();
+    MediaDirectories.finishScan( root.id, generation );
+
+    return stats;
+  }
 }
