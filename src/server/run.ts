@@ -1,3 +1,4 @@
+import { api } from '@/src/server/api';
 import { Config } from '@/src/server/core/Config';
 import { db } from '@/src/server/core/Database';
 import { Worker } from '@/src/server/job/Worker';
@@ -23,6 +24,7 @@ async function run () : Promise< void > {
   app.disable( 'x-powered-by' );
   app.use( express.json( { limit: '32kb' } ) );
   app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
+  app.use( 'api/', api );
 
 
   // --- react ---
