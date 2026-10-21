@@ -3,7 +3,7 @@ import { JobQueue } from '@/src/server/job/Queue';
 import { Media } from '@/src/server/media/Media';
 import { MediaDirectories } from '@/src/server/media/Directories';
 import { MediaRoots } from '@/src/server/media/Roots';
-import type { JobContext, JobHandler, JobKind } from '@/src/shared/types/job';
+import type { ExistingMedia, JobContext, JobHandler, JobKind, ScannedFile, ScanStats } from '@/src/shared/types/job';
 import type { MediaType } from '@/src/shared/types/media';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import { createHash } from 'node:crypto';
@@ -99,6 +99,77 @@ export class ScanJob implements JobHandler {
       return `${ hashVersion }:${ hash.digest( 'hex' ) }`;
     } finally {
       await file.close();
+    }
+  }
+
+  private async scanDirectory (
+    root: MediaRoot, directory: string, existingByPath: Map< string, ExistingMedia >, files: ScannedFile[],
+    directories: string[], stats: ScanStats, progress: { count: number }, signal: AbortSignal
+  ) : Promise< void > {
+    signal.throwIfAborted();
+    let entries;
+
+    try { entries = await readdir( directory, { withFileTypes: true } ) }
+    catch ( err ) {
+      if ( signal.aborted ) throw err;
+
+      stats.errors++;
+      console.error( `[Scan] Could not read directory ${ directory }:`, err );
+      return;
+    }
+
+    for ( const entry of entries ) {
+      signal.throwIfAborted();
+
+      const absolutePath = join( directory, entry.name );
+
+      if ( entry.isSymbolicLink() ) { stats.ignored++; continue }
+
+      if ( entry.isDirectory() ) {
+        directories.push( relative( root.path, absolutePath ).split( sep ).join( '/' ) );
+        await this.scanDirectory( root, absolutePath, existingByPath, files, directories, stats, progress, signal );
+        continue;
+      }
+
+      if ( ! entry.isFile() ) { stats.ignored++; continue }
+
+      const extension = extname( entry.name ).toLowerCase();
+      const media = extensions[ extension ];
+
+      if ( ! media ) { stats.ignored++; continue }
+
+      try {
+        const fileStat = await stat( absolutePath );
+        signal.throwIfAborted();
+
+        const path = relative( root.path, absolutePath ).split( sep ).join( '/' );
+        const modifiedAt = fileStat.mtime.toISOString();
+        const previous = existingByPath.get( path );
+
+        const fingerprint = previous?.fingerprint?.startsWith( `${ hashVersion }:` ) &&
+          previous.sizeBytes === fileStat.size && previous.modifiedAt === modifiedAt
+          ? previous.fingerprint
+          : await this.hashFile( absolutePath, fileStat.size, fileStat.mtimeMs, signal );
+
+        signal.throwIfAborted();
+
+        files.push( {
+          absolutePath, path, fileName: entry.name, type: media.type, mimeType: media.mimeType,
+          sizeBytes: fileStat.size, mtimeMs: fileStat.mtimeMs, modifiedAt, fingerprint
+        } );
+
+        stats.discovered++;
+      } catch ( err ) {
+        if ( signal.aborted ) throw err;
+
+        stats.errors++;
+        console.error( `[Scan] Could not inspect file ${ absolutePath }:`, err );
+      }
+
+      if ( ++progress.count % 100 === 0 ) {
+        signal.throwIfAborted();
+        await new Promise< void >( resolve => setImmediate( resolve ) );
+      }
     }
   }
 }
