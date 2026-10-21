@@ -8,6 +8,7 @@ import { registerDbCommands } from '@/src/maintenance/commands/db';
 import { registerDirectoryCommands } from '@/src/maintenance/commands/directories';
 import { registerFavoriteCommands } from '@/src/maintenance/commands/favorites';
 import { registerInitCommands } from '@/src/maintenance/commands/init';
+import { registerJobCommands } from '@/src/maintenance/commands/job';
 import { registerMarkerCommands } from '@/src/maintenance/commands/markers';
 import { registerMediaCommands } from '@/src/maintenance/commands/media';
 import { registerMetadataCommands } from '@/src/maintenance/commands/metadata';
@@ -64,6 +65,9 @@ registerPlaylistCommands( frame );
 registerFavoriteCommands( frame );
 registerMarkerCommands( frame );
 registerPlayCommands( frame );
+
+frame.commandsGroup( 'Background Jobs:' );
+registerJobCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
