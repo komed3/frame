@@ -54,3 +54,6 @@ const extensions: Record< string, { type: MediaType, mimeType: string } > = {
   '.heif': { type: 'image', mimeType: 'image/heif' },
   '.txt': { type: 'text', mimeType: 'text/plain' }
 };
+
+
+export class ScanJob implements JobHandler {}
