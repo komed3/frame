@@ -32,6 +32,25 @@ export class Worker {
   private loops: Promise< void >[] = [];
   private started = false;
 
+  private async runLoop ( workerId: string ) : Promise< void > {
+    const { signal } = this.controller;
+
+    while ( ! signal.aborted ) {
+      try {
+        const job = JobQueue.claim( workerId );
+        if ( job ) { await this.process( job, workerId ); continue }
+
+        await wait( this.pollIntervalMs, signal );
+      } catch ( err ) {
+        if ( signal.aborted ) break;
+        console.error( '[Worker] Queue loop failed:', err );
+
+        try { await wait( this.pollIntervalMs, signal ) }
+        catch { break }
+      }
+    }
+  }
+
   public constructor ( options: WorkerOptions = {} ) {
     this.concurrency = options.concurrency ?? 1;
     this.pollIntervalMs = options.pollIntervalMs ?? 1000;
@@ -69,24 +88,5 @@ export class Worker {
 
     this.loops = [];
     this.started = false;
-  }
-
-  private async runLoop ( workerId: string ) : Promise< void > {
-    const { signal } = this.controller;
-
-    while ( ! signal.aborted ) {
-      try {
-        const job = JobQueue.claim( workerId );
-        if ( job ) { await this.process( job, workerId ); continue }
-
-        await wait( this.pollIntervalMs, signal );
-      } catch ( err ) {
-        if ( signal.aborted ) break;
-        console.error( '[Worker] Queue loop failed:', err );
-
-        try { await wait( this.pollIntervalMs, signal ) }
-        catch { break }
-      }
-    }
   }
 }
