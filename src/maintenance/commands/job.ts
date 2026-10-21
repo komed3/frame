@@ -6,3 +6,10 @@ import { MediaRoots } from '@/src/server/media/Roots';
 import { resolveId, validateEnum } from '@/src/server/utils';
 import type { JobKind, JobStatus } from '@/src/shared/types/job';
 import { Command } from 'commander';
+
+
+export const registerJobCommands = ( program: Command ) : void => {
+  const jobCommand = program
+    .command( 'job' )
+    .description( 'Manage background jobs' );
+}
