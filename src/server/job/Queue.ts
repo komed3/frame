@@ -8,6 +8,7 @@ export const JOB_PRIORITIES: Record< JobKind, number > = {
 };
 
 export const JOB_KINDS = Object.keys( JOB_PRIORITIES ) as JobKind[];
+export const JOB_STATUSES: JobStatus[] = [ 'pending', 'running', 'done', 'failed', 'cancelled' ];
 
 
 const SELECT_JOB = `
