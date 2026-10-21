@@ -42,4 +42,14 @@ export class Worker {
       this.runLoop( `${ this.workerId }-${ index + 1 }` )
     );
   }
+
+  public async stop () : Promise< void > {
+    if ( ! this.started ) return;
+
+    this.controller.abort();
+    await Promise.all( this.loops );
+
+    this.loops = [];
+    this.started = false;
+  }
 }
