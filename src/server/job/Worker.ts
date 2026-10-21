@@ -30,4 +30,16 @@ export class Worker {
     } ) ) if ( ! Number.isSafeInteger( value ) || value < 1 )
       throw new Error( `${ name } must be a positive integer` );
   }
+
+  public start () : void {
+    if ( this.started ) return;
+
+    this.started = true;
+    const recovered = JobQueue.recover();
+    if ( recovered ) console.info( `[Worker] Recovered ${ recovered } interrupted job(s).` );
+
+    this.loops = Array.from( { length: this.concurrency }, ( _, index ) =>
+      this.runLoop( `${ this.workerId }-${ index + 1 }` )
+    );
+  }
 }
