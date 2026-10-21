@@ -84,4 +84,14 @@ export const registerJobCommands = ( program: Command ) : void => {
       const id = JobQueue.enqueue( { kind, mediaId: targetId, priority, maxAttempts } );
       ui.success( `Job ${ id } (${ kind }) queued for media ${ targetId }.` );
     } );
+
+  jobCommand
+    .command( 'cancel <id>' )
+    .description( 'Cancel a pending job' )
+    .action( ( id: string ) => {
+      const jobId = resolveId( id, 'job' );
+      JobQueue.cancel( jobId );
+
+      ui.success( `Cancelled job ${ jobId }.` );
+    } );
 }
