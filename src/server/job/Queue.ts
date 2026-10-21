@@ -167,4 +167,26 @@ export class JobQueue {
     if ( Number( result.changes ) !== 1 )
       throw new Error( `Could not release job ${ id }: worker ownership was lost` );
   }
+
+  public static recover () : number {
+    return db.transaction( tx => {
+      const result = tx.prepare( `
+        UPDATE jobs SET
+          status = CASE WHEN attempts >= max_attempts THEN 'failed' ELSE 'pending' END,
+          worker = NULL,
+          locked_at_ms = NULL,
+          error = CASE
+            WHEN attempts >= max_attempts THEN COALESCE( error, 'Worker stopped before completion; retry limit reached' )
+            ELSE COALESCE( error, 'Recovered after an interrupted worker run' )
+          END,
+          finished_at = CASE WHEN attempts >= max_attempts
+            THEN strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+            ELSE NULL END,
+          updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
+        WHERE status = 'running'
+      ` ).run();
+
+      return Number( result.changes );
+    } );
+  }
 }
