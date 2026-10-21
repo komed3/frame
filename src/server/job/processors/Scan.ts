@@ -56,4 +56,49 @@ const extensions: Record< string, { type: MediaType, mimeType: string } > = {
 };
 
 
-export class ScanJob implements JobHandler {}
+export class ScanJob implements JobHandler {
+  private async hashFile ( path: string, size: number, mtimeMs: number, signal: AbortSignal ) : Promise< string > {
+    signal.throwIfAborted();
+    const file = await open( path );
+
+    try {
+      const initialStat = await file.stat();
+      signal.throwIfAborted();
+
+      if ( initialStat.size !== size || initialStat.mtimeMs !== mtimeMs )
+        throw new Error( `File changed before hashing: ${ path }` );
+
+      const hash = createHash( 'sha256' );
+      hash.update( `${ hashVersion }\0${ size }\0` );
+
+      const offsets = size <= sampleSize ? [ 0 ] : [
+        0, Math.floor( ( size - sampleSize ) / 2 ), size - sampleSize
+      ];
+
+      for ( const offset of [ ...new Set( offsets ) ] ) {
+        signal.throwIfAborted();
+
+        const length = Math.min( sampleSize, size - offset );
+        const buffer = Buffer.allocUnsafe( length );
+        const { bytesRead } = await file.read( buffer, 0, length, offset );
+
+        signal.throwIfAborted();
+
+        if ( bytesRead !== length ) throw new Error( `Incomplete read while hashing: ${ path }` );
+
+        hash.update( `${ offset }\0${ length }\0` );
+        hash.update( buffer );
+      }
+
+      const finalStat = await file.stat();
+      signal.throwIfAborted();
+
+      if ( finalStat.size !== size || finalStat.mtimeMs !== mtimeMs )
+        throw new Error( `File changed while hashing: ${ path }` );
+
+      return `${ hashVersion }:${ hash.digest( 'hex' ) }`;
+    } finally {
+      await file.close();
+    }
+  }
+}
