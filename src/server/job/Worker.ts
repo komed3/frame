@@ -4,6 +4,24 @@ import type { JobRecord, WorkerOptions } from '@/src/shared/types/job';
 import { randomUUID } from 'node:crypto';
 
 
+const wait = ( ms: number, signal: AbortSignal ) : Promise< void > => new Promise( ( resolve, reject ) => {
+  if ( signal.aborted ) return reject( new Error( 'Worker stopped' ) );
+
+  const timer = setTimeout( () => {
+    signal.removeEventListener( 'abort', abort );
+    resolve();
+  }, ms );
+
+  const abort = () => {
+    clearTimeout( timer );
+    signal.removeEventListener( 'abort', abort );
+    reject( new Error( 'Worker stopped' ) );
+  };
+
+  signal.addEventListener( 'abort', abort, { once: true } );
+} );
+
+
 export class Worker {
   private readonly concurrency: number;
   private readonly pollIntervalMs: number;
