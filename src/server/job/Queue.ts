@@ -3,6 +3,10 @@ import { assertId, validateNumber } from '@/src/server/utils';
 import type { EnqueueJob, JobKind, JobRecord, JobRow, JobStatus } from '@/src/shared/types/job';
 
 
+export const JOB_PRIORITIES: Record< JobKind, number > = {
+  scan: 10, metadata: 8, tracks: 7, text: 5, preview: 5, wave: 3, frames: 1
+};
+
 export const JOB_KINDS: JobKind[] = [ 'scan', 'metadata', 'preview', 'frames', 'wave', 'text' ];
 
 const SELECT_JOB = `
