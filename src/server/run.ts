@@ -2,9 +2,9 @@ import { Config } from '@/src/server/core/Config';
 import { db } from '@/src/server/core/Database';
 import { Worker } from '@/src/server/job/Worker';
 import express from 'express';
+import type { Server } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Server } from 'node:http';
 import type { ViteDevServer } from 'vite';
 
 import '@/src/server/job/handler';
@@ -23,6 +23,7 @@ async function run () : Promise< void > {
   app.disable( 'x-powered-by' );
   app.use( express.json( { limit: '32kb' } ) );
   app.use( express.urlencoded( { extended: true, limit: '32kb' } ) );
+
 
   // --- react ---
 
@@ -46,6 +47,7 @@ async function run () : Promise< void > {
       res.redirect( 301, '/' );
     } );
   }
+
 
   // --- start ---
 
