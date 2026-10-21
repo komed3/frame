@@ -42,3 +42,11 @@ export interface JobResult {
 export interface JobHandler {
   execute ( context: JobContext ) : Promise< void | JobResult >;
 }
+
+export interface WorkerOptions {
+  concurrency?: number;
+  pollIntervalMs?: number;
+  retryDelayMs?: number;
+  maxRetryDelayMs?: number;
+  workerId?: string;
+}
