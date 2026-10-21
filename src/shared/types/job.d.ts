@@ -20,6 +20,10 @@ export interface JobRecord {
   finishedAt: string | null;
 }
 
+export interface JobRow extends Omit< JobRecord, 'payload' > {
+  payloadJson: string;
+}
+
 export interface EnqueueJob {
   kind: JobKind;
   rootId?: number;
