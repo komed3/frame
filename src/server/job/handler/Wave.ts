@@ -27,5 +27,15 @@ export class WaveJob implements JobHandler {
       '-max_alloc', '536870912', '-i', path, '-t', durationSeconds.toFixed( 3 ), '-map', '0:a:0',
       '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
     ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
+
+    const timeoutMs = Config.get( 'WAVE_TIMEOUT_MS' );
+    let timedOut = false, closed = false, stderr = '';
+    let killTimer: ReturnType< typeof setTimeout > | undefined;
+
+    const timeout = setTimeout( () => { timedOut = true, child.kill( 'SIGKILL' ) }, timeoutMs );
+    timeout.unref();
+
+    child.stderr.setEncoding( 'utf8' );
+    child.stderr.on( 'data', ( chunk: string ) => { stderr = ( stderr + chunk ).slice( -16_384 ) } );
   }
 }
