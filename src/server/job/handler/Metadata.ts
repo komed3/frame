@@ -1,12 +1,10 @@
-import { MediaRoots } from '@/src/server/media/Roots';
 import { Media } from '@/src/server/media/Media';
+import { MediaRoots } from '@/src/server/media/Roots';
+import { execFileAsync } from '@/src/server/utils';
 import type { ExtractedMetadata, JobContext, JobHandler, ProbeData } from '@/src/shared/types/job';
-import type { MediaType, MediaUpdate } from '@/src/shared/types/media';
-import { execFile } from 'node:child_process';
+import type { MediaType } from '@/src/shared/types/media';
 import { open, stat } from 'node:fs/promises';
 import { extname } from 'node:path';
-import { promisify } from 'node:util';
-import { execFileAsync } from '@/src/server/utils';
 
 
 export class MetadataJob implements JobHandler {
