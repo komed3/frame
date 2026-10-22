@@ -1,3 +1,4 @@
+import { Config } from '@/src/server/core/Config';
 import { JobQueue } from '@/src/server/job/Queue';
 import { registry } from '@/src/server/job/Registry';
 import type { JobRecord, WorkerOptions } from '@/src/shared/types/job';
@@ -85,10 +86,10 @@ export class Worker {
   }
 
   public constructor ( options: WorkerOptions = {} ) {
-    this.concurrency = options.concurrency ?? 1;
-    this.pollIntervalMs = options.pollIntervalMs ?? 1000;
-    this.retryDelayMs = options.retryDelayMs ?? 1000;
-    this.maxRetryDelayMs = options.maxRetryDelayMs ?? 60000;
+    this.concurrency = options.concurrency ?? Config.get( 'WORKER_CONCURRENCY' );
+    this.pollIntervalMs = options.pollIntervalMs ?? Config.get( 'WORKER_POLL_INTERVAL_MS' );
+    this.retryDelayMs = options.retryDelayMs ?? Config.get( 'WORKER_RETRY_DELAY_MS' );
+    this.maxRetryDelayMs = options.maxRetryDelayMs ?? Config.get( 'WORKER_MAX_RETRY_DELAY_MS' );
     this.workerId = options.workerId ?? `frame-${ process.pid }-${ randomUUID() }`;
 
     if ( ! Number.isSafeInteger( this.concurrency ) || this.concurrency < 1 )
