@@ -43,5 +43,11 @@ export class WaveJob implements JobHandler {
     const samplesPerPoint = Math.max( 1, Math.ceil( waveformRate * durationSeconds / targetPoints ) );
     let min = Infinity, max = -Infinity, samples = 0;
     let carry = Buffer.alloc( 0 );
+
+    const writePoint = () => {
+      if ( ! samples ) return;
+      if ( values.length < targetPoints ) values.push( [ min, max ] );
+      min = Infinity, max = -Infinity, samples = 0;
+    };
   }
 }
