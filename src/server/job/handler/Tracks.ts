@@ -1,5 +1,5 @@
 import { Config } from '@/src/server/core/Config';
-import { parsePositive, parseRate } from '@/src/server/job/handler/utils';
+import { assertMediaUnchange, parsePositive, parseRate } from '@/src/server/job/handler/utils';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import { MediaTracks } from '@/src/server/media/Tracks';
@@ -73,7 +73,7 @@ export class TracksJob implements JobHandler {
     const info = await stat( path );
 
     signal.throwIfAborted();
-    if ( info.size !== media.sizeBytes ) throw new Error( `Media changed since scan: ${ path }` );
+    assertMediaUnchange( path, media, info );
 
     if ( media.type !== 'video' && media.type !== 'audio' ) {
       MediaTracks.replace( media.id, [] );
