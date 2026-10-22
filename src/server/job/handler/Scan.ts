@@ -11,7 +11,7 @@ import { open, readdir, stat } from 'node:fs/promises';
 import { basename, extname, join, relative, sep } from 'node:path';
 
 
-const hashVersion = 'partial-sha256-v1', sampleSize = 64 * 1024;
+const hashVersion = '1', sampleSize = 64 * 1024;
 const extensions: Record< string, { type: MediaType, mimeType: string } > = {
   '.mp4': { type: 'video', mimeType: 'video/mp4' }, '.m4v': { type: 'video', mimeType: 'video/mp4' },
   '.mkv': { type: 'video', mimeType: 'video/x-matroska' }, '.mov': { type: 'video', mimeType: 'video/quicktime' },
