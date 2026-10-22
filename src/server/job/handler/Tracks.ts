@@ -1,3 +1,4 @@
+import { Config } from '@/src/server/core/Config';
 import { parsePositive, parseRate } from '@/src/server/job/handler/parse';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
@@ -83,10 +84,12 @@ export class TracksJob implements JobHandler {
       return;
     }
 
-    const { stdout } = await execFileAsync( 'ffprobe',
-      [ '-v', 'error', '-show_streams', '-of', 'json', path ],
-      { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024, signal }
-    );
+    const { stdout } = await execFileAsync( 'ffprobe', [
+      '-v', 'error', '-show_streams', '-of', 'json', path
+    ], {
+      encoding: 'utf8',timeout: Config.get( 'FFPROBE_TIMEOUT_MS' ),
+      maxBuffer: 8 * 1024 * 1024, signal
+    } );
 
     signal.throwIfAborted();
 
