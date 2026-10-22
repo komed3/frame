@@ -11,7 +11,7 @@ import { open, readdir, stat } from 'node:fs/promises';
 import { basename, extname, join, relative, sep } from 'node:path';
 
 
-const hashVersion = '1', sampleSize = 64 * 1024;
+const hashVersion = '1', sampleSize = 64 * 1024, hashLength = 16;
 const extensions: Record< string, { type: MediaType, mimeType: string } > = {
   '.mp4': { type: 'video', mimeType: 'video/mp4' }, '.m4v': { type: 'video', mimeType: 'video/mp4' },
   '.mkv': { type: 'video', mimeType: 'video/x-matroska' }, '.mov': { type: 'video', mimeType: 'video/quicktime' },
@@ -76,7 +76,7 @@ export class ScanJob implements JobHandler {
       if ( finalStat.size !== size || finalStat.mtimeMs !== mtimeMs )
         throw new Error( `File changed while hashing: ${ path }` );
 
-      return `${ hashVersion }:${ hash.digest( 'hex' ) }`;
+      return `${ hashVersion }:${ hash.digest( 'hex' ).substring( 0, hashLength ) }`;
     } finally {
       await file.close();
     }
