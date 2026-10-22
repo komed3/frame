@@ -26,10 +26,7 @@ export async function getAssetSource ( job: JobRecord, signal: AbortSignal ) : P
   const info = await stat( path );
 
   signal.throwIfAborted();
-
-  if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
-    Math.trunc( info.mtimeMs ) !== new Date( media.modifiedAt ).getTime() ) )
-    throw new Error( `Media changed since scan: ${ path }` );
+  if ( info.size !== media.sizeBytes ) throw new Error( `Media changed since scan: ${ path }` );
 
   return { media, path, fingerprint:
     ( media.fingerprint ?? `${ media.sizeBytes }-${ media.modifiedAt ?? 'unknown' }` )

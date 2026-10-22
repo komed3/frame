@@ -73,10 +73,7 @@ export class TracksJob implements JobHandler {
     const info = await stat( path );
 
     signal.throwIfAborted();
-
-    if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
-      Math.trunc( info.mtimeMs ) !== new Date( media.modifiedAt ).getTime() ) )
-      throw new Error( `Media changed since scan: ${ path }` );
+    if ( info.size !== media.sizeBytes ) throw new Error( `Media changed since scan: ${ path }` );
 
     if ( media.type !== 'video' && media.type !== 'audio' ) {
       MediaTracks.replace( media.id, [] );
