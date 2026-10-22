@@ -1,4 +1,4 @@
-import type { MediaType, MediaUpdate } from '@/src/shared/types/media';
+import type { MediaRecord, MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
 export type JobKind = 'scan' | 'metadata' | 'tracks' | 'preview' | 'frames' | 'wave' | 'text';
@@ -136,3 +136,12 @@ export interface ProbeData {
 }
 
 export type ExtractedMetadata = MediaUpdate;
+
+
+// --- assets ---
+
+export interface AssetSource {
+  media: MediaRecord;
+  path: string;
+  fingerprint: string;
+}
