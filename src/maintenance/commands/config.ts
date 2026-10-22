@@ -17,8 +17,8 @@ export const registerConfigCommands = ( program: Command ) : void => {
       return {
         name: key, value: Config.get( key ), default: def.default,
         type: def.type, description: def.desc,
-        min: def.type === 'integer' ? def.min : '',
-        max: def.type === 'integer' ? def.max : ''
+        min: def.type === 'integer' || def.type === 'number' ? def.min : '',
+        max: def.type === 'integer' || def.type === 'number' ? def.max : ''
       };
     } ) ) );
 
