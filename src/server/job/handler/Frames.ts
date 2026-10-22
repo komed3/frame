@@ -33,5 +33,52 @@ export class FramesJob implements JobHandler {
     signal.throwIfAborted();
     await mkdir( dirname( outputDirectory ), { recursive: true } );
     await mkdir( tempDirectory, { recursive: true } );
+
+    try {
+      await runFfmpeg( [
+        '-i', path, '-map', '0:V:0', '-vf', `${ select },${ scale }`, '-fps_mode', 'vfr',
+        '-frames:v', String( count ), '-c:v', 'libwebp', '-quality', '76', '-start_number', '0',
+        '-y', `${ tempDirectory }/%06d.webp`
+      ], signal );
+
+      signal.throwIfAborted();
+
+      const files = ( await readdir( tempDirectory ) ).filter( f => extname( f ).toLowerCase() === '.webp' ).sort();
+      if ( ! files.length ) throw new Error( `No frames generated for media ${ media.id }` );
+
+      const frames = files.map( ( file, index ) => ( {
+        index, timeMs: Math.min( durationMs, index * intervalMs ),
+        path: `${ relativeDirectory }/${ file }`
+      } ) );
+
+      await writeFile( `${ tempDirectory }/manifest.json`, JSON.stringify( {
+        version: 1, durationMs, intervalMs, width: 320, height: 180, frames
+      } ) );
+
+      signal.throwIfAborted();
+      let backedUp = false;
+
+      try { await rename( outputDirectory, backupDirectory ), backedUp = true }
+      catch ( err ) { if ( ( err as NodeJS.ErrnoException ).code !== 'ENOENT' ) throw err }
+
+      try {
+        await rename( tempDirectory, outputDirectory );
+        signal.throwIfAborted();
+
+        await MediaAssets.write( media.id, {
+          kind: 'frames', path: manifestPath, fingerprint: media.fingerprint,  mimeType: 'application/json',
+          width: 320, height: 180, data: { frameCount: frames.length, durationMs, intervalMs }
+        }, Buffer.from( JSON.stringify( { version: 1, durationMs, intervalMs, width: 320, height: 180, frames } ) ) );
+
+        if ( backedUp ) await rm( backupDirectory, { recursive: true, force: true } );
+      } catch ( err ) {
+        await rm( outputDirectory, { recursive: true, force: true } );
+        if ( backedUp ) await rename( backupDirectory, outputDirectory );
+        throw err;
+      }
+    } catch ( err ) {
+      await rm( tempDirectory, { recursive: true, force: true } );
+      throw err;
+    }
   }
 }
