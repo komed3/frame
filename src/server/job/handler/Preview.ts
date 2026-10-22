@@ -1,5 +1,5 @@
 import { Config } from '@/src/server/core/Config';
-import { assetPath, getAssetSource, mediaExtension, runFfmpeg } from '@/src/server/job/handler/assets';
+import { assetPath, assetSignal, getAssetSource, mediaExtension, runFfmpeg } from '@/src/server/job/handler/assets';
 import { MediaAssets } from '@/src/server/media/Assets';
 import { execFileAsync } from '@/src/server/utils';
 import type { JobContext, JobHandler } from '@/src/shared/types/job';
@@ -91,16 +91,17 @@ export class PreviewJob implements JobHandler {
   public async execute ( { job, signal }: JobContext ) : Promise< void > {
     if ( job.kind !== 'preview' ) throw new Error( 'Invalid preview job' );
 
-    const source = await getAssetSource( job, signal );
+    const S = assetSignal( signal );
+    const source = await getAssetSource( job, S );
     if ( ! source ) return;
 
     if ( ! [ 'video', 'audio', 'image' ].includes( source.media.type ) ) return;
     if ( source.media.type === 'video' && ! source.media.durationMs )
       console.warn( `[Preview] Media ${ source.media.id } has no known duration; using the beginning.` );
 
-    await this.createImage( source, 'poster', signal );
-    signal.throwIfAborted();
-    await this.createImage( source, 'thumb', signal );
+    await this.createImage( source, 'poster', S );
+    S.throwIfAborted();
+    await this.createImage( source, 'thumb', S );
 
     console.info( `[Preview] Media ${ source.media.id } (${ source.media.path }) generated.` );
   }
