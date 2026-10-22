@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { JobQueue } from '@/src/server/job/Queue';
 import { registry } from '@/src/server/job/Registry';
-import type { JobRecord, WorkerOptions } from '@/src/shared/types/job';
+import type { JobRecord } from '@/src/shared/types/job';
 import { randomUUID } from 'node:crypto';
 
 
@@ -24,12 +24,14 @@ const wait = ( ms: number, signal: AbortSignal ) : Promise< void > => new Promis
 
 
 export class Worker {
+  private readonly controller = new AbortController();
+
   private readonly concurrency: number;
   private readonly pollIntervalMs: number;
   private readonly retryDelayMs: number;
   private readonly maxRetryDelayMs: number;
   private readonly workerId: string;
-  private readonly controller = new AbortController();
+
   private loops: Promise< void >[] = [];
   private started = false;
 
@@ -85,12 +87,12 @@ export class Worker {
     }
   }
 
-  public constructor ( options: WorkerOptions = {} ) {
-    this.concurrency = options.concurrency ?? Config.get( 'WORKER_CONCURRENCY' );
-    this.pollIntervalMs = options.pollIntervalMs ?? Config.get( 'WORKER_POLL_INTERVAL_MS' );
-    this.retryDelayMs = options.retryDelayMs ?? Config.get( 'WORKER_RETRY_DELAY_MS' );
-    this.maxRetryDelayMs = options.maxRetryDelayMs ?? Config.get( 'WORKER_MAX_RETRY_DELAY_MS' );
-    this.workerId = options.workerId ?? `frame-${ process.pid }-${ randomUUID() }`;
+  public constructor () {
+    this.concurrency = Config.get( 'WORKER_CONCURRENCY' );
+    this.pollIntervalMs = Config.get( 'WORKER_POLL_INTERVAL_MS' );
+    this.retryDelayMs = Config.get( 'WORKER_RETRY_DELAY_MS' );
+    this.maxRetryDelayMs = Config.get( 'WORKER_MAX_RETRY_DELAY_MS' );
+    this.workerId = `frame-${ process.pid }-${ randomUUID() }`;
 
     if ( ! Number.isSafeInteger( this.concurrency ) || this.concurrency < 1 )
       throw new Error( 'Worker concurrency must be a positive integer' );
