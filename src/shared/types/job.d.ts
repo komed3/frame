@@ -56,14 +56,6 @@ export interface JobListFilters {
   mediaId?: number;
 }
 
-export interface WorkerOptions {
-  concurrency?: number;
-  pollIntervalMs?: number;
-  retryDelayMs?: number;
-  maxRetryDelayMs?: number;
-  workerId?: string;
-}
-
 
 // --- scan ---
 
