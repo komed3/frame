@@ -10,7 +10,6 @@ export const registerScanCommands = ( program: Command ) : void => {
     .description( 'Queue a scan for every enabled media root' )
     .action( () => {
       const roots = MediaRoots.list( true );
-
       if ( ! roots.length ) return ui.info( 'No enabled media roots found.' );
 
       for ( const root of roots ) {
