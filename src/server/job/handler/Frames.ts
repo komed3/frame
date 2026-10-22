@@ -1,5 +1,5 @@
 import { Config } from '@/src/server/core/Config';
-import { getAssetSource, runFfmpeg } from '@/src/server/job/handler/assets';
+import { assetSignal, getAssetSource, runFfmpeg } from '@/src/server/job/handler/assets';
 import { MediaAssets } from '@/src/server/media/Assets';
 import type { JobContext, JobHandler } from '@/src/shared/types/job';
 import { randomUUID } from 'node:crypto';
@@ -11,7 +11,8 @@ export class FramesJob implements JobHandler {
   public async execute ( { job, signal }: JobContext ) : Promise< void > {
     if ( job.kind !== 'frames' ) throw new Error( 'Invalid frames job' );
 
-    const source = await getAssetSource( job, signal );
+    const S = assetSignal( signal );
+    const source = await getAssetSource( job, S );
     if ( ! source || source.media.type !== 'video' ) return;
 
     const { media, path } = source, durationMs = media.durationMs ?? 0;
@@ -30,7 +31,7 @@ export class FramesJob implements JobHandler {
     const previous = MediaAssets.get( media.id, 'frames' );
     const backupDirectory = `${ outputDirectory }.bak-${ randomUUID() }`;
 
-    signal.throwIfAborted();
+    S.throwIfAborted();
     await mkdir( dirname( outputDirectory ), { recursive: true } );
     await mkdir( tempDirectory, { recursive: true } );
 
@@ -39,9 +40,9 @@ export class FramesJob implements JobHandler {
         '-i', path, '-map', '0:V:0', '-vf', `${ select },${ scale }`, '-fps_mode', 'vfr',
         '-frames:v', String( count ), '-c:v', 'libwebp', '-quality', '76', '-start_number', '0',
         '-y', `${ tempDirectory }/%06d.webp`
-      ], signal );
+      ], S );
 
-      signal.throwIfAborted();
+      S.throwIfAborted();
 
       const files = ( await readdir( tempDirectory ) ).filter( f => extname( f ).toLowerCase() === '.webp' ).sort();
       if ( ! files.length ) throw new Error( `No frames generated for media ${ media.id }` );
@@ -55,7 +56,7 @@ export class FramesJob implements JobHandler {
         version: 1, durationMs, intervalMs, width: 320, height: 180, frames
       } ) );
 
-      signal.throwIfAborted();
+      S.throwIfAborted();
       let backedUp = false;
 
       try { await rename( outputDirectory, backupDirectory ), backedUp = true }
@@ -63,7 +64,7 @@ export class FramesJob implements JobHandler {
 
       try {
         await rename( tempDirectory, outputDirectory );
-        signal.throwIfAborted();
+        S.throwIfAborted();
 
         await MediaAssets.write( media.id, {
           kind: 'frames', path: manifestPath, fingerprint: media.fingerprint,  mimeType: 'application/json',
