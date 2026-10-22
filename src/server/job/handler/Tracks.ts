@@ -1,3 +1,4 @@
+import { parsePositive, parseRate } from '@/src/server/job/handler/parse';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import { MediaTracks } from '@/src/server/media/Tracks';
@@ -5,7 +6,6 @@ import { execFileAsync } from '@/src/server/utils';
 import type { JobContext, JobHandler, ProbeData, ProbeStream } from '@/src/shared/types/job';
 import type { MediaTrackInput, MediaTrackKind } from '@/src/shared/types/tracks';
 import { stat } from 'node:fs/promises';
-import { parsePositive, parseRate } from '@/src/server/job/handler/parse';
 
 
 export class TracksJob implements JobHandler {
@@ -53,5 +53,49 @@ export class TracksJob implements JobHandler {
         }
       } ];
     } );
+  }
+
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {
+    if ( job.kind !== 'tracks' || job.mediaId === null || job.rootId !== null )
+      throw new Error( 'Invalid tracks job' );
+
+    signal.throwIfAborted();
+
+    const media = Media.get( job.mediaId );
+    if ( ! media || ! media.available ) return;
+
+    const root = MediaRoots.list().find( root => root.id === media.rootId );
+    if ( ! root ) throw new Error( `Media root ${ media.rootId } does not exist` );
+    if ( ! root.enabled ) return console.warn( `[Tracks] Skipping disabled root ${ root.id }.` );
+
+    const path = MediaRoots.resolve( media.rootId, media.path );
+    const info = await stat( path );
+
+    signal.throwIfAborted();
+
+    if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
+      info.mtimeMs !== new Date( media.modifiedAt ).getTime() ) )
+      throw new Error( `Media changed since scan: ${ path }` );
+
+    if ( media.type !== 'video' && media.type !== 'audio' ) {
+      MediaTracks.replace( media.id, [] );
+      console.info( `[Tracks] Media ${ media.id } (${ media.path }) has no supported tracks.` );
+      return;
+    }
+
+    const { stdout } = await execFileAsync( 'ffprobe',
+      [ '-v', 'error', '-show_streams', '-of', 'json', path ],
+      { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024, signal }
+    );
+
+    signal.throwIfAborted();
+
+    const probe = JSON.parse( stdout ) as ProbeData;
+    const tracks = this.extract( probe.streams ?? [] );
+
+    signal.throwIfAborted();
+    MediaTracks.replace( media.id, tracks );
+
+    console.info( `[Tracks] Media ${ media.id } (${ media.path }) extracted: ${ tracks.length } stream(s).` );
   }
 }
