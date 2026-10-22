@@ -11,4 +11,9 @@ export class SystemCheck {
     if ( result.error || result.status !== 0 ) return null;
     return result.stdout.trim().split( '\n' )[ 0 ] || `${ name } is available`;
   }
+
+  private static canWrite () : boolean {
+    try { accessSync( process.cwd(), constants.W_OK ); return true }
+    catch { return false }
+  }
 }
