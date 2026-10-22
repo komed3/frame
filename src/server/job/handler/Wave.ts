@@ -9,3 +9,8 @@ import { randomUUID } from 'node:crypto';
 
 
 const waveformRate = 8000;
+
+
+export class WaveJob implements JobHandler {
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {}
+}
