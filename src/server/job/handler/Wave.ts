@@ -1,11 +1,11 @@
 import { Config } from '@/src/server/core/Config';
+import { assetPath, getAssetSource } from '@/src/server/job/handler/assets';
 import { MediaAssets } from '@/src/server/media/Assets';
-import { getAssetSource, assetPath } from '@/src/server/job/handler/assets';
 import type { JobContext, JobHandler } from '@/src/shared/types/job';
 import { spawn } from 'node:child_process';
-import { mkdir, rename, rm, writeFile, readFile } from 'node:fs/promises';
-import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
 
 
 const waveformRate = 8000;
