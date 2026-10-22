@@ -108,9 +108,10 @@ export class Worker {
     const recovered = JobQueue.recover();
     if ( recovered ) console.info( `[Worker] Recovered ${ recovered } interrupted job(s).` );
 
-    this.loops = Array.from( { length: this.concurrency }, ( _, index ) =>
-      this.runLoop( `${ this.workerId }-${ index + 1 }` )
-    );
+    this.loops = Array.from( { length: this.concurrency }, ( _, index ) => {
+      console.info( `[Worker] Starting loop ${ index + 1 } of ${ this.concurrency }.` );
+      return this.runLoop( `${ this.workerId }-${ index + 1 }` );
+    } );
   }
 
   public async stop () : Promise< void > {
@@ -119,6 +120,7 @@ export class Worker {
     this.controller.abort();
     await Promise.all( this.loops );
 
+    console.info( `[Worker] Stopped ${ this.concurrency } loop(s).` );
     this.loops = [];
     this.started = false;
   }
