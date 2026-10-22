@@ -109,7 +109,7 @@ export class Worker {
     if ( recovered ) console.info( `[Worker] Recovered ${ recovered } interrupted job(s).` );
 
     this.loops = Array.from( { length: this.concurrency }, ( _, index ) => {
-      console.info( `[Worker] Starting loop ${ index + 1 } of ${ this.concurrency }.` );
+      console.info( `[Worker] Starting loop ${ index + 1 } of ${ this.concurrency } ...` );
       return this.runLoop( `${ this.workerId }-${ index + 1 }` );
     } );
   }
