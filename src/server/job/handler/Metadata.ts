@@ -1,3 +1,4 @@
+import { Config } from '@/src/server/core/Config';
 import { parseDate, parsePositive, parseRate } from '@/src/server/job/handler/parse';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
@@ -6,7 +7,6 @@ import type { ExtractedMetadata, JobContext, JobHandler, ProbeData } from '@/src
 import type { MediaType } from '@/src/shared/types/media';
 import { open, stat } from 'node:fs/promises';
 import { extname } from 'node:path';
-import { Config } from '@/src/server/core/Config';
 
 
 export class MetadataJob implements JobHandler {
