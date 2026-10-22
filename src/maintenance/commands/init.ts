@@ -72,6 +72,8 @@ const createAdmin = async () : Promise< void > => {
 const configureRoots = async () : Promise< void > => {
   ui.nl();
   ui.headline( 'Configure media roots', '[3/3]' );
+  ui.nl();
+
   ui.info( 'Add the directories containing your media files.' );
   ui.info( 'Press Enter without a path to finish this step.' );
   ui.nl();
@@ -119,6 +121,8 @@ export const registerInitCommands = ( program: Command ) : void => {
       ui.nl();
 
       ui.info( ui.key( 'Welcome to Frame' ) );
+      ui.nl();
+
       ui.info( 'This command will guide you through the initial configuration of Frame.' );
       ui.info( 'Press Enter to accept the displayed default value.' );
       ui.nl();
