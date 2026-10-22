@@ -11,12 +11,19 @@ export class Config {
   public static readonly schema = {
     NODE_ENV: { type: 'enum', desc: 'Runtime environment', default: 'dev', values: [ 'dev', 'development', 'test', 'prod', 'production' ] },
     HOST: { type: 'string', desc: 'HTTP bind address', default: '0.0.0.0' },
-    PORT: { type: 'integer', desc: 'HTTP port', default: 3000, min: 1, max: 65535 },
+    PORT: { type: 'integer', desc: 'HTTP port', default: 3e3, min: 1, max: 65535 },
     DB_PATH: { type: 'path', desc: 'SQLite database path', default: 'data/frame.sqlite' },
-    DB_BUSY_TIMEOUT_MS: { type: 'integer', desc: 'SQLite busy timeout', default: 5000, min: 0, max: 6e4 },
-    ASSETS_PATH: { type: 'path', desc: 'Generated assets path', default: 'data/assets' },
+    DB_BUSY_TIMEOUT_MS: { type: 'integer', desc: 'SQLite busy timeout', default: 5e3, min: 0, max: 6e4 },
     SESSION_LIFETIME_MS: { type: 'integer', desc: 'Session lifetime', default: 2592e6, min: 6e4, max: 31536e6 },
-    PASSWORD_STRICT: { type: 'boolean', desc: 'Enforce strong password requirements', default: true }
+    PASSWORD_STRICT: { type: 'boolean', desc: 'Enforce strong password requirements', default: true },
+    ASSETS_PATH: { type: 'path', desc: 'Generated assets path', default: 'data/assets' },
+    ASSET_TIMEOUT_MS: { type: 'integer', desc: 'Asset job timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },
+    FFMPEG_TIMEOUT_MS: { type: 'integer', desc: 'FFmpeg timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },
+    FFPROBE_TIMEOUT_MS: { type: 'integer', desc: 'FFprobe timeout in milliseconds', default: 1.2e5, min: 1e3, max: 86.4e6 },
+    WAVE_TIMEOUT_MS: { type: 'integer', desc: 'Waveform extraction timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },
+    SCRUBBER_FPS: { type: 'number', desc: 'Scrubber frames per second', default: 1, min: 0.1, max: 10 },
+    SCRUBBER_MAX_FRAMES: { type: 'integer', desc: 'Maximum scrubber frames per video', default: 450, min: 1, max: 500 },
+    SCRUBBER_MIN_FRAMES: { type: 'integer', desc: 'Minimum scrubber frames per video', default: 24, min: 1, max: 500 },
   } satisfies ConfigTable;
 
   private static isName ( name: string ) : name is ConfigName {
