@@ -37,5 +37,11 @@ export class WaveJob implements JobHandler {
 
     child.stderr.setEncoding( 'utf8' );
     child.stderr.on( 'data', ( chunk: string ) => { stderr = ( stderr + chunk ).slice( -16_384 ) } );
+
+    const values: Array< [ number, number ] > = [];
+    const targetPoints = Math.min( 1.5e6, Math.max( 8000, Math.ceil( durationSeconds * 100 ) ) );
+    const samplesPerPoint = Math.max( 1, Math.ceil( waveformRate * durationSeconds / targetPoints ) );
+    let min = Infinity, max = -Infinity, samples = 0;
+    let carry = Buffer.alloc( 0 );
   }
 }
