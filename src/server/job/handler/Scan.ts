@@ -76,7 +76,7 @@ export class ScanJob implements JobHandler {
       if ( finalStat.size !== size || finalStat.mtimeMs !== mtimeMs )
         throw new Error( `File changed while hashing: ${ path }` );
 
-      return `${ hashVersion }:${ hash.digest( 'hex' ).substring( 0, hashLength ) }`;
+      return `${ hashVersion }:${ hash.digest().toString( 'base64url' ).substring( 0, hashLength ) }`;
     } finally {
       await file.close();
     }
