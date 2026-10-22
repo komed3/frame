@@ -18,7 +18,7 @@ export class Config {
     SESSION_LIFETIME_MS: { type: 'integer', desc: 'Session lifetime', default: 2592e6, min: 6e4, max: 31536e6 },
     PASSWORD_STRICT: { type: 'boolean', desc: 'Enforce strong password requirements', default: true },
     ASSETS_PATH: { type: 'path', desc: 'Generated assets path', default: 'data/assets' },
-    ASSET_TIMEOUT_MS: { type: 'integer', desc: 'Asset job timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },
+    ASSETS_TIMEOUT_MS: { type: 'integer', desc: 'Asset job timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },
     FFMPEG_TIMEOUT_MS: { type: 'integer', desc: 'FFmpeg timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },
     FFPROBE_TIMEOUT_MS: { type: 'integer', desc: 'FFprobe timeout in milliseconds', default: 1.2e5, min: 1e3, max: 86.4e6 },
     WAVE_TIMEOUT_MS: { type: 'integer', desc: 'Waveform extraction timeout in milliseconds', default: 1.5e6, min: 1e3, max: 86.4e6 },

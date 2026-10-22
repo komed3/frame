@@ -16,7 +16,7 @@ export interface ConfigSchema {
   PASSWORD_STRICT: boolean;
 
   ASSETS_PATH: string;
-  ASSET_TIMEOUT_MS: number;
+  ASSETS_TIMEOUT_MS: number;
 
   FFMPEG_TIMEOUT_MS: number;
   FFPROBE_TIMEOUT_MS: number;

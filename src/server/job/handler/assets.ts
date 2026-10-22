@@ -43,7 +43,7 @@ export function assetPath ( kind: string, source: AssetSource, extension: string
 
 
 export function assetSignal ( signal: AbortSignal ) : AbortSignal {
-  return AbortSignal.any( [ signal, AbortSignal.timeout( Config.get( 'ASSET_TIMEOUT_MS' ) ) ] );
+  return AbortSignal.any( [ signal, AbortSignal.timeout( Config.get( 'ASSETS_TIMEOUT_MS' ) ) ] );
 }
 
 
