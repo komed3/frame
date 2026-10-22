@@ -1,4 +1,4 @@
-import type { MediaType } from '@/src/shared/types/media';
+import type { MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
 export type JobKind = 'scan' | 'metadata' | 'tracks' | 'preview' | 'frames' | 'wave' | 'text';
@@ -97,3 +97,32 @@ export interface ScanStats {
   ignored: number;
   errors: number;
 }
+
+
+// --- metadata ---
+
+export interface ProbeStream {
+  codec_type?: string;
+  codec_name?: string;
+  width?: number;
+  height?: number;
+  avg_frame_rate?: string;
+  r_frame_rate?: string;
+  bit_rate?: string;
+  sample_rate?: string;
+  channels?: number;
+  disposition?: { attached_pic?: number };
+  tags?: Record< string, string >;
+}
+
+export interface ProbeData {
+  streams?: ProbeStream[];
+  format?: {
+    format_name?: string;
+    duration?: string;
+    bit_rate?: string;
+    tags?: Record< string, string >;
+  };
+}
+
+export type ExtractedMetadata = MediaUpdate;
