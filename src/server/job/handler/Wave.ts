@@ -65,5 +65,50 @@ export class WaveJob implements JobHandler {
 
     signal.addEventListener( 'abort', abortChild, { once: true } );
     if ( signal.aborted ) abortChild();
+
+    try {
+      for await ( const chunk of child.stdout ) {
+        signal.throwIfAborted();
+
+        const buffer = carry.length ? Buffer.concat( [ carry, chunk as Buffer ] ) : chunk as Buffer;
+        const completeLength = buffer.length - buffer.length % 4;
+
+        for ( let offset = 0; offset < completeLength; offset += 4 ) {
+          const sample = buffer.readFloatLE( offset );
+          if ( ! Number.isFinite( sample ) ) throw new Error( `Invalid audio sample for media ${ media.id }` );
+
+          const value = Math.max( -1, Math.min( 1, sample ) );
+          min = Math.min( min, value ), max = Math.max( max, value );
+          if ( ++samples >= samplesPerPoint ) writePoint();
+        }
+
+        carry = Buffer.from( buffer.subarray( completeLength ) );
+      }
+
+      signal.throwIfAborted();
+      if ( carry.length ) throw new Error( `Incomplete waveform sample for media ${ media.id }` );
+      writePoint();
+
+      const exitCode = await exitPromise;
+      signal.throwIfAborted();
+
+      if ( timedOut || exitCode !== 0 ) throw new Error(
+        `FFmpeg waveform failed for media ${ media.id } (exit ${ exitCode }): ${ stderr.trim() }`
+      );
+
+      if ( ! values.length ) throw new Error( `No audio samples generated for media ${ media.id }` );
+    } catch ( err ) {
+      abortChild();
+
+      try { await exitPromise }
+      catch { /* The child could not be started. */ }
+
+      throw err;
+    } finally {
+      signal.removeEventListener( 'abort', abortChild );
+      clearTimeout( timeout );
+
+      if ( killTimer ) clearTimeout( killTimer );
+    }
   }
 }
