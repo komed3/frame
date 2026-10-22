@@ -1,7 +1,7 @@
+import { ui } from '@/src/maintenance/utils/ui';
+import { JobQueue } from '@/src/server/job/Queue';
 import { MediaRoots } from '@/src/server/media/Roots';
 import { Command } from 'commander';
-import { ui } from '../utils/ui';
-import { JobQueue } from '@/src/server/job/Queue';
 
 
 export const registerScanCommands = ( program: Command ) : void => {
