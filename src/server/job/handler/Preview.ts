@@ -87,4 +87,21 @@ export class PreviewJob implements JobHandler {
     catch ( err ) { throw err }
     finally { await rm( tempPath, { force: true } ) }
   }
+
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {
+    if ( job.kind !== 'preview' ) throw new Error( 'Invalid preview job' );
+
+    const source = await getAssetSource( job, signal );
+    if ( ! source ) return;
+
+    if ( ! [ 'video', 'audio', 'image' ].includes( source.media.type ) ) return;
+    if ( source.media.type === 'video' && ! source.media.durationMs )
+      console.warn( `[Preview] Media ${ source.media.id } has no known duration; using the beginning.` );
+
+    await this.createImage( source, 'poster', signal );
+    signal.throwIfAborted();
+    await this.createImage( source, 'thumb', signal );
+
+    console.info( `[Preview] Media ${ source.media.id } (${ source.media.path }) generated.` );
+  }
 }
