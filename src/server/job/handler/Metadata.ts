@@ -8,4 +8,16 @@ import { extname } from 'node:path';
 import { promisify } from 'node:util';
 
 
-export class MetadataJob implements JobHandler {}
+export class MetadataJob implements JobHandler {
+  private number ( value: string | number | undefined ) : number | null {
+    if ( value === undefined || value === '' ) return null;
+
+    const parsed = Number( value );
+    return Number.isFinite( parsed ) ? parsed : null;
+  }
+
+  private positive ( value: string | number | undefined ) : number | null {
+    const parsed = this.number( value );
+    return parsed !== null && parsed > 0 ? parsed : null;
+  }
+}
