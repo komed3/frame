@@ -16,7 +16,7 @@ const configure = async () : Promise< void > => {
     let details = def.desc;
 
     if ( def.type === 'enum' && def.values ) details += `\nAllowed values: ${ def.values.join( ', ' ) }`;
-    if ( def.type === 'integer' ) details += `\nRange: ${ def.min }–${ def.max }`;
+    if ( def.type === 'integer' || def.type === 'number' ) details += `\nRange: ${ def.min }–${ def.max }`;
 
     let saved = false;
 
