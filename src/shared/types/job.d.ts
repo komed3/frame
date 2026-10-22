@@ -102,8 +102,11 @@ export interface ScanStats {
 // --- metadata ---
 
 export interface ProbeStream {
+  index?: number;
   codec_type?: string;
   codec_name?: string;
+  codec_long_name?: string;
+  profile?: string;
   width?: number;
   height?: number;
   avg_frame_rate?: string;
@@ -111,7 +114,14 @@ export interface ProbeStream {
   bit_rate?: string;
   sample_rate?: string;
   channels?: number;
-  disposition?: { attached_pic?: number };
+  channel_layout?: string;
+  pix_fmt?: string;
+  sample_fmt?: string;
+  disposition?: {
+    attached_pic?: number;
+    default?: number;
+    forced?: number;
+  };
   tags?: Record< string, string >;
 }
 
