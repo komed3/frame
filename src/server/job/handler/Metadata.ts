@@ -20,4 +20,14 @@ export class MetadataJob implements JobHandler {
     const parsed = this.number( value );
     return parsed !== null && parsed > 0 ? parsed : null;
   }
+
+  private parseRate ( value?: string ) : number | null {
+    if ( ! value ) return null;
+
+    const [ numerator, denominator ] = value.split( '/' ).map( Number );
+    if ( ! denominator || ! Number.isFinite( numerator ) || ! Number.isFinite( denominator ) ) return null;
+
+    const rate = numerator / denominator;
+    return Number.isFinite( rate ) && rate > 0 ? rate : null;
+  }
 }
