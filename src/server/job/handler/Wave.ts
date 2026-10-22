@@ -49,5 +49,21 @@ export class WaveJob implements JobHandler {
       if ( values.length < targetPoints ) values.push( [ min, max ] );
       min = Infinity, max = -Infinity, samples = 0;
     };
+
+    const exitPromise = new Promise< number >( ( resolve, reject ) => {
+      child.once( 'error', reject );
+      child.once( 'close', code => { closed = true; resolve( code ?? -1 ) } );
+    } );
+
+    const abortChild = () => {
+      if ( closed ) return;
+
+      child.kill( 'SIGTERM' );
+      killTimer = setTimeout( () => { if ( ! closed ) child.kill( 'SIGKILL' ) }, 5000 );
+      killTimer.unref();
+    };
+
+    signal.addEventListener( 'abort', abortChild, { once: true } );
+    if ( signal.aborted ) abortChild();
   }
 }
