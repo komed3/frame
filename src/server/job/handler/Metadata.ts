@@ -8,3 +8,4 @@ import { extname } from 'node:path';
 import { promisify } from 'node:util';
 
 
+export class MetadataJob implements JobHandler {}
