@@ -5,7 +5,7 @@ import { execFileAsync } from '@/src/server/utils';
 import type { JobContext, JobHandler, ProbeData, ProbeStream } from '@/src/shared/types/job';
 import type { MediaTrackInput, MediaTrackKind } from '@/src/shared/types/tracks';
 import { stat } from 'node:fs/promises';
-import { parsePositive, parseRate } from './parse';
+import { parsePositive, parseRate } from '@/src/server/job/handler/parse';
 
 
 export class TracksJob implements JobHandler {
