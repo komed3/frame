@@ -75,7 +75,7 @@ export class TracksJob implements JobHandler {
     signal.throwIfAborted();
 
     if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
-      info.mtimeMs !== new Date( media.modifiedAt ).getTime() ) )
+      Math.trunc( info.mtimeMs ) !== new Date( media.modifiedAt ).getTime() ) )
       throw new Error( `Media changed since scan: ${ path }` );
 
     if ( media.type !== 'video' && media.type !== 'audio' ) {

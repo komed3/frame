@@ -116,7 +116,7 @@ export class MetadataJob implements JobHandler {
     signal.throwIfAborted();
 
     if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
-      info.mtimeMs !== new Date( media.modifiedAt ).getTime() ) )
+      Math.trunc( info.mtimeMs ) !== new Date( media.modifiedAt ).getTime() ) )
       throw new Error( `Media changed since scan: ${ path }` );
 
     const metadata = media.type === 'text'
