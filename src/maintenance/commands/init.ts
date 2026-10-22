@@ -68,6 +68,41 @@ const createAdmin = async () : Promise< void > => {
 };
 
 
+const configureRoots = async () : Promise< void > => {
+  ui.nl();
+  ui.headline( 'Configure media roots', '[3/3]' );
+  ui.info( 'Add the directories containing your media files.' );
+  ui.info( 'Press Enter without a path to finish this step.' );
+  ui.nl();
+
+  let count = 0;
+
+  while ( true ) {
+    const path = await prompt( 'Media root path:' );
+    if ( ! path ) break;
+
+    try {
+      const id = MediaRoots.add( path );
+      count++;
+
+      ui.success( `Registered media root ${ id }: ${ ui.value( path ) }` );
+    } catch ( err ) {
+      ui.error( err instanceof Error ? err.message : String( err ) );
+    }
+  }
+
+  const roots = MediaRoots.list( true );
+
+  for ( const root of roots ) {
+    const id = JobQueue.enqueue( { kind: 'scan', rootId: root.id } );
+    ui.success( `Scan job ${ id } queued for root ${ root.id }: ${ root.path }` );
+  }
+
+  if ( count ) ui.info( `Registered ${ count } media root(s).` );
+  if ( ! roots.length ) ui.info( 'No enabled media roots found. You can add them later using the root command.' );
+};
+
+
 export const registerInitCommands = ( program: Command ) : void => {
   program
     .command( 'init' )
