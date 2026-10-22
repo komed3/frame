@@ -2,6 +2,8 @@ import { prompt, promptConfirmedPassword } from '@/src/maintenance/utils/prompt'
 import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
 import { User } from '@/src/server/core/User';
+import { JobQueue } from '@/src/server/job/Queue';
+import { MediaRoots } from '@/src/server/media/Roots';
 import type { ConfigName, ConfigValue } from '@/src/shared/types/config';
 import { Command } from 'commander';
 import { existsSync } from 'node:fs';
