@@ -1,3 +1,7 @@
+import type { MediaRecord } from '@/src/shared/types/media';
+import type { Stats } from 'node:fs';
+
+
 export function parseNumber ( value: string | number | undefined ) : number | null {
   if ( value === undefined || value === '' ) return null;
 
@@ -36,4 +40,12 @@ export function parseDate ( tags: Record< string, string >, ...keys: string[] ) 
   }
 
   return null;
+}
+
+
+export function assertMediaUnchange ( path: string, media: Pick< MediaRecord, 'sizeBytes' | 'modifiedAt' >, info: Stats ) : void {
+  if ( info.size !== media.sizeBytes ) throw new Error( `Media size changed since scan: ${ path }` );
+
+  if ( media.modifiedAt !== null && info.mtime.toISOString() !== media.modifiedAt )
+    throw new Error( `Media modification time changed since scan: ${ path }` );
 }
