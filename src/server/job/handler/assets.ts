@@ -42,6 +42,11 @@ export function assetPath ( kind: string, source: AssetSource, extension: string
 }
 
 
+export function assetSignal ( signal: AbortSignal ) : AbortSignal {
+  return AbortSignal.any( [ signal, AbortSignal.timeout( Config.get( 'ASSET_TIMEOUT_MS' ) ) ] );
+}
+
+
 export function mediaExtension ( path: string ) : string {
   return extname( path ).toLowerCase();
 }
