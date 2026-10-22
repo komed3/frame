@@ -1,12 +1,26 @@
 export interface ConfigSchema {
   NODE_ENV: 'dev' | 'development' | 'test' | 'prod' | 'production';
+
   HOST: string;
   PORT: number;
+
   DB_PATH: string;
   DB_BUSY_TIMEOUT_MS: number;
-  ASSETS_PATH: string;
+
   SESSION_LIFETIME_MS: number;
   PASSWORD_STRICT: boolean;
+
+  ASSETS_PATH: string;
+  ASSET_TIMEOUT_MS: number;
+
+  FFMPEG_TIMEOUT_MS: number;
+  FFPROBE_TIMEOUT_MS: number;
+
+  WAVE_TIMEOUT_MS: number;
+
+  SCRUBBER_FPS: number;
+  SCRUBBER_MAX_FRAMES: number;
+  SCRUBBER_MIN_FRAMES: number;
 }
 
 export type ConfigName = keyof ConfigSchema;
