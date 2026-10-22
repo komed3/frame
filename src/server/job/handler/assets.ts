@@ -36,3 +36,8 @@ export async function getAssetSource ( job: JobRecord, signal: AbortSignal ) : P
     ( media.fingerprint ?? `${ media.sizeBytes }-${ media.modifiedAt ?? 'unknown' }` )
       .replace( /[^a-zA-Z0-9_-]/g, '_' ) };
 }
+
+
+export function assetPath ( kind: string, source: AssetSource, extension: string ) : string {
+  return `${ kind }/${ source.media.id }-${ source.fingerprint }${ extension }`;
+}
