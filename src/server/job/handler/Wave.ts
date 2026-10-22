@@ -12,5 +12,10 @@ const waveformRate = 8000;
 
 
 export class WaveJob implements JobHandler {
-  public async execute ( { job, signal }: JobContext ) : Promise< void > {}
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {
+    if ( job.kind !== 'wave' ) throw new Error( 'Invalid waveform job' );
+
+    const source = await getAssetSource( job, signal );
+    if ( ! source || ! [ 'video', 'audio' ].includes( source.media.type ) ) return;
+  }
 }
