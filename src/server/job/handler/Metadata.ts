@@ -1,11 +1,12 @@
 import { MediaRoots } from '@/src/server/media/Roots';
 import { Media } from '@/src/server/media/Media';
-import type { JobContext, JobHandler } from '@/src/shared/types/job';
+import type { ExtractedMetadata, JobContext, JobHandler, ProbeData } from '@/src/shared/types/job';
 import type { MediaType, MediaUpdate } from '@/src/shared/types/media';
 import { execFile } from 'node:child_process';
 import { open, stat } from 'node:fs/promises';
 import { extname } from 'node:path';
 import { promisify } from 'node:util';
+import { execFileAsync } from '@/src/server/utils';
 
 
 export class MetadataJob implements JobHandler {
@@ -44,5 +45,58 @@ export class MetadataJob implements JobHandler {
     }
 
     return null;
+  }
+
+  private async probe ( path: string, type: MediaType, signal: AbortSignal ) : Promise< ExtractedMetadata > {
+    signal.throwIfAborted();
+
+    const { stdout } = await execFileAsync( 'ffprobe',
+      [ '-v', 'error', '-show_format', '-show_streams', '-of', 'json', path ],
+      { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024, signal }
+    );
+
+    signal.throwIfAborted();
+
+    const probe = JSON.parse( stdout ) as ProbeData;
+    const streams = probe.streams ?? [], format = probe.format ?? {};
+    const video = streams.find( s => s.codec_type === 'video' && ! s.disposition?.attached_pic ) ??
+      streams.find( s => s.codec_type === 'video' );
+    const audio = streams.find( s => s.codec_type === 'audio' );
+    const primary = type === 'audio' ? audio : video ?? audio;
+    const tags = { ...format.tags, ...primary?.tags };
+    const duration = this.positive( format.duration );
+
+    return {
+      durationMs: type === 'video' || type === 'audio'
+        ? duration === null ? null : Math.round( duration * 1000 )
+        : null,
+      width: this.positive( video?.width ),
+      height: this.positive( video?.height ),
+      fps: type === 'video'
+        ? this.parseRate( video?.avg_frame_rate ) ?? this.parseRate( video?.r_frame_rate )
+        : null,
+      bitrate: this.positive( format.bit_rate ) ?? this.positive( primary?.bit_rate ),
+      container: ( format.format_name?.split( ',' )[ 0 ] ?? extname( path ).slice( 1 ) ) || null,
+      videoCodec: video?.codec_name ?? null,
+      audioCodec: audio?.codec_name ?? null,
+      sampleRate: this.positive( audio?.sample_rate ),
+      channels: this.positive( audio?.channels ),
+      encoding: null,
+      language: tags.language ?? null,
+      releasedAt: this.parseDate( tags, 'date', 'year', 'release_date' ),
+      recordedAt: this.parseDate( tags, 'creation_time', 'recorded_date', 'date_recorded' ),
+      data: {
+        format: format.format_name ?? null,
+        tags,
+        streams: streams.map( stream => ( {
+          type: stream.codec_type ?? null,
+          codec: stream.codec_name ?? null,
+          width: stream.width ?? null,
+          height: stream.height ?? null,
+          attachedPicture: Boolean( stream.disposition?.attached_pic ),
+          tags: stream.tags ?? {}
+        } ) )
+      }
+    };
   }
 }
