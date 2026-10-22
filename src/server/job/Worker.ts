@@ -92,13 +92,13 @@ export class Worker {
 
   public start () : void {
     if ( this.started ) return;
-
     this.started = true;
-    const recovered = JobQueue.recover();
+
+    const concurrency = Config.get( 'WORKER_CONCURRENCY' ), recovered = JobQueue.recover();
     if ( recovered ) console.info( `[Worker] Recovered ${ recovered } interrupted job(s).` );
 
-    this.loops = Array.from( { length: Config.get( 'WORKER_CONCURRENCY' ) }, ( _, index ) => {
-      console.info( `[Worker] Starting loop ${ index + 1 } of ${ Config.get( 'WORKER_CONCURRENCY' ) } ...` );
+    this.loops = Array.from( { length: concurrency }, ( _, index ) => {
+      console.info( `[Worker] Starting loop ${ index + 1 } of ${ concurrency } ...` );
       return this.runLoop( `${ this.workerId }-${ index + 1 }` );
     } );
   }
@@ -110,7 +110,6 @@ export class Worker {
     await Promise.all( this.loops );
 
     console.info( `[Worker] Stopped ${ Config.get( 'WORKER_CONCURRENCY' ) } loop(s).` );
-    this.loops = [];
-    this.started = false;
+    this.loops = [], this.started = false;
   }
 }
