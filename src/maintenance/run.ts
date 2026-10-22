@@ -16,6 +16,7 @@ import { registerPlaylistCommands } from '@/src/maintenance/commands/playlists';
 import { registerPlayCommands } from '@/src/maintenance/commands/plays';
 import { registerPrefCommands } from '@/src/maintenance/commands/pref';
 import { registerRootCommands } from '@/src/maintenance/commands/roots';
+import { registerScanCommands } from '@/src/maintenance/commands/scan';
 import { registerSearchCommands } from '@/src/maintenance/commands/search';
 import { registerTagCommands } from '@/src/maintenance/commands/tags';
 import { registerTrackCommands } from '@/src/maintenance/commands/tracks';
@@ -68,6 +69,7 @@ registerPlayCommands( frame );
 
 frame.commandsGroup( 'Background Jobs:' );
 registerJobCommands( frame );
+registerScanCommands( frame );
 
 
 try { await frame.parseAsync( process.argv ) }
