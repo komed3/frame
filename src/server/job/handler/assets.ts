@@ -41,3 +41,15 @@ export async function getAssetSource ( job: JobRecord, signal: AbortSignal ) : P
 export function assetPath ( kind: string, source: AssetSource, extension: string ) : string {
   return `${ kind }/${ source.media.id }-${ source.fingerprint }${ extension }`;
 }
+
+
+export async function runFfmpeg ( args: string[], signal: AbortSignal ) : Promise< void > {
+  signal.throwIfAborted();
+
+  await execFileAsync( 'ffmpeg', [
+    '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
+    '-max_alloc', '536870912', '-max_pixels', '89128960', ...args
+  ], { timeout: Config.get( 'FFMPEG_TIMEOUT_MS' ), maxBuffer: 4 * 1024 * 1024, signal } );
+
+  signal.throwIfAborted();
+}
