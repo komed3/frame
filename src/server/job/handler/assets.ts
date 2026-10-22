@@ -43,6 +43,11 @@ export function assetPath ( kind: string, source: AssetSource, extension: string
 }
 
 
+export function mediaExtension ( path: string ) : string {
+  return extname( path ).toLowerCase();
+}
+
+
 export async function runFfmpeg ( args: string[], signal: AbortSignal ) : Promise< void > {
   signal.throwIfAborted();
 
