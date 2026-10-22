@@ -64,9 +64,10 @@ export interface WorkerOptions {
   workerId?: string;
 }
 
+
 // --- scan ---
 
-interface ExistingMedia {
+export interface ExistingMedia {
   id: number;
   path: string;
   fileName: string;
@@ -79,7 +80,7 @@ interface ExistingMedia {
   title: string | null;
 }
 
-interface ScannedFile {
+export interface ScannedFile {
   absolutePath: string;
   path: string;
   fileName: string;
@@ -91,7 +92,7 @@ interface ScannedFile {
   fingerprint: string;
 }
 
-interface ScanStats {
+export interface ScanStats {
   discovered: number;
   ignored: number;
   errors: number;
