@@ -21,5 +21,11 @@ export class WaveJob implements JobHandler {
     const { media, path } = source;
     const durationSeconds = Math.max( 0, ( media.durationMs ?? 0 ) / 1000 );
     if ( ! durationSeconds ) throw new Error( `Audio duration is unknown: ${ media.id }` );
+
+    const child = spawn( 'ffmpeg', [
+      '-hide_banner', '-loglevel', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
+      '-max_alloc', '536870912', '-i', path, '-t', durationSeconds.toFixed( 3 ), '-map', '0:a:0',
+      '-vn', '-ac', '1', '-ar', String( waveformRate ), '-f', 'f32le', 'pipe:1'
+    ], { stdio: [ 'ignore', 'pipe', 'pipe' ] } );
   }
 }
