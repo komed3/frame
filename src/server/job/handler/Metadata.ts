@@ -13,10 +13,12 @@ export class MetadataJob implements JobHandler {
   private async probe ( path: string, type: MediaType, signal: AbortSignal ) : Promise< ExtractedMetadata > {
     signal.throwIfAborted();
 
-    const { stdout } = await execFileAsync( 'ffprobe',
-      [ '-v', 'error', '-show_format', '-show_streams', '-of', 'json', path ],
-      { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024, signal }
-    );
+    const { stdout } = await execFileAsync( 'ffprobe', [
+      '-v', 'error', '-show_format', '-show_streams', '-of', 'json', path
+    ], {
+      encoding: 'utf8', timeout: Config.get( 'FFPROBE_TIMEOUT_MS' ),
+      maxBuffer: 8 * 1024 * 1024, signal
+    } );
 
     signal.throwIfAborted();
 
