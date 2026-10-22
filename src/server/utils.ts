@@ -1,3 +1,7 @@
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+
+
 export function assertId ( id: number, label: string ) : void {
   if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid ${ label } ID: ${ id }` );
 }
@@ -70,3 +74,6 @@ export function validateEnum < T extends string > ( value: unknown, label: strin
 
   return value as T;
 }
+
+
+export const execFileAsync = promisify( execFile );
