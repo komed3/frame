@@ -5,3 +5,6 @@ import type { JobContext, JobHandler } from '@/src/shared/types/job';
 import { mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { extname, dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
+
+
+export class FramesJob implements JobHandler {}
