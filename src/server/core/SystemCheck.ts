@@ -23,10 +23,8 @@ export class SystemCheck {
 
     const version = process.versions.node.split( '.' ).map( Number );
     const nodeOk = version[ 0 ] > 22 || ( version[ 0 ] === 22 && version[ 1 ] >= 5 );
-    const memory = totalmem(), cores = cpus().length;
-    const ffmpeg = this.executable( 'ffmpeg' );
-    const ffprobe = this.executable( 'ffprobe' );
-    const writable = this.canWrite();
+    const memory = totalmem(), cores = cpus().length, writable = this.canWrite();
+    const ffmpeg = this.executable( 'ffmpeg' ), ffprobe = this.executable( 'ffprobe' );
 
     const checks: CheckResult[] = [ {
       name: 'Node.js', ok: nodeOk, message: nodeOk
