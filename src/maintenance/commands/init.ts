@@ -114,6 +114,10 @@ export const registerInitCommands = ( program: Command ) : void => {
 
       if ( ! SystemCheck.run() ) { process.exitCode = 1; return }
 
+      ui.nl();
+      console.log( ui.muted( '----------' ) );
+      ui.nl();
+
       ui.info( ui.key( 'Welcome to Frame' ) );
       ui.info( 'This command will guide you through the initial configuration of Frame.' );
       ui.info( 'Press Enter to accept the displayed default value.' );
