@@ -17,5 +17,9 @@ export class WaveJob implements JobHandler {
 
     const source = await getAssetSource( job, signal );
     if ( ! source || ! [ 'video', 'audio' ].includes( source.media.type ) ) return;
+
+    const { media, path } = source;
+    const durationSeconds = Math.max( 0, ( media.durationMs ?? 0 ) / 1000 );
+    if ( ! durationSeconds ) throw new Error( `Audio duration is unknown: ${ media.id }` );
   }
 }
