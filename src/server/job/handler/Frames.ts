@@ -29,5 +29,9 @@ export class FramesJob implements JobHandler {
     const select = `select='isnan(prev_selected_t)+gte(t-prev_selected_t\\,${ ( intervalMs / 1000 ).toFixed( 8 ) })'`;
     const previous = MediaAssets.get( media.id, 'frames' );
     const backupDirectory = `${ outputDirectory }.bak-${ randomUUID() }`;
+
+    signal.throwIfAborted();
+    await mkdir( dirname( outputDirectory ), { recursive: true } );
+    await mkdir( tempDirectory, { recursive: true } );
   }
 }
