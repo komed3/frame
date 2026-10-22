@@ -19,7 +19,7 @@ async function run () : Promise< void > {
   const app = express();
 
   let server: Server | undefined, vite: ViteDevServer | undefined;
-  const worker = new Worker();
+  const worker = new Worker( { concurrency: Config.get( 'WORKER_CONCURRENCY' ) } );
 
   app.disable( 'x-powered-by' );
   app.use( express.json( { limit: '32kb' } ) );
