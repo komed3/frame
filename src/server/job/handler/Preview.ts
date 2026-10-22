@@ -1,11 +1,11 @@
 import { Config } from '@/src/server/core/Config';
+import { assetPath, getAssetSource, mediaExtension, runFfmpeg } from '@/src/server/job/handler/assets';
 import { MediaAssets } from '@/src/server/media/Assets';
-import { getAssetSource, assetPath, mediaExtension, runFfmpeg } from '@/src/server/job/handler/assets';
+import { execFileAsync } from '@/src/server/utils';
 import type { JobContext, JobHandler } from '@/src/shared/types/job';
+import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { randomUUID } from 'node:crypto';
-import { execFileAsync } from '../../utils';
 
 
 export class PreviewJob implements JobHandler {
