@@ -118,6 +118,7 @@ export const registerInitCommands = ( program: Command ) : void => {
 
       await configure();
       await createAdmin();
+      await configureRoots();
 
       ui.nl();
       ui.info( 'Frame initialization complete.' );
