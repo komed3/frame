@@ -6,6 +6,7 @@ import type { ExtractedMetadata, JobContext, JobHandler, ProbeData } from '@/src
 import type { MediaType } from '@/src/shared/types/media';
 import { open, stat } from 'node:fs/promises';
 import { extname } from 'node:path';
+import { Config } from '@/src/server/core/Config';
 
 
 export class MetadataJob implements JobHandler {
