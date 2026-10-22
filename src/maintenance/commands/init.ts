@@ -11,7 +11,7 @@ import { resolve } from 'node:path';
 
 
 const configure = async () : Promise< void > => {
-  ui.headline( 'Configure Frame', '[1/2]' );
+  ui.headline( 'Configure Frame', '[1/3]' );
 
   for ( const key of Object.keys( Config.schema ) as ConfigName[] ) {
     const def = Config.schema[ key ], cur = String( Config.get( key ) );
@@ -44,7 +44,7 @@ const createAdmin = async () : Promise< void > => {
   if ( activeAdmin ) return ui.info( `An active administrator already exists: ${ activeAdmin.username }` );
 
   ui.nl();
-  ui.headline( 'Create administrator account', '[2/2]' );
+  ui.headline( 'Create administrator account', '[2/3]' );
   ui.nl();
 
   let username = await prompt( 'Administrator username:', 'admin' );
