@@ -141,7 +141,7 @@ export class MetadataJob implements JobHandler {
 
     const root = MediaRoots.list().find( root => root.id === media.rootId );
     if ( ! root ) throw new Error( `Media root ${ media.rootId } does not exist` );
-    if ( ! root.enabled ) return;
+    if ( ! root.enabled ) return console.warn( `[Metadata] Skipping disabled root ${ root.id }.` );
 
     const path = MediaRoots.resolve( media.rootId, media.path );
     const info = await stat( path );
@@ -158,5 +158,7 @@ export class MetadataJob implements JobHandler {
 
     signal.throwIfAborted();
     Media.update( media.id, metadata );
+
+    console.info( `[Metadata] Media ${ media.id } (${ media.path }) processed.` );
   }
 }
