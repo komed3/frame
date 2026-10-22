@@ -24,4 +24,49 @@ export class TextJob implements JobHandler {
     const bytes = encoding.startsWith( 'utf-16' ) ? sample.subarray( 0, sample.length - sample.length % 2 ) : sample;
     return new TextDecoder( encoding ).decode( bytes ).replace( /^\uFEFF/, '' ).replace( /\r\n?/g, '\n' ).trim();
   }
+
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {
+    if ( job.kind !== 'text' || job.mediaId === null || job.rootId !== null ) throw new Error( 'Invalid text job' );
+    signal.throwIfAborted();
+
+    const media = Media.get( job.mediaId );
+    if ( ! media || ! media.available ) return;
+    if ( media.type !== 'text' ) return;
+
+    const root = MediaRoots.list().find( root => root.id === media.rootId );
+    if ( ! root ) throw new Error( `Media root ${ media.rootId } does not exist` );
+    if ( ! root.enabled ) return console.warn( `[Text] Skipping disabled root ${ root.id }.` );
+
+    const path = MediaRoots.resolve( media.rootId, media.path );
+    const info = await stat( path );
+
+    signal.throwIfAborted();
+
+    if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
+      info.mtimeMs !== new Date( media.modifiedAt ).getTime() ) )
+      throw new Error( `Media changed since scan: ${ path }` );
+
+    const file = await open( path );
+
+    try {
+      const buffer = Buffer.alloc( maxBytes );
+      const { bytesRead } = await file.read( buffer, 0, buffer.length, 0 );
+
+      signal.throwIfAborted();
+
+      const excerpt = this.decode( buffer.subarray( 0, bytesRead ) );
+      const finalStat = await file.stat();
+      signal.throwIfAborted();
+
+      if ( finalStat.size !== info.size || finalStat.mtimeMs !== info.mtimeMs )
+        throw new Error( `Media changed while extracting text: ${ path }` );
+
+      MediaMetadata.set( media.id, 'textExcerpt', excerpt, 'scan' );
+
+      const bytes = Buffer.byteLength( excerpt, 'utf8' );
+      console.info( `[Text] Media ${ media.id } (${ media.path }) excerpt extracted: ${ bytes } byte(s).` );
+    } finally {
+      await file.close();
+    }
+  }
 }
