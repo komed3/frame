@@ -12,7 +12,7 @@ export function parsePositive ( value: string | number | undefined ) : number | 
 }
 
 
-export function parseRate ( value?: string ) : Number | null {
+export function parseRate ( value?: string ) : number | null {
   if ( ! value ) return null;
 
   const [ numerator, denominator ] = value.split( '/' ).map( Number );
