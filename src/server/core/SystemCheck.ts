@@ -27,9 +27,8 @@ export class SystemCheck {
     const ffmpeg = this.executable( 'ffmpeg' ), ffprobe = this.executable( 'ffprobe' );
 
     const checks: CheckResult[] = [ {
-      name: 'Node.js', ok: nodeOk, message: nodeOk
-        ? `Version ${ process.versions.node }`
-        : `Version ${ process.versions.node } is too old; require Node.js >=22.5`
+      name: 'Node.js', ok: nodeOk, message: nodeOk ? `Version ${ process.versions.node }` :
+        `Version ${ process.versions.node } is too old; require Node.js >=22.5`
     }, {
       name: 'RAM', ok: memory >= 2 * 1024 ** 3, warning: memory >= 2 * 1024 ** 3 && memory < 4 * 1024 ** 3,
       message: `${ ( memory / 1024 ** 3 ).toFixed( 1 ) } GiB installed; at least 2 GiB required${
@@ -45,9 +44,8 @@ export class SystemCheck {
       name: 'ffprobe', ok: !! ffprobe,
       message: ffprobe ?? 'Not found or not executable; install ffprobe and check PATH'
     }, {
-      name: 'Write access', ok: writable, message: writable
-        ? 'Current directory is writable'
-        : 'Current directory is not writable; run Frame from a directory where you have write access'
+      name: 'Write access', ok: writable, message: writable ? 'Current directory is writable' :
+        'Current directory is not writable; run Frame from a directory where you have write access'
     } ];
 
     let errors = 0;
