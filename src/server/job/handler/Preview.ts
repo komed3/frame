@@ -5,3 +5,6 @@ import type { JobContext, JobHandler } from '@/src/shared/types/job';
 import { mkdir, readFile, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
+
+
+export class PreviewJob implements JobHandler {}
