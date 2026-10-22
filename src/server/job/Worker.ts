@@ -24,13 +24,8 @@ const wait = ( ms: number, signal: AbortSignal ) : Promise< void > => new Promis
 
 
 export class Worker {
-  private readonly controller = new AbortController();
-
-  private readonly concurrency: number;
-  private readonly pollIntervalMs: number;
-  private readonly retryDelayMs: number;
-  private readonly maxRetryDelayMs: number;
   private readonly workerId: string;
+  private readonly controller = new AbortController();
 
   private loops: Promise< void >[] = [];
   private started = false;
@@ -54,7 +49,10 @@ export class Worker {
         return;
       }
 
-      const delay = Math.min( this.retryDelayMs * 2 ** Math.min( job.attempts - 1, 30 ), this.maxRetryDelayMs );
+      const delay = Math.min(
+        Config.get( 'WORKER_RETRY_DELAY_MS' ) * 2 ** Math.min( job.attempts - 1, 30 ),
+        Config.get( 'WORKER_MAX_RETRY_DELAY_MS' )
+      );
 
       try {
         JobQueue.retry( job.id, workerId, err, delay );
@@ -70,38 +68,26 @@ export class Worker {
 
   private async runLoop ( workerId: string ) : Promise< void > {
     const { signal } = this.controller;
+    const pollIntervalMs = Config.get( 'WORKER_POLL_INTERVAL_MS' );
 
     while ( ! signal.aborted ) {
       try {
         const job = JobQueue.claim( workerId );
         if ( job ) { await this.process( job, workerId ); continue }
 
-        await wait( this.pollIntervalMs, signal );
+        await wait( pollIntervalMs, signal );
       } catch ( err ) {
         if ( signal.aborted ) break;
         console.error( '[Worker] Queue loop failed:', err );
 
-        try { await wait( this.pollIntervalMs, signal ) }
+        try { await wait( pollIntervalMs, signal ) }
         catch { break }
       }
     }
   }
 
   public constructor () {
-    this.concurrency = Config.get( 'WORKER_CONCURRENCY' );
-    this.pollIntervalMs = Config.get( 'WORKER_POLL_INTERVAL_MS' );
-    this.retryDelayMs = Config.get( 'WORKER_RETRY_DELAY_MS' );
-    this.maxRetryDelayMs = Config.get( 'WORKER_MAX_RETRY_DELAY_MS' );
     this.workerId = `frame-${ process.pid }-${ randomUUID() }`;
-
-    if ( ! Number.isSafeInteger( this.concurrency ) || this.concurrency < 1 )
-      throw new Error( 'Worker concurrency must be a positive integer' );
-
-    for ( const [ name, value ] of Object.entries( {
-      pollIntervalMs: this.pollIntervalMs, retryDelayMs: this.retryDelayMs,
-      maxRetryDelayMs: this.maxRetryDelayMs
-    } ) ) if ( ! Number.isSafeInteger( value ) || value < 1 )
-      throw new Error( `${ name } must be a positive integer` );
   }
 
   public start () : void {
@@ -111,8 +97,8 @@ export class Worker {
     const recovered = JobQueue.recover();
     if ( recovered ) console.info( `[Worker] Recovered ${ recovered } interrupted job(s).` );
 
-    this.loops = Array.from( { length: this.concurrency }, ( _, index ) => {
-      console.info( `[Worker] Starting loop ${ index + 1 } of ${ this.concurrency } ...` );
+    this.loops = Array.from( { length: Config.get( 'WORKER_CONCURRENCY' ) }, ( _, index ) => {
+      console.info( `[Worker] Starting loop ${ index + 1 } of ${ Config.get( 'WORKER_CONCURRENCY' ) } ...` );
       return this.runLoop( `${ this.workerId }-${ index + 1 }` );
     } );
   }
@@ -123,7 +109,7 @@ export class Worker {
     this.controller.abort();
     await Promise.all( this.loops );
 
-    console.info( `[Worker] Stopped ${ this.concurrency } loop(s).` );
+    console.info( `[Worker] Stopped ${ Config.get( 'WORKER_CONCURRENCY' ) } loop(s).` );
     this.loops = [];
     this.started = false;
   }
