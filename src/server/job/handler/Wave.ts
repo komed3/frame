@@ -1,5 +1,5 @@
 import { Config } from '@/src/server/core/Config';
-import { assetPath, getAssetSource } from '@/src/server/job/handler/assets';
+import { assetPath, assetSignal, getAssetSource } from '@/src/server/job/handler/assets';
 import { MediaAssets } from '@/src/server/media/Assets';
 import type { JobContext, JobHandler } from '@/src/shared/types/job';
 import { spawn } from 'node:child_process';
@@ -15,7 +15,8 @@ export class WaveJob implements JobHandler {
   public async execute ( { job, signal }: JobContext ) : Promise< void > {
     if ( job.kind !== 'wave' ) throw new Error( 'Invalid waveform job' );
 
-    const source = await getAssetSource( job, signal );
+    const S = assetSignal( signal );
+    const source = await getAssetSource( job, S );
     if ( ! source || ! [ 'video', 'audio' ].includes( source.media.type ) ) return;
 
     const { media, path } = source;
@@ -63,12 +64,12 @@ export class WaveJob implements JobHandler {
       killTimer.unref();
     };
 
-    signal.addEventListener( 'abort', abortChild, { once: true } );
-    if ( signal.aborted ) abortChild();
+    S.addEventListener( 'abort', abortChild, { once: true } );
+    if ( S.aborted ) abortChild();
 
     try {
       for await ( const chunk of child.stdout ) {
-        signal.throwIfAborted();
+        S.throwIfAborted();
 
         const buffer = carry.length ? Buffer.concat( [ carry, chunk as Buffer ] ) : chunk as Buffer;
         const completeLength = buffer.length - buffer.length % 4;
@@ -85,12 +86,12 @@ export class WaveJob implements JobHandler {
         carry = Buffer.from( buffer.subarray( completeLength ) );
       }
 
-      signal.throwIfAborted();
+      S.throwIfAborted();
       if ( carry.length ) throw new Error( `Incomplete waveform sample for media ${ media.id }` );
       writePoint();
 
       const exitCode = await exitPromise;
-      signal.throwIfAborted();
+      S.throwIfAborted();
 
       if ( timedOut || exitCode !== 0 ) throw new Error(
         `FFmpeg waveform failed for media ${ media.id } (exit ${ exitCode }): ${ stderr.trim() }`
@@ -105,13 +106,13 @@ export class WaveJob implements JobHandler {
 
       throw err;
     } finally {
-      signal.removeEventListener( 'abort', abortChild );
+      S.removeEventListener( 'abort', abortChild );
       clearTimeout( timeout );
 
       if ( killTimer ) clearTimeout( killTimer );
     }
 
-    signal.throwIfAborted();
+    S.throwIfAborted();
 
     const header = Buffer.alloc( 24 );
     Buffer.from( 'FRMWAV1\0', 'ascii' ).copy( header, 0 );
@@ -133,9 +134,9 @@ export class WaveJob implements JobHandler {
     await mkdir( dirname( outputPath ), { recursive: true } );
 
     try {
-      signal.throwIfAborted();
+      S.throwIfAborted();
       await writeFile( tempPath, Buffer.concat( [ header, data ] ) );
-      signal.throwIfAborted();
+      S.throwIfAborted();
 
       await MediaAssets.write( media.id, {
         kind: 'wave', path: relativePath, fingerprint: media.fingerprint,
