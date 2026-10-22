@@ -5,6 +5,9 @@ export interface ConfigSchema {
   PORT: number;
 
   WORKER_CONCURRENCY: number;
+  WORKER_POLL_INTERVAL_MS: number;
+  WORKER_RETRY_DELAY_MS: number;
+  WORKER_MAX_RETRY_DELAY_MS: number;
 
   DB_PATH: string;
   DB_BUSY_TIMEOUT_MS: number;
