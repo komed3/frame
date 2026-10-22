@@ -131,4 +131,34 @@ export class MetadataJob implements JobHandler {
       await file.close();
     }
   }
+
+  public async execute ( { job, signal }: JobContext ) : Promise< void > {
+    if ( job.kind !== 'metadata' || job.mediaId === null || job.rootId !== null )
+      throw new Error( 'Invalid metadata job' );
+
+    signal.throwIfAborted();
+
+    const media = Media.get( job.mediaId );
+    if ( ! media || ! media.available ) return;
+
+    const root = MediaRoots.list().find( root => root.id === media.rootId );
+    if ( ! root ) throw new Error( `Media root ${ media.rootId } does not exist` );
+    if ( ! root.enabled ) return;
+
+    const path = MediaRoots.resolve( media.rootId, media.path );
+    const info = await stat( path );
+
+    signal.throwIfAborted();
+
+    if ( info.size !== media.sizeBytes || ( media.modifiedAt !== null &&
+      info.mtimeMs !== new Date( media.modifiedAt ).getTime() ) )
+      throw new Error( `Media changed since scan: ${ path }` );
+
+    const metadata = media.type === 'text'
+      ? await this.probeText( path, info.size, signal )
+      : await this.probe( path, media.type, signal );
+
+    signal.throwIfAborted();
+    Media.update( media.id, metadata );
+  }
 }
