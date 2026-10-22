@@ -1,5 +1,5 @@
 import { Config } from '@/src/server/core/Config';
-import { parseDate, parsePositive, parseRate } from '@/src/server/job/handler/utils';
+import { assertMediaUnchange, parseDate, parsePositive, parseRate } from '@/src/server/job/handler/utils';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import { execFileAsync } from '@/src/server/utils';
@@ -114,7 +114,7 @@ export class MetadataJob implements JobHandler {
     const info = await stat( path );
 
     signal.throwIfAborted();
-    if ( info.size !== media.sizeBytes ) throw new Error( `Media changed since scan: ${ path }` );
+    assertMediaUnchange( path, media, info );
 
     const metadata = media.type === 'text'
       ? await this.probeText( path, info.size, signal )

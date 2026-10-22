@@ -1,3 +1,4 @@
+import { assertMediaUnchange } from '@/src/server/job/handler/utils';
 import { Media } from '@/src/server/media/Media';
 import { MediaMetadata } from '@/src/server/media/Metadata';
 import { MediaRoots } from '@/src/server/media/Roots';
@@ -41,7 +42,7 @@ export class TextJob implements JobHandler {
     const info = await stat( path );
 
     signal.throwIfAborted();
-    if ( info.size !== media.sizeBytes ) throw new Error( `Media changed since scan: ${ path }` );
+    assertMediaUnchange( path, media, info );
 
     const file = await open( path );
 
