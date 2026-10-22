@@ -3,6 +3,7 @@
 import { registerAssetCommands } from '@/src/maintenance/commands/assets';
 import { registerAuthCommands } from '@/src/maintenance/commands/auth';
 import { registerCategoryCommands } from '@/src/maintenance/commands/categories';
+import { registerCheckCommands } from '@/src/maintenance/commands/check';
 import { registerConfigCommands } from '@/src/maintenance/commands/config';
 import { registerDbCommands } from '@/src/maintenance/commands/db';
 import { registerDirectoryCommands } from '@/src/maintenance/commands/directories';
@@ -40,6 +41,7 @@ frame
 
 frame.commandsGroup( 'Configuration:' );
 registerInitCommands( frame );
+registerCheckCommands( frame );
 registerConfigCommands( frame );
 registerDbCommands( frame );
 
