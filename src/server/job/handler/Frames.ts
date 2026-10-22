@@ -80,5 +80,12 @@ export class FramesJob implements JobHandler {
       await rm( tempDirectory, { recursive: true, force: true } );
       throw err;
     }
+
+    if ( previous && previous.path !== manifestPath ) {
+      const oldDirectory = dirname( MediaAssets.resolvePath( previous.path ) );
+      if ( oldDirectory !== outputDirectory ) await rm( oldDirectory, { recursive: true, force: true } );
+    }
+
+    console.info( `[Frames] Media ${ media.id } (${ media.path }) generated: ${ count } frame(s).` );
   }
 }
