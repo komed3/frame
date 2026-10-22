@@ -12,6 +12,7 @@ export class Config {
     NODE_ENV: { type: 'enum', desc: 'Runtime environment', default: 'dev', values: [ 'dev', 'development', 'test', 'prod', 'production' ] },
     HOST: { type: 'string', desc: 'HTTP bind address', default: '0.0.0.0' },
     PORT: { type: 'integer', desc: 'HTTP port', default: 3e3, min: 1, max: 65535 },
+    WORKER_CONCURRENCY: { type: 'integer', desc: 'Maximum number of concurrent background jobs', default: 1, min: 1, max: 16 },
     DB_PATH: { type: 'path', desc: 'SQLite database path', default: 'data/frame.sqlite' },
     DB_BUSY_TIMEOUT_MS: { type: 'integer', desc: 'SQLite busy timeout', default: 5e3, min: 0, max: 6e4 },
     SESSION_LIFETIME_MS: { type: 'integer', desc: 'Session lifetime', default: 2592e6, min: 6e4, max: 31536e6 },
