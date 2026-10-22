@@ -4,13 +4,13 @@ export interface ConfigSchema {
   HOST: string;
   PORT: number;
 
+  WORKER_CONCURRENCY: number;
+
   DB_PATH: string;
   DB_BUSY_TIMEOUT_MS: number;
 
   SESSION_LIFETIME_MS: number;
   PASSWORD_STRICT: boolean;
-
-  WORKER_CONCURRENCY: number;
 
   ASSETS_PATH: string;
   ASSET_TIMEOUT_MS: number;
