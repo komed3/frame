@@ -1,4 +1,5 @@
 import { Config } from '@/src/server/core/Config';
+import { assertMediaUnchange } from '@/src/server/job/handler/utils';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import { execFileAsync } from '@/src/server/utils';
@@ -26,11 +27,11 @@ export async function getAssetSource ( job: JobRecord, signal: AbortSignal ) : P
   const info = await stat( path );
 
   signal.throwIfAborted();
-  if ( info.size !== media.sizeBytes ) throw new Error( `Media changed since scan: ${ path }` );
+  assertMediaUnchange( path, media, info );
 
-  return { media, path, fingerprint:
-    ( media.fingerprint ?? `${ media.sizeBytes }-${ media.modifiedAt ?? 'unknown' }` )
-      .replace( /[^a-zA-Z0-9_-]/g, '_' ) };
+  return { media, path, fingerprint: (
+    media.fingerprint ?? `${ media.sizeBytes }-${ media.modifiedAt ?? 'unknown' }`
+  ).replace( /[^a-zA-Z0-9_-]/g, '_' ) };
 }
 
 
