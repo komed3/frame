@@ -3,7 +3,7 @@ import { MediaAssets } from '@/src/server/media/Assets';
 import { getAssetSource, assetPath } from '@/src/server/job/handler/assets';
 import type { JobContext, JobHandler } from '@/src/shared/types/job';
 import { spawn } from 'node:child_process';
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rename, rm, writeFile, readFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
@@ -110,5 +110,44 @@ export class WaveJob implements JobHandler {
 
       if ( killTimer ) clearTimeout( killTimer );
     }
+
+    signal.throwIfAborted();
+
+    const header = Buffer.alloc( 24 );
+    Buffer.from( 'FRMWAV1\0', 'ascii' ).copy( header, 0 );
+    header.writeUInt32LE( Math.round( waveformRate / samplesPerPoint ), 8 );
+    header.writeUInt32LE( values.length, 12 );
+    header.writeDoubleLE( durationSeconds, 16 );
+
+    const data = Buffer.alloc( values.length * 4 );
+
+    values.forEach( ( [ low, high ], index ) => {
+      data.writeInt16LE( Math.round( low * 32767 ), index * 4 );
+      data.writeInt16LE( Math.round( high * 32767 ), index * 4 + 2 );
+    } );
+
+    const relativePath = assetPath( 'wave', source, '.bin' );
+    const outputPath = MediaAssets.resolvePath( relativePath );
+    const tempPath = `${ outputPath }.${ randomUUID() }.tmp`;
+
+    await mkdir( dirname( outputPath ), { recursive: true } );
+
+    try {
+      signal.throwIfAborted();
+      await writeFile( tempPath, Buffer.concat( [ header, data ] ) );
+      signal.throwIfAborted();
+
+      await MediaAssets.write( media.id, {
+        kind: 'wave', path: relativePath, fingerprint: media.fingerprint,
+        mimeType: 'application/octet-stream', data: {
+          format: 'FRMWAV1', durationMs: media.durationMs,
+          pointCount: values.length, values: 'signed-int16-min-max'
+        }
+      }, await readFile( tempPath ) );
+    } finally {
+      await rm( tempPath, { force: true } );
+    }
+
+    console.info( `[Wave] Media ${ media.id } (${ media.path }) generated: ${ values.length } point(s).` );
   }
 }
