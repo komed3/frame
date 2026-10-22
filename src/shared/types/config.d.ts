@@ -10,6 +10,8 @@ export interface ConfigSchema {
   SESSION_LIFETIME_MS: number;
   PASSWORD_STRICT: boolean;
 
+  WORKER_CONCURRENCY: number;
+
   ASSETS_PATH: string;
   ASSET_TIMEOUT_MS: number;
 
