@@ -1,5 +1,6 @@
 import { assets } from '@/src/server/api/endpoints/assets';
 import { auth } from '@/src/server/api/endpoints/auth';
+import { directories } from '@/src/server/api/endpoints/directories';
 import { media } from '@/src/server/api/endpoints/media';
 import { roots } from '@/src/server/api/endpoints/roots';
 import { stream } from '@/src/server/api/endpoints/stream';
@@ -15,6 +16,7 @@ api.use( '/auth', auth );
 
 api.use( requireAuth );
 api.use( '/roots', roots );
+api.use( '/directories', directories );
 api.use( '/media', media );
 api.use( '/assets', assets );
 api.use( '/stream', stream );
