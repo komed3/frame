@@ -80,3 +80,11 @@ categories.post( '/', ( req, res ) => {
   const id = MediaTaxonomy.createCategory( name, parentId );
   res.json( MediaTaxonomy.getCategory( id ) );
 } );
+
+categories.patch( '/:id', ( req, res ) => {
+  const { name } = req.body ?? {};
+  if ( typeof name !== 'string' ) return res.status( 400 ).json( { error: 'Category name is required' } );
+
+  MediaTaxonomy.renameCategory( res.locals.categoryId, name );
+  res.json( MediaTaxonomy.getCategory( res.locals.categoryId ) );
+} );
