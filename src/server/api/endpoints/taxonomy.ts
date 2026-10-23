@@ -37,6 +37,7 @@ const assertCategoryId: RequestParamHandler = ( _, res, next, value ) => {
 
 tags.param( 'id', assertTagId );
 tags.get( '/', ( _, res ) => res.json( MediaTaxonomy.listTags() ) );
+tags.get( '/:id', ( _, res ) => res.json( res.locals.tag ) );
 
 tags.post( '/', ( req, res ) => {
   const { name } = req.body ?? {};
