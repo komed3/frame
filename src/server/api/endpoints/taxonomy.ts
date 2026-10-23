@@ -59,3 +59,9 @@ tags.delete( '/:id', ( _, res ) => {
   MediaTaxonomy.deleteTag( res.locals.tagId );
   res.status( 204 ).end();
 } );
+
+
+// --- categories ---
+
+categories.param( 'id', assertCategoryId );
+categories.get( '/', ( _, res ) => res.json( MediaTaxonomy.listCategories() ) );
