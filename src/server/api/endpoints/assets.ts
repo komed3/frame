@@ -36,3 +36,10 @@ assets.get( '/:id/:kind', ( req, res, next ) => {
 
   sendAsset( id, req.params.kind, 'default', res, next );
 } );
+
+assets.get( '/:id/:kind/:variant', ( req, res, next ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  sendAsset( id, req.params.kind, req.params.variant, res, next );
+} );
