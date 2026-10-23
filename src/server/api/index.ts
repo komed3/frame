@@ -20,3 +20,5 @@ api.use( '/directories', directories );
 api.use( '/media', media );
 api.use( '/assets', assets );
 api.use( '/stream', stream );
+
+api.use( ( _, res ) => res.status( 404 ).json( { error: 'API endpoint not found' } ) );
