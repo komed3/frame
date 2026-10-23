@@ -1,3 +1,4 @@
+import { assets } from '@/src/server/api/endpoints/assets';
 import { auth } from '@/src/server/api/endpoints/auth';
 import { media } from '@/src/server/api/endpoints/media';
 import { roots } from '@/src/server/api/endpoints/roots';
@@ -13,6 +14,7 @@ api.get( '/health', ( _, res ) => res.json( { status: 'ok' } ) );
 api.use( '/auth', auth );
 
 api.use( requireAuth );
-api.use( '/media', media );
 api.use( '/roots', roots );
+api.use( '/media', media );
+api.use( '/assets', assets );
 api.use( '/stream', stream );
