@@ -7,3 +7,8 @@ import { Router } from 'express';
 
 
 export const media = Router();
+
+
+media.get( '/', ( req, res ) => res.json( Media.list( {
+  limit: Number( req.query.limit ?? 100 ), offset: Number( req.query.offset ?? 0 )
+} ) ) );
