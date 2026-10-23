@@ -49,3 +49,11 @@ media.put( '/:id/metadata/:key', ( req, res ) => {
   MediaMetadata.set( id, req.params.key, value, 'manual' );
   res.json( MediaMetadata.get( id, req.params.key, 'manual' ) );
 } );
+
+media.delete( '/:id/metadata/:key', ( req, res ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  MediaMetadata.delete( id, req.params.key, 'manual' );
+  res.status( 204 ).end();
+} );
