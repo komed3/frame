@@ -35,3 +35,15 @@ playlists.get( '/', ( req, res ) => {
 
   res.json( Playlists.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );
+
+playlists.post( '/', ( req, res ) => {
+  const { name, description } = req.body ?? {};
+
+  if ( typeof name !== 'string' ) return res.status( 400 ).json( { error: 'Playlist name is required' } );
+
+  if ( description !== undefined && description !== null && typeof description !== 'string' )
+    return res.status( 400 ).json( { error: 'description must be a string or null' } );
+
+  const id = Playlists.create( res.locals.user.id, name, description ?? undefined );
+  res.status( 201 ).json( Playlists.get( res.locals.user.id, id ) );
+} );
