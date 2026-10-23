@@ -20,3 +20,13 @@ media.post( '/search', ( req, res ) => {
 
   res.json( MediaSearch.search( { ...options, userId: res.locals.user.id } ) );
 } );
+
+media.get( '/:id', ( req, res ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  const item = Media.get( id );
+  if ( ! item ) return res.status( 404 ).json( { error: 'Media not found' } );
+
+  res.json( item );
+} );
