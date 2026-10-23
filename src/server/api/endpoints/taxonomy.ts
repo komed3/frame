@@ -111,3 +111,8 @@ categories.put( '/:id/parent', ( req, res, next ) => {
 
   res.json( MediaTaxonomy.getCategory( res.locals.categoryId ) );
 } );
+
+categories.delete( '/:id', ( _, res ) => {
+  MediaTaxonomy.deleteCategory( res.locals.categoryId );
+  res.status( 204 ).end();
+} );
