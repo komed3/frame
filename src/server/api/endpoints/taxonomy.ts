@@ -37,3 +37,11 @@ const assertCategoryId: RequestParamHandler = ( _, res, next, value ) => {
 
 tags.param( 'id', assertTagId );
 tags.get( '/', ( _, res ) => res.json( MediaTaxonomy.listTags() ) );
+
+tags.post( '/', ( req, res ) => {
+  const { name } = req.body ?? {};
+  if ( typeof name !== 'string' ) return res.status( 400 ).json( { error: 'Tag name is required' } );
+
+  const id = MediaTaxonomy.createTag( name );
+  res.json( MediaTaxonomy.getTag( id ) );
+} );
