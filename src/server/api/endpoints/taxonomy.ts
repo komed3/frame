@@ -46,3 +46,16 @@ tags.post( '/', ( req, res ) => {
   const id = MediaTaxonomy.createTag( name );
   res.json( MediaTaxonomy.getTag( id ) );
 } );
+
+tags.patch( '/:id', ( req, res ) => {
+  const { name } = req.body ?? {};
+  if ( typeof name !== 'string' ) return res.status( 400 ).json( { error: 'Tag name is required' } );
+
+  MediaTaxonomy.renameTag( res.locals.tagId, name );
+  res.json( MediaTaxonomy.getTag( res.locals.tagId ) );
+} );
+
+tags.delete( '/:id', ( _, res ) => {
+  MediaTaxonomy.deleteTag( res.locals.tagId );
+  res.status( 204 ).end();
+} );
