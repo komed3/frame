@@ -20,3 +20,5 @@ auth.post( '/login', async ( req, res, next ) => {
     next( err );
   }
 } );
+
+auth.get( '/me', requireAuth, ( _, res ) => res.json( { user: res.locals.user } ) );
