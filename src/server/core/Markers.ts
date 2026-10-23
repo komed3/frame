@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, normalizeOptionalString, normalizeString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, normalizeOptionalString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
@@ -89,12 +89,12 @@ export class Markers {
 
     if ( patch.title !== undefined ) {
       assignments.push( 'title = ?' );
-      values.push( normalizeString( patch.title, 'Marker title' ) );
+      values.push( normalizeOptionalString( patch.title, 'Marker title' ) );
     }
 
     if ( patch.description !== undefined ) {
       assignments.push( 'description = ?' );
-      values.push( normalizeString( patch.description, 'Marker description' ) );
+      values.push( normalizeOptionalString( patch.description, 'Marker description' ) );
     }
 
     if ( ! assignments.length ) return;
