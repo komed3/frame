@@ -5,3 +5,6 @@ import { Router } from 'express';
 
 
 export const roots = Router();
+
+
+roots.get( '/', ( _, res ) => res.json( MediaRoots.list() ) );
