@@ -26,3 +26,5 @@ markers.get( '/', ( req, res ) => {
 
   res.json( Markers.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );
+
+markers.get( '/:id', ( _, res ) => res.json( res.locals.marker ) );
