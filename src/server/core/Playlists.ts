@@ -103,7 +103,7 @@ export class Playlists {
 
     if ( patch.description !== undefined ) {
       assignments.push( 'description = ?' );
-      values.push( normalizeString( patch.description, 'Playlist description' ) );
+      values.push( normalizeOptionalString( patch.description, 'Playlist description' ) );
     }
 
     if ( ! assignments.length ) return;
