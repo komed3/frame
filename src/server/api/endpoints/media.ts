@@ -1,3 +1,4 @@
+import { assertMediaId } from '@/src/server/api/middleware';
 import { parseId } from '@/src/server/api/utils';
 import { Media } from '@/src/server/media/Media';
 import { MediaMetadata } from '@/src/server/media/Metadata';
@@ -7,6 +8,7 @@ import { Router } from 'express';
 
 
 export const media = Router();
+media.param( 'id', assertMediaId );
 
 
 media.get( '/', ( req, res ) => res.json( Media.list( {
