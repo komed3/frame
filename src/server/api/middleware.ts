@@ -1,7 +1,7 @@
 import { parseId } from '@/src/server/api/utils';
 import { Auth } from '@/src/server/core/Auth';
 import { Media } from '@/src/server/media/Media';
-import type { Request, RequestHandler, RequestParamHandler } from 'express';
+import type { ErrorRequestHandler, Request, RequestHandler, RequestParamHandler } from 'express';
 
 
 export function getToken ( req: Request ) : string | null {
@@ -33,4 +33,16 @@ export const assertMediaId: RequestParamHandler = ( _, res, next, value ) => {
 
   res.locals.mediaId = id;
   next();
+};
+
+
+export const errorHandler: ErrorRequestHandler = ( err, _, res, next ) => {
+  if ( res.headersSent ) return next( err );
+
+  const status = Number( err?.status ?? err?.statusCode );
+  const clientError = status >= 400 && status < 500;
+
+  res.status( clientError ? status : 500 ).json( {
+    error: clientError && err instanceof Error ? err.message : 'Internal server error'
+  } );
 };
