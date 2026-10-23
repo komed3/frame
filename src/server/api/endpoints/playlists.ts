@@ -81,3 +81,20 @@ playlists.patch( '/:id', ( req, res ) => {
   Playlists.update( res.locals.user.id, res.locals.playlistId, patch );
   res.json( Playlists.get( res.locals.user.id, res.locals.playlistId ) );
 } );
+
+playlists.delete( '/:id', ( _, res ) => {
+  Playlists.delete( res.locals.user.id, res.locals.playlistId );
+  res.status( 204 ).end();
+} );
+
+playlists.get( '/:id/items', ( req, res ) => {
+  const pagination = parsePagination( req.query.limit, req.query.offset );
+  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
+
+  res.json( Playlists.listItems( res.locals.user.id, res.locals.playlistId, pagination.limit, pagination.offset ) );
+} );
+
+playlists.delete( '/:id/items', ( _, res ) => {
+  const deleted = Playlists.clearItems( res.locals.user.id, res.locals.playlistId );
+  res.json( { deleted } );
+} );
