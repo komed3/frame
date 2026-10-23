@@ -29,3 +29,10 @@ assets.get( '/:id', ( req, res ) => {
     url: `/api/media/${ id }/assets/${ asset.kind }/${ encodeURIComponent( asset.variant ) }`
   } ) ) );
 } );
+
+assets.get( '/:id/:kind', ( req, res, next ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  sendAsset( id, req.params.kind, 'default', res, next );
+} );
