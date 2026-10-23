@@ -63,3 +63,19 @@ categories.param( 'id', ( _, res, next, value ) => {
 } );
 
 categories.get( '/', ( _, res ) => res.json( MediaTaxonomy.listCategories() ) );
+
+categories.post( '/', ( req, res ) => {
+  const { name, parentId = null } = req.body ?? {};
+
+  if ( typeof name !== 'string' )
+    return res.status( 400 ).json( { error: 'Category name is required' } );
+
+  if ( parentId !== null && ( typeof parentId !== 'number' || ! Number.isSafeInteger( parentId ) || parentId < 1 ) )
+    return res.status( 400 ).json( { error: 'Invalid parent category ID' } );
+
+  if ( parentId !== null && ! MediaTaxonomy.getCategory( parentId ) )
+    return res.status( 404 ).json( { error: 'Parent category not found' } );
+
+  const id = MediaTaxonomy.createCategory( name, parentId );
+  res.json( MediaTaxonomy.getCategory( id ) );
+} );
