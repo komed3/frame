@@ -1,5 +1,5 @@
-import { media } from '@/src/server/api/media';
-import { stream } from '@/src/server/api/stream';
+import { media } from '@/src/server/api/endpoints/media';
+import { stream } from '@/src/server/api/endpoints/stream';
 import { Router } from 'express';
 
 
