@@ -88,3 +88,26 @@ categories.patch( '/:id', ( req, res ) => {
   MediaTaxonomy.renameCategory( res.locals.categoryId, name );
   res.json( MediaTaxonomy.getCategory( res.locals.categoryId ) );
 } );
+
+categories.put( '/:id/parent', ( req, res, next ) => {
+  const parentId = req.body?.parentId;
+  if ( parentId === undefined ) return res.status( 400 ).json( {
+    error: 'Parent category ID is required; use null for a root category'
+  } );
+
+  if ( parentId !== null && ( typeof parentId !== 'number' || ! Number.isSafeInteger( parentId ) || parentId < 1 ) )
+    return res.status( 400 ).json( { error: 'Invalid parent category ID' } );
+
+  if ( parentId !== null && ! MediaTaxonomy.getCategory( parentId ) )
+    return res.status( 404 ).json( { error: 'Parent category not found' } );
+
+  try { MediaTaxonomy.setCategoryParent( res.locals.categoryId, parentId ) }
+  catch ( err ) {
+    if ( err instanceof Error && err.message === 'Category hierarchy cannot contain a cycle' )
+      return res.status( 400 ).json( { error: err.message } );
+
+    return next( err );
+  }
+
+  res.json( MediaTaxonomy.getCategory( res.locals.categoryId ) );
+} );
