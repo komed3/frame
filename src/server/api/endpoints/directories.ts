@@ -51,7 +51,9 @@ directories.get( '/:rootId', ( req, res ) => {
 
   while ( parent ) {
     trail.push( { id: parent.id, name: parent.name, path: parent.path } );
+
     parent = parent.parentId === null ? null : MediaDirectories.get( parent.parentId );
+    if ( parent && parent.rootId !== root.id ) return res.status( 404 ).json( { error: 'Directory not found' } );
   }
 
   const limit = Number( req.query.limit ?? 100 );
