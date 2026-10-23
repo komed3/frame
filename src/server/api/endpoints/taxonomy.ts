@@ -31,3 +31,9 @@ const assertCategoryId: RequestParamHandler = ( _, res, next, value ) => {
   res.locals.category = category;
   next();
 };
+
+
+// --- tags ---
+
+tags.param( 'id', assertTagId );
+tags.get( '/', ( _, res ) => res.json( MediaTaxonomy.listTags() ) );
