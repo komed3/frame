@@ -28,3 +28,29 @@ markers.get( '/', ( req, res ) => {
 } );
 
 markers.get( '/:id', ( _, res ) => res.json( res.locals.marker ) );
+
+markers.patch( '/:id', ( req, res ) => {
+  const body = req.body ?? {}, patch: MarkerUpdate = {};
+
+  if ( body.positionMs !== undefined ) {
+    if ( ! Number.isSafeInteger( body.positionMs ) || body.positionMs < 0 )
+      return res.status( 400 ).json( { error: 'positionMs must be a non-negative integer' } );
+
+    patch.positionMs = body.positionMs;
+  }
+
+  for ( const key of [ 'title', 'description' ] as const ) {
+    const value = body[ key ];
+
+    if ( value === undefined ) continue;
+    if ( value !== null && typeof value !== 'string' )
+      return res.status( 400 ).json( { error: `${ key } must be a string or null` } );
+
+    patch[ key ] = value;
+  }
+
+  if ( ! Object.keys( patch ).length ) return res.status( 400 ).json( { error: 'No marker fields provided' } );
+
+  Markers.update( res.locals.user.id, res.locals.markerId, patch );
+  res.json( Markers.get( res.locals.user.id, res.locals.markerId ) );
+} );
