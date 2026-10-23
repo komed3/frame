@@ -1,10 +1,12 @@
+import { getToken, requireAuth } from '@/src/server/api/middleware';
 import { Auth } from '@/src/server/core/Auth';
 import { Router } from 'express';
-import { getToken, requireAuth } from '@/src/server/api/middleware';
 
 
 export const auth = Router();
 
+
+auth.get( '/me', requireAuth, ( _, res ) => res.json( { user: res.locals.user } ) );
 
 auth.post( '/login', async ( req, res, next ) => {
   const { username, password } = req.body ?? {};
@@ -21,4 +23,7 @@ auth.post( '/login', async ( req, res, next ) => {
   }
 } );
 
-auth.get( '/me', requireAuth, ( _, res ) => res.json( { user: res.locals.user } ) );
+auth.post( '/logout', requireAuth, ( req, res ) => {
+  Auth.logout( getToken( req ) );
+  res.status( 204 ).end();
+} );
