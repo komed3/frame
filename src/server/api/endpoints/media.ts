@@ -84,3 +84,34 @@ media.put( '/:id/categories', ( req, res ) => {
   MediaTaxonomy.setMediaCategories( res.locals.mediaId, categoryIds );
   res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) );
 } );
+
+
+// --- markers ---
+
+media.get( '/:id/markers', ( req, res ) => {
+  const pagination = parsePagination( req.query.limit, req.query.offset );
+  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
+
+  res.json( Markers.mediaMarker( res.locals.user.id, res.locals.mediaId, pagination.limit, pagination.offset ) );
+} );
+
+media.post( '/:id/markers', ( req, res ) => {
+  const { positionMs, title, description } = req.body ?? {};
+
+  if ( ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
+    return res.status( 400 ).json( { error: 'positionMs must be a non-negative integer' } );
+
+  if ( title !== undefined && title !== null && typeof title !== 'string' )
+    return res.status( 400 ).json( { error: 'title must be a string or null' } );
+
+  if ( description !== undefined && description !== null && typeof description !== 'string' )
+    return res.status( 400 ).json( { error: 'description must be a string or null' } );
+
+  const id = Markers.create( res.locals.user.id, res.locals.mediaId, positionMs, title, description );
+  res.status( 201 ).json( Markers.get( res.locals.user.id, id ) );
+} );
+
+media.delete( '/:id/markers', ( _, res ) => {
+  const deleted = Markers.clearMediaMarker( res.locals.user.id, res.locals.mediaId );
+  res.json( { deleted } );
+} );
