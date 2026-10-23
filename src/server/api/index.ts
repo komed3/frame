@@ -1,5 +1,8 @@
+import { auth } from '@/src/server/api/endpoints/auth';
 import { media } from '@/src/server/api/endpoints/media';
+import { roots } from '@/src/server/api/endpoints/roots';
 import { stream } from '@/src/server/api/endpoints/stream';
+import { requireAuth } from '@/src/server/api/middleware';
 import { Router } from 'express';
 
 
@@ -7,6 +10,9 @@ export const api = Router();
 
 
 api.get( '/health', ( _, res ) => res.json( { status: 'ok' } ) );
+api.use( '/auth', auth );
 
+api.use( requireAuth );
 api.use( '/media', media );
+api.use( '/roots', roots );
 api.use( '/stream', stream );
