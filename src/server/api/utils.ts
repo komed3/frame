@@ -4,9 +4,9 @@ export function parseId ( value: string ) : number | null {
 }
 
 
-export function parsePagination ( limitValue: unknown, offsetValue: unknown ) : { limit: number; offset: number } | null {
-  const limit = limitValue === undefined ? 100 : typeof limitValue === 'string' ? Number( limitValue ) : NaN;
-  const offset = offsetValue === undefined ? 0 : typeof offsetValue === 'string' ? Number( offsetValue ) : NaN;
+export function parsePagination ( l: unknown, o: unknown ) : { limit: number; offset: number } | null {
+  const limit = l === undefined ? 100 : typeof l === 'string' ? Number( l ) : NaN;
+  const offset = o === undefined ? 0 : typeof o === 'string' ? Number( o ) : NaN;
 
   if ( ! Number.isSafeInteger( limit ) || limit < 1 || limit > 500 ||
     ! Number.isSafeInteger( offset ) || offset < 0 ) return null;
