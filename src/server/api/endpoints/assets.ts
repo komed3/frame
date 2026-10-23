@@ -1,10 +1,11 @@
-import { parseId } from '@/src/server/api/utils';
+import { assertMediaId } from '@/src/server/api/middleware';
 import { ASSET_KINDS, MediaAssets } from '@/src/server/media/Assets';
 import type { MediaAssetKind } from '@/src/shared/types/assets';
 import { Router, type NextFunction, type Response } from 'express';
 
 
 export const assets = Router();
+assets.param( 'id', assertMediaId );
 
 
 function sendAsset ( id: number, kind: string, variant: string, res: Response, next: NextFunction ) {
@@ -21,25 +22,14 @@ function sendAsset ( id: number, kind: string, variant: string, res: Response, n
 }
 
 
-assets.get( '/:id', ( req, res ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+assets.get( '/:id', ( _, res ) => res.json( MediaAssets.list( res.locals.mediaId ).map(
+  ( { path, ...asset } ) => ( { ...asset, url: `/api/media/${ res.locals.mediaId }/assets/${ asset.kind }/${
+    encodeURIComponent( asset.variant )
+  }` } )
+) ) );
 
-  res.json( MediaAssets.list( id ).map( ( { path, ...asset } ) => ( { ...asset,
-    url: `/api/media/${ id }/assets/${ asset.kind }/${ encodeURIComponent( asset.variant ) }`
-  } ) ) );
-} );
+assets.get( '/:id/:kind', ( req, res, next ) =>
+  sendAsset( res.locals.mediaId, req.params.kind, 'default', res, next ) );
 
-assets.get( '/:id/:kind', ( req, res, next ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
-
-  sendAsset( id, req.params.kind, 'default', res, next );
-} );
-
-assets.get( '/:id/:kind/:variant', ( req, res, next ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
-
-  sendAsset( id, req.params.kind, req.params.variant, res, next );
-} );
+assets.get( '/:id/:kind/:variant', ( req, res, next ) =>
+  sendAsset( res.locals.mediaId, req.params.kind, req.params.variant, res, next ) );
