@@ -14,3 +14,17 @@ favorites.get( '/', ( req, res ) => {
 
   res.json( Favorites.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );
+
+favorites.get( '/:mediaId', ( _, res ) =>
+  res.json( { favorite: Favorites.has( res.locals.user.id, res.locals.mediaId ) } )
+);
+
+favorites.post( '/:mediaId', ( _, res ) => {
+  const added = Favorites.add( res.locals.user.id, res.locals.mediaId );
+  res.json( { favorite: true, added } );
+} );
+
+favorites.delete( '/:mediaId', ( _, res ) => {
+  Favorites.remove( res.locals.user.id, res.locals.mediaId );
+  res.status( 204 ).end();
+} );
