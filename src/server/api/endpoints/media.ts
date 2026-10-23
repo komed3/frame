@@ -1,5 +1,4 @@
 import { assertMediaId } from '@/src/server/api/middleware';
-import { parseId } from '@/src/server/api/utils';
 import { Media } from '@/src/server/media/Media';
 import { MediaMetadata } from '@/src/server/media/Metadata';
 import { MediaSearch } from '@/src/server/media/Search';
@@ -23,39 +22,26 @@ media.post( '/search', ( req, res ) => {
   res.json( MediaSearch.search( { ...options, userId: res.locals.user.id } ) );
 } );
 
-media.get( '/:id', ( req, res ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
-
-  const item = Media.get( id );
+media.get( '/:id', ( _, res ) => {
+  const item = Media.get( res.locals.mediaId );
   if ( ! item ) return res.status( 404 ).json( { error: 'Media not found' } );
 
   res.json( item );
 } );
 
-media.get( '/:id/metadata', ( req, res ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
-
-  res.json( MediaMetadata.list( id ) );
-} );
+media.get( '/:id/metadata', ( _, res ) =>
+  res.json( MediaMetadata.list( res.locals.mediaId ) )
+);
 
 media.put( '/:id/metadata/:key', ( req, res ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
-
   const { value } = req.body ?? {};
-  if ( typeof value !== 'string' )
-    return res.status( 400 ).json( { error: 'Metadata value must be a string' } );
+  if ( typeof value !== 'string' ) return res.status( 400 ).json( { error: 'Metadata value must be a string' } );
 
-  MediaMetadata.set( id, req.params.key, value, 'manual' );
-  res.json( MediaMetadata.get( id, req.params.key, 'manual' ) );
+  MediaMetadata.set( res.locals.mediaId, req.params.key, value, 'manual' );
+  res.json( MediaMetadata.get( res.locals.mediaId, req.params.key, 'manual' ) );
 } );
 
 media.delete( '/:id/metadata/:key', ( req, res ) => {
-  const id = parseId( req.params.id );
-  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
-
-  MediaMetadata.delete( id, req.params.key, 'manual' );
+  MediaMetadata.delete( res.locals.mediaId, req.params.key, 'manual' );
   res.status( 204 ).end();
 } );
