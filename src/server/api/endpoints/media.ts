@@ -49,6 +49,9 @@ media.delete( '/:id/metadata/:key', ( req, res ) => {
   res.status( 204 ).end();
 } );
 
+
+// --- tags ---
+
 media.get( '/:id/tags', ( _, res ) => res.json( MediaTaxonomy.getMediaTags( res.locals.mediaId ) ) );
 
 media.put( '/:id/tags', ( req, res ) => {
@@ -62,4 +65,22 @@ media.put( '/:id/tags', ( req, res ) => {
 
   MediaTaxonomy.setMediaTags( res.locals.mediaId, tagIds );
   res.json( MediaTaxonomy.getMediaTags( res.locals.mediaId ) );
+} );
+
+
+// --- categories ---
+
+media.get( '/:id/categories', ( _, res ) => res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) ) );
+
+media.put( '/:id/categories', ( req, res ) => {
+  const { categoryIds } = req.body ?? {};
+
+  if ( ! Array.isArray( categoryIds ) || ! categoryIds.every( id => typeof id === 'number' && Number.isSafeInteger( id ) && id > 0 ) )
+    return res.status( 400 ).json( { error: 'categoryIds must be an array of positive integer IDs' } );
+
+  if ( categoryIds.some( id => ! MediaTaxonomy.getCategory( id ) ) )
+    return res.status( 404 ).json( { error: 'One or more categories were not found' } );
+
+  MediaTaxonomy.setMediaCategories( res.locals.mediaId, categoryIds );
+  res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) );
 } );
