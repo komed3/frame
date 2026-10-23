@@ -37,3 +37,15 @@ media.get( '/:id/metadata', ( req, res ) => {
 
   res.json( MediaMetadata.list( id ) );
 } );
+
+media.put( '/:id/metadata/:key', ( req, res ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  const { value } = req.body ?? {};
+  if ( typeof value !== 'string' )
+    return res.status( 400 ).json( { error: 'Metadata value must be a string' } );
+
+  MediaMetadata.set( id, req.params.key, value, 'manual' );
+  res.json( MediaMetadata.get( id, req.params.key, 'manual' ) );
+} );
