@@ -25,9 +25,9 @@ const sendAsset: RequestHandler = ( req, res, next ) => {
 
 
 assets.get( '/:id', ( _, res ) => res.json( MediaAssets.list( res.locals.mediaId ).map(
-  ( { path, ...asset } ) => ( { ...asset, url: `/api/media/${ res.locals.mediaId }/assets/${ asset.kind }/${
-    encodeURIComponent( asset.variant )
-  }` } )
+  ( { path, ...asset } ) => ( { ...asset, url:
+    `/api/assets/${ res.locals.mediaId }/${ asset.kind }/${ encodeURIComponent( asset.variant ) }`
+  } )
 ) ) );
 
 assets.get( '/:id/:kind', sendAsset );
