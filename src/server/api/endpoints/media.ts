@@ -30,3 +30,10 @@ media.get( '/:id', ( req, res ) => {
 
   res.json( item );
 } );
+
+media.get( '/:id/metadata', ( req, res ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  res.json( MediaMetadata.list( id ) );
+} );
