@@ -63,6 +63,7 @@ categories.param( 'id', ( _, res, next, value ) => {
 } );
 
 categories.get( '/', ( _, res ) => res.json( MediaTaxonomy.listCategories() ) );
+categories.get( '/:id', ( _, res ) => res.json( res.locals.category ) );
 
 categories.post( '/', ( req, res ) => {
   const { name, parentId = null } = req.body ?? {};
