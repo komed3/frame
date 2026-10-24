@@ -1,6 +1,6 @@
 export interface ProgressRecord {
-  userId: number;
-  mediaId: number;
+  userId: string;
+  mediaId: string;
   positionMs: number;
   completed: boolean;
   updatedAt: string;

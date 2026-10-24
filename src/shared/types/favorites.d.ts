@@ -1,5 +1,5 @@
 export interface FavoriteRecord {
-  userId: number;
-  mediaId: number;
+  userId: string;
+  mediaId: string;
   createdAt: string;
 }
