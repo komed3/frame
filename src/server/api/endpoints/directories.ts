@@ -28,8 +28,6 @@ directories.get( '/:rootId', ( req, res ) => {
   if ( value !== undefined && directoryId === null )
     return res.status( 400 ).json( { error: 'Invalid directory ID' } );
 
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
-
   const current = directoryId === null ? null : MediaDirectories.get( directoryId );
   if ( current && current.rootId !== root.id ) return res.status( 404 ).json( { error: 'Directory not found' } );
   if ( directoryId !== null && ! current ) return res.status( 404 ).json( { error: 'Directory not found' } );

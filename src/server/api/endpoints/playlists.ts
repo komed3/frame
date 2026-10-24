@@ -12,8 +12,6 @@ playlists.param( 'id', assertPlaylistId );
 
 playlists.get( '/', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
-
   res.json( Playlists.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );
 
@@ -24,8 +22,6 @@ playlists.post( '/', ( req, res ) => {
 
 playlists.get( '/for-media/:mediaId', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
-
   res.json( Playlists.mediaPlaylists( res.locals.user.id, res.locals.mediaId, pagination.limit, pagination.offset ) );
 } );
 
@@ -43,8 +39,6 @@ playlists.delete( '/:id', ( _, res ) => {
 
 playlists.get( '/:id/items', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
-
   res.json( Playlists.listItems( res.locals.user.id, res.locals.playlistId, pagination.limit, pagination.offset ) );
 } );
 

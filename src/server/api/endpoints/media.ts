@@ -13,8 +13,6 @@ media.param( 'id', assertMediaId );
 
 media.get( '/', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
-
   res.json( Media.list( pagination ) );
 } );
 
@@ -45,8 +43,6 @@ media.put( '/:id/categories', ( req, res ) => {
 
 media.get( '/:id/markers', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
-
   res.json( Markers.mediaMarker( res.locals.user.id, res.locals.mediaId, pagination.limit, pagination.offset ) );
 } );
 

@@ -11,7 +11,6 @@ markers.param( 'id', assertMarkerId );
 
 markers.get( '/', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
 
   res.json( Markers.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );

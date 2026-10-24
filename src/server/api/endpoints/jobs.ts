@@ -12,7 +12,6 @@ jobs.get( '/stats', ( _, res ) => res.json( JobQueue.getStats() ) );
 jobs.get( '/', ( req, res ) => {
   const { status, kind, rootId, mediaId } = req.query;
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
 
   res.json( JobQueue.list( status as JobStatus | undefined, pagination.limit, pagination.offset, {
     kind: kind as JobKind | undefined,
