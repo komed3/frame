@@ -263,5 +263,8 @@ export class JobQueue {
     const kinds = as< { kind: JobKind; count: number }[] >( conn().prepare(
       'SELECT kind, COUNT(*) AS count FROM jobs GROUP BY kind'
     ).all() );
+
+    for ( const row of statuses ) byStatus[ row.status ] = row.count;
+    for ( const row of kinds ) byKind[ row.kind ] = row.count;
   }
 }
