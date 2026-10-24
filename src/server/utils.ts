@@ -25,6 +25,11 @@ export function assertRelativePath ( path: string, label: string ) : void {
 }
 
 
+export function parsePagination ( limit: unknown, offset: unknown ) : { limit: number; offset: number } {
+  return { limit: limit === undefined ? 100 : Number( limit ), offset: offset === undefined ? 0 : Number( offset ) };
+}
+
+
 export function assertLimitOffset ( limit: number, offset = 0 ) : void {
   if ( ! Number.isSafeInteger( limit ) || limit < 1 ) throw new Error( `Invalid plays limit: ${ limit }` );
   if ( ! Number.isSafeInteger( offset ) || offset < 0 ) throw new Error( `Invalid plays offset: ${ offset }` );
