@@ -1,5 +1,5 @@
-import { parsePagination } from '@/src/server/api/utils';
 import { Markers } from '@/src/server/core/Markers';
+import { parsePagination } from '@/src/server/utils';
 import type { MarkerUpdate } from '@/src/shared/types/markers';
 import { Router } from 'express';
 

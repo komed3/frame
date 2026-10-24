@@ -1,5 +1,5 @@
-import { parsePagination } from '@/src/server/api/utils';
 import { JobQueue } from '@/src/server/job/Queue';
+import { parsePagination } from '@/src/server/utils';
 import type { JobKind, JobStatus } from '@/src/shared/types/job';
 import { Router } from 'express';
 

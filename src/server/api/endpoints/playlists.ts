@@ -1,5 +1,5 @@
-import { parsePagination } from '@/src/server/api/utils';
 import { Playlists } from '@/src/server/core/Playlists';
+import { parsePagination } from '@/src/server/utils';
 import type { PlaylistUpdate } from '@/src/shared/types/playlists';
 import { Router } from 'express';
 
