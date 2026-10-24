@@ -56,6 +56,14 @@ export interface JobListFilters {
   mediaId?: number;
 }
 
+export interface JobStats {
+  total: number;
+  byStatus: Record< JobStatus, number >;
+  byKind: Record< JobKind, number >;
+  pendingReady: number;
+  pendingScheduled: number;
+}
+
 
 // --- scan ---
 
