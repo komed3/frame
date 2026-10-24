@@ -194,9 +194,12 @@ export class User {
     User.assertAdmin( actorId );
 
     if ( actorId === userId ) throw new Error( 'You cannot disable your own account' );
-    if ( ! User.getRow( userId ) ) throw new Error( 'User does not exist' );
 
     db.transaction( tx => {
+      const target = as< UserRow | null >( tx.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
+      if ( ! target ) throw new Error( 'User does not exist' );
+      if ( disabled ) User.assertCanDestructive( target, 'Cannot disable the last active administrator' );
+
       tx.prepare( 'UPDATE users SET disabled_at = ? WHERE id = ?' ).run(
         disabled ? new Date().toISOString() : null, userId
       );
