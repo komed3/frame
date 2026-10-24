@@ -1,4 +1,3 @@
-import { assertMediaId } from '@/src/server/api/middleware';
 import { parsePagination } from '@/src/server/api/utils';
 import { Markers } from '@/src/server/core/Markers';
 import { Media } from '@/src/server/media/Media';
@@ -8,7 +7,6 @@ import { Router } from 'express';
 
 
 export const media = Router();
-media.param( 'id', assertMediaId );
 
 
 media.get( '/', ( req, res ) => {
@@ -16,42 +14,42 @@ media.get( '/', ( req, res ) => {
   res.json( Media.list( pagination ) );
 } );
 
-media.get( '/:id', ( _, res ) => res.json( Media.get( res.locals.mediaId ) ) );
-media.get( '/:id/metadata', ( _, res ) => res.json( MediaMetadata.list( res.locals.mediaId ) ) );
-media.get( '/:id/tags', ( _, res ) => res.json( MediaTaxonomy.getMediaTags( res.locals.mediaId ) ) );
-media.get( '/:id/categories', ( _, res ) => res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) ) );
+media.get( '/:id', ( req, res ) => res.json( Media.get( req.params.id ) ) );
+media.get( '/:id/metadata', ( req, res ) => res.json( MediaMetadata.list( req.params.id ) ) );
+media.get( '/:id/tags', ( req, res ) => res.json( MediaTaxonomy.getMediaTags( req.params.id ) ) );
+media.get( '/:id/categories', ( req, res ) => res.json( MediaTaxonomy.getMediaCategories( req.params.id ) ) );
 
 media.put( '/:id/metadata/:key', ( req, res ) => {
-  MediaMetadata.set( res.locals.mediaId, req.params.key, req.body?.value, 'manual' );
-  res.json( MediaMetadata.get( res.locals.mediaId, req.params.key, 'manual' ) );
+  MediaMetadata.set( req.params.id, req.params.key, req.body?.value, 'manual' );
+  res.json( MediaMetadata.get( req.params.id, req.params.key, 'manual' ) );
 } );
 
 media.delete( '/:id/metadata/:key', ( req, res ) => {
-  MediaMetadata.delete( res.locals.mediaId, req.params.key, 'manual' );
+  MediaMetadata.delete( req.params.id, req.params.key, 'manual' );
   res.status( 204 ).end();
 } );
 
 media.put( '/:id/tags', ( req, res ) => {
-  MediaTaxonomy.setMediaTags( res.locals.mediaId, req.body?.tagIds );
-  res.json( MediaTaxonomy.getMediaTags( res.locals.mediaId ) );
+  MediaTaxonomy.setMediaTags( req.params.id, req.body?.tagIds );
+  res.json( MediaTaxonomy.getMediaTags( req.params.id ) );
 } );
 
 media.put( '/:id/categories', ( req, res ) => {
-  MediaTaxonomy.setMediaCategories( res.locals.mediaId, req.body?.categoryIds );
-  res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) );
+  MediaTaxonomy.setMediaCategories( req.params.id, req.body?.categoryIds );
+  res.json( MediaTaxonomy.getMediaCategories( req.params.id ) );
 } );
 
 media.get( '/:id/markers', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
-  res.json( Markers.mediaMarker( res.locals.user.id, res.locals.mediaId, pagination.limit, pagination.offset ) );
+  res.json( Markers.mediaMarker( res.locals.user.id, req.params.id, pagination.limit, pagination.offset ) );
 } );
 
 media.post( '/:id/markers', ( req, res ) => {
   const { positionMs, title, description } = req.body ?? {};
-  const id = Markers.create( res.locals.user.id, res.locals.mediaId, positionMs, title, description );
-  res.status( 201 ).json( Markers.get( res.locals.user.id, id ) );
+  const id = Markers.create( res.locals.user.id, req.params.id, positionMs, title, description );
+  res.status( 201 ).json( { id } );
 } );
 
-media.delete( '/:id/markers', ( _, res ) => res.json( {
-  deleted: Markers.clearMediaMarker( res.locals.user.id, res.locals.mediaId )
+media.delete( '/:id/markers', ( req, res ) => res.json( {
+  deleted: Markers.clearMediaMarker( res.locals.user.id, req.params.id )
 } ) );
