@@ -1,8 +1,8 @@
 export interface PlayRecord {
-  id: number;
-  userId: number;
-  mediaId: number;
-  sessionId: number | null;
+  id: string;
+  userId: string;
+  mediaId: string;
+  sessionId: string | null;
   startedAt: string;
   endedAt: string | null;
   watchedMs: number;
