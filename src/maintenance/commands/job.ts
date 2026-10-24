@@ -29,10 +29,12 @@ export const registerJobCommands = ( program: Command ) : void => {
       const status = options.status === undefined ? undefined : validateEnum( options.status, 'job status', JOB_STATUSES );
       const kind = options.kind === undefined ? undefined : validateEnum( options.kind, 'job kind', JOB_KINDS );
 
-      const jobs = JobQueue.list( status, parseNumber( options.limit, 'limit', 1 ), parseNumber( options.offset, 'offset' ), {
-        kind, rootId: options.root === undefined ? undefined : resolveId( options.root, 'media root' ),
-        mediaId: options.media === undefined ? undefined : resolveId( options.media, 'media' )
-      } );
+      const jobs = JobQueue.list(
+        status, parseNumber( options.limit, 'limit', 1, 1000 ), parseNumber( options.offset, 'offset' ), {
+          kind, rootId: options.root === undefined ? undefined : resolveId( options.root, 'media root' ),
+          mediaId: options.media === undefined ? undefined : resolveId( options.media, 'media' )
+        }
+      );
 
       if ( ! jobs.length ) return ui.info( 'No jobs found.' );
 
@@ -64,8 +66,8 @@ export const registerJobCommands = ( program: Command ) : void => {
     .action( ( kindValue: string, target: string, options: { priority?: string, attempts: string } ) => {
       const kind = validateEnum( kindValue, 'job kind', JOB_KINDS ) as JobKind;
       const targetId = resolveId( target, kind === 'scan' ? 'media root' : 'media' );
-      const priority = options.priority === undefined ? undefined : parseNumber( options.priority, 'priority' );
-      const maxAttempts = parseNumber( options.attempts, 'attempts', 1 );
+      const priority = options.priority === undefined ? undefined : parseNumber( options.priority, 'priority', -1e6, 1e6 );
+      const maxAttempts = parseNumber( options.attempts, 'attempts', 1, 100 );
 
       if ( kind === 'scan' ) {
         const root = MediaRoots.list().find( root => root.id === targetId );
