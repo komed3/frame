@@ -2,8 +2,10 @@ import { assertStringId, validateNumber } from '@/src/server/utils';
 
 
 export const resolveId = ( value: unknown, label: string ) : string => {
-  assertStringId( value as string, label );
-  return value as string;
+  if ( typeof value !== 'string' ) throw new Error( `Invalid ${ label } ID: ${ value }` );
+  assertStringId( value, label );
+
+  return value;
 };
 
 
