@@ -30,3 +30,8 @@ jobs.get( '/:id', ( req, res ) => {
 
   res.json( job );
 } );
+
+jobs.post( '/', ( req, res ) => {
+  const id = JobQueue.enqueue( req.body );
+  res.status( 202 ).json( { job: JobQueue.get( id ) } );
+} );
