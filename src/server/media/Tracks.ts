@@ -1,6 +1,7 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId } from '@/src/server/utils';
+import { generateId } from '@/src/server/utils';
 import type { MediaTrackInput, MediaTrackKind, MediaTrackRecord, MediaTrackRow } from '@/src/shared/types/tracks';
 
 
@@ -20,7 +21,7 @@ export class MediaTracks {
     };
   }
 
-  public static list ( mediaId: number ) : MediaTrackRecord[] {
+  public static list ( mediaId: string ) : MediaTrackRecord[] {
     Media.assertMediaIdSafe( mediaId );
 
     const rows = as< MediaTrackRow[] >( conn().prepare( `
@@ -36,9 +37,11 @@ export class MediaTracks {
     return rows.map( row => MediaTracks.mapRow( row ) );
   }
 
-  public static get ( mediaId: number, streamIndex: number ) : MediaTrackRecord | null {
+  public static get ( mediaId: string, streamIndex: number ) : MediaTrackRecord | null {
     Media.assertMediaIdSafe( mediaId );
-    assertId( streamIndex, 'stream' );
+
+    if ( ! Number.isSafeInteger( streamIndex ) || streamIndex < 0 )
+      throw new Error( `Invalid stream index: ${ streamIndex }` );
 
     const row = as< MediaTrackRow | undefined >( conn().prepare( `
       SELECT
@@ -52,7 +55,7 @@ export class MediaTracks {
     return row ? MediaTracks.mapRow( row ) : null;
   }
 
-  public static replace ( mediaId: number, tracks: MediaTrackInput[] ) : void {
+  public static replace ( mediaId: string, tracks: MediaTrackInput[] ) : void {
     Media.assertMediaIdSafe( mediaId );
 
     db.transaction( tx => {
@@ -60,13 +63,14 @@ export class MediaTracks {
 
       const insert = tx.prepare( `
         INSERT INTO tracks (
-          media_id, stream_index, kind, codec, language, title, is_default, is_forced,
+          id, media_id, stream_index, kind, codec, language, title, is_default, is_forced,
           width, height, fps, bitrate, sample_rate, channels, data_json
         )
-        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
       ` );
 
       for ( const track of tracks ) insert.run(
+        generateId( Config.get( 'ID_LENGTH' ) ),
         mediaId, track.streamIndex, track.kind, track.codec ?? null,
         track.language ?? null, track.title ?? null, +( track.isDefault ?? false ),
         +( track.isForced ?? false ), track.width ?? null, track.height ?? null,
@@ -76,7 +80,7 @@ export class MediaTracks {
     } );
   }
 
-  public static clear ( mediaId: number ) : void {
+  public static clear ( mediaId: string ) : void {
     Media.assertMediaIdSafe( mediaId );
     conn().prepare( 'DELETE FROM tracks WHERE media_id = ?' ).run( mediaId );
   }
