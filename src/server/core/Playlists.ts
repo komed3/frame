@@ -1,6 +1,7 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, normalizeOptionalString, normalizeString } from '@/src/server/utils';
+import { assertLimitOffset, assertStringId, generateId, normalizeOptionalString, normalizeString } from '@/src/server/utils';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 
 
@@ -16,15 +17,15 @@ const ITEM_SELECT = ( dir: 'ASC' | 'DESC' ) : string => `
 
 
 export class Playlists {
-  private static assertOwned ( userId: number, playlistId: number ) : void {
-    assertId( userId, 'user' );
-    assertId( playlistId, 'playlist' );
+  private static assertOwned ( userId: string, playlistId: string ) : void {
+    assertStringId( userId, 'user' );
+    assertStringId( playlistId, 'playlist' );
 
     if ( ! conn().prepare( 'SELECT 1 FROM playlists WHERE id = ? AND user_id = ?' ).get( playlistId, userId ) )
       throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
   }
 
-  private static touch ( playlistId: number ) : void {
+  private static touch ( playlistId: string ) : void {
     conn().prepare( `
       UPDATE playlists
       SET updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
@@ -32,7 +33,7 @@ export class Playlists {
     ` ).run( playlistId );
   }
 
-  public static get ( userId: number, playlistId: number ) : PlaylistRecord | null {
+  public static get ( userId: string, playlistId: string ) : PlaylistRecord | null {
     Playlists.assertOwned( userId, playlistId );
 
     const row = as< PlaylistRecord | undefined >( conn().prepare( `
@@ -46,8 +47,8 @@ export class Playlists {
     return row ?? null;
   }
 
-  public static list ( userId: number, limit = 100, offset = 0 ) : PlaylistRecord[] {
-    assertId( userId, 'user' );
+  public static list ( userId: string, limit = 100, offset = 0 ) : PlaylistRecord[] {
+    assertStringId( userId, 'user' );
     assertLimitOffset( limit, offset );
 
     return as< PlaylistRecord[] >( conn().prepare( `
@@ -61,8 +62,8 @@ export class Playlists {
     ` ).all( userId, limit, offset ) );
   }
 
-  public static mediaPlaylists ( userId: number, mediaId: number, limit = 100, offset = 0 ) : PlaylistRecord[] {
-    assertId( userId, 'user' );
+  public static mediaPlaylists ( userId: string, mediaId: string, limit = 100, offset = 0 ) : PlaylistRecord[] {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
     assertLimitOffset( limit, offset );
 
@@ -78,20 +79,22 @@ export class Playlists {
     ` ).all( userId, mediaId, limit, offset ) );
   }
 
-  public static create ( userId: number, name: string, description?: string ) : number {
-    assertId( userId, 'user' );
+  public static create ( userId: string, name: string, description?: string ) : string {
+    assertStringId( userId, 'user' );
 
-    const result = conn().prepare(
-      'INSERT INTO playlists ( user_id, name, description ) VALUES ( ?, ?, ? )'
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
+
+    conn().prepare(
+      'INSERT INTO playlists ( id, user_id, name, description ) VALUES ( ?, ?, ?, ? )'
     ).run(
-      userId, normalizeString( name, 'Playlist name' ),
+      id, userId, normalizeString( name, 'Playlist name' ),
       normalizeOptionalString( description, 'Playlist description' )
     );
 
-    return Number( result.lastInsertRowid );
+    return id;
   }
 
-  public static update ( userId: number, playlistId: number, patch: PlaylistUpdate ) : void {
+  public static update ( userId: string, playlistId: string, patch: PlaylistUpdate ) : void {
     Playlists.assertOwned( userId, playlistId );
 
     const assignments: string[] = [], values: ( string | null )[] = [];
@@ -119,14 +122,14 @@ export class Playlists {
       throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
   }
 
-  public static delete ( userId: number, playlistId: number ) : boolean {
+  public static delete ( userId: string, playlistId: string ) : boolean {
     Playlists.assertOwned( userId, playlistId );
 
     const result = conn().prepare( 'DELETE FROM playlists WHERE id = ? AND user_id = ?' ).run( playlistId, userId );
     return Number( result.changes ) > 0;
   }
 
-  public static listItems ( userId: number, playlistId: number, limit = 100, offset = 0 ) : PlaylistItemRecord[] {
+  public static listItems ( userId: string, playlistId: string, limit = 100, offset = 0 ) : PlaylistItemRecord[] {
     Playlists.assertOwned( userId, playlistId );
     assertLimitOffset( limit, offset );
 
@@ -139,7 +142,7 @@ export class Playlists {
     ` ).all( playlistId, limit, offset ) );
   }
 
-  public static mediaInPlaylist ( userId: number, playlistId: number, mediaId: number ) : boolean {
+  public static mediaInPlaylist ( userId: string, playlistId: string, mediaId: string ) : boolean {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
 
@@ -148,7 +151,7 @@ export class Playlists {
     ).get( playlistId, mediaId ) );
   }
 
-  public static nextItem ( userId: number, playlistId: number, mediaId: number ) : PlaylistItemRecord | null {
+  public static nextItem ( userId: string, playlistId: string, mediaId: string ) : PlaylistItemRecord | null {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
 
@@ -157,7 +160,7 @@ export class Playlists {
     ) ?? null;
   }
 
-  public static prevItem ( userId: number, playlistId: number, mediaId: number ) : PlaylistItemRecord | null {
+  public static prevItem ( userId: string, playlistId: string, mediaId: string ) : PlaylistItemRecord | null {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
 
@@ -166,7 +169,7 @@ export class Playlists {
     ) ?? null;
   }
 
-  public static addItem ( userId: number, playlistId: number, mediaId: number ) : void {
+  public static addItem ( userId: string, playlistId: string, mediaId: string ) : void {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
 
@@ -181,7 +184,7 @@ export class Playlists {
     Playlists.touch( playlistId );
   }
 
-  public static removeItem ( userId: number, playlistId: number, mediaId: number ) : boolean {
+  public static removeItem ( userId: string, playlistId: string, mediaId: string ) : boolean {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
 
@@ -193,7 +196,7 @@ export class Playlists {
     return Number( result.changes ) > 0;
   }
 
-  public static moveItem ( userId: number, playlistId: number, mediaId: number, position: number ) : void {
+  public static moveItem ( userId: string, playlistId: string, mediaId: string, position: number ) : void {
     Playlists.assertOwned( userId, playlistId );
     Media.assertMediaIdSafe( mediaId );
 
@@ -201,7 +204,7 @@ export class Playlists {
       throw new Error( `Invalid playlist position: ${ position }` );
 
     db.transaction( tx => {
-      const items = as< { mediaId: number; position: number }[] >( tx.prepare( `
+      const items = as< { mediaId: string; position: number }[] >( tx.prepare( `
         SELECT media_id AS mediaId, position
         FROM playlist_items
         WHERE playlist_id = ?
@@ -227,16 +230,11 @@ export class Playlists {
       ) );
 
       items.forEach( ( item, index ) => updatePosition.run( index, playlistId, item.mediaId ) );
-
-      tx.prepare( `
-        UPDATE playlists
-        SET updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
-        WHERE id = ?
-      ` ).run( playlistId );
+      tx.prepare( `UPDATE playlists SET updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) WHERE id = ?` ).run( playlistId );
     } );
   }
 
-  public static clearItems ( userId: number, playlistId: number ) : number {
+  public static clearItems ( userId: string, playlistId: string ) : number {
     Playlists.assertOwned( userId, playlistId );
 
     const result = conn().prepare( 'DELETE FROM playlist_items WHERE playlist_id = ?' ).run( playlistId );
