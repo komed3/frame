@@ -18,7 +18,7 @@ CREATE TABLE users (
 
 CREATE TABLE sessions (
   id TEXT PRIMARY KEY NOT NULL,
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
   token_hash TEXT NOT NULL UNIQUE,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
   expires_at TEXT NOT NULL,
@@ -44,8 +44,8 @@ CREATE TABLE roots (
 
 CREATE TABLE directories (
   id TEXT PRIMARY KEY NOT NULL,
-  root_id INTEGER NOT NULL REFERENCES roots ( id ) ON DELETE CASCADE,
-  parent_id INTEGER,
+  root_id TEXT NOT NULL REFERENCES roots ( id ) ON DELETE CASCADE,
+  parent_id TEXT,
   path TEXT NOT NULL,
   name TEXT NOT NULL,
   scan_generation INTEGER NOT NULL DEFAULT 0 CHECK ( scan_generation >= 0 ),
@@ -61,8 +61,8 @@ CREATE INDEX directories_parent_idx ON directories ( root_id, parent_id, name CO
 
 CREATE TABLE media (
   id TEXT PRIMARY KEY NOT NULL,
-  root_id INTEGER NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
-  directory_id INTEGER,
+  root_id TEXT NOT NULL NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
+  directory_id TEXT NOT NULL,
   path TEXT NOT NULL,
   file_name TEXT NOT NULL,
 
@@ -128,7 +128,7 @@ CREATE INDEX media_hash_idx ON media ( file_hash );
 
 CREATE TABLE tracks (
   id TEXT PRIMARY KEY NOT NULL,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   stream_index INTEGER NOT NULL,
   kind TEXT NOT NULL CHECK ( kind IN ( 'video', 'audio', 'subtitle', 'data' ) ),
   codec TEXT,
@@ -157,7 +157,7 @@ CREATE INDEX tracks_kind_language_idx ON tracks ( kind, language );
 
 CREATE TABLE media_metadata (
   id TEXT PRIMARY KEY NOT NULL,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   key TEXT NOT NULL COLLATE NOCASE,
   value TEXT NOT NULL,
   source TEXT NOT NULL DEFAULT 'manual' CHECK ( source IN ( 'manual', 'scan' ) ),
@@ -180,8 +180,8 @@ CREATE TABLE tags (
 );
 
 CREATE TABLE media_tags (
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
-  tag_id INTEGER NOT NULL REFERENCES tags ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  tag_id TEXT NOT NULL REFERENCES tags ( id ) ON DELETE CASCADE,
   PRIMARY KEY ( media_id, tag_id )
 );
 
@@ -190,14 +190,14 @@ CREATE INDEX media_tags_tag_idx ON media_tags ( tag_id, media_id );
 CREATE TABLE categories (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL COLLATE NOCASE UNIQUE,
-  parent_id INTEGER REFERENCES categories ( id ) ON DELETE SET NULL
+  parent_id TEXT NOT NULL REFERENCES categories ( id ) ON DELETE SET NULL
 );
 
 CREATE INDEX categories_parent_idx ON categories ( parent_id );
 
 CREATE TABLE media_categories (
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
-  category_id INTEGER NOT NULL REFERENCES categories ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  category_id TEXT NOT NULL REFERENCES categories ( id ) ON DELETE CASCADE,
   PRIMARY KEY ( media_id, category_id )
 );
 
@@ -210,10 +210,8 @@ CREATE INDEX media_categories_category_idx ON media_categories ( category_id, me
 
 CREATE TABLE assets (
   id TEXT PRIMARY KEY NOT NULL,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
-  kind TEXT NOT NULL CHECK ( kind IN (
-    'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle'
-  ) ),
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK ( kind IN ( 'poster', 'thumb', 'frames', 'wave', 'text', 'subtitle' ) ),
   variant TEXT NOT NULL DEFAULT 'default',
   path TEXT NOT NULL UNIQUE,
   fingerprint TEXT,
@@ -237,8 +235,8 @@ CREATE INDEX assets_kind_idx ON assets ( kind );
 
 CREATE TABLE jobs (
   id TEXT PRIMARY KEY NOT NULL,
-  root_id INTEGER REFERENCES roots ( id ) ON DELETE CASCADE,
-  media_id INTEGER REFERENCES media ( id ) ON DELETE CASCADE,
+  root_id TEXT NOT NULL REFERENCES roots ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
 
   kind TEXT NOT NULL CHECK ( kind IN (
     'scan', 'metadata', 'tracks', 'preview', 'frames', 'wave', 'text'
@@ -287,7 +285,7 @@ CREATE UNIQUE INDEX jobs_global_active_idx ON jobs ( kind )
 -- ============================================================
 
 CREATE TABLE user_preferences (
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
   key TEXT NOT NULL,
   value_json TEXT NOT NULL CHECK ( json_valid( value_json ) ),
   updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
@@ -296,8 +294,8 @@ CREATE TABLE user_preferences (
 );
 
 CREATE TABLE progress (
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   position_ms INTEGER NOT NULL DEFAULT 0 CHECK ( position_ms >= 0 ),
   completed INTEGER NOT NULL DEFAULT 0 CHECK ( completed IN ( 0, 1 ) ),
   updated_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
@@ -314,9 +312,9 @@ CREATE INDEX progress_recent_idx ON progress ( user_id, updated_at DESC );
 
 CREATE TABLE plays (
   id TEXT PRIMARY KEY NOT NULL,
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
-  session_id INTEGER REFERENCES sessions ( id ) ON DELETE SET NULL,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  session_id TEXT REFERENCES sessions ( id ) ON DELETE SET NULL,
   started_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
   ended_at TEXT,
   watched_ms INTEGER NOT NULL DEFAULT 0 CHECK ( watched_ms >= 0 ),
@@ -332,8 +330,8 @@ CREATE INDEX plays_media_recent_idx ON plays ( media_id, started_at DESC );
 -- ============================================================
 
 CREATE TABLE favorites (
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
 
   PRIMARY KEY ( user_id, media_id )
@@ -343,7 +341,7 @@ CREATE INDEX favorites_media_idx ON favorites ( media_id );
 
 CREATE TABLE playlists (
   id TEXT PRIMARY KEY NOT NULL,
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
@@ -353,8 +351,8 @@ CREATE TABLE playlists (
 );
 
 CREATE TABLE playlist_items (
-  playlist_id INTEGER NOT NULL REFERENCES playlists ( id ) ON DELETE CASCADE,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  playlist_id TEXT NOT NULL REFERENCES playlists ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   position INTEGER NOT NULL CHECK ( position >= 0 ),
   added_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
 
@@ -371,8 +369,8 @@ CREATE INDEX playlist_items_media_idx ON playlist_items ( media_id );
 
 CREATE TABLE markers (
   id TEXT PRIMARY KEY NOT NULL,
-  user_id INTEGER NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
-  media_id INTEGER NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   position_ms INTEGER NOT NULL CHECK ( position_ms >= 0 ),
   title TEXT,
   description TEXT,
