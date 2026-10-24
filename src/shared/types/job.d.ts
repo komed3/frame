@@ -5,9 +5,9 @@ export type JobKind = 'scan' | 'metadata' | 'tracks' | 'preview' | 'frames' | 'w
 export type JobStatus = 'pending' | 'running' | 'done' | 'failed' | 'cancelled';
 
 export interface JobRecord {
-  id: number;
-  rootId: number | null;
-  mediaId: number | null;
+  id: string;
+  rootId: string | null;
+  mediaId: string | null;
   kind: JobKind;
   status: JobStatus;
   priority: number;
@@ -29,8 +29,8 @@ export interface JobRow extends Omit< JobRecord, 'payload' > {
 
 export interface EnqueueJob {
   kind: JobKind;
-  rootId?: number;
-  mediaId?: number;
+  rootId?: string;
+  mediaId?: string;
   priority?: number;
   maxAttempts?: number;
   runAfterMs?: number;
@@ -68,7 +68,7 @@ export interface JobStats {
 // --- scan ---
 
 export interface ExistingMedia {
-  id: number;
+  id: string;
   path: string;
   fileName: string;
   type: MediaType;

@@ -1,6 +1,6 @@
 export interface PlaylistRecord {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   name: string;
   description: string | null;
   createdAt: string;
@@ -8,8 +8,8 @@ export interface PlaylistRecord {
 }
 
 export interface PlaylistItemRecord {
-  playlistId: number;
-  mediaId: number;
+  playlistId: string;
+  mediaId: string;
   position: number;
   addedAt: string;
 }

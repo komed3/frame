@@ -1,7 +1,7 @@
 export interface MarkerRecord {
-  id: number;
-  userId: number;
-  mediaId: number;
+  id: string;
+  userId: string;
+  mediaId: string;
   positionMs: number;
   title: string | null;
   description: string | null;
