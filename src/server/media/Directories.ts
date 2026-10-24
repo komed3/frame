@@ -1,5 +1,6 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertId, assertRelativePath } from '@/src/server/utils';
+import { assertRelativePath, assertStringId, generateId } from '@/src/server/utils';
 import type {
   MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow,
   MediaDirectoryTree
@@ -14,7 +15,7 @@ export class MediaDirectories {
     };
   }
 
-  private static assertGeneration ( rootId: number, scanGeneration: number ) : void {
+  private static assertGeneration ( rootId: string, scanGeneration: number ) : void {
     const root = as< { scanGeneration: number } | undefined >( conn().prepare(
       'SELECT scan_generation AS scanGeneration FROM roots WHERE id = ?'
     ).get( rootId ) );
@@ -25,8 +26,8 @@ export class MediaDirectories {
     );
   }
 
-  public static get ( id: number ) : MediaDirectory | null {
-    assertId( id, 'media directory' );
+  public static get ( id: string ) : MediaDirectory | null {
+    assertStringId( id, 'media directory' );
 
     const row = as< MediaDirectoryRow | undefined >( conn().prepare( `
       SELECT
@@ -39,8 +40,8 @@ export class MediaDirectories {
     return row ? MediaDirectories.mapRow( row ) : null;
   }
 
-  public static getByPath ( rootId: number, path: string ) : MediaDirectory | null {
-    assertId( rootId, 'media root' );
+  public static getByPath ( rootId: string, path: string ) : MediaDirectory | null {
+    assertStringId( rootId, 'media root' );
     assertRelativePath( path, 'directory' );
 
     const row = as< MediaDirectoryRow | undefined >( conn().prepare( `
@@ -54,9 +55,9 @@ export class MediaDirectories {
     return row ? MediaDirectories.mapRow( row ) : null;
   }
 
-  public static list ( rootId: number, parentId: number | null = null ) : MediaDirectoryEntry[] {
-    assertId( rootId, 'media root' );
-    if ( parentId !== null ) assertId( parentId, 'media directory' );
+  public static list ( rootId: string, parentId: string | null = null ) : MediaDirectoryEntry[] {
+    assertStringId( rootId, 'media root' );
+    if ( parentId !== null ) assertStringId( parentId, 'media directory' );
 
     return as< MediaDirectoryEntry[] >( conn().prepare( `
       SELECT
@@ -71,8 +72,8 @@ export class MediaDirectories {
     ` ).all( rootId, parentId ) );
   }
 
-  public static tree ( rootId: number ) : MediaDirectoryTree[] {
-    assertId( rootId, 'media root' );
+  public static tree ( rootId: string ) : MediaDirectoryTree[] {
+    assertStringId( rootId, 'media root' );
 
     const rows = as< MediaDirectoryEntry[] >( conn().prepare( `
       SELECT
@@ -86,7 +87,7 @@ export class MediaDirectories {
       ORDER BY d.path COLLATE NOCASE, d.id
     ` ).all( rootId ) );
 
-    const nodes = new Map< number, MediaDirectoryTree >();
+    const nodes = new Map< string, MediaDirectoryTree >();
     const tree: MediaDirectoryTree[] = [];
 
     for ( const row of rows ) nodes.set( row.id, { ...row, children: [] } );
@@ -101,8 +102,8 @@ export class MediaDirectories {
     return tree;
   }
 
-  public static beginScan ( rootId: number ) : number {
-    assertId( rootId, 'media root' );
+  public static beginScan ( rootId: string ) : number {
+    assertStringId( rootId, 'media root' );
 
     const row = as< { scanGeneration: number } | undefined >( conn().prepare( `
       UPDATE roots
@@ -115,9 +116,12 @@ export class MediaDirectories {
     return row.scanGeneration;
   }
 
-  public static register ( rootId: number, path: string, scanGeneration: number ) : number {
-    assertId( rootId, 'media root' );
-    assertId( scanGeneration, 'scan generation' );
+  public static register ( rootId: string, path: string, scanGeneration: number ) : string {
+    assertStringId( rootId, 'media root' );
+
+    if ( ! Number.isSafeInteger( scanGeneration ) || scanGeneration < 0 )
+      throw new Error( `Invalid scan generation: ${ scanGeneration }` );
+
     assertRelativePath( path, 'directory' );
 
     return db.transaction( tx => {
@@ -126,10 +130,10 @@ export class MediaDirectories {
       const separator = path.lastIndexOf( '/' );
       const parentPath = separator < 0 ? null : path.slice( 0, separator );
       const name = separator < 0 ? path : path.slice( separator + 1 );
-      let parentId: number | null = null;
+      let parentId: string | null = null;
 
       if ( parentPath !== null ) {
-        const parent = as< { id: number } | undefined >( tx.prepare(
+        const parent = as< { id: string } | undefined >( tx.prepare(
           'SELECT id FROM directories WHERE root_id = ? AND path = ? AND scan_generation = ?'
         ).get( rootId, parentPath, scanGeneration ) );
 
@@ -137,25 +141,28 @@ export class MediaDirectories {
         parentId = parent.id;
       }
 
-      const row = as< { id: number } | undefined >( tx.prepare( `
-        INSERT INTO directories ( root_id, parent_id, path, name, scan_generation, scanned_at )
-        VALUES ( ?, ?, ?, ?, ?, strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
+      const id = generateId( Config.get( 'ID_LENGTH' ) );
+      const row = as< { id: string } | undefined >( tx.prepare( `
+        INSERT INTO directories ( id, root_id, parent_id, path, name, scan_generation, scanned_at )
+        VALUES ( ?, ?, ?, ?, ?, ?, strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
         ON CONFLICT ( root_id, path ) DO UPDATE SET
           parent_id = excluded.parent_id,
           name = excluded.name,
           scan_generation = excluded.scan_generation,
           scanned_at = excluded.scanned_at
         RETURNING id
-      ` ).get( rootId, parentId, path, name, scanGeneration ) );
+      ` ).get( id, rootId, parentId, path, name, scanGeneration ) );
 
       if ( ! row ) throw new Error( `Could not register media directory: ${ path }` );
       return row.id;
     } );
   }
 
-  public static finishScan ( rootId: number, scanGeneration: number ) : void {
-    assertId( rootId, 'media root' );
-    assertId( scanGeneration, 'scan generation' );
+  public static finishScan ( rootId: string, scanGeneration: number ) : void {
+    assertStringId( rootId, 'media root' );
+
+    if ( ! Number.isSafeInteger( scanGeneration ) || scanGeneration < 0 )
+      throw new Error( `Invalid scan generation: ${ scanGeneration }` );
 
     db.transaction( tx => {
       MediaDirectories.assertGeneration( rootId, scanGeneration );
