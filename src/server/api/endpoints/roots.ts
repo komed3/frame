@@ -6,3 +6,6 @@ import { Router } from 'express';
 
 export const roots = Router();
 roots.param( 'id', assertRootId );
+
+
+roots.get( '/', ( _, res ) => res.json( MediaRoots.list() ) );
