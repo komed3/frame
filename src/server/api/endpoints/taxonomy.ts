@@ -36,3 +36,39 @@ tags.delete( '/:id', ( _, res ) => {
   MediaTaxonomy.deleteTag( res.locals.tagId );
   res.status( 204 ).end();
 } );
+
+
+categories.param( 'id', ( _, res, next, value ) => {
+  const id = parseId( value );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid category ID' } );
+
+  const category = MediaTaxonomy.getCategory( id );
+  if ( ! category ) return res.status( 404 ).json( { error: 'Category not found' } );
+
+  res.locals.categoryId = id;
+  res.locals.category = category;
+  next();
+} );
+
+categories.get( '/', ( _, res ) => res.json( MediaTaxonomy.listCategories() ) );
+categories.get( '/:id', ( _, res ) => res.json( res.locals.category ) );
+
+categories.post( '/', ( req, res ) => {
+  const id = MediaTaxonomy.createCategory( req.body?.name, req.body?.parentId ?? null );
+  res.status( 201 ).json( MediaTaxonomy.getCategory( id ) );
+} );
+
+categories.patch( '/:id', ( req, res ) => {
+  MediaTaxonomy.renameCategory( res.locals.categoryId, req.body?.name );
+  res.json( MediaTaxonomy.getCategory( res.locals.categoryId ) );
+} );
+
+categories.put( '/:id/parent', ( req, res ) => {
+  MediaTaxonomy.setCategoryParent( res.locals.categoryId, req.body?.parentId );
+  res.json( MediaTaxonomy.getCategory( res.locals.categoryId ) );
+} );
+
+categories.delete( '/:id', ( _, res ) => {
+  MediaTaxonomy.deleteCategory( res.locals.categoryId );
+  res.status( 204 ).end();
+} );
