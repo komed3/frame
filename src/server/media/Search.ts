@@ -1,5 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
-import { assertStringId, assertLimitOffset } from '@/src/server/utils';
+import { assertLimitOffset, assertStringId } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchDateFilter as DF, MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike,
@@ -31,7 +31,7 @@ const DATE_COLUMNS: Record< MediaSearchDateField, string > = {
 
 const SORT_COLUMNS: Record< Exclude< MediaSearchSort, 'relevance' >, string > = {
   id: 'm.id', rootId: 'm.root_id', type: 'm.type',
-  title: `COALESCE( NULLIF( m.title, \'\'' ), m.file_name ) COLLATE NOCASE`,
+  title: 'COALESCE( NULLIF( m.title, \'\' ), m.file_name ) COLLATE NOCASE',
   fileName: 'm.file_name COLLATE NOCASE', path: 'm.path COLLATE NOCASE',
   mimeType: 'm.mime_type COLLATE NOCASE', sizeBytes: 'm.size_bytes',
   modifiedAt: 'm.modified_at', fileHash: 'm.file_hash', fingerprint: 'm.fingerprint',
