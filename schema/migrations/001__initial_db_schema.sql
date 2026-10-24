@@ -128,7 +128,7 @@ CREATE INDEX media_hash_idx ON media ( file_hash );
 
 CREATE TABLE tracks (
   id TEXT PRIMARY KEY NOT NULL,
-  media_id TEXT NOT NULL NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
   stream_index INTEGER NOT NULL,
   kind TEXT NOT NULL CHECK ( kind IN ( 'video', 'audio', 'subtitle', 'data' ) ),
   codec TEXT,
