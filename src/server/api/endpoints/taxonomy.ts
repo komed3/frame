@@ -18,3 +18,21 @@ tags.param( 'id', ( _, res, next, value ) => {
   res.locals.tag = tag;
   next();
 } );
+
+tags.get( '/', ( _, res ) => res.json( MediaTaxonomy.listTags() ) );
+tags.get( '/:id', ( _, res ) => res.json( res.locals.tag ) );
+
+tags.post( '/', ( req, res ) => {
+  const id = MediaTaxonomy.createTag( req.body?.name );
+  res.status( 201 ).json( MediaTaxonomy.getTag( id ) );
+} );
+
+tags.patch( '/:id', ( req, res ) => {
+  MediaTaxonomy.renameTag( res.locals.tagId, req.body?.name );
+  res.json( MediaTaxonomy.getTag( res.locals.tagId ) );
+} );
+
+tags.delete( '/:id', ( _, res ) => {
+  MediaTaxonomy.deleteTag( res.locals.tagId );
+  res.status( 204 ).end();
+} );
