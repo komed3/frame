@@ -1,6 +1,9 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { assertId, validateNumber } from '@/src/server/utils';
-import type { EnqueueJob, JobKind, JobListFilters, JobRecord, JobRow, JobStats, JobStatus } from '@/src/shared/types/job';
+import type {
+  EnqueueJob, JobKind, JobListFilters, JobRecord,
+  JobRow, JobStats, JobStatus
+} from '@/src/shared/types/job';
 
 
 export const JOB_PRIORITIES: Record< JobKind, number > = {
@@ -274,5 +277,10 @@ export class JobQueue {
       FROM jobs
       WHERE status = 'pending'
     ` ).get( now, now ) );
+
+    return {
+      total: Object.values( byStatus ).reduce( ( sum, count ) => sum + count, 0 ),
+      byStatus, byKind, pendingReady: pending.ready, pendingScheduled: pending.scheduled
+    };
   }
 }
