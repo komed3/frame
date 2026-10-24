@@ -1,5 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
-import { assertId, validateBoolean, validateEnum, validateNumber } from '@/src/server/utils';
+import { assertStringId, validateBoolean, validateEnum, validateNumber } from '@/src/server/utils';
 import type { PrefName, PrefRow, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
 
 
@@ -39,8 +39,8 @@ export class Pref {
     return validateEnum( value, key, def.values ) as PrefValue< K >;
   }
 
-  public static get < K extends PrefName > ( userId: number, name: K ) : PrefValue< K > {
-    assertId( userId, 'user' );
+  public static get < K extends PrefName > ( userId: string, name: K ) : PrefValue< K > {
+    assertStringId( userId, 'user' );
 
     const key = this.resolveName( name ), row = as< PrefRow | null >( conn().prepare(
       'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ? AND key = ?'
@@ -49,8 +49,8 @@ export class Pref {
     return ( row ? this.parseValue( key, row.value_json ) : this.schema[ key ].default ) as PrefValue< K >;
   }
 
-  public static all ( userId: number ) : PrefSchema {
-    assertId( userId, 'user' );
+  public static all ( userId: string ) : PrefSchema {
+    assertStringId( userId, 'user' );
 
     const result = Object.fromEntries( Object.entries( this.schema ).map(
       ( [ name, def ] ) => [ name, def.default ] )
@@ -70,8 +70,8 @@ export class Pref {
     return result;
   }
 
-  public static set < K extends PrefName > ( userId: number, name: K, value: PrefValue< K > ) : PrefValue< K > {
-    assertId( userId, 'user' );
+  public static set < K extends PrefName > ( userId: string, name: K, value: PrefValue< K > ) : PrefValue< K > {
+    assertStringId( userId, 'user' );
 
     const key = this.resolveName( name );
     const parsed = this.validate( key, value ) as PrefValue< K >;
@@ -87,8 +87,8 @@ export class Pref {
     return parsed;
   }
 
-  public static reset ( userId: number, name: PrefName ) : boolean {
-    assertId( userId, 'user' );
+  public static reset ( userId: string, name: PrefName ) : boolean {
+    assertStringId( userId, 'user' );
 
     const key = this.resolveName( name );
     const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ? AND key = ?' ).run( userId, key );
@@ -96,8 +96,8 @@ export class Pref {
     return Number( result.changes ) > 0;
   }
 
-  public static resetAll ( userId: number ) : number {
-    assertId( userId, 'user' );
+  public static resetAll ( userId: string ) : number {
+    assertStringId( userId, 'user' );
 
     const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
