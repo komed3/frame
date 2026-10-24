@@ -1,5 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
-import { assertId, assertLimitOffset } from '@/src/server/utils';
+import { assertStringId, assertLimitOffset } from '@/src/server/utils';
 import type { MediaRecord, MediaRow } from '@/src/shared/types/media';
 import type {
   MediaSearchDateFilter as DF, MediaSearchAssetKind, MediaSearchDateField, MediaSearchFilterLike,
@@ -19,9 +19,9 @@ const TEXT_COLUMNS: Record< MediaSearchTextField, string > = {
 };
 
 const NUMBER_COLUMNS: Record< MediaSearchNumberField, string > = {
-  id: 'm.id', rootId: 'm.root_id', sizeBytes: 'm.size_bytes', rating: 'm.rating',
-  durationMs: 'm.duration_ms', width: 'm.width', height: 'm.height', fps: 'm.fps',
-  bitrate: 'm.bitrate', sampleRate: 'm.sample_rate', channels: 'm.channels'
+  sizeBytes: 'm.size_bytes', rating: 'm.rating', durationMs: 'm.duration_ms',
+  width: 'm.width', height: 'm.height', fps: 'm.fps', bitrate: 'm.bitrate',
+  sampleRate: 'm.sample_rate', channels: 'm.channels'
 };
 
 const DATE_COLUMNS: Record< MediaSearchDateField, string > = {
@@ -31,7 +31,7 @@ const DATE_COLUMNS: Record< MediaSearchDateField, string > = {
 
 const SORT_COLUMNS: Record< Exclude< MediaSearchSort, 'relevance' >, string > = {
   id: 'm.id', rootId: 'm.root_id', type: 'm.type',
-  title: 'COALESCE( NULLIF( m.title, \'\' ), m.file_name ) COLLATE NOCASE',
+  title: `COALESCE( NULLIF( m.title, \'\'' ), m.file_name ) COLLATE NOCASE`,
   fileName: 'm.file_name COLLATE NOCASE', path: 'm.path COLLATE NOCASE',
   mimeType: 'm.mime_type COLLATE NOCASE', sizeBytes: 'm.size_bytes',
   modifiedAt: 'm.modified_at', fileHash: 'm.file_hash', fingerprint: 'm.fingerprint',
@@ -57,7 +57,7 @@ export class MediaSearch {
     return { ...row, available: Boolean( row.available ), data: data as Record< string, unknown > };
   }
 
-  private static normalizeIds ( ids: number[] ) : number[] {
+  private static normalizeIds ( ids: string[] ) : string[] {
     return [ ...new Set( ids ) ];
   }
 
@@ -65,7 +65,7 @@ export class MediaSearch {
     const d = value.trim().replace( ' ', 'T' );
     const date = /^\d{4}-\d{2}-\d{2}/.exec( d )?.[ 0 ];
 
-    if ( date && new Date( `${ date }T00:00:00.000Z` ).toISOString().slice( 0, 10 ) !== date ) 
+    if ( date && new Date( `${ date }T00:00:00.000Z` ).toISOString().slice( 0, 10 ) !== date )
       throw new Error( `Invalid date: ${ value }` );
 
     return /^\d{4}-\d{2}-\d{2}$/.test( d ) ? `${ d }T${ endOfDay ? '23:59:59.999' : '00:00:00.000' }Z`
@@ -149,7 +149,7 @@ export class MediaSearch {
   }
 
   private static taxFilters ( cond: string[], values: ( string | number )[], options: O ) : void {
-    const append = ( ids: number[] | undefined, table: string, key: string, mode: string ) => {
+    const append = ( ids: string[] | undefined, table: string, key: string, mode: string ) => {
       if ( ! ids?.length ) return;
       const uniqueIds = MediaSearch.normalizeIds( ids );
 
@@ -288,7 +288,7 @@ export class MediaSearch {
 
     if ( favorite === undefined && played === undefined && progress === undefined ) return;
     if ( userId === undefined ) throw new Error( 'userId is required for user-specific search filters' );
-    assertId( userId, 'user' );
+    assertStringId( userId, 'user' );
 
     const exists = ( table: string, value: boolean ) => {
       cond.push( `${ value ? 'EXISTS' : 'NOT EXISTS' } (
@@ -382,7 +382,7 @@ export class MediaSearch {
 
     const from = `
       FROM media m JOIN roots r ON r.id = m.root_id
-      ${ hasQuery ? 'JOIN media_fts ON media_fts.rowid = m.id' : '' }
+      ${ hasQuery ? 'JOIN media_fts ON media_fts.rowid = m.rowid' : '' }
     `;
 
     const totalRow = as< { total: number } >( conn().prepare(
