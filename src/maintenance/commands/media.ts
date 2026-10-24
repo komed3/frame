@@ -1,8 +1,7 @@
-import { parseNumber, parseValue } from '@/src/maintenance/utils/parse';
+import { parseNumber, parseValue, resolveId } from '@/src/maintenance/utils/parse';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Media, MEDIA_TYPES } from '@/src/server/media/Media';
-import { resolveId } from '@/src/server/utils';
 import type { MediaType } from '@/src/shared/types/media';
 import { Command } from 'commander';
 
