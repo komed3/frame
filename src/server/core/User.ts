@@ -1,13 +1,13 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertStringId, generateId } from '@/src/server/utils';
+import { assertId, generateId } from '@/src/server/utils';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 
 export class User {
   private static getRow ( userId: string ) : UserRow | null {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     return as< UserRow | null >( conn().prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
   }
 
@@ -135,7 +135,7 @@ export class User {
   }
 
   public static delete ( userId: string ) : void {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     db.transaction( tx => {
       const target = as< UserRow | null >( tx.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );

@@ -12,12 +12,7 @@ export function generateId ( length: number ) : string {
 }
 
 
-export function assertId ( id: number, label: string ) : void {
-  if ( ! Number.isSafeInteger( id ) || id < 1 ) throw new Error( `Invalid ${ label } ID: ${ id }` );
-}
-
-
-export function assertStringId ( id: string, label: string ) : void {
+export function assertId ( id: string, label: string ) : void {
   if ( typeof id !== 'string' || ! /^[a-zA-Z0-9]{5,32}$/.test( id ) )
     throw new Error( `Invalid ${ label } ID: ${ id }` );
 }

@@ -1,6 +1,6 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertStringId, generateId, validateNumber } from '@/src/server/utils';
+import { assertId, generateId, validateNumber } from '@/src/server/utils';
 import type {
   EnqueueJob, JobKind, JobListFilters, JobRecord,
   JobRow, JobStats, JobStatus
@@ -42,8 +42,8 @@ export class JobQueue {
     if ( filters.kind !== undefined && ! JOB_KINDS.includes( filters.kind ) )
       throw new Error( `Invalid job kind: ${ filters.kind }` );
 
-    if ( filters.rootId !== undefined ) assertStringId( filters.rootId, 'root' );
-    if ( filters.mediaId !== undefined ) assertStringId( filters.mediaId, 'media' );
+    if ( filters.rootId !== undefined ) assertId( filters.rootId, 'root' );
+    if ( filters.mediaId !== undefined ) assertId( filters.mediaId, 'media' );
     if ( filters.rootId !== undefined && filters.mediaId !== undefined )
       throw new Error( 'A job list cannot target both a root and a media record' );
 
@@ -66,7 +66,7 @@ export class JobQueue {
   }
 
   public static get ( id: string ) : JobRecord | null {
-    assertStringId( id, 'job' );
+    assertId( id, 'job' );
 
     const row = as< JobRow | undefined >( conn().prepare( `${ SELECT_JOB } WHERE id = ?` ).get( id ) );
     return row ? JobQueue.mapRow( row ) : null;
@@ -74,8 +74,8 @@ export class JobQueue {
 
   public static enqueue ( input: EnqueueJob ) : string {
     if ( ! JOB_KINDS.includes( input.kind ) ) throw new Error( `Invalid job kind: ${ input.kind }` );
-    if ( input.rootId !== undefined ) assertStringId( input.rootId, 'root' );
-    if ( input.mediaId !== undefined ) assertStringId( input.mediaId, 'media' );
+    if ( input.rootId !== undefined ) assertId( input.rootId, 'root' );
+    if ( input.mediaId !== undefined ) assertId( input.mediaId, 'media' );
 
     if ( input.rootId !== undefined && input.mediaId !== undefined )
       throw new Error( 'A job cannot target both a root and a media record' );
@@ -145,7 +145,7 @@ export class JobQueue {
   }
 
   public static complete ( id: string, workerId: string ) : void {
-    assertStringId( id, 'job' );
+    assertId( id, 'job' );
 
     const result = conn().prepare( `
       UPDATE jobs SET
@@ -163,7 +163,7 @@ export class JobQueue {
   }
 
   public static retry ( id: string, workerId: string, error: unknown, delayMs: number ) : void {
-    assertStringId( id, 'job' );
+    assertId( id, 'job' );
     validateNumber( delayMs, 'Retry delay', 0, Number.MAX_SAFE_INTEGER, true );
 
     const job = JobQueue.get( id );
@@ -192,7 +192,7 @@ export class JobQueue {
   }
 
   public static release ( id: string, workerId: string ) : void {
-    assertStringId( id, 'job' );
+    assertId( id, 'job' );
 
     const result = conn().prepare( `
       UPDATE jobs SET
@@ -232,7 +232,7 @@ export class JobQueue {
   }
 
   public static cancel ( id: string ) : void {
-    assertStringId( id, 'job' );
+    assertId( id, 'job' );
 
     const result = conn().prepare( `
       UPDATE jobs SET
@@ -250,7 +250,7 @@ export class JobQueue {
   }
 
   public static retryNow ( id: string ) : void {
-    assertStringId( id, 'job' );
+    assertId( id, 'job' );
 
     const result = conn().prepare( `
       UPDATE jobs SET

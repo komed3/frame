@@ -1,6 +1,6 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertRelativePath, assertStringId, generateId } from '@/src/server/utils';
+import { assertId, assertRelativePath, generateId } from '@/src/server/utils';
 import type {
   MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow,
   MediaDirectoryTree
@@ -27,7 +27,7 @@ export class MediaDirectories {
   }
 
   public static get ( id: string ) : MediaDirectory | null {
-    assertStringId( id, 'media directory' );
+    assertId( id, 'media directory' );
 
     const row = as< MediaDirectoryRow | undefined >( conn().prepare( `
       SELECT
@@ -41,7 +41,7 @@ export class MediaDirectories {
   }
 
   public static getByPath ( rootId: string, path: string ) : MediaDirectory | null {
-    assertStringId( rootId, 'media root' );
+    assertId( rootId, 'media root' );
     assertRelativePath( path, 'directory' );
 
     const row = as< MediaDirectoryRow | undefined >( conn().prepare( `
@@ -56,8 +56,8 @@ export class MediaDirectories {
   }
 
   public static list ( rootId: string, parentId: string | null = null ) : MediaDirectoryEntry[] {
-    assertStringId( rootId, 'media root' );
-    if ( parentId !== null ) assertStringId( parentId, 'media directory' );
+    assertId( rootId, 'media root' );
+    if ( parentId !== null ) assertId( parentId, 'media directory' );
 
     return as< MediaDirectoryEntry[] >( conn().prepare( `
       SELECT
@@ -73,7 +73,7 @@ export class MediaDirectories {
   }
 
   public static tree ( rootId: string ) : MediaDirectoryTree[] {
-    assertStringId( rootId, 'media root' );
+    assertId( rootId, 'media root' );
 
     const rows = as< MediaDirectoryEntry[] >( conn().prepare( `
       SELECT
@@ -103,7 +103,7 @@ export class MediaDirectories {
   }
 
   public static beginScan ( rootId: string ) : number {
-    assertStringId( rootId, 'media root' );
+    assertId( rootId, 'media root' );
 
     const row = as< { scanGeneration: number } | undefined >( conn().prepare( `
       UPDATE roots
@@ -117,7 +117,7 @@ export class MediaDirectories {
   }
 
   public static register ( rootId: string, path: string, scanGeneration: number ) : string {
-    assertStringId( rootId, 'media root' );
+    assertId( rootId, 'media root' );
 
     if ( ! Number.isSafeInteger( scanGeneration ) || scanGeneration < 0 )
       throw new Error( `Invalid scan generation: ${ scanGeneration }` );
@@ -159,7 +159,7 @@ export class MediaDirectories {
   }
 
   public static finishScan ( rootId: string, scanGeneration: number ) : void {
-    assertStringId( rootId, 'media root' );
+    assertId( rootId, 'media root' );
 
     if ( ! Number.isSafeInteger( scanGeneration ) || scanGeneration < 0 )
       throw new Error( `Invalid scan generation: ${ scanGeneration }` );

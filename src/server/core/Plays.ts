@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertLimitOffset, assertStringId, generateId } from '@/src/server/utils';
+import { assertId, assertLimitOffset, generateId } from '@/src/server/utils';
 import type { PlayRecord, PlayRow } from '@/src/shared/types/plays';
 
 
@@ -11,8 +11,8 @@ export class Plays {
   }
 
   private static updateRow ( userId: string, playId: string, watchedMs: number, completed: boolean, finished: boolean ) : void {
-    assertStringId( userId, 'user' );
-    assertStringId( playId, 'play' );
+    assertId( userId, 'user' );
+    assertId( playId, 'play' );
 
     const result = conn().prepare( `
       UPDATE plays SET
@@ -46,7 +46,7 @@ export class Plays {
   }
 
   public static listByUser ( userId: string, limit = 100, offset = 0 ) : PlayRecord[] {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     return Plays.list( 'user_id = ?', [ userId ], limit, offset );
   }
 
@@ -56,15 +56,15 @@ export class Plays {
   }
 
   public static listByUserAndMedia ( userId: string, mediaId: string, limit = 100, offset = 0 ) : PlayRecord[] {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     return Plays.list( 'user_id = ? AND media_id = ?', [ userId, mediaId ], limit, offset );
   }
 
   public static get ( userId: string, playId: string ) : PlayRecord | null {
-    assertStringId( userId, 'user' );
-    assertStringId( playId, 'play' );
+    assertId( userId, 'user' );
+    assertId( playId, 'play' );
 
     const row = as< PlayRow | undefined >( conn().prepare( `
       SELECT
@@ -79,9 +79,9 @@ export class Plays {
   }
 
   public static start ( userId: string, mediaId: string, sessionId: string | null = null ) : string {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
-    if ( sessionId !== null ) assertStringId( sessionId, 'session' );
+    if ( sessionId !== null ) assertId( sessionId, 'session' );
 
     const id = generateId( Config.get( 'ID_LENGTH' ) );
 
@@ -101,15 +101,15 @@ export class Plays {
   }
 
   public static delete ( userId: string, playId: string ) : boolean {
-    assertStringId( userId, 'user' );
-    assertStringId( playId, 'play' );
+    assertId( userId, 'user' );
+    assertId( playId, 'play' );
 
     const result = conn().prepare( 'DELETE FROM plays WHERE user_id = ? AND id = ?' ).run( userId, playId );
     return Number( result.changes ) > 0;
   }
 
   public static clear ( userId: string ) : number {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const result = conn().prepare( 'DELETE FROM plays WHERE user_id = ?' ).run( userId );
     return Number( result.changes );

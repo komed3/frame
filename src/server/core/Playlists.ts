@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertLimitOffset, assertStringId, generateId, normalizeOptionalString, normalizeString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, generateId, normalizeOptionalString, normalizeString } from '@/src/server/utils';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 
 
@@ -18,8 +18,8 @@ const ITEM_SELECT = ( dir: 'ASC' | 'DESC' ) : string => `
 
 export class Playlists {
   private static assertOwned ( userId: string, playlistId: string ) : void {
-    assertStringId( userId, 'user' );
-    assertStringId( playlistId, 'playlist' );
+    assertId( userId, 'user' );
+    assertId( playlistId, 'playlist' );
 
     if ( ! conn().prepare( 'SELECT 1 FROM playlists WHERE id = ? AND user_id = ?' ).get( playlistId, userId ) )
       throw new Error( `Playlist ${ playlistId } does not exist for user ${ userId }` );
@@ -48,7 +48,7 @@ export class Playlists {
   }
 
   public static list ( userId: string, limit = 100, offset = 0 ) : PlaylistRecord[] {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     assertLimitOffset( limit, offset );
 
     return as< PlaylistRecord[] >( conn().prepare( `
@@ -63,7 +63,7 @@ export class Playlists {
   }
 
   public static mediaPlaylists ( userId: string, mediaId: string, limit = 100, offset = 0 ) : PlaylistRecord[] {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
     assertLimitOffset( limit, offset );
 
@@ -80,7 +80,7 @@ export class Playlists {
   }
 
   public static create ( userId: string, name: string, description?: string ) : string {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const id = generateId( Config.get( 'ID_LENGTH' ) );
 

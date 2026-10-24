@@ -1,9 +1,9 @@
-import { assertStringId, validateNumber } from '@/src/server/utils';
+import { assertId, validateNumber } from '@/src/server/utils';
 
 
 export const resolveId = ( value: unknown, label: string ) : string => {
   if ( typeof value !== 'string' ) throw new Error( `Invalid ${ label } ID: ${ value }` );
-  assertStringId( value, label );
+  assertId( value, label );
 
   return value;
 };

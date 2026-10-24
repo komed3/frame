@@ -1,5 +1,5 @@
 import { as, conn } from '@/src/server/core/Database';
-import { assertStringId, validateBoolean, validateEnum, validateNumber } from '@/src/server/utils';
+import { assertId, validateBoolean, validateEnum, validateNumber } from '@/src/server/utils';
 import type { PrefName, PrefRow, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
 
 
@@ -40,7 +40,7 @@ export class Pref {
   }
 
   public static get < K extends PrefName > ( userId: string, name: K ) : PrefValue< K > {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const key = this.resolveName( name ), row = as< PrefRow | null >( conn().prepare(
       'SELECT key, value_json, updated_at FROM user_preferences WHERE user_id = ? AND key = ?'
@@ -50,7 +50,7 @@ export class Pref {
   }
 
   public static all ( userId: string ) : PrefSchema {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const result = Object.fromEntries( Object.entries( this.schema ).map(
       ( [ name, def ] ) => [ name, def.default ] )
@@ -71,7 +71,7 @@ export class Pref {
   }
 
   public static set < K extends PrefName > ( userId: string, name: K, value: PrefValue< K > ) : PrefValue< K > {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const key = this.resolveName( name );
     const parsed = this.validate( key, value ) as PrefValue< K >;
@@ -88,7 +88,7 @@ export class Pref {
   }
 
   public static reset ( userId: string, name: PrefName ) : boolean {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const key = this.resolveName( name );
     const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ? AND key = ?' ).run( userId, key );
@@ -97,7 +97,7 @@ export class Pref {
   }
 
   public static resetAll ( userId: string ) : number {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const result = conn().prepare( 'DELETE FROM user_preferences WHERE user_id = ?' ).run( userId );
     return Number( result.changes );

@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertStringId, generateId, normalizeString } from '@/src/server/utils';
+import { assertId, generateId, normalizeString } from '@/src/server/utils';
 import type { CategoryRecord, TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 
 
@@ -10,7 +10,7 @@ export class MediaTaxonomy {
     Media.assertMediaIdSafe( mediaId );
 
     const uniqueIds = [ ...new Set( ids ) ];
-    uniqueIds.forEach( id => assertStringId( id, kind === 'tags' ? 'tag' : 'category' ) );
+    uniqueIds.forEach( id => assertId( id, kind === 'tags' ? 'tag' : 'category' ) );
 
     const table = kind === 'tags' ? 'tags' : 'categories';
     const joinTable = kind === 'tags' ? 'media_tags' : 'media_categories';
@@ -43,7 +43,7 @@ export class MediaTaxonomy {
   }
 
   public static getTag ( id: string ) : TagRecord | null {
-    assertStringId( id, 'tag' );
+    assertId( id, 'tag' );
 
     return as< TagRecord | undefined >( conn().prepare(
       'SELECT id, name FROM tags WHERE id = ?'
@@ -65,7 +65,7 @@ export class MediaTaxonomy {
   }
 
   public static renameTag ( id: string, name: string ) : void {
-    assertStringId( id, 'tag' );
+    assertId( id, 'tag' );
 
     const value = normalizeString( name, 'Tag' );
     const result = conn().prepare( 'UPDATE tags SET name = ? WHERE id = ?' ).run( value, id );
@@ -74,7 +74,7 @@ export class MediaTaxonomy {
   }
 
   public static deleteTag ( id: string ) : void {
-    assertStringId( id, 'tag' );
+    assertId( id, 'tag' );
 
     const result = conn().prepare( 'DELETE FROM tags WHERE id = ?' ).run( id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Tag ${ id } does not exist` );
@@ -106,7 +106,7 @@ export class MediaTaxonomy {
   }
 
   public static getCategory ( id: string ) : CategoryRecord | null {
-    assertStringId( id, 'category' );
+    assertId( id, 'category' );
 
     return as< CategoryRecord | undefined >( conn().prepare(
       'SELECT id, name, parent_id AS parentId FROM categories WHERE id = ?'
@@ -117,7 +117,7 @@ export class MediaTaxonomy {
     const value = normalizeString( name, 'Category' );
 
     if ( parentId !== null ) {
-      assertStringId( parentId, 'parent category' );
+      assertId( parentId, 'parent category' );
 
       if ( ! MediaTaxonomy.getCategory( parentId ) )
         throw new Error( `Parent category ${ parentId } does not exist` );
@@ -135,7 +135,7 @@ export class MediaTaxonomy {
   }
 
   public static renameCategory ( id: string, name: string ) : void {
-    assertStringId( id, 'category' );
+    assertId( id, 'category' );
 
     const value = normalizeString( name, 'Category' );
     const result = conn().prepare( 'UPDATE categories SET name = ? WHERE id = ?' ).run( value, id );
@@ -144,10 +144,10 @@ export class MediaTaxonomy {
   }
 
   public static setCategoryParent ( id: string, parentId: string | null ) : void {
-    assertStringId( id, 'category' );
+    assertId( id, 'category' );
 
     if ( parentId !== null ) {
-      assertStringId( parentId, 'parent category' );
+      assertId( parentId, 'parent category' );
 
       if ( ! MediaTaxonomy.getCategory( parentId ) )
         throw new Error( `Parent category ${ parentId } does not exist` );
@@ -171,7 +171,7 @@ export class MediaTaxonomy {
   }
 
   public static deleteCategory ( id: string ) : void {
-    assertStringId( id, 'category' );
+    assertId( id, 'category' );
 
     const result = conn().prepare( 'DELETE FROM categories WHERE id = ?' ).run( id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Category ${ id } does not exist` );

@@ -1,14 +1,14 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertLimitOffset, assertStringId, generateId, normalizeOptionalString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, generateId, normalizeOptionalString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
 export class Markers {
   public static get ( userId: string, markerId: string ) : MarkerRecord | null {
-    assertStringId( userId, 'user' );
-    assertStringId( markerId, 'marker' );
+    assertId( userId, 'user' );
+    assertId( markerId, 'marker' );
 
     const row = as< MarkerRecord | undefined >( conn().prepare( `
       SELECT
@@ -22,7 +22,7 @@ export class Markers {
   }
 
   public static list ( userId: string, limit = 100, offset = 0 ) : MarkerRecord[] {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     assertLimitOffset( limit, offset );
 
     return as< MarkerRecord[] >( conn().prepare( `
@@ -37,7 +37,7 @@ export class Markers {
   }
 
   public static mediaMarker ( userId: string, mediaId: string, limit = 100, offset = 0 ) : MarkerRecord[] {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
     assertLimitOffset( limit, offset );
 
@@ -56,7 +56,7 @@ export class Markers {
     userId: string, mediaId: string, positionMs: number,
     title: string | null = null, description: string | null = null
   ) : string {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     if ( ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
@@ -77,8 +77,8 @@ export class Markers {
   }
 
   public static update ( userId: string, markerId: string, patch: MarkerUpdate ) : void {
-    assertStringId( userId, 'user' );
-    assertStringId( markerId, 'marker' );
+    assertId( userId, 'user' );
+    assertId( markerId, 'marker' );
 
     const assignments: string[] = [], values: ( number | string | null )[] = [];
 
@@ -113,15 +113,15 @@ export class Markers {
   }
 
   public static delete ( userId: string, markerId: string ) : boolean {
-    assertStringId( userId, 'user' );
-    assertStringId( markerId, 'marker' );
+    assertId( userId, 'user' );
+    assertId( markerId, 'marker' );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND id = ?' ).run( userId, markerId );
     return Number( result.changes ) > 0;
   }
 
   public static clearMediaMarker ( userId: string, mediaId: string ) : number {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
@@ -129,7 +129,7 @@ export class Markers {
   }
 
   public static clear ( userId: string ) : number {
-    assertStringId( userId, 'user' );
+    assertId( userId, 'user' );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
