@@ -1,5 +1,6 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn } from '@/src/server/core/Database';
-import { assertId, assertLimitOffset, assertRelativePath } from '@/src/server/utils';
+import { assertLimitOffset, assertRelativePath, assertStringId, generateId } from '@/src/server/utils';
 import type { MediaFileInput, MediaListOptions, MediaRecord, MediaRow, MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
@@ -36,22 +37,22 @@ export class Media {
     return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
   }
 
-  public static assertMediaIdSafe ( mediaId: number ) : void {
-    assertId( mediaId, 'media' );
+  public static assertMediaIdSafe ( mediaId: string ) : void {
+    assertStringId( mediaId, 'media' );
 
     if ( ! conn().prepare( 'SELECT id FROM media WHERE id = ?' ).get( mediaId ) )
       throw new Error( `Media ${ mediaId } does not exist` );
   }
 
-  public static get ( id: number ) : MediaRecord | null {
-    assertId( id, 'media' );
+  public static get ( id: string ) : MediaRecord | null {
+    assertStringId( id, 'media' );
 
     const row = as< MediaRow | undefined >( conn().prepare( `${ SELECT_MEDIA } WHERE id = ?` ).get( id ) );
     return row ? Media.mapRow( row ) : null;
   }
 
-  public static getByPath ( rootId: number, path: string ) : MediaRecord | null {
-    assertId( rootId, 'media root' );
+  public static getByPath ( rootId: string, path: string ) : MediaRecord | null {
+    assertStringId( rootId, 'media root' );
     assertRelativePath( path, 'media' );
 
     const row = as< MediaRow | undefined >( conn().prepare(
@@ -63,20 +64,20 @@ export class Media {
 
   public static list ( options: MediaListOptions = {} ) : MediaRecord[] {
     const { rootId, directoryId, type, availableOnly = false, limit = 100, offset = 0 } = options;
-    const conditions: string[] = [], values: ( string | number )[] = [];
+    const conditions: string[] = [], values: ( string | number | null )[] = [];
 
     if ( rootId !== undefined ) {
-      assertId( rootId, 'media root' );
+      assertStringId( rootId, 'media root' );
 
       conditions.push( 'root_id = ?' );
       values.push( rootId );
     }
 
     if ( directoryId !== undefined ) {
-      if ( directoryId !== null ) assertId( directoryId, 'media directory' );
+      if ( directoryId !== null ) assertStringId( directoryId, 'media directory' );
 
       conditions.push( 'directory_id IS ?' );
-      values.push( directoryId! );
+      values.push( directoryId );
     }
 
     if ( type !== undefined ) {
@@ -97,10 +98,11 @@ export class Media {
     return rows.map( row => Media.mapRow( row ) );
   }
 
-  public static registerFile ( input: MediaFileInput, directoryId: number | null ) : number {
-    assertId( input.rootId, 'media root' );
+  public static registerFile ( input: MediaFileInput, directoryId: string | null ) : string {
+    assertStringId( input.rootId, 'media root' );
     assertRelativePath( input.path, 'media' );
-    if ( directoryId !== null ) assertId( directoryId, 'directory' );
+
+    if ( directoryId !== null ) assertStringId( directoryId, 'directory' );
 
     if ( ! input.fileName || input.fileName.includes( '/' ) || input.fileName.includes( '\\' ) )
       throw new Error( `Invalid media file name: ${ input.fileName }` );
@@ -111,13 +113,14 @@ export class Media {
     if ( ! Number.isSafeInteger( input.sizeBytes ) || input.sizeBytes < 0 )
       throw new Error( `Invalid media file size: ${ input.sizeBytes }` );
 
-    const row = as< { id: number } | undefined >( conn().prepare( `
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    const row = as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO media (
-        root_id, directory_id, path, file_name, type, mime_type,
+        id, root_id, directory_id, path, file_name, type, mime_type,
         size_bytes, modified_at, scanned_at
       )
       VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?, ?, ?, ?,
         strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       )
       ON CONFLICT ( root_id, path ) DO UPDATE SET
@@ -144,7 +147,7 @@ export class Media {
         updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       RETURNING id
     ` ).get(
-      input.rootId, directoryId, input.path, input.fileName, input.type,
+      id, input.rootId, directoryId, input.path, input.fileName, input.type,
       input.mimeType ?? null, input.sizeBytes, input.modifiedAt ?? null
     ) );
 
@@ -152,8 +155,8 @@ export class Media {
     return row.id;
   }
 
-  public static update ( id: number, patch: MediaUpdate ) : void {
-    assertId( id, 'media' );
+  public static update ( id: string, patch: MediaUpdate ) : void {
+    assertStringId( id, 'media' );
 
     const columns = Object.entries( UPDATE_COLUMNS ) as [ keyof MediaUpdate, string ][];
     const assignments: string[] = [], values: ( string | number | null )[] = [];
@@ -182,8 +185,8 @@ export class Media {
     if ( Number( result.changes ) !== 1 ) throw new Error( `Media ${ id } does not exist` );
   }
 
-    public static clean () : number {
-      const result = conn().prepare( 'DELETE FROM media WHERE available = 0' ).run();
-      return Number( result.changes );
-    }
+  public static clean () : number {
+    const result = conn().prepare( 'DELETE FROM media WHERE available = 0' ).run();
+    return Number( result.changes );
+  }
 }
