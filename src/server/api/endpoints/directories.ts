@@ -1,5 +1,4 @@
-import { assertRootId } from '@/src/server/api/middleware';
-import { parseId, parsePagination } from '@/src/server/api/utils';
+import { parsePagination } from '@/src/server/api/utils';
 import { MediaDirectories } from '@/src/server/media/Directories';
 import { Media } from '@/src/server/media/Media';
 import type { MediaDirectory } from '@/src/shared/types/directories';
@@ -8,7 +7,6 @@ import { basename } from 'node:path';
 
 
 export const directories = Router();
-directories.param( 'rootId', assertRootId );
 
 
 directories.get( '/:rootId/tree', ( _, res ) => {
@@ -22,7 +20,7 @@ directories.get( '/:rootId/tree', ( _, res ) => {
 
 directories.get( '/:rootId', ( req, res ) => {
   const root = res.locals.root, value = req.query.directoryId;
-  const directoryId = value === undefined ? null : parseId( String( value ) );
+  const directoryId = value === undefined ? null : value as string;
   const pagination = parsePagination( req.query.limit, req.query.offset );
 
   if ( value !== undefined && directoryId === null )
