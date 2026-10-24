@@ -1,8 +1,9 @@
+import { resolveId } from '@/src/maintenance/utils/parse';
 import { confirm } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
 import { ASSET_KINDS, MediaAssets } from '@/src/server/media/Assets';
-import { resolveId, validateEnum } from '@/src/server/utils';
+import { validateEnum } from '@/src/server/utils';
 import type { MediaAssetKind } from '@/src/shared/types/assets';
 import { Command } from 'commander';
 
@@ -51,18 +52,18 @@ export const registerAssetCommands = ( program: Command ) : void => {
       console.log( MediaAssets.resolvePath( asset.path ) );
     } );
 
-    assetCommand
-      .command( 'clean' )
-      .description( 'Remove orphaned assets from the file system' )
-      .option( '-y, --yes', 'Skip confirmation' )
-      .action( async ( options: { yes?: boolean } ) => {
-        ui.warning( 'This will permanently delete files not registered in the database.' );
-        ui.warning( `Assets directory: ${ ui.value( Config.get( 'ASSETS_PATH' ) ) }` );
-        ui.nl();
+  assetCommand
+    .command( 'clean' )
+    .description( 'Remove orphaned assets from the file system' )
+    .option( '-y, --yes', 'Skip confirmation' )
+    .action( async ( options: { yes?: boolean } ) => {
+      ui.warning( 'This will permanently delete files not registered in the database.' );
+      ui.warning( `Assets directory: ${ ui.value( Config.get( 'ASSETS_PATH' ) ) }` );
+      ui.nl();
 
-        if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
+      if ( ! options.yes && ! await confirm( 'Continue?' ) ) return ui.cancelled();
 
-        const count = await MediaAssets.clean();
-        ui.success( `Deleted ${ count } orphaned asset file(s).` );
-      } );
+      const count = await MediaAssets.clean();
+      ui.success( `Deleted ${ count } orphaned asset file(s).` );
+    } );
 }
