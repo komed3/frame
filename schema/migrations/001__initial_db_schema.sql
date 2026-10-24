@@ -235,8 +235,8 @@ CREATE INDEX assets_kind_idx ON assets ( kind );
 
 CREATE TABLE jobs (
   id TEXT PRIMARY KEY NOT NULL,
-  root_id TEXT NOT NULL REFERENCES roots ( id ) ON DELETE CASCADE,
-  media_id TEXT NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  root_id TEXT REFERENCES roots ( id ) ON DELETE CASCADE,
+  media_id TEXT REFERENCES media ( id ) ON DELETE CASCADE,
 
   kind TEXT NOT NULL CHECK ( kind IN (
     'scan', 'metadata', 'tracks', 'preview', 'frames', 'wave', 'text'
