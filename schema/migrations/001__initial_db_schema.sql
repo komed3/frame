@@ -61,7 +61,7 @@ CREATE INDEX directories_parent_idx ON directories ( root_id, parent_id, name CO
 
 CREATE TABLE media (
   id TEXT PRIMARY KEY NOT NULL,
-  root_id TEXT NOT NULL NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
+  root_id TEXT NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
   directory_id TEXT NOT NULL,
   path TEXT NOT NULL,
   file_name TEXT NOT NULL,
@@ -128,7 +128,7 @@ CREATE INDEX media_hash_idx ON media ( file_hash );
 
 CREATE TABLE tracks (
   id TEXT PRIMARY KEY NOT NULL,
-  media_id TEXT NOT NULL NOT NULL REFERENCES media ( id ) ON DELETE CASCADE,
+  media_id TEXT NOT NULL NULL REFERENCES media ( id ) ON DELETE CASCADE,
   stream_index INTEGER NOT NULL,
   kind TEXT NOT NULL CHECK ( kind IN ( 'video', 'audio', 'subtitle', 'data' ) ),
   codec TEXT,
@@ -190,7 +190,7 @@ CREATE INDEX media_tags_tag_idx ON media_tags ( tag_id, media_id );
 CREATE TABLE categories (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL COLLATE NOCASE UNIQUE,
-  parent_id TEXT NOT NULL REFERENCES categories ( id ) ON DELETE SET NULL
+  parent_id TEXT REFERENCES categories ( id ) ON DELETE SET NULL
 );
 
 CREATE INDEX categories_parent_idx ON categories ( parent_id );
@@ -394,22 +394,22 @@ CREATE TRIGGER media_fts_insert
 AFTER INSERT ON media
 BEGIN
   INSERT INTO media_fts ( rowid, title, description, file_name, path )
-  VALUES ( new.id, new.title, new.description, new.file_name, new.path );
+  VALUES ( new.rowid, new.title, new.description, new.file_name, new.path );
 END;
 
 CREATE TRIGGER media_fts_delete
 AFTER DELETE ON media
 BEGIN
   INSERT INTO media_fts ( media_fts, rowid, title, description, file_name, path )
-  VALUES ( 'delete', old.id, old.title, old.description, old.file_name, old.path );
+  VALUES ( 'delete', old.rowid, old.title, old.description, old.file_name, old.path );
 END;
 
 CREATE TRIGGER media_fts_update
 AFTER UPDATE OF title, description, file_name, path ON media
 BEGIN
   INSERT INTO media_fts ( media_fts, rowid, title, description, file_name, path )
-  VALUES ( 'delete', old.id, old.title, old.description, old.file_name, old.path );
+  VALUES ( 'delete', old.rowid, old.title, old.description, old.file_name, old.path );
 
   INSERT INTO media_fts ( rowid, title, description, file_name, path )
-  VALUES ( new.id, new.title, new.description, new.file_name, new.path );
+  VALUES ( new.rowid, new.title, new.description, new.file_name, new.path );
 END;
