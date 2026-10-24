@@ -153,7 +153,7 @@ export class ScanJob implements JobHandler {
     }
   }
 
-  private enqueueMediaJobs ( mediaId: number, type: MediaType ) : void {
+  private enqueueMediaJobs ( mediaId: string, type: MediaType ) : void {
     JobQueue.enqueue( { kind: 'metadata', mediaId } );
 
     if ( type === 'video' || type === 'audio' ) {
@@ -207,7 +207,7 @@ export class ScanJob implements JobHandler {
       existingByFingerprint.set( media.fingerprint, matches );
     }
 
-    const matchedIds = new Set< number >();
+    const matchedIds = new Set< string >();
     const matchedFiles = new Map< ScannedFile, ExistingMedia >();
 
     for ( const file of files ) {
@@ -239,7 +239,7 @@ export class ScanJob implements JobHandler {
     signal.throwIfAborted();
 
     const generation = MediaDirectories.beginScan( root.id );
-    const directoryIds = new Map< string, number >();
+    const directoryIds = new Map< string, string >();
 
     for ( const path of directories ) {
       signal.throwIfAborted();
