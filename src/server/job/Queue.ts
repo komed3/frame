@@ -1,6 +1,6 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { assertId, validateNumber } from '@/src/server/utils';
-import type { EnqueueJob, JobKind, JobListFilters, JobRecord, JobRow, JobStatus } from '@/src/shared/types/job';
+import type { EnqueueJob, JobKind, JobListFilters, JobRecord, JobRow, JobStats, JobStatus } from '@/src/shared/types/job';
 
 
 export const JOB_PRIORITIES: Record< JobKind, number > = {
@@ -251,4 +251,6 @@ export class JobQueue {
     if ( ! job ) throw new Error( `Job ${ id } does not exist` );
     throw new Error( `Cannot retry job ${ id } with status '${ job.status }'` );
   }
+
+  public static getStats () : JobStats {}
 }
