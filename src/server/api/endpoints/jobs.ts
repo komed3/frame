@@ -1,4 +1,4 @@
-import { parsePagination } from '@/src/server/api/utils';
+import { parseId, parsePagination } from '@/src/server/api/utils';
 import { JobQueue } from '@/src/server/job/Queue';
 import type { JobKind, JobStatus } from '@/src/shared/types/job';
 import { Router } from 'express';
@@ -19,4 +19,14 @@ jobs.get( '/', ( req, res ) => {
     rootId: rootId === undefined ? undefined : Number( rootId ),
     mediaId: mediaId === undefined ? undefined : Number( mediaId )
   } ) );
+} );
+
+jobs.get( '/:id', ( req, res ) => {
+  const id = parseId( req.params.id );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid job ID' } );
+
+  const job = JobQueue.get( id );
+  if ( ! job ) return res.status( 404 ).json( { error: 'Job not found' } );
+
+  res.json( job );
 } );
