@@ -62,7 +62,7 @@ CREATE INDEX directories_parent_idx ON directories ( root_id, parent_id, name CO
 CREATE TABLE media (
   id TEXT PRIMARY KEY NOT NULL,
   root_id TEXT NOT NULL REFERENCES roots ( id ) ON DELETE RESTRICT,
-  directory_id TEXT NOT NULL,
+  directory_id TEXT,
   path TEXT NOT NULL,
   file_name TEXT NOT NULL,
 
