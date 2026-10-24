@@ -255,5 +255,13 @@ export class JobQueue {
   public static getStats () : JobStats {
     const byStatus = Object.fromEntries( JOB_STATUSES.map( status => [ status, 0 ] ) ) as Record< JobStatus, number >;
     const byKind = Object.fromEntries( JOB_KINDS.map( kind => [ kind, 0 ] ) ) as Record< JobKind, number >;
+
+    const statuses = as< { status: JobStatus; count: number }[] >( conn().prepare(
+      'SELECT status, COUNT(*) AS count FROM jobs GROUP BY status'
+    ).all() );
+
+    const kinds = as< { kind: JobKind; count: number }[] >( conn().prepare(
+      'SELECT kind, COUNT(*) AS count FROM jobs GROUP BY kind'
+    ).all() );
   }
 }
