@@ -17,6 +17,12 @@ export function assertId ( id: number, label: string ) : void {
 }
 
 
+export function assertStringId ( id: string, label: string ) : void {
+  if ( typeof id !== 'string' || ! /^[a-zA-Z0-9]{5,32}$/.test( id ) )
+    throw new Error( `Invalid ${ label } ID: ${ id }` );
+}
+
+
 export function assertRelativePath ( path: string, label: string ) : void {
   if ( typeof path !== 'string' || ! path || path.includes( '\0' ) || path.includes( '\\' ) ||
     path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' ) )
