@@ -10,6 +10,7 @@ dotenv.config( { override: true, quiet: true } );
 export class Config {
   public static readonly schema = {
     NODE_ENV: { type: 'enum', desc: 'Runtime environment', default: 'dev', values: [ 'dev', 'development', 'test', 'prod', 'production' ] },
+    ID_LENGTH: { type: 'integer', desc: 'Length of generated IDs', default: 7, min: 5, max: 32 },
     HOST: { type: 'string', desc: 'HTTP bind address', default: '0.0.0.0' },
     PORT: { type: 'integer', desc: 'HTTP port', default: 3e3, min: 1, max: 65535 },
     WORKER_CONCURRENCY: { type: 'integer', desc: 'Maximum number of concurrent background jobs', default: 1, min: 1, max: 16 },
