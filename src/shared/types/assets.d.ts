@@ -1,8 +1,8 @@
 export type MediaAssetKind = 'poster' | 'thumb' | 'frames' | 'wave' | 'text' | 'subtitle';
 
 export interface MediaAssetRecord {
-  id: number;
-  mediaId: number;
+  id: string;
+  mediaId: string;
   kind: MediaAssetKind;
   variant: string;
   path: string;

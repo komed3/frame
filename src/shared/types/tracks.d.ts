@@ -1,8 +1,8 @@
 export type MediaTrackKind = 'video' | 'audio' | 'subtitle' | 'data';
 
 export interface MediaTrackRecord {
-  id: number;
-  mediaId: number;
+  id: string;
+  mediaId: string;
   streamIndex: number;
   kind: MediaTrackKind;
   codec: string | null;

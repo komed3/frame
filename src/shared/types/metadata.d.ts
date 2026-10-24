@@ -1,8 +1,8 @@
 export type MediaMetadataSource = 'manual' | 'scan';
 
 export interface MediaMetadataRecord {
-  id: number;
-  mediaId: number;
+  id: string;
+  mediaId: string;
   key: string;
   value: string;
   source: MediaMetadataSource;
