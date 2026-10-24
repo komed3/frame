@@ -6,3 +6,10 @@ import { Router } from 'express';
 
 export const assets = Router();
 assets.param( 'id', assertMediaId );
+
+
+assets.get( '/:id', ( _, res ) => res.json( MediaAssets.list( res.locals.mediaId ).map(
+  ( { path, ...asset } ) => ( { ...asset, url:
+    `/api/assets/${ res.locals.mediaId }/${ asset.kind }/${ encodeURIComponent( asset.variant ) }`
+  } )
+) ) );
