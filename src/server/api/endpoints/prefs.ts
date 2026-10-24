@@ -7,6 +7,7 @@ export const prefs = Router();
 
 
 prefs.get( '/', ( _, res ) => res.json( { schema: Pref.schema, values: Pref.all( res.locals.user.id ) } ) );
+prefs.delete( '/', ( _, res ) => res.json( { deleted: Pref.resetAll( res.locals.user.id ) } ) );
 
 prefs.get( '/:key', ( req, res, next ) => {
   try {
