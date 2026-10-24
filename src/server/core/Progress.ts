@@ -1,6 +1,6 @@
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset } from '@/src/server/utils';
+import { assertLimitOffset, assertStringId } from '@/src/server/utils';
 import type { ProgressRecord, ProgressRow } from '@/src/shared/types/progress';
 
 
@@ -9,8 +9,8 @@ export class Progress {
     return { ...row, completed: row.completed === 1 };
   }
 
-  public static list ( userId: number, limit = 100, offset = 0 ) : ProgressRecord[] {
-    assertId( userId, 'user' );
+  public static list ( userId: string, limit = 100, offset = 0 ) : ProgressRecord[] {
+    assertStringId( userId, 'user' );
     assertLimitOffset( limit, offset );
 
     const rows = as< ProgressRow[] >( conn().prepare( `
@@ -26,8 +26,8 @@ export class Progress {
     return rows.map( row => Progress.mapRow( row ) );
   }
 
-  public static get ( userId: number, mediaId: number ) : ProgressRecord | null {
-    assertId( userId, 'user' );
+  public static get ( userId: string, mediaId: string ) : ProgressRecord | null {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     const row = as< ProgressRow | undefined >( conn().prepare( `
@@ -41,8 +41,8 @@ export class Progress {
     return row ? Progress.mapRow( row ) : null;
   }
 
-  public static save ( userId: number, mediaId: number, positionMs: number, completed = false ) : ProgressRecord {
-    assertId( userId, 'user' );
+  public static save ( userId: string, mediaId: string, positionMs: number, completed = false ) : ProgressRecord {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     const row = as< ProgressRow | undefined >( conn().prepare( `
@@ -61,16 +61,16 @@ export class Progress {
     return Progress.mapRow( row );
   }
 
-  public static delete ( userId: number, mediaId: number ) : boolean {
-    assertId( userId, 'user' );
+  public static delete ( userId: string, mediaId: string ) : boolean {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
     return Number( result.changes ) > 0;
   }
 
-  public static clear ( userId: number ) : number {
-    assertId( userId, 'user' );
+  public static clear ( userId: string ) : number {
+    assertStringId( userId, 'user' );
 
     const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
