@@ -1,14 +1,16 @@
+import { assertMediaId } from '@/src/server/api/middleware';
 import { MediaAssets } from '@/src/server/media/Assets';
 import type { MediaAssetKind } from '@/src/shared/types/assets';
 import { type RequestHandler, Router } from 'express';
 
 
 export const assets = Router();
+assets.param( 'id', assertMediaId );
 
 
 const sendAsset: RequestHandler = ( req, res, next ) => {
   const asset = MediaAssets.get(
-    req.params.id as string, req.params.kind as MediaAssetKind,
+    res.locals.mediaId, req.params.kind as MediaAssetKind,
     req.params.variant as string ?? 'default'
   );
 
@@ -20,9 +22,9 @@ const sendAsset: RequestHandler = ( req, res, next ) => {
 };
 
 
-assets.get( '/:id', ( req, res ) => res.json( MediaAssets.list( req.params.id ).map(
+assets.get( '/:id', ( _, res ) => res.json( MediaAssets.list( res.locals.mediaId ).map(
   ( { path, ...asset } ) => ( { ...asset, url:
-    `/api/assets/${ req.params.id }/${ asset.kind }/${ encodeURIComponent( asset.variant ) }`
+    `/api/assets/${ res.locals.mediaId }/${ asset.kind }/${ encodeURIComponent( asset.variant ) }`
   } )
 ) ) );
 
