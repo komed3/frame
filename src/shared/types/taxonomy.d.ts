@@ -1,12 +1,12 @@
 export type TaxonomyKind = 'tags' | 'categories';
 
 export interface TagRecord {
-  id: number;
+  id: string;
   name: string;
 }
 
 export interface CategoryRecord {
-  id: number;
+  id: string;
   name: string;
-  parentId: number | null;
+  parentId: string | null;
 }
