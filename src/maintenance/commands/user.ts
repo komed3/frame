@@ -1,7 +1,7 @@
+import { resolveId } from '@/src/maintenance/utils/parse';
 import { confirm, promptConfirmedPassword, promptPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { User } from '@/src/server/core/User';
-import { resolveId } from '@/src/server/utils';
 import { Command } from 'commander';
 
 
