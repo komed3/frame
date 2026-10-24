@@ -1,13 +1,14 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, normalizeOptionalString } from '@/src/server/utils';
+import { assertLimitOffset, assertStringId, generateId, normalizeOptionalString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
 export class Markers {
-  public static get ( userId: number, markerId: number ) : MarkerRecord | null {
-    assertId( userId, 'user' );
-    assertId( markerId, 'marker' );
+  public static get ( userId: string, markerId: string ) : MarkerRecord | null {
+    assertStringId( userId, 'user' );
+    assertStringId( markerId, 'marker' );
 
     const row = as< MarkerRecord | undefined >( conn().prepare( `
       SELECT
@@ -20,8 +21,8 @@ export class Markers {
     return row ?? null;
   }
 
-  public static list ( userId: number, limit = 100, offset = 0 ) : MarkerRecord[] {
-    assertId( userId, 'user' );
+  public static list ( userId: string, limit = 100, offset = 0 ) : MarkerRecord[] {
+    assertStringId( userId, 'user' );
     assertLimitOffset( limit, offset );
 
     return as< MarkerRecord[] >( conn().prepare( `
@@ -35,8 +36,8 @@ export class Markers {
     ` ).all( userId, limit, offset ) );
   }
 
-  public static mediaMarker ( userId: number, mediaId: number, limit = 100, offset = 0 ) : MarkerRecord[] {
-    assertId( userId, 'user' );
+  public static mediaMarker ( userId: string, mediaId: string, limit = 100, offset = 0 ) : MarkerRecord[] {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
     assertLimitOffset( limit, offset );
 
@@ -52,30 +53,32 @@ export class Markers {
   }
 
   public static create (
-    userId: number, mediaId: number, positionMs: number,
+    userId: string, mediaId: string, positionMs: number,
     title: string | null = null, description: string | null = null
-  ) : number {
-    assertId( userId, 'user' );
+  ) : string {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     if ( ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
       throw new Error( `Invalid marker position: ${ positionMs }` );
 
-    const result = conn().prepare( `
-      INSERT INTO markers ( user_id, media_id, position_ms, title, description )
-      VALUES ( ?, ?, ?, ?, ? )
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
+
+    conn().prepare( `
+      INSERT INTO markers ( id, user_id, media_id, position_ms, title, description )
+      VALUES ( ?, ?, ?, ?, ?, ? )
     ` ).run(
-      userId, mediaId, positionMs,
+      id, userId, mediaId, positionMs,
       normalizeOptionalString( title, 'Marker title' ),
       normalizeOptionalString( description, 'Marker description' )
     );
 
-    return Number( result.lastInsertRowid );
+    return id;
   }
 
-  public static update ( userId: number, markerId: number, patch: MarkerUpdate ) : void {
-    assertId( userId, 'user' );
-    assertId( markerId, 'marker' );
+  public static update ( userId: string, markerId: string, patch: MarkerUpdate ) : void {
+    assertStringId( userId, 'user' );
+    assertStringId( markerId, 'marker' );
 
     const assignments: string[] = [], values: ( number | string | null )[] = [];
 
@@ -109,24 +112,24 @@ export class Markers {
       throw new Error( `Marker ${ markerId } does not exist for user ${ userId }` );
   }
 
-  public static delete ( userId: number, markerId: number ) : boolean {
-    assertId( userId, 'user' );
-    assertId( markerId, 'marker' );
+  public static delete ( userId: string, markerId: string ) : boolean {
+    assertStringId( userId, 'user' );
+    assertStringId( markerId, 'marker' );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND id = ?' ).run( userId, markerId );
     return Number( result.changes ) > 0;
   }
 
-  public static clearMediaMarker ( userId: number, mediaId: number ) : number {
-    assertId( userId, 'user' );
+  public static clearMediaMarker ( userId: string, mediaId: string ) : number {
+    assertStringId( userId, 'user' );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
     return Number( result.changes );
   }
 
-  public static clear ( userId: number ) : number {
-    assertId( userId, 'user' );
+  public static clear ( userId: string ) : number {
+    assertStringId( userId, 'user' );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
