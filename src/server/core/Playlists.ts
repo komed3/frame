@@ -5,10 +5,10 @@ import { assertId, assertLimitOffset, generateId, normalizeOptionalString, norma
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 
 
-const ITEM_SELECT = ( dir: 'ASC' | 'DESC' ) : string => `
+const ITEM_SELECT = ( dir: 'ASC' | 'DESC', operator: '<' | '>' ) => `
   SELECT playlist_id AS playlistId, media_id AS mediaId, position, added_at AS addedAt
   FROM playlist_items
-  WHERE playlist_id = ? AND position > (
+  WHERE playlist_id = ? AND position ${ operator } (
     SELECT position FROM playlist_items WHERE playlist_id = ? AND media_id = ?
   )
   ORDER BY position ${ dir }, media_id ${ dir }
@@ -84,9 +84,7 @@ export class Playlists {
 
     const id = generateId( Config.get( 'ID_LENGTH' ) );
 
-    conn().prepare(
-      'INSERT INTO playlists ( id, user_id, name, description ) VALUES ( ?, ?, ?, ? )'
-    ).run(
+    conn().prepare( 'INSERT INTO playlists ( id, user_id, name, description ) VALUES ( ?, ?, ?, ? )' ).run(
       id, userId, normalizeString( name, 'Playlist name' ),
       normalizeOptionalString( description, 'Playlist description' )
     );
@@ -156,7 +154,7 @@ export class Playlists {
     Media.assertMediaIdSafe( mediaId );
 
     return as< PlaylistItemRecord | undefined >(
-      conn().prepare( ITEM_SELECT( 'ASC' ) ).get( playlistId, playlistId, mediaId )
+      conn().prepare( ITEM_SELECT( 'ASC', '>' ) ).get( playlistId, playlistId, mediaId )
     ) ?? null;
   }
 
@@ -165,7 +163,7 @@ export class Playlists {
     Media.assertMediaIdSafe( mediaId );
 
     return as< PlaylistItemRecord | undefined >(
-      conn().prepare( ITEM_SELECT( 'DESC' ) ).get( playlistId, playlistId, mediaId )
+      conn().prepare( ITEM_SELECT( 'DESC', '<' ) ).get( playlistId, playlistId, mediaId )
     ) ?? null;
   }
 
