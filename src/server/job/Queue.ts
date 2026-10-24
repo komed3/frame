@@ -266,5 +266,13 @@ export class JobQueue {
 
     for ( const row of statuses ) byStatus[ row.status ] = row.count;
     for ( const row of kinds ) byKind[ row.kind ] = row.count;
+
+    const now = Date.now(), pending = as< { ready: number; scheduled: number } >( conn().prepare( `
+      SELECT
+        COALESCE( SUM( run_after_ms <= ? ), 0 ) AS ready,
+        COALESCE( SUM( run_after_ms > ? ), 0 ) AS scheduled
+      FROM jobs
+      WHERE status = 'pending'
+    ` ).get( now, now ) );
   }
 }
