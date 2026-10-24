@@ -1,4 +1,4 @@
-import { resolveId } from '@/src/maintenance/utils/parse';
+import { parseNumber, resolveId } from '@/src/maintenance/utils/parse';
 import { ui } from '@/src/maintenance/utils/ui';
 import { MediaTracks } from '@/src/server/media/Tracks';
 import { Command } from 'commander';
@@ -23,7 +23,7 @@ export const registerTrackCommands = ( program: Command ) : void => {
     .command( 'get <media> <stream-index>' )
     .description( 'Show one track by stream index' )
     .action( ( media: string, streamIndex: string ) => {
-      const index = resolveId( streamIndex, 'stream' );
+      const index = parseNumber( streamIndex, 'stream index' );
       const track = MediaTracks.get( resolveId( media, 'media' ), index );
       if ( ! track ) throw new Error( `Track with stream index ${ index } does not exist` );
 
