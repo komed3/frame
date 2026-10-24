@@ -19,3 +19,20 @@ prefs.get( '/:key', ( req, res, next ) => {
     next( err );
   }
 } );
+
+prefs.put( '/:key', ( req, res, next ) => {
+  try {
+    const key = Pref.resolveName( req.params.key );
+    const value = Pref.set( res.locals.user.id, key, req.body?.value );
+
+    res.json( { key, value } );
+  } catch ( err ) {
+    if ( err instanceof Error && err.message.startsWith( 'Unknown preference key:' ) )
+      return res.status( 404 ).json( { error: err.message } );
+
+    if ( err instanceof Error && /must be|Invalid value/.test( err.message ) )
+      return res.status( 400 ).json( { error: err.message } );
+
+    next( err );
+  }
+} );
