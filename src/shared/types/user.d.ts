@@ -1,5 +1,5 @@
 export interface UserRecord {
-  id: number;
+  id: string;
   username: string;
   isAdmin: boolean;
   createdAt: string;
@@ -7,7 +7,7 @@ export interface UserRecord {
 }
 
 export interface UserRow {
-  id: number;
+  id: string;
   username: string;
   pw_hash: string;
   is_admin: 0 | 1;

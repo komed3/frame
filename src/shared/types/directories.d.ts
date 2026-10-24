@@ -1,7 +1,7 @@
 export interface MediaDirectory {
-  id: number;
-  rootId: number;
-  parentId: number | null;
+  id: string;
+  rootId: string;
+  parentId: string | null;
   path: string;
   name: string;
   scannedAt: string;

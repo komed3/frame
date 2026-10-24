@@ -2,8 +2,8 @@ import type { UserRecord } from '@/src/shared/types/user';
 
 
 export interface SessionRow {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   token_hash: string;
   created_at: string;
   expires_at: string;
@@ -17,8 +17,8 @@ export interface AuthResult {
 }
 
 export interface ActiveSessionRow {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   username: string;
   isAdmin: number;
   createdAt: string;

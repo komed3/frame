@@ -1,5 +1,5 @@
 export interface MediaRoot {
-  id: number;
+  id: string;
   path: string;
   enabled: boolean;
   scanGeneration: number;
@@ -8,7 +8,7 @@ export interface MediaRoot {
 }
 
 export interface MediaRootRow {
-  id: number;
+  id: string;
   path: string;
   enabled: number;
   scanGeneration: number;
