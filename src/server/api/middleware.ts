@@ -62,3 +62,21 @@ export const assertMarkerId: RequestParamHandler = ( _, res, next, value ) => {
   res.locals.marker = marker;
   next();
 };
+
+
+export const assertPlaylistId: RequestParamHandler = ( _, res, next, value ) => {
+  const id = parseId( value );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid playlist ID' } );
+
+  try {
+    const playlist = Playlists.get( res.locals.user.id, id );
+    res.locals.playlistId = id;
+    res.locals.playlist = playlist;
+    next();
+  } catch ( err ) {
+    if ( err instanceof Error && err.message.startsWith( 'Playlist ' ) )
+      return res.status( 404 ).json( { error: 'Playlist not found' } );
+
+    next( err );
+  }
+};
