@@ -52,8 +52,8 @@ export interface JobHandler {
 
 export interface JobListFilters {
   kind?: JobKind;
-  rootId?: number;
-  mediaId?: number;
+  rootId?: string;
+  mediaId?: string;
 }
 
 export interface JobStats {
