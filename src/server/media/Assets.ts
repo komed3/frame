@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertRelativePath } from '@/src/server/utils';
+import { assertRelativePath, generateId } from '@/src/server/utils';
 import type { MediaAssetInput, MediaAssetKind, MediaAssetRecord, MediaAssetRow } from '@/src/shared/types/assets';
 import { randomUUID } from 'node:crypto';
 import { mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
@@ -17,8 +17,8 @@ export class MediaAssets {
     if ( typeof variant !== 'string' || ! variant.trim() ) throw new Error( 'Asset variant must not be empty' );
   }
 
-  private static assertPathAvailable ( path: string, mediaId: number, kind: MediaAssetKind, variant: string ) : void {
-    const row = as< { mediaId: number, kind: MediaAssetKind, variant: string } | undefined >(
+  private static assertPathAvailable ( path: string, mediaId: string, kind: MediaAssetKind, variant: string ) : void {
+    const row = as< { mediaId: string, kind: MediaAssetKind, variant: string } | undefined >(
       conn().prepare( 'SELECT media_id AS mediaId, kind, variant FROM assets WHERE path = ?' ).get( path )
     );
 
@@ -47,7 +47,7 @@ export class MediaAssets {
     return resolve( Config.get( 'ASSETS_PATH' ), path );
   }
 
-  public static list ( mediaId: number, kind?: MediaAssetKind ) : MediaAssetRecord[] {
+  public static list ( mediaId: string, kind?: MediaAssetKind ) : MediaAssetRecord[] {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( kind );
 
@@ -64,7 +64,7 @@ export class MediaAssets {
     return rows.map( row => MediaAssets.mapRow( row ) );
   }
 
-  public static get ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : MediaAssetRecord | null {
+  public static get ( mediaId: string, kind: MediaAssetKind, variant = 'default' ) : MediaAssetRecord | null {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( kind, variant );
 
@@ -80,17 +80,18 @@ export class MediaAssets {
     return row ? MediaAssets.mapRow( row ) : null;
   }
 
-  public static register ( mediaId: number, asset: MediaAssetInput ) : number {
+  public static register ( mediaId: string, asset: MediaAssetInput ) : string {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( asset.kind, asset.variant ?? 'default' );
     MediaAssets.resolvePath( asset.path );
 
-    const row = as< { id: number } | undefined >( conn().prepare( `
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    const row = as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO assets (
-        media_id, kind, variant, path, fingerprint, mime_type,
+        id, media_id, kind, variant, path, fingerprint, mime_type,
         size_bytes, width, height, data_json
       )
-      VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+      VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
       ON CONFLICT ( media_id, kind, variant ) DO UPDATE SET
         path = excluded.path,
         fingerprint = excluded.fingerprint,
@@ -102,7 +103,7 @@ export class MediaAssets {
         created_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       RETURNING id
     ` ).get(
-      mediaId, asset.kind, asset.variant ?? 'default',
+      id, mediaId, asset.kind, asset.variant ?? 'default',
       asset.path, asset.fingerprint ?? null, asset.mimeType ?? null,
       asset.sizeBytes ?? null, asset.width ?? null,
       asset.height ?? null, JSON.stringify( asset.data ?? {} )
@@ -112,7 +113,7 @@ export class MediaAssets {
     return row.id;
   }
 
-  public static async write ( mediaId: number, asset: MediaAssetInput, content: Uint8Array ) : Promise< number > {
+  public static async write ( mediaId: string, asset: MediaAssetInput, content: Uint8Array ) : Promise< string > {
     Media.assertMediaIdSafe( mediaId );
 
     const variant = asset.variant === undefined ? 'default' : asset.variant.trim();
@@ -140,7 +141,7 @@ export class MediaAssets {
       throw err;
     }
 
-    let id: number;
+    let id: string;
 
     try { id = MediaAssets.register( mediaId, { ...input, sizeBytes: content.byteLength } ) }
     catch ( err ) {
@@ -155,9 +156,9 @@ export class MediaAssets {
   }
 
   public static async update (
-    mediaId: number, kind: MediaAssetKind, variant: string, content: Uint8Array,
+    mediaId: string, kind: MediaAssetKind, variant: string, content: Uint8Array,
     changes: Partial< Pick< MediaAssetInput, 'path' | 'fingerprint' | 'mimeType' | 'width' | 'height' | 'data' > > = {}
-  ) : Promise< number > {
+  ) : Promise< string > {
     const previous = MediaAssets.get( mediaId, kind, variant );
     if ( ! previous ) throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
 
@@ -171,7 +172,7 @@ export class MediaAssets {
     }, content );
   }
 
-  public static async delete ( mediaId: number, kind: MediaAssetKind, variant = 'default' ) : Promise< void > {
+  public static async delete ( mediaId: string, kind: MediaAssetKind, variant = 'default' ) : Promise< void > {
     Media.assertMediaIdSafe( mediaId );
     MediaAssets.assertKind( kind, variant );
 
