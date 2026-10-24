@@ -9,3 +9,13 @@ import { basename } from 'node:path';
 
 export const directories = Router();
 directories.param( 'rootId', assertRootId );
+
+
+directories.get( '/:rootId/tree', ( _, res ) => {
+  const root = res.locals.root;
+
+  res.json( {
+    root: { id: root.id, name: basename( root.path ) || root.path },
+    tree: MediaDirectories.tree( root.id )
+  } );
+} );
