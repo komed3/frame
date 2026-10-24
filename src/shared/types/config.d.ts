@@ -1,5 +1,6 @@
 export interface ConfigSchema {
   NODE_ENV: 'dev' | 'development' | 'test' | 'prod' | 'production';
+  ID_LENGTH: number;
 
   HOST: string;
   PORT: number;
