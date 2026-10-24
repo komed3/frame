@@ -30,3 +30,15 @@ playlists.get( '/for-media/:mediaId', ( req, res ) => {
     res.locals.user.id, res.locals.mediaId, pagination.limit, pagination.offset
   ) );
 } );
+
+playlists.get( '/:id', ( _, res ) => res.json( res.locals.playlist ) );
+
+playlists.patch( '/:id', ( req, res ) => {
+  Playlists.update( res.locals.user.id, res.locals.playlistId, req.body as PlaylistUpdate );
+  res.json( Playlists.get( res.locals.user.id, res.locals.playlistId ) );
+} );
+
+playlists.delete( '/:id', ( _, res ) => {
+  Playlists.delete( res.locals.user.id, res.locals.playlistId );
+  res.status( 204 ).end();
+} );
