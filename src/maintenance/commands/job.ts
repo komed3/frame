@@ -1,9 +1,9 @@
-import { parseNumber, parseValue } from '@/src/maintenance/utils/parse';
+import { parseNumber, parseValue, resolveId } from '@/src/maintenance/utils/parse';
 import { ui } from '@/src/maintenance/utils/ui';
 import { JOB_KINDS, JOB_STATUSES, JobQueue } from '@/src/server/job/Queue';
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
-import { resolveId, validateEnum } from '@/src/server/utils';
+import { validateEnum } from '@/src/server/utils';
 import type { JobKind } from '@/src/shared/types/job';
 import { Command } from 'commander';
 
