@@ -1,5 +1,15 @@
 import { execFile } from 'node:child_process';
+import { randomInt } from 'node:crypto';
 import { promisify } from 'node:util';
+
+
+const ID_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+
+export function generateId ( length: number ) : string {
+  if ( ! Number.isInteger( length ) || length < 5 || length > 32 ) throw new Error( `Invalid ID length: ${ length }` );
+  return Array.from( { length }, () => ID_ALPHABET[ randomInt( ID_ALPHABET.length ) ] ).join( '' );
+}
 
 
 export function assertId ( id: number, label: string ) : void {
@@ -8,10 +18,9 @@ export function assertId ( id: number, label: string ) : void {
 
 
 export function assertRelativePath ( path: string, label: string ) : void {
-  if (
-    typeof path !== 'string' || ! path || path.includes( '\0' ) || path.includes( '\\' ) ||
-    path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' )
-  ) throw new Error( `Invalid relative ${ label } path: ${ path }` );
+  if ( typeof path !== 'string' || ! path || path.includes( '\0' ) || path.includes( '\\' ) ||
+    path.startsWith( '/' ) || path.split( '/' ).some( part => ! part || part === '.' || part === '..' ) )
+    throw new Error( `Invalid relative ${ label } path: ${ path }` );
 }
 
 
