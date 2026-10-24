@@ -1,6 +1,7 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { normalizeString } from '@/src/server/utils';
+import { generateId, normalizeString } from '@/src/server/utils';
 import type { MediaMetadataInput, MediaMetadataRecord, MediaMetadataSource } from '@/src/shared/types/metadata';
 
 
@@ -28,7 +29,7 @@ export class MediaMetadata {
     } );
   }
 
-  public static list ( mediaId: number, source?: MediaMetadataSource ) : MediaMetadataRecord[] {
+  public static list ( mediaId: string, source?: MediaMetadataSource ) : MediaMetadataRecord[] {
     Media.assertMediaIdSafe( mediaId );
     if ( source !== undefined ) MediaMetadata.assertSource( source );
 
@@ -40,7 +41,7 @@ export class MediaMetadata {
     ` ).all( ...( source === undefined ? [ mediaId ] : [ mediaId, source ] ) ) );
   }
 
-  public static get ( mediaId: number, key: string, source: MediaMetadataSource = 'manual' ) : MediaMetadataRecord | null {
+  public static get ( mediaId: string, key: string, source: MediaMetadataSource = 'manual' ) : MediaMetadataRecord | null {
     Media.assertMediaIdSafe( mediaId );
     MediaMetadata.assertSource( source );
 
@@ -53,27 +54,28 @@ export class MediaMetadata {
     return row ?? null;
   }
 
-  public static set ( mediaId: number, key: string, value: string, source: MediaMetadataSource = 'manual' ) : number {
+  public static set ( mediaId: string, key: string, value: string, source: MediaMetadataSource = 'manual' ) : string {
     Media.assertMediaIdSafe( mediaId );
     MediaMetadata.assertSource( source );
 
     const normalizedKey = normalize( key );
     if ( typeof value !== 'string' ) throw new Error( `Invalid metadata value for key: ${ normalizedKey }` );
 
-    const row = as< { id: number } | undefined >( conn().prepare( `
-      INSERT INTO media_metadata ( media_id, key, value, source )
-      VALUES ( ?, ?, ?, ? )
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    const row = as< { id: string } | undefined >( conn().prepare( `
+      INSERT INTO media_metadata ( id, media_id, key, value, source )
+      VALUES ( ?, ?, ?, ?, ? )
       ON CONFLICT ( media_id, key, source ) DO UPDATE SET
         value = excluded.value,
         updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       RETURNING id
-    ` ).get( mediaId, normalizedKey, value, source ) );
+    ` ).get( id, mediaId, normalizedKey, value, source ) );
 
     if ( ! row ) throw new Error( `Could not save metadata: ${ normalizedKey }` );
     return row.id;
   }
 
-  public static delete ( mediaId: number, key: string, source: MediaMetadataSource = 'manual' ) : void {
+  public static delete ( mediaId: string, key: string, source: MediaMetadataSource = 'manual' ) : void {
     Media.assertMediaIdSafe( mediaId );
     MediaMetadata.assertSource( source );
 
@@ -84,7 +86,7 @@ export class MediaMetadata {
     if ( Number( result.changes ) !== 1 ) throw new Error( `Metadata key does not exist: ${ key }` );
   }
 
-  public static replaceScan ( mediaId: number, entries: MediaMetadataInput[] ) : void {
+  public static replaceScan ( mediaId: string, entries: MediaMetadataInput[] ) : void {
     Media.assertMediaIdSafe( mediaId );
     const normalizedEntries = MediaMetadata.normalizeEntries( entries );
 
@@ -92,11 +94,12 @@ export class MediaMetadata {
       tx.prepare( 'DELETE FROM media_metadata WHERE media_id = ? AND source = ?' ).run( mediaId, 'scan' );
 
       const insert = tx.prepare( `
-        INSERT INTO media_metadata ( media_id, key, value, source )
-        VALUES ( ?, ?, ?, 'scan' )
+        INSERT INTO media_metadata ( id, media_id, key, value, source )
+        VALUES ( ?, ?, ?, ?, 'scan' )
       ` );
 
-      for ( const entry of normalizedEntries ) insert.run( mediaId, entry.key, entry.value );
+      for ( const entry of normalizedEntries )
+        insert.run( generateId( Config.get( 'ID_LENGTH' ) ), mediaId, entry.key, entry.value );
     } );
   }
 }
