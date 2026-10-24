@@ -252,5 +252,8 @@ export class JobQueue {
     throw new Error( `Cannot retry job ${ id } with status '${ job.status }'` );
   }
 
-  public static getStats () : JobStats {}
+  public static getStats () : JobStats {
+    const byStatus = Object.fromEntries( JOB_STATUSES.map( status => [ status, 0 ] ) ) as Record< JobStatus, number >;
+    const byKind = Object.fromEntries( JOB_KINDS.map( kind => [ kind, 0 ] ) ) as Record< JobKind, number >;
+  }
 }
