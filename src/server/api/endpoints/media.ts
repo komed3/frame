@@ -22,6 +22,7 @@ media.get( '/', ( req, res ) => {
 
 media.get( '/:id', ( _, res ) => res.json( Media.get( res.locals.mediaId ) ) );
 media.get( '/:id/metadata', ( _, res ) => res.json( MediaMetadata.list( res.locals.mediaId ) ) );
+media.get( '/:id/tags', ( _, res ) => res.json( MediaTaxonomy.getMediaTags( res.locals.mediaId ) ) );
 
 media.put( '/:id/metadata/:key', ( req, res ) => {
   MediaMetadata.set( res.locals.mediaId, req.params.key, req.body?.value, 'manual' );
@@ -31,4 +32,18 @@ media.put( '/:id/metadata/:key', ( req, res ) => {
 media.delete( '/:id/metadata/:key', ( req, res ) => {
   MediaMetadata.delete( res.locals.mediaId, req.params.key, 'manual' );
   res.status( 204 ).end();
+} );
+
+media.put( '/:id/tags', ( req, res ) => {
+  MediaTaxonomy.setMediaTags( res.locals.mediaId, req.body?.tagIds );
+  res.json( MediaTaxonomy.getMediaTags( res.locals.mediaId ) );
+} );
+
+media.get( '/:id/categories', ( _, res ) =>
+  res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) )
+);
+
+media.put( '/:id/categories', ( req, res ) => {
+  MediaTaxonomy.setMediaCategories( res.locals.mediaId, req.body?.categoryIds );
+  res.json( MediaTaxonomy.getMediaCategories( res.locals.mediaId ) );
 } );
