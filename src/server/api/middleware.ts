@@ -32,3 +32,20 @@ export const assertRootId: RequestParamHandler = ( _, res, next, value ) => {
   res.locals.root = root;
   next();
 };
+
+
+export const assertMediaId: RequestParamHandler = ( _, res, next, value ) => {
+  const id = parseId( value );
+  if ( id === null ) return res.status( 400 ).json( { error: 'Invalid media ID' } );
+
+  try {
+    Media.assertMediaIdSafe( id );
+    res.locals.mediaId = id;
+    next();
+  } catch ( err ) {
+    if ( err instanceof Error && err.message === `Media ${ id } does not exist` )
+      return res.status( 404 ).json( { error: 'Media not found' } );
+
+    next( err );
+  }
+};
