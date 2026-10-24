@@ -5,3 +5,6 @@ import { Router } from 'express';
 
 
 export const jobs = Router();
+
+
+jobs.get( '/stats', ( _, res ) => res.json( JobQueue.getStats() ) );
