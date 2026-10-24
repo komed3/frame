@@ -1,9 +1,9 @@
 export type MediaType = 'video' | 'audio' | 'image' | 'text' | 'other';
 
 export interface MediaRecord {
-  id: number;
-  rootId: number;
-  directoryId: number | null;
+  id: string;
+  rootId: string;
+  directoryId: string | null;
   path: string;
   fileName: string;
   type: MediaType;
@@ -43,7 +43,7 @@ export interface MediaRow extends Omit< MediaRecord, 'available' | 'data' > {
 }
 
 export interface MediaFileInput {
-  rootId: number;
+  rootId: string;
   path: string;
   fileName: string;
   type: MediaType;
@@ -59,8 +59,8 @@ export type MediaUpdate = Partial< Pick< MediaRecord,
 > >;
 
 export interface MediaListOptions {
-  rootId?: number;
-  directoryId?: number | null;
+  rootId?: string;
+  directoryId?: string | null;
   type?: MediaType;
   availableOnly?: boolean;
   limit?: number;
