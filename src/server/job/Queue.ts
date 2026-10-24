@@ -1,5 +1,6 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertId, validateNumber } from '@/src/server/utils';
+import { assertStringId, generateId, validateNumber } from '@/src/server/utils';
 import type {
   EnqueueJob, JobKind, JobListFilters, JobRecord,
   JobRow, JobStats, JobStatus
@@ -41,8 +42,8 @@ export class JobQueue {
     if ( filters.kind !== undefined && ! JOB_KINDS.includes( filters.kind ) )
       throw new Error( `Invalid job kind: ${ filters.kind }` );
 
-    if ( filters.rootId !== undefined ) assertId( filters.rootId, 'root' );
-    if ( filters.mediaId !== undefined ) assertId( filters.mediaId, 'media' );
+    if ( filters.rootId !== undefined ) assertStringId( filters.rootId, 'root' );
+    if ( filters.mediaId !== undefined ) assertStringId( filters.mediaId, 'media' );
     if ( filters.rootId !== undefined && filters.mediaId !== undefined )
       throw new Error( 'A job list cannot target both a root and a media record' );
 
@@ -64,19 +65,26 @@ export class JobQueue {
     return rows.map( JobQueue.mapRow );
   }
 
-  public static get ( id: number ) : JobRecord | null {
-    assertId( id, 'job' );
+  public static get ( id: string ) : JobRecord | null {
+    assertStringId( id, 'job' );
 
     const row = as< JobRow | undefined >( conn().prepare( `${ SELECT_JOB } WHERE id = ?` ).get( id ) );
     return row ? JobQueue.mapRow( row ) : null;
   }
 
-  public static enqueue ( input: EnqueueJob ) : number {
+  public static enqueue ( input: EnqueueJob ) : string {
     if ( ! JOB_KINDS.includes( input.kind ) ) throw new Error( `Invalid job kind: ${ input.kind }` );
-    if ( input.rootId !== undefined ) assertId( input.rootId, 'root' );
-    if ( input.mediaId !== undefined ) assertId( input.mediaId, 'media' );
+    if ( input.rootId !== undefined ) assertStringId( input.rootId, 'root' );
+    if ( input.mediaId !== undefined ) assertStringId( input.mediaId, 'media' );
+
     if ( input.rootId !== undefined && input.mediaId !== undefined )
       throw new Error( 'A job cannot target both a root and a media record' );
+
+    if ( input.kind === 'scan' && ( input.rootId === undefined || input.mediaId !== undefined ) )
+      throw new Error( 'A scan job must target exactly one root' );
+
+    if ( input.kind !== 'scan' && ( input.mediaId === undefined || input.rootId !== undefined ) )
+      throw new Error( `A ${ input.kind } job must target exactly one media record` );
 
     const priority = validateNumber( input.priority ?? JOB_PRIORITIES[ input.kind ], 'Job priority', -1e6, 1e6, true );
     const maxAttempts = validateNumber( input.maxAttempts ?? 3, 'Maximum job attempts', 1, 100, true );
@@ -86,19 +94,21 @@ export class JobQueue {
     if ( ! payload || typeof payload !== 'object' || Array.isArray( payload ) )
       throw new Error( 'Job payload must be an object' );
 
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
     const result = conn().prepare( `
-      INSERT OR IGNORE INTO jobs ( root_id, media_id, kind, priority, max_attempts, run_after_ms, payload_json )
-      VALUES ( ?, ?, ?, ?, ?, ?, ? )
+      INSERT OR IGNORE INTO jobs ( id, root_id, media_id, kind, priority, max_attempts, run_after_ms, payload_json )
+      VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
     ` ).run(
-      input.rootId ?? null, input.mediaId ?? null, input.kind, priority,
+      id, input.rootId ?? null, input.mediaId ?? null, input.kind, priority,
       maxAttempts, runAfterMs, JSON.stringify( payload )
     );
 
-    if ( Number( result.changes ) === 1 ) return Number( result.lastInsertRowid );
+    if ( Number( result.changes ) === 1 ) return id;
 
-    const existing = as< { id: number } | undefined >( conn().prepare( `
+    const existing = as< { id: string } | undefined >( conn().prepare( `
       SELECT id FROM jobs
-      WHERE kind = ? AND root_id IS ? AND media_id IS ? AND status IN ( 'pending', 'running' )
+      WHERE kind = ? AND root_id IS ? AND media_id IS ?
+        AND status IN ( 'pending', 'running' )
     ` ).get( input.kind, input.rootId ?? null, input.mediaId ?? null ) );
 
     if ( existing ) return existing.id;
@@ -134,7 +144,9 @@ export class JobQueue {
     } );
   }
 
-  public static complete ( id: number, workerId: string ) : void {
+  public static complete ( id: string, workerId: string ) : void {
+    assertStringId( id, 'job' );
+
     const result = conn().prepare( `
       UPDATE jobs SET
         status = 'done',
@@ -150,7 +162,10 @@ export class JobQueue {
       throw new Error( `Could not complete job ${ id }: worker ownership was lost` );
   }
 
-  public static retry ( id: number, workerId: string, error: unknown, delayMs: number ) : void {
+  public static retry ( id: string, workerId: string, error: unknown, delayMs: number ) : void {
+    assertStringId( id, 'job' );
+    validateNumber( delayMs, 'Retry delay', 0, Number.MAX_SAFE_INTEGER, true );
+
     const job = JobQueue.get( id );
     if ( ! job || job.status !== 'running' || job.worker !== workerId )
       throw new Error( `Could not retry job ${ id }: worker ownership was lost` );
@@ -176,7 +191,9 @@ export class JobQueue {
     );
   }
 
-  public static release ( id: number, workerId: string ) : void {
+  public static release ( id: string, workerId: string ) : void {
+    assertStringId( id, 'job' );
+
     const result = conn().prepare( `
       UPDATE jobs SET
         status = 'pending',
@@ -214,8 +231,8 @@ export class JobQueue {
     } );
   }
 
-  public static cancel ( id: number ) : void {
-    assertId( id, 'job' );
+  public static cancel ( id: string ) : void {
+    assertStringId( id, 'job' );
 
     const result = conn().prepare( `
       UPDATE jobs SET
@@ -232,8 +249,8 @@ export class JobQueue {
     throw new Error( `Cannot cancel job ${ id } with status '${ job.status }'` );
   }
 
-  public static retryNow ( id: number ) : void {
-    assertId( id, 'job' );
+  public static retryNow ( id: string ) : void {
+    assertStringId( id, 'job' );
 
     const result = conn().prepare( `
       UPDATE jobs SET
