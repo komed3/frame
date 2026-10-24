@@ -19,3 +19,16 @@ media.get( '/', ( req, res ) => {
 
   res.json( Media.list( pagination ) );
 } );
+
+media.get( '/:id', ( _, res ) => res.json( Media.get( res.locals.mediaId ) ) );
+media.get( '/:id/metadata', ( _, res ) => res.json( MediaMetadata.list( res.locals.mediaId ) ) );
+
+media.put( '/:id/metadata/:key', ( req, res ) => {
+  MediaMetadata.set( res.locals.mediaId, req.params.key, req.body?.value, 'manual' );
+  res.json( MediaMetadata.get( res.locals.mediaId, req.params.key, 'manual' ) );
+} );
+
+media.delete( '/:id/metadata/:key', ( req, res ) => {
+  MediaMetadata.delete( res.locals.mediaId, req.params.key, 'manual' );
+  res.status( 204 ).end();
+} );
