@@ -44,7 +44,7 @@ export type MediaSearchTextField =
   | 'creator' | 'language' | 'container' | 'videoCodec' | 'audioCodec' | 'encoding';
 
 export type MediaSearchNumberField =
-  | 'id' | 'rootId' | 'sizeBytes' | 'rating' | 'durationMs' | 'width' | 'height' | 'fps'
+  | 'sizeBytes' | 'rating' | 'durationMs' | 'width' | 'height' | 'fps'
   | 'bitrate' | 'sampleRate' | 'channels';
 
 export type MediaSearchDateField =
@@ -77,9 +77,9 @@ export interface MediaSearchOptions {
   query?: string;
   queryMode?: MediaSearchQueryMode;
 
-  ids?: number[];
-  excludeIds?: number[];
-  rootIds?: number[];
+  ids?: string[];
+  excludeIds?: string[];
+  rootIds?: string[];
   types?: MediaType[];
   available?: boolean;
   rootEnabled?: boolean;
@@ -88,13 +88,13 @@ export interface MediaSearchOptions {
   numbers?: Partial< Record< MediaSearchNumberField, MediaSearchNumberFilter > >;
   dates?: Partial< Record< MediaSearchDateField, MediaSearchDateFilter > >;
 
-  tagIds?: number[];
+  tagIds?: string[];
   tagMode?: 'any' | 'all';
-  excludeTagIds?: number[];
+  excludeTagIds?: string[];
 
-  categoryIds?: number[];
+  categoryIds?: string[];
   categoryMode?: 'any' | 'all';
-  excludeCategoryIds?: number[];
+  excludeCategoryIds?: string[];
 
   metadata?: MediaSearchMetadataFilter[];
   tracks?: MediaSearchTrackFilter[];
@@ -103,7 +103,7 @@ export interface MediaSearchOptions {
   assetKindsAll?: MediaSearchAssetKind[];
   missingAssetKinds?: MediaSearchAssetKind[];
 
-  userId?: number;
+  userId?: string;
   favorite?: boolean;
   played?: boolean;
   progress?: MediaSearchProgress;
