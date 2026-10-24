@@ -11,3 +11,11 @@ import { Router } from 'express';
 
 export const media = Router();
 media.param( 'id', assertMediaId );
+
+
+media.get( '/', ( req, res ) => {
+  const pagination = parsePagination( req.query.limit, req.query.offset );
+  if ( ! pagination ) return res.status( 400 ).json( { error: 'Invalid pagination options' } );
+
+  res.json( Media.list( pagination ) );
+} );
