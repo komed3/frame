@@ -386,7 +386,7 @@ CREATE INDEX markers_user_idx ON markers ( user_id );
 -- ============================================================
 
 CREATE VIRTUAL TABLE media_fts USING fts5 (
-  title, description, file_name, path, content = 'media', content_rowid = 'id',
+  title, description, file_name, path, content = 'media', content_rowid = 'rowid',
   tokenize = 'unicode61 remove_diacritics 2'
 );
 
