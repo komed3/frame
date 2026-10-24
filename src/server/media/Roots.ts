@@ -1,5 +1,6 @@
+import { Config } from '@/src/server/core/Config';
 import { as, conn } from '@/src/server/core/Database';
-import { assertId } from '@/src/server/utils';
+import { assertStringId, generateId } from '@/src/server/utils';
 import type { MediaRoot, MediaRootRow } from '@/src/shared/types/roots';
 import { realpathSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep, win32 } from 'node:path';
@@ -20,11 +21,12 @@ export class MediaRoots {
     return rel === '' || ( rel !== '..' && ! rel.startsWith( `..${ sep }` ) && ! isAbsolute( rel ) );
   }
 
-  private static getRow ( id: number ) : MediaRootRow {
-    assertId( id, 'media root' );
+  private static getRow ( id: string ) : MediaRootRow {
+    assertStringId( id, 'media root' );
 
     const row = as< MediaRootRow | undefined >( conn().prepare( `
-      SELECT id, path, enabled, scanned_at AS scannedAt, created_at AS createdAt
+      SELECT id, path, enabled, scan_generation AS scanGeneration,
+        scanned_at AS scannedAt, created_at AS createdAt
       FROM roots WHERE id = ?
     ` ).get( id ) );
 
@@ -36,14 +38,16 @@ export class MediaRoots {
     return { ...row, enabled: row.enabled === 1 };
   }
 
-  public static add ( path: string, enabled = true ) : number {
+  public static add ( path: string, enabled = true ) : string {
     const canonicalPath = MediaRoots.canonicalize( path );
-    const row = as< { id: number } | undefined >( conn().prepare( `
-      INSERT INTO roots ( path, enabled )
-      VALUES ( ?, ? )
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
+
+    const row = as< { id: string } | undefined >( conn().prepare( `
+      INSERT INTO roots ( id, path, enabled )
+      VALUES ( ?, ?, ? )
       ON CONFLICT ( path ) DO UPDATE SET enabled = excluded.enabled
       RETURNING id
-    ` ).get( canonicalPath, +!! enabled ) );
+    ` ).get( id, canonicalPath, +!! enabled ) );
 
     if ( ! row ) throw new Error( `Could not register media root: ${ canonicalPath }` );
     return row.id;
@@ -61,14 +65,14 @@ export class MediaRoots {
     return rows.map( row => MediaRoots.mapRow( row ) );
   }
 
-  public static setEnabled ( id: number, enabled: boolean ) : void {
-    assertId( id, 'media root' );
+  public static setEnabled ( id: string, enabled: boolean ) : void {
+    assertStringId( id, 'media root' );
 
     const result = conn().prepare( 'UPDATE roots SET enabled = ? WHERE id = ?' ).run( +!! enabled, id );
     if ( Number( result.changes ) !== 1 ) throw new Error( `Media root ${ id } does not exist` );
   }
 
-  public static resolve ( id: number, relativePath: string ) : string {
+  public static resolve ( id: string, relativePath: string ) : string {
     const root = MediaRoots.getRow( id );
 
     if ( ! root.enabled ) throw new Error( `Media root ${ id } is disabled` );
