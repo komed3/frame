@@ -1,11 +1,13 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
+import { assertStringId, generateId } from '@/src/server/utils';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
 
 export class User {
-  private static getRow ( userId: number ) : UserRow | null {
+  private static getRow ( userId: string ) : UserRow | null {
+    assertStringId( userId, 'user' );
     return as< UserRow | null >( conn().prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
   }
 
@@ -45,14 +47,14 @@ export class User {
     return timingSafeEqual( actual, expected );
   }
 
-  private static assertAdmin ( actorId: number ) : void {
+  private static assertAdmin ( actorId: string ) : void {
     const actor = User.getRow( actorId );
 
     if ( ! actor || actor.disabled_at || actor.is_admin !== 1 )
       throw new Error( 'Administrator privileges are required' );
   }
 
-  private static assertCanManage ( actorId: number, userId: number ) : UserRow {
+  private static assertCanManage ( actorId: string, userId: string ) : UserRow {
     const actor = User.getRow( actorId ), target = User.getRow( userId );
     if ( ! actor || actor.disabled_at ) throw new Error( 'User is not available' );
     if ( ! target ) throw new Error( 'User does not exist' );
@@ -95,7 +97,7 @@ export class User {
     ).all() ).map( row => User.toRecord( row ) );
   }
 
-  public static get ( userId: number ) : UserRecord | null {
+  public static get ( userId: string ) : UserRecord | null {
     const row = User.getRow( userId );
     return row ? User.toRecord( row ) : null;
   }
@@ -109,7 +111,7 @@ export class User {
   }
 
   public static resolveUser ( ref: string ) : UserRecord {
-    const user = /^\d+$/.test( ref ) ? User.get( Number( ref ) ) : User.getByUsername( ref );
+    const user = /^[a-zA-Z0-9]{5,32}$/.test( ref ) ? User.get( ref ) ?? User.getByUsername( ref ) : User.getByUsername( ref );
     if ( ! user ) throw new Error( `User not found: ${ ref }` );
     return user;
   }
@@ -120,20 +122,21 @@ export class User {
 
     User.validatePassword( pw );
     const hash = await User.hashPassword( pw );
+    const id = generateId( Config.get( 'ID_LENGTH' ) );
 
-    const result = conn().prepare( `
-      INSERT INTO users ( username, pw_hash, is_admin )
-      VALUES ( ?, ?, ? )
-    ` ).run( name, hash, +!! isAdmin );
+    conn().prepare(
+      'INSERT INTO users ( id, username, pw_hash, is_admin ) VALUES ( ?, ?, ?, ? )'
+    ).run( id, name, hash, +!! isAdmin );
 
-    const user = User.get( Number( result.lastInsertRowid ) );
+    const user = User.get( id );
     if ( ! user ) throw new Error( 'Failed to create user' );
 
     return user;
   }
 
-  
-  public static delete ( userId: number ) : void {
+  public static delete ( userId: string ) : void {
+    assertStringId( userId, 'user' );
+
     db.transaction( tx => {
       const target = as< UserRow | null >( tx.prepare( 'SELECT * FROM users WHERE id = ?' ).get( userId ) );
       if ( ! target ) throw new Error( 'User does not exist' );
@@ -145,7 +148,7 @@ export class User {
     } );
   }
 
-  public static changeUsername ( actorId: number, userId: number, username: string ) : UserRecord {
+  public static changeUsername ( actorId: string, userId: string, username: string ) : UserRecord {
     const target = User.assertCanManage( actorId, userId );
     const name = User.validateUsername( username );
 
@@ -160,7 +163,7 @@ export class User {
     return user;
   }
 
-  public static async changePassword ( actorId: number, userId: number, newPw: string, curPw?: string ) : Promise< void > {
+  public static async changePassword ( actorId: string, userId: string, newPw: string, curPw?: string ) : Promise< void > {
     const target = User.assertCanManage( actorId, userId );
     User.validatePassword( newPw );
 
@@ -175,7 +178,7 @@ export class User {
     } );
   }
 
-  public static setAdmin ( actorId: number, userId: number, isAdmin: boolean ) : void {
+  public static setAdmin ( actorId: string, userId: string, isAdmin: boolean ) : void {
     User.assertAdmin( actorId );
 
     db.transaction( tx => {
@@ -187,7 +190,7 @@ export class User {
     } );
   }
 
-  public static setDisabled ( actorId: number, userId: number, disabled: boolean ) : void {
+  public static setDisabled ( actorId: string, userId: string, disabled: boolean ) : void {
     User.assertAdmin( actorId );
 
     if ( actorId === userId ) throw new Error( 'You cannot disable your own account' );
@@ -202,7 +205,7 @@ export class User {
     } );
   }
 
-  public static async verifyPassword ( userId: number, password: string ) : Promise< boolean > {
+  public static async verifyPassword ( userId: string, password: string ) : Promise< boolean > {
     const user = User.getRow( userId );
     return !! user && await User.verifyHash( password, user.pw_hash );
   }
