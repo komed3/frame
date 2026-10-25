@@ -1,6 +1,6 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertId, generateId } from '@/src/server/utils';
+import { assertId } from '@/src/server/utils';
 import type { UserRecord, UserRow } from '@/src/shared/types/user';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
@@ -122,11 +122,13 @@ export class User {
 
     User.validatePassword( pw );
     const hash = await User.hashPassword( pw );
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    const id = db.createWithId( id => {
+      conn().prepare(
+        'INSERT INTO users ( id, username, pw_hash, is_admin ) VALUES ( ?, ?, ?, ? )'
+      ).run( id, name, hash, +!! isAdmin );
 
-    conn().prepare(
-      'INSERT INTO users ( id, username, pw_hash, is_admin ) VALUES ( ?, ?, ?, ? )'
-    ).run( id, name, hash, +!! isAdmin );
+      return id;
+    } );
 
     const user = User.get( id );
     if ( ! user ) throw new Error( 'Failed to create user' );
