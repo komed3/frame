@@ -1,4 +1,5 @@
 import { as, conn, db } from '@/src/server/core/Database';
+import { User } from '@/src/server/core/User';
 import { Media } from '@/src/server/media/Media';
 import { assertId, assertLimitOffset, normalizeOptionalString, normalizeString } from '@/src/server/utils';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
@@ -17,7 +18,7 @@ const ITEM_SELECT = ( dir: 'ASC' | 'DESC', operator: '<' | '>' ) => `
 
 export class Playlists {
   private static assertOwned ( userId: string, playlistId: string ) : void {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( playlistId, 'playlist' );
 
     if ( ! conn().prepare( 'SELECT 1 FROM playlists WHERE id = ? AND user_id = ?' ).get( playlistId, userId ) )
@@ -47,7 +48,7 @@ export class Playlists {
   }
 
   public static list ( userId: string, limit = 100, offset = 0 ) : PlaylistRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertLimitOffset( limit, offset );
 
     return as< PlaylistRecord[] >( conn().prepare( `
@@ -62,7 +63,7 @@ export class Playlists {
   }
 
   public static mediaPlaylists ( userId: string, mediaId: string, limit = 100, offset = 0 ) : PlaylistRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
     assertLimitOffset( limit, offset );
 
@@ -79,7 +80,7 @@ export class Playlists {
   }
 
   public static create ( userId: string, name: string, description?: string ) : string {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
 
     return db.createWithId( id => {
       conn().prepare( 'INSERT INTO playlists ( id, user_id, name, description ) VALUES ( ?, ?, ?, ? )' ).run(
