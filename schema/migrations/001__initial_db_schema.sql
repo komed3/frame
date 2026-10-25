@@ -22,7 +22,7 @@ CREATE TABLE sessions (
   token_hash TEXT NOT NULL UNIQUE,
   created_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) ),
   expires_at TEXT NOT NULL,
-  last_seen_at TEXT
+  last_seen_at TEXT NOT NULL DEFAULT ( strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
 );
 
 CREATE INDEX sessions_user_idx ON sessions ( user_id );
