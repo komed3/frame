@@ -1,12 +1,11 @@
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import type { MediaRecord } from '@/src/shared/types/media';
+import type { ByteRange } from '@/src/shared/types/stream';
 import type { NextFunction, Request, Response } from 'express';
-import type { ReadStream } from 'node:fs';
-import { open } from 'node:fs/promises';
 import type { Stats } from 'node:fs';
 import type { FileHandle } from 'node:fs/promises';
-import type { ByteRange } from '@/src/shared/types/stream';
+import { open } from 'node:fs/promises';
 
 
 const CHUNK_SIZE = 1024 * 1024;
@@ -223,5 +222,9 @@ export class Stream {
       if ( res.headersSent ) res.destroy( err instanceof Error ? err : undefined );
       else next( err );
     }
+  }
+
+  public static handle ( req: Request, res: Response, next: NextFunction ) : void {
+    void Stream.send( req, res, next );
   }
 }
