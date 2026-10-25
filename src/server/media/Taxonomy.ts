@@ -1,7 +1,6 @@
-import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, generateId, normalizeString } from '@/src/server/utils';
+import { assertId, normalizeString } from '@/src/server/utils';
 import type { CategoryRecord, TagRecord, TaxonomyKind } from '@/src/shared/types/taxonomy';
 
 
@@ -52,13 +51,11 @@ export class MediaTaxonomy {
 
   public static createTag ( name: string ) : string {
     const value = normalizeString( name, 'Tag' );
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-
-    const row = as< { id: string } | undefined >( conn().prepare( `
+    const row = db.createWithId( id => as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO tags ( id, name ) VALUES ( ?, ? )
       ON CONFLICT ( name ) DO UPDATE SET name = tags.name
       RETURNING id
-    ` ).get( id, value ) );
+    ` ).get( id, value ) ) );
 
     if ( ! row ) throw new Error( `Could not create tag: ${ value }` );
     return row.id;
@@ -123,12 +120,11 @@ export class MediaTaxonomy {
         throw new Error( `Parent category ${ parentId } does not exist` );
     }
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-    const row = as< { id: string } | undefined >( conn().prepare( `
+    const row = db.createWithId( id => as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO categories ( id, name, parent_id ) VALUES ( ?, ?, ? )
       ON CONFLICT ( name ) DO UPDATE SET name = categories.name
       RETURNING id
-    ` ).get( id, value, parentId ) );
+    ` ).get( id, value, parentId ) ) );
 
     if ( ! row ) throw new Error( `Could not create category: ${ value }` );
     return row.id;
