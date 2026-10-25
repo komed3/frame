@@ -1,7 +1,6 @@
-import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { generateId, normalizeString } from '@/src/server/utils';
+import { normalizeString } from '@/src/server/utils';
 import type { MediaMetadataInput, MediaMetadataRecord, MediaMetadataSource } from '@/src/shared/types/metadata';
 
 
@@ -61,15 +60,14 @@ export class MediaMetadata {
     const normalizedKey = normalize( key );
     if ( typeof value !== 'string' ) throw new Error( `Invalid metadata value for key: ${ normalizedKey }` );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-    const row = as< { id: string } | undefined >( conn().prepare( `
+    const row = db.createWithId( id => as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO media_metadata ( id, media_id, key, value, source )
       VALUES ( ?, ?, ?, ?, ? )
       ON CONFLICT ( media_id, key, source ) DO UPDATE SET
         value = excluded.value,
         updated_at = strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' )
       RETURNING id
-    ` ).get( id, mediaId, normalizedKey, value, source ) );
+    ` ).get( id, mediaId, normalizedKey, value, source ) ) );
 
     if ( ! row ) throw new Error( `Could not save metadata: ${ normalizedKey }` );
     return row.id;
@@ -93,13 +91,8 @@ export class MediaMetadata {
     db.transaction( tx => {
       tx.prepare( 'DELETE FROM media_metadata WHERE media_id = ? AND source = ?' ).run( mediaId, 'scan' );
 
-      const insert = tx.prepare( `
-        INSERT INTO media_metadata ( id, media_id, key, value, source )
-        VALUES ( ?, ?, ?, ?, 'scan' )
-      ` );
-
-      for ( const entry of normalizedEntries )
-        insert.run( generateId( Config.get( 'ID_LENGTH' ) ), mediaId, entry.key, entry.value );
+      const insert = tx.prepare( `INSERT INTO media_metadata ( id, media_id, key, value, source ) VALUES ( ?, ?, ?, ?, 'scan' )` );
+      for ( const entry of normalizedEntries ) db.createWithId( id => insert.run( id, mediaId, entry.key, entry.value ) );
     } );
   }
 }
