@@ -189,9 +189,9 @@ export class MediaAssets {
 
       if ( Number( result.changes ) !== 1 )
         throw new Error( `Asset ${ kind }/${ variant } does not exist for media ${ mediaId }` );
-    } catch ( error ) {
+    } catch ( err ) {
       if ( backedUp ) await rename( backupPath, path );
-      throw error;
+      throw err;
     }
 
     if ( backedUp ) await rm( backupPath, { force: true } );
@@ -199,30 +199,36 @@ export class MediaAssets {
 
   public static async clean () : Promise< number > {
     const root = Config.get( 'ASSETS_PATH' );
-    const reg = new Set( as< { path: string }[] >( conn().prepare( 'SELECT path FROM assets' ).all() ).map( a => a.path ) );
+    const assets = as< { path: string, kind: MediaAssetKind }[] >( conn().prepare( 'SELECT path, kind FROM assets' ).all() );
+    const reg = new Set( assets.map( a => a.path ) );
+
+    const protectedDirectories = new Set( assets
+      .filter( a => a.kind === 'frames' && a.path.endsWith( '/manifest.json' ) )
+      .map( a => dirname( a.path ) ) );
+
     let removed = 0;
 
-    const cleanDirectory = async ( directory: string ) : Promise< void > => {
+    const cleanDirectory = async ( dir: string ) : Promise< void > => {
       let entries;
 
-      try { entries = await readdir( directory, { withFileTypes: true } ) }
+      try { entries = await readdir( dir, { withFileTypes: true } ) }
       catch ( err ) {
         if ( ( err as NodeJS.ErrnoException ).code === 'ENOENT' ) return;
         throw err;
       }
 
       for ( const entry of entries ) {
-        const path = resolve( directory, entry.name );
+        const path = resolve( dir, entry.name );
+        const relativePath = relative( root, path ).split( sep ).join( '/' );
 
         if ( entry.isDirectory() ) {
+          if ( protectedDirectories.has( relativePath ) ) continue;
+
           await cleanDirectory( path );
           continue;
         }
 
-        if ( ! entry.isFile() ) continue;
-
-        const relativePath = relative( root, path ).split( sep ).join( '/' );
-        if ( reg.has( relativePath ) ) continue;
+        if ( ! entry.isFile() || reg.has( relativePath ) ) continue;
 
         await rm( path );
         removed++;
