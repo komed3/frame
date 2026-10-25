@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { generateId } from '@/src/server/utils';
 
 
 export class Database {
@@ -161,6 +162,13 @@ export class Database {
       throw err;
     } finally {
       this.transactionActive = false;
+    }
+  }
+
+  public createWithId < T > ( callback: ( id: string ) => T ) : T {
+    while ( true ) {
+      try { return callback( generateId( Config.get( 'ID_LENGTH' ) ) ) }
+      catch ( err ) { if ( ! Database.isPrimaryKeyCollision( err ) ) throw err }
     }
   }
 }
