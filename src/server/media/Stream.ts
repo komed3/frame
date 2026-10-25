@@ -131,4 +131,97 @@ export class Stream {
       throw err;
     }
   }
+
+  private static async send ( req: Request, res: Response, next: NextFunction ) : Promise< void > {
+    let file: FileHandle | null = null;
+
+    try {
+      const media = Stream.resolveMedia( req.params.id as string, res );
+      if ( ! media ) return;
+
+      file = await Stream.openMedia( media, res );
+      if ( ! file ) return;
+
+      const stats = await file.stat();
+      const size = stats.size;
+
+      res.setHeader( 'Accept-Ranges', 'bytes' );
+      res.setHeader( 'Cache-Control', 'private, no-cache' );
+      res.setHeader( 'X-Content-Type-Options', 'nosniff' );
+
+      const etag = Stream.etag( stats );
+      res.setHeader( 'ETag', etag );
+      res.setHeader( 'Last-Modified', stats.mtime.toUTCString() );
+
+      if ( size <= 0 ) {
+        res.setHeader( 'Content-Range', 'bytes */0' );
+        res.status( 416 ).end();
+
+        await file.close();
+        file = null;
+
+        return;
+      }
+
+      const rangeHeader = req.get( 'range' );
+      const rangeAllowed = Stream.ifRangeMatches( req.get( 'if-range' ), etag, stats );
+
+      let range: ByteRange | null;
+
+      if ( ! rangeHeader || ! rangeAllowed ) range = Stream.defaultRange( size );
+      else {
+        range = Stream.parseRange( rangeHeader, size );
+
+        if ( ! range ) {
+          res.setHeader( 'Content-Range', `bytes */${ size }` );
+          res.status( 416 ).end();
+
+          await file.close();
+
+          file = null;
+          return;
+        }
+      }
+
+      const length = range.end - range.start + 1;
+      const contentType = media.mimeType && /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/.test( media.mimeType )
+        ? media.mimeType : media.type === 'video' ? 'video/mp4' : 'audio/mpeg';
+
+      res.status( 206 );
+      res.setHeader( 'Content-Type', contentType );
+      res.setHeader( 'Content-Length', length );
+      res.setHeader( 'Content-Range', `bytes ${ range.start }-${ range.end }/${ size }` );
+
+      if ( req.method === 'HEAD' ) {
+        await file.close();
+        file = null;
+        res.end();
+
+        return;
+      }
+
+      const readable = file.createReadStream( {
+        start: range.start, end: range.end, highWaterMark: STREAM_BUFFER_SIZE, autoClose: true
+      } );
+
+      file = null;
+
+      res.once( 'close', () => { if ( ! res.writableFinished ) readable.destroy() } );
+
+      readable.once( 'error', err => {
+        if ( res.headersSent ) res.destroy( err );
+        else next( err );
+      } );
+
+      readable.pipe( res );
+    } catch ( err ) {
+      if ( file ) {
+        try { await file.close() }
+        catch { /** Preserve the original error */ }
+      }
+
+      if ( res.headersSent ) res.destroy( err instanceof Error ? err : undefined );
+      else next( err );
+    }
+  }
 }
