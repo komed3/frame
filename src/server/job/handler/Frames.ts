@@ -22,7 +22,7 @@ export class FramesJob implements JobHandler {
     const minFrames = Math.min( maxFrames, Config.get( 'SCRUBBER_MIN_FRAMES' ) );
     const count = Math.min( maxFrames, Math.max( minFrames, Math.ceil( durationMs / 1000 * Config.get( 'SCRUBBER_FPS' ) ) ) );
     const intervalMs = Math.ceil( durationMs / count );
-    const relativeDirectory = `frames/${ media.id }-${ source.fingerprint }`;
+    const relativeDirectory = `frames/${ media.id }`;
     const outputDirectory = MediaAssets.resolvePath( relativeDirectory );
     const tempDirectory = `${ outputDirectory }.tmp-${ randomUUID() }`;
     const manifestPath = `${ relativeDirectory }/manifest.json`;

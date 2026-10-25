@@ -36,7 +36,7 @@ export async function getAssetSource ( job: JobRecord, signal: AbortSignal ) : P
 
 
 export function assetPath ( kind: string, source: AssetSource, extension: string ) : string {
-  return `${ kind }/${ source.media.id }-${ source.fingerprint }${ extension }`;
+  return `${ kind }/${ source.media.id }${ extension }`;
 }
 
 
