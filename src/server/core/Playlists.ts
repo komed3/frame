@@ -1,7 +1,6 @@
-import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, generateId, normalizeOptionalString, normalizeString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, normalizeOptionalString, normalizeString } from '@/src/server/utils';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 
 
@@ -82,14 +81,14 @@ export class Playlists {
   public static create ( userId: string, name: string, description?: string ) : string {
     assertId( userId, 'user' );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    return db.createWithId( id => {
+      conn().prepare( 'INSERT INTO playlists ( id, user_id, name, description ) VALUES ( ?, ?, ?, ? )' ).run(
+        id, userId, normalizeString( name, 'Playlist name' ),
+        normalizeOptionalString( description, 'Playlist description' )
+      );
 
-    conn().prepare( 'INSERT INTO playlists ( id, user_id, name, description ) VALUES ( ?, ?, ?, ? )' ).run(
-      id, userId, normalizeString( name, 'Playlist name' ),
-      normalizeOptionalString( description, 'Playlist description' )
-    );
-
-    return id;
+      return id;
+    } );
   }
 
   public static update ( userId: string, playlistId: string, patch: PlaylistUpdate ) : void {
