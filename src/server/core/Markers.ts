@@ -1,4 +1,5 @@
 import { as, conn, db } from '@/src/server/core/Database';
+import { User } from '@/src/server/core/User';
 import { Media } from '@/src/server/media/Media';
 import { assertId, assertLimitOffset, normalizeOptionalString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
@@ -6,7 +7,7 @@ import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 export class Markers {
   public static get ( userId: string, markerId: string ) : MarkerRecord | null {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( markerId, 'marker' );
 
     const row = as< MarkerRecord | undefined >( conn().prepare( `
@@ -21,7 +22,7 @@ export class Markers {
   }
 
   public static list ( userId: string, limit = 100, offset = 0 ) : MarkerRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertLimitOffset( limit, offset );
 
     return as< MarkerRecord[] >( conn().prepare( `
@@ -36,7 +37,7 @@ export class Markers {
   }
 
   public static mediaMarker ( userId: string, mediaId: string, limit = 100, offset = 0 ) : MarkerRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
     assertLimitOffset( limit, offset );
 
@@ -55,7 +56,7 @@ export class Markers {
     userId: string, mediaId: string, positionMs: number,
     title: string | null = null, description: string | null = null
   ) : string {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     if ( ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
@@ -76,7 +77,7 @@ export class Markers {
   }
 
   public static update ( userId: string, markerId: string, patch: MarkerUpdate ) : void {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( markerId, 'marker' );
 
     const assignments: string[] = [], values: ( number | string | null )[] = [];
@@ -112,7 +113,7 @@ export class Markers {
   }
 
   public static delete ( userId: string, markerId: string ) : boolean {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( markerId, 'marker' );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND id = ?' ).run( userId, markerId );
@@ -120,7 +121,7 @@ export class Markers {
   }
 
   public static clearMediaMarker ( userId: string, mediaId: string ) : number {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
@@ -128,7 +129,7 @@ export class Markers {
   }
 
   public static clear ( userId: string ) : number {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
 
     const result = conn().prepare( 'DELETE FROM markers WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
