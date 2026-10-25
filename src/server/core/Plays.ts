@@ -1,7 +1,6 @@
-import { Config } from '@/src/server/core/Config';
-import { as, conn } from '@/src/server/core/Database';
+import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, generateId } from '@/src/server/utils';
+import { assertId, assertLimitOffset } from '@/src/server/utils';
 import type { PlayRecord, PlayRow } from '@/src/shared/types/plays';
 
 
@@ -83,13 +82,13 @@ export class Plays {
     Media.assertMediaIdSafe( mediaId );
     if ( sessionId !== null ) assertId( sessionId, 'session' );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    return db.createWithId( id => {
+      conn().prepare(
+        'INSERT INTO plays ( id, user_id, media_id, session_id ) VALUES ( ?, ?, ?, ? )'
+      ).run( id, userId, mediaId, sessionId );
 
-    conn().prepare(
-      'INSERT INTO plays ( id, user_id, media_id, session_id ) VALUES ( ?, ?, ?, ? )'
-    ).run( id, userId, mediaId, sessionId );
-
-    return id;
+      return id;
+    } );
   }
 
   public static update ( userId: string, playId: string, watchedMs: number, completed = false ) : void {
