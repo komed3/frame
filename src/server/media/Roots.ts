@@ -1,6 +1,5 @@
-import { Config } from '@/src/server/core/Config';
-import { as, conn } from '@/src/server/core/Database';
-import { assertId, generateId } from '@/src/server/utils';
+import { as, conn, db } from '@/src/server/core/Database';
+import { assertId } from '@/src/server/utils';
 import type { MediaRoot, MediaRootRow } from '@/src/shared/types/roots';
 import { realpathSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep, win32 } from 'node:path';
@@ -40,14 +39,12 @@ export class MediaRoots {
 
   public static add ( path: string, enabled = true ) : string {
     const canonicalPath = MediaRoots.canonicalize( path );
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-
-    const row = as< { id: string } | undefined >( conn().prepare( `
+    const row = db.createWithId( id => as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO roots ( id, path, enabled )
       VALUES ( ?, ?, ? )
       ON CONFLICT ( path ) DO UPDATE SET enabled = excluded.enabled
       RETURNING id
-    ` ).get( id, canonicalPath, +!! enabled ) );
+    ` ).get( id, canonicalPath, +!! enabled ) ) );
 
     if ( ! row ) throw new Error( `Could not register media root: ${ canonicalPath }` );
     return row.id;
