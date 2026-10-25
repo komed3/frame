@@ -89,4 +89,46 @@ export class Stream {
 
     return media;
   }
+
+  private static async openMedia ( media: MediaRecord, res: Response ) : Promise< FileHandle | null > {
+    let path: string;
+
+    try { path = MediaRoots.resolve( media.rootId, media.path ) }
+    catch ( err ) {
+      const message = err instanceof Error ? err.message : '';
+      const status = /does not exist|disabled|ENOENT|ENOTDIR/i.test( message ) ? 404
+        : /invalid|traversal|outside/i.test( message ) ? 400 : 500;
+
+      Stream.sendError( res, status, status < 500 ? message : 'Unable to access media' );
+      return null;
+    }
+
+    try {
+      const file = await open( path, 'r' );
+      const stats = await file.stat();
+
+      if ( ! stats.isFile() ) {
+        await file.close();
+
+        Stream.sendError( res, 404, 'Media file not found' );
+        return null;
+      }
+
+      return file;
+    } catch ( err ) {
+      const code = ( err as NodeJS.ErrnoException ).code;
+
+      if ( code === 'ENOENT' || code === 'ENOTDIR' ) {
+        Stream.sendError( res, 404, 'Media file not found' );
+        return null;
+      }
+
+      if ( code === 'EACCES' || code === 'EPERM' ) {
+        Stream.sendError( res, 403, 'Media file cannot be accessed' );
+        return null;
+      }
+
+      throw err;
+    }
+  }
 }
