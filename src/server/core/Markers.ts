@@ -1,7 +1,6 @@
-import { Config } from '@/src/server/core/Config';
-import { as, conn } from '@/src/server/core/Database';
+import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset, generateId, normalizeOptionalString } from '@/src/server/utils';
+import { assertId, assertLimitOffset, normalizeOptionalString } from '@/src/server/utils';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
@@ -62,18 +61,18 @@ export class Markers {
     if ( ! Number.isSafeInteger( positionMs ) || positionMs < 0 )
       throw new Error( `Invalid marker position: ${ positionMs }` );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
+    return db.createWithId( id => {
+      conn().prepare( `
+        INSERT INTO markers ( id, user_id, media_id, position_ms, title, description )
+        VALUES ( ?, ?, ?, ?, ?, ? )
+      ` ).run(
+        id, userId, mediaId, positionMs,
+        normalizeOptionalString( title, 'Marker title' ),
+        normalizeOptionalString( description, 'Marker description' )
+      );
 
-    conn().prepare( `
-      INSERT INTO markers ( id, user_id, media_id, position_ms, title, description )
-      VALUES ( ?, ?, ?, ?, ?, ? )
-    ` ).run(
-      id, userId, mediaId, positionMs,
-      normalizeOptionalString( title, 'Marker title' ),
-      normalizeOptionalString( description, 'Marker description' )
-    );
-
-    return id;
+      return id;
+    } );
   }
 
   public static update ( userId: string, markerId: string, patch: MarkerUpdate ) : void {
