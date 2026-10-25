@@ -1,6 +1,5 @@
-import { Config } from '@/src/server/core/Config';
-import { as, conn } from '@/src/server/core/Database';
-import { assertId, assertLimitOffset, assertRelativePath, generateId } from '@/src/server/utils';
+import { as, conn, db } from '@/src/server/core/Database';
+import { assertId, assertLimitOffset, assertRelativePath } from '@/src/server/utils';
 import type { MediaFileInput, MediaListOptions, MediaRecord, MediaRow, MediaType, MediaUpdate } from '@/src/shared/types/media';
 
 
@@ -113,8 +112,7 @@ export class Media {
     if ( ! Number.isSafeInteger( input.sizeBytes ) || input.sizeBytes < 0 )
       throw new Error( `Invalid media file size: ${ input.sizeBytes }` );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-    const row = as< { id: string } | undefined >( conn().prepare( `
+    const row = db.createWithId( id => as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO media (
         id, root_id, directory_id, path, file_name, type, mime_type,
         size_bytes, modified_at, scanned_at
@@ -149,7 +147,7 @@ export class Media {
     ` ).get(
       id, input.rootId, directoryId, input.path, input.fileName, input.type,
       input.mimeType ?? null, input.sizeBytes, input.modifiedAt ?? null
-    ) );
+    ) ) );
 
     if ( ! row ) throw new Error( `Could not register media file: ${ input.path }` );
     return row.id;
