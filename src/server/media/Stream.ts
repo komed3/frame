@@ -1,15 +1,26 @@
 import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import type { MediaRecord } from '@/src/shared/types/media';
-import type { ByteRange } from '@/src/shared/types/stream';
-import type { NextFunction, Request, Response } from 'express';
-import type { Stats } from 'node:fs';
+import type { ByteRange, StreamResult } from '@/src/shared/types/stream';
+import type { ReadStream, Stats } from 'node:fs';
 import type { FileHandle } from 'node:fs/promises';
 import { open } from 'node:fs/promises';
 
 
 const CHUNK_SIZE = 1024 * 1024;
 const STREAM_BUFFER_SIZE = 64 * 1024;
+
+
+export class StreamError extends Error {
+  public constructor (
+    message: string,
+    public readonly status: number,
+    public readonly headers: Record< string, string > = {}
+  ) {
+    super( message );
+    this.name = 'StreamError';
+  }
+}
 
 
 export class Stream {
@@ -57,39 +68,22 @@ export class Stream {
     return Number.isFinite( date ) && date >= Math.floor( stats.mtimeMs / 1000 ) * 1000;
   }
 
-  private static sendError ( res: Response, status: number, message: string ) : void {
-    if ( res.headersSent ) { res.destroy(); return }
-    res.status( status ).json( { error: message } );
-  }
-
-  private static resolveMedia ( id: string, res: Response ) : MediaRecord | null {
+  private static resolveMedia ( id: string ) : MediaRecord {
     let media: MediaRecord | null;
 
     try { media = Media.get( id ) }
-    catch ( err ) {
-      Stream.sendError( res, 400, err instanceof Error ? err.message : 'Invalid media ID' );
-      return null;
-    }
+    catch ( err ) { throw new StreamError( err instanceof Error ? err.message : 'Invalid media ID', 400 ) }
 
-    if ( ! media ) {
-      Stream.sendError( res, 404, 'Media not found' );
-      return null;
-    }
+    if ( ! media ) throw new StreamError( 'Media not found', 404 );
+    if ( ! media.available ) throw new StreamError( 'Media is unavailable', 404 );
 
-    if ( ! media.available ) {
-      Stream.sendError( res, 404, 'Media is unavailable' );
-      return null;
-    }
-
-    if ( media.type !== 'video' && media.type !== 'audio' ) {
-      Stream.sendError( res, 415, 'Media type cannot be streamed' );
-      return null;
-    }
+    if ( media.type !== 'video' && media.type !== 'audio' )
+      throw new StreamError( 'Media type cannot be streamed', 415 );
 
     return media;
   }
 
-  private static async openMedia ( media: MediaRecord, res: Response ) : Promise< FileHandle | null > {
+  private static async openMedia ( media: MediaRecord ) : Promise< FileHandle > {
     let path: string;
 
     try { path = MediaRoots.resolve( media.rootId, media.path ) }
@@ -98,8 +92,7 @@ export class Stream {
       const status = /does not exist|disabled|ENOENT|ENOTDIR/i.test( message ) ? 404
         : /invalid|traversal|outside/i.test( message ) ? 400 : 500;
 
-      Stream.sendError( res, status, status < 500 ? message : 'Unable to access media' );
-      return null;
+      throw new StreamError( status < 500 ? message : 'Unable to access media', status );
     }
 
     try {
@@ -108,123 +101,80 @@ export class Stream {
 
       if ( ! stats.isFile() ) {
         await file.close();
-
-        Stream.sendError( res, 404, 'Media file not found' );
-        return null;
+        throw new StreamError( 'Media file not found', 404 );
       }
 
       return file;
     } catch ( err ) {
+      if ( err instanceof StreamError ) throw err;
+
       const code = ( err as NodeJS.ErrnoException ).code;
-
-      if ( code === 'ENOENT' || code === 'ENOTDIR' ) {
-        Stream.sendError( res, 404, 'Media file not found' );
-        return null;
-      }
-
-      if ( code === 'EACCES' || code === 'EPERM' ) {
-        Stream.sendError( res, 403, 'Media file cannot be accessed' );
-        return null;
-      }
+      if ( code === 'ENOENT' || code === 'ENOTDIR' ) throw new StreamError( 'Media file not found', 404 );
+      if ( code === 'EACCES' || code === 'EPERM' ) throw new StreamError( 'Media file cannot be accessed', 403 );
 
       throw err;
     }
   }
 
-  private static async send ( req: Request, res: Response, next: NextFunction ) : Promise< void > {
-    let file: FileHandle | null = null;
+  private static contentType ( media: MediaRecord ) : string {
+    if ( media.mimeType && /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/.test( media.mimeType ) )
+      return media.mimeType;
+
+    return media.type === 'video' ? 'video/mp4' : 'audio/mpeg';
+  }
+
+  public static async open ( id: string, rangeHeader?: string, ifRangeHeader?: string, method: 'GET' | 'HEAD' = 'GET' ) : Promise< StreamResult > {
+    const media = Stream.resolveMedia( id ), file = await Stream.openMedia( media );
+    let body: ReadStream | null = null;
 
     try {
-      const media = Stream.resolveMedia( req.params.id as string, res );
-      if ( ! media ) return;
-
-      file = await Stream.openMedia( media, res );
-      if ( ! file ) return;
-
       const stats = await file.stat();
       const size = stats.size;
-
-      res.setHeader( 'Accept-Ranges', 'bytes' );
-      res.setHeader( 'Cache-Control', 'private, no-cache' );
-      res.setHeader( 'X-Content-Type-Options', 'nosniff' );
-
       const etag = Stream.etag( stats );
-      res.setHeader( 'ETag', etag );
-      res.setHeader( 'Last-Modified', stats.mtime.toUTCString() );
 
-      if ( size <= 0 ) {
-        res.setHeader( 'Content-Range', 'bytes */0' );
-        res.status( 416 ).end();
+      const headers: Record< string, string > = {
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'private, no-cache',
+        'Content-Type': Stream.contentType( media ),
+        'ETag': etag,
+        'Last-Modified': stats.mtime.toUTCString(),
+        'X-Content-Type-Options': 'nosniff'
+      };
 
-        await file.close();
-        file = null;
+      if ( size <= 0 ) throw new StreamError( 'Media file is empty', 416, {
+        'Content-Range': 'bytes */0'
+      } );
 
-        return;
-      }
+      const rangeAllowed = Stream.ifRangeMatches( ifRangeHeader, etag, stats );
+      const range = ! rangeHeader || ! rangeAllowed ? Stream.defaultRange( size ) : Stream.parseRange( rangeHeader, size );
 
-      const rangeHeader = req.get( 'range' );
-      const rangeAllowed = Stream.ifRangeMatches( req.get( 'if-range' ), etag, stats );
-
-      let range: ByteRange | null;
-
-      if ( ! rangeHeader || ! rangeAllowed ) range = Stream.defaultRange( size );
-      else {
-        range = Stream.parseRange( rangeHeader, size );
-
-        if ( ! range ) {
-          res.setHeader( 'Content-Range', `bytes */${ size }` );
-          res.status( 416 ).end();
-
-          await file.close();
-
-          file = null;
-          return;
-        }
-      }
+      if ( ! range ) throw new StreamError( 'Requested byte range is not satisfiable', 416, {
+        'Content-Range': `bytes */${ size }`
+      } );
 
       const length = range.end - range.start + 1;
-      const contentType = media.mimeType && /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/.test( media.mimeType )
-        ? media.mimeType : media.type === 'video' ? 'video/mp4' : 'audio/mpeg';
 
-      res.status( 206 );
-      res.setHeader( 'Content-Type', contentType );
-      res.setHeader( 'Content-Length', length );
-      res.setHeader( 'Content-Range', `bytes ${ range.start }-${ range.end }/${ size }` );
+      headers[ 'Content-Length' ] = String( length );
+      headers[ 'Content-Range' ] = `bytes ${ range.start }-${ range.end }/${ size }`;
 
-      if ( req.method === 'HEAD' ) {
+      if ( method === 'HEAD' ) {
         await file.close();
-        file = null;
-        res.end();
-
-        return;
+        return { status: 206, headers, body: null };
       }
 
-      const readable = file.createReadStream( {
-        start: range.start, end: range.end, highWaterMark: STREAM_BUFFER_SIZE, autoClose: true
+      body = file.createReadStream( {
+        start: range.start, end: range.end, highWaterMark: STREAM_BUFFER_SIZE,
+        autoClose: true
       } );
 
-      file = null;
-
-      res.once( 'close', () => { if ( ! res.writableFinished ) readable.destroy() } );
-
-      readable.once( 'error', err => {
-        if ( res.headersSent ) res.destroy( err );
-        else next( err );
-      } );
-
-      readable.pipe( res );
+      return { status: 206, headers, body };
     } catch ( err ) {
-      if ( file ) {
+      if ( ! body ) {
         try { await file.close() }
         catch { /** Preserve the original error */ }
       }
 
-      if ( res.headersSent ) res.destroy( err instanceof Error ? err : undefined );
-      else next( err );
+      throw err;
     }
-  }
-
-  public static handle ( req: Request, res: Response, next: NextFunction ) : void {
-    void Stream.send( req, res, next );
   }
 }
