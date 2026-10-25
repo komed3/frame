@@ -1,7 +1,7 @@
 import { Config } from '@/src/server/core/Config';
-import { as, conn } from '@/src/server/core/Database';
+import { as, conn, db } from '@/src/server/core/Database';
 import { Media } from '@/src/server/media/Media';
-import { assertRelativePath, generateId } from '@/src/server/utils';
+import { assertRelativePath } from '@/src/server/utils';
 import type { MediaAssetInput, MediaAssetKind, MediaAssetRecord, MediaAssetRow } from '@/src/shared/types/assets';
 import { randomUUID } from 'node:crypto';
 import { mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
@@ -85,8 +85,7 @@ export class MediaAssets {
     MediaAssets.assertKind( asset.kind, asset.variant ?? 'default' );
     MediaAssets.resolvePath( asset.path );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-    const row = as< { id: string } | undefined >( conn().prepare( `
+    const row = db.createWithId( id => as< { id: string } | undefined >( conn().prepare( `
       INSERT INTO assets (
         id, media_id, kind, variant, path, fingerprint, mime_type,
         size_bytes, width, height, data_json
@@ -107,7 +106,7 @@ export class MediaAssets {
       asset.path, asset.fingerprint ?? null, asset.mimeType ?? null,
       asset.sizeBytes ?? null, asset.width ?? null,
       asset.height ?? null, JSON.stringify( asset.data ?? {} )
-    ) );
+    ) ) );
 
     if ( ! row ) throw new Error( `Could not register asset for media ${ mediaId }` );
     return row.id;
