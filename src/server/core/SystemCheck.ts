@@ -1,4 +1,3 @@
-import { ui } from '@/src/maintenance/utils/ui';
 import { CheckResult } from '@/src/shared/types/check';
 import { spawnSync } from 'node:child_process';
 import { accessSync, constants } from 'node:fs';
@@ -17,16 +16,13 @@ export class SystemCheck {
     catch { return false }
   }
 
-  public static run () : boolean {
-    ui.headline( 'Check system requirements', '[System]' );
-    ui.nl();
-
+  public static run () : CheckResult[] {
     const version = process.versions.node.split( '.' ).map( Number );
     const nodeOk = version[ 0 ] > 22 || ( version[ 0 ] === 22 && version[ 1 ] >= 5 );
     const memory = totalmem(), cores = cpus().length, writable = this.canWrite();
     const ffmpeg = this.executable( 'ffmpeg' ), ffprobe = this.executable( 'ffprobe' );
 
-    const checks: CheckResult[] = [ {
+    return [ {
       name: 'Node.js', ok: nodeOk, message: nodeOk ? `Version ${ process.versions.node }` :
         `Version ${ process.versions.node } is too old; require Node.js >=22.5`
     }, {
@@ -47,20 +43,5 @@ export class SystemCheck {
       name: 'Write access', ok: writable, message: writable ? 'Current directory is writable' :
         'Current directory is not writable; run Frame from a directory where you have write access'
     } ];
-
-    let errors = 0;
-
-    for ( const check of checks ) {
-      if ( check.warning ) ui.warning( `${ check.name}: ${ check.message }` );
-      else if ( check.ok ) ui.success( `${ check.name}: ${ check.message }` );
-      else ui.error( `${ check.name}: ${ check.message }` ), errors++;
-    }
-
-    ui.nl();
-
-    if ( errors ) ui.error( `System check failed: ${ errors } requirement(s) not met.` );
-    else ui.success( 'All required system checks passed.' );
-
-    return errors === 0;
   }
 }
