@@ -1,7 +1,7 @@
+import { checkSystemRequirements } from '@/src/maintenance/commands/check';
 import { prompt, promptConfirmedPassword } from '@/src/maintenance/utils/prompt';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Config } from '@/src/server/core/Config';
-import { SystemCheck } from '@/src/server/core/SystemCheck';
 import { User } from '@/src/server/core/User';
 import { JobQueue } from '@/src/server/job/Queue';
 import { MediaRoots } from '@/src/server/media/Roots';
@@ -114,7 +114,7 @@ export const registerInitCommands = ( program: Command ) : void => {
       if ( existsSync( resolve( '.env' ) ) )
         throw new Error( 'Frame has already been initialized (.env already exists).' );
 
-      if ( ! SystemCheck.run() ) { process.exitCode = 1; return }
+      if ( ! checkSystemRequirements() ) { process.exitCode = 1; return }
 
       ui.nl();
       console.log( ui.muted( '----------' ) );
