@@ -6,3 +6,7 @@ import type { ReadStream } from 'node:fs';
 import { open } from 'node:fs/promises';
 import type { Stats } from 'node:fs';
 import type { FileHandle } from 'node:fs/promises';
+
+
+const CHUNK_SIZE = 1024 * 1024;
+const STREAM_BUFFER_SIZE = 64 * 1024;
