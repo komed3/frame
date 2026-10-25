@@ -2,7 +2,7 @@ import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { ByteRange, StreamResult } from '@/src/shared/types/stream';
-import { realpathSync, type ReadStream, type Stats } from 'node:fs';
+import type { ReadStream, Stats } from 'node:fs';
 import type { FileHandle } from 'node:fs/promises';
 import { open } from 'node:fs/promises';
 
@@ -112,9 +112,6 @@ export class Stream {
     try {
       const stats = await file.stat();
       if ( ! stats.isFile() ) throw new StreamError( 'Media file not found', 404 );
-
-      const actualPath = realpathSync( `/proc/self/fd/${ file.fd }` );
-      if ( actualPath !== path ) throw new StreamError( 'Media path changed while opening', 403 );
 
       return [ file, stats ];
     } catch ( err ) {
