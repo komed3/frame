@@ -45,4 +45,8 @@ export class Stream {
 
     return { start, end };
   }
+
+  private static etag ( stats: Stats ) : string {
+    return `"${ stats.size.toString( 16 ) }-${ Math.trunc( stats.mtimeMs ).toString( 16 ) }-${ stats.ino.toString( 16 ) }"`;
+  }
 }
