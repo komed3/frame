@@ -2,7 +2,7 @@ import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { ByteRange, StreamResult } from '@/src/shared/types/stream';
-import type { ReadStream, Stats } from 'node:fs';
+import { realpathSync, type ReadStream, type Stats } from 'node:fs';
 import type { FileHandle } from 'node:fs/promises';
 import { open } from 'node:fs/promises';
 
@@ -62,7 +62,9 @@ export class Stream {
 
   private static ifRangeMatches ( value: string | undefined, etag: string, stats: Stats ) : boolean {
     if ( ! value ) return true;
-    if ( value.startsWith( '"' ) ) return value === etag;
+
+    value = value.trim();
+    if ( value.startsWith( '"' ) || value.startsWith( 'W/' ) ) return value === etag;
 
     const date = Date.parse( value );
     return Number.isFinite( date ) && date >= Math.floor( stats.mtimeMs / 1000 ) * 1000;
@@ -83,7 +85,7 @@ export class Stream {
     return media;
   }
 
-  private static async openMedia ( media: MediaRecord ) : Promise< FileHandle > {
+  private static async openMedia ( media: MediaRecord ) : Promise< [ FileHandle, Stats ] > {
     let path: string;
 
     try { path = MediaRoots.resolve( media.rootId, media.path ) }
@@ -95,55 +97,52 @@ export class Stream {
       throw new StreamError( status < 500 ? message : 'Unable to access media', status );
     }
 
-    try {
-      const file = await open( path, 'r' );
-      const stats = await file.stat();
+    let file: FileHandle;
 
-      if ( ! stats.isFile() ) {
-        await file.close();
-        throw new StreamError( 'Media file not found', 404 );
-      }
-
-      return file;
-    } catch ( err ) {
-      if ( err instanceof StreamError ) throw err;
-
+    try { file = await open( path, 'r' ) }
+    catch ( err ) {
       const code = ( err as NodeJS.ErrnoException ).code;
+
       if ( code === 'ENOENT' || code === 'ENOTDIR' ) throw new StreamError( 'Media file not found', 404 );
       if ( code === 'EACCES' || code === 'EPERM' ) throw new StreamError( 'Media file cannot be accessed', 403 );
 
       throw err;
     }
-  }
-
-  private static contentType ( media: MediaRecord ) : string {
-    if ( media.mimeType && /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/.test( media.mimeType ) )
-      return media.mimeType;
-
-    return media.type === 'video' ? 'video/mp4' : 'audio/mpeg';
-  }
-
-  public static async open ( id: string, rangeHeader?: string, ifRangeHeader?: string, method: 'GET' | 'HEAD' = 'GET' ) : Promise< StreamResult > {
-    const media = Stream.resolveMedia( id ), file = await Stream.openMedia( media );
-    let body: ReadStream | null = null;
 
     try {
       const stats = await file.stat();
-      const size = stats.size;
-      const etag = Stream.etag( stats );
+      if ( ! stats.isFile() ) throw new StreamError( 'Media file not found', 404 );
 
+      const actualPath = realpathSync( `/proc/self/fd/${ file.fd }` );
+      if ( actualPath !== path ) throw new StreamError( 'Media path changed while opening', 403 );
+
+      return [ file, stats ];
+    } catch ( err ) {
+      try { await file.close() }
+      catch { /** Preserve the original error */ }
+
+      if ( err instanceof StreamError ) throw err;
+      throw new StreamError( 'Unable to verify media file', 500 );
+    }
+  }
+
+  private static contentType ( media: MediaRecord ) : string {
+    if ( media.mimeType && /^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/.test( media.mimeType ) ) return media.mimeType;
+    return 'application/octet-stream';
+  }
+
+  public static async open ( id: string, rangeHeader?: string, ifRangeHeader?: string, method: 'GET' | 'HEAD' = 'GET' ) : Promise< StreamResult > {
+    const media = Stream.resolveMedia( id ), [ file, stats ] = await Stream.openMedia( media );
+    let body: ReadStream | null = null;
+
+    try {
+      const size = stats.size, etag = Stream.etag( stats );
       const headers: Record< string, string > = {
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'private, no-cache',
-        'Content-Type': Stream.contentType( media ),
-        'ETag': etag,
-        'Last-Modified': stats.mtime.toUTCString(),
-        'X-Content-Type-Options': 'nosniff'
+        'Accept-Ranges': 'bytes', 'Cache-Control': 'private, no-cache', 'Content-Type': Stream.contentType( media ),
+        'ETag': etag, 'Last-Modified': stats.mtime.toUTCString(), 'X-Content-Type-Options': 'nosniff'
       };
 
-      if ( size <= 0 ) throw new StreamError( 'Media file is empty', 416, {
-        'Content-Range': 'bytes */0'
-      } );
+      if ( size <= 0 ) throw new StreamError( 'Media file is empty', 416, { 'Content-Range': 'bytes */0' } );
 
       const rangeAllowed = Stream.ifRangeMatches( ifRangeHeader, etag, stats );
       const range = ! rangeHeader || ! rangeAllowed ? Stream.defaultRange( size ) : Stream.parseRange( rangeHeader, size );
