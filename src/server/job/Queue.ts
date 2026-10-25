@@ -1,6 +1,5 @@
-import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertId, generateId, validateNumber } from '@/src/server/utils';
+import { assertId, validateNumber } from '@/src/server/utils';
 import type {
   EnqueueJob, JobKind, JobListFilters, JobRecord,
   JobRow, JobStats, JobStatus
@@ -26,6 +25,10 @@ const SELECT_JOB = `
 
 
 export class JobQueue {
+  private static isUniqueConstraint ( err: unknown ) : boolean {
+    return typeof err === 'object' && err !== null && 'errcode' in err && err.errcode === 2067;
+  }
+
   private static mapRow ( row: JobRow ) : JobRecord {
     const payload = JSON.parse( row.payloadJson ) as unknown;
     if ( ! payload || typeof payload !== 'object' || Array.isArray( payload ) )
@@ -94,16 +97,21 @@ export class JobQueue {
     if ( ! payload || typeof payload !== 'object' || Array.isArray( payload ) )
       throw new Error( 'Job payload must be an object' );
 
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
-    const result = conn().prepare( `
-      INSERT OR IGNORE INTO jobs ( id, root_id, media_id, kind, priority, max_attempts, run_after_ms, payload_json )
-      VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
-    ` ).run(
-      id, input.rootId ?? null, input.mediaId ?? null, input.kind, priority,
-      maxAttempts, runAfterMs, JSON.stringify( payload )
-    );
+    try {
+      return db.createWithId( id => {
+        conn().prepare( `
+          INSERT INTO jobs ( id, root_id, media_id, kind, priority, max_attempts, run_after_ms, payload_json )
+          VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+        ` ).run(
+          id, input.rootId ?? null, input.mediaId ?? null, input.kind, priority,
+          maxAttempts, runAfterMs, JSON.stringify( payload )
+        );
 
-    if ( Number( result.changes ) === 1 ) return id;
+        return id;
+      } );
+    } catch ( err ) {
+      if ( ! JobQueue.isUniqueConstraint( err ) ) throw err;
+    }
 
     const existing = as< { id: string } | undefined >( conn().prepare( `
       SELECT id FROM jobs
