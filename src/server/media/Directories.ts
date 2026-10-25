@@ -1,10 +1,6 @@
-import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
-import { assertId, assertRelativePath, generateId } from '@/src/server/utils';
-import type {
-  MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow,
-  MediaDirectoryTree
-} from '@/src/shared/types/directories';
+import { assertId, assertRelativePath } from '@/src/server/utils';
+import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryRow, MediaDirectoryTree } from '@/src/shared/types/directories';
 
 
 export class MediaDirectories {
@@ -141,8 +137,7 @@ export class MediaDirectories {
         parentId = parent.id;
       }
 
-      const id = generateId( Config.get( 'ID_LENGTH' ) );
-      const row = as< { id: string } | undefined >( tx.prepare( `
+      const row = db.createWithId( id => as< { id: string } | undefined >( tx.prepare( `
         INSERT INTO directories ( id, root_id, parent_id, path, name, scan_generation, scanned_at )
         VALUES ( ?, ?, ?, ?, ?, ?, strftime( '%Y-%m-%dT%H:%M:%fZ', 'now' ) )
         ON CONFLICT ( root_id, path ) DO UPDATE SET
@@ -151,7 +146,7 @@ export class MediaDirectories {
           scan_generation = excluded.scan_generation,
           scanned_at = excluded.scanned_at
         RETURNING id
-      ` ).get( id, rootId, parentId, path, name, scanGeneration ) );
+      ` ).get( id, rootId, parentId, path, name, scanGeneration ) ) );
 
       if ( ! row ) throw new Error( `Could not register media directory: ${ path }` );
       return row.id;
