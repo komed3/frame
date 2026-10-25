@@ -1,7 +1,6 @@
 import { Config } from '@/src/server/core/Config';
 import { as, conn, db } from '@/src/server/core/Database';
 import { User } from '@/src/server/core/User';
-import { generateId } from '@/src/server/utils';
 import type { ActiveSession, ActiveSessionRow, AuthResult, SessionRow } from '@/src/shared/types/auth';
 import type { UserRecord } from '@/src/shared/types/user';
 import { createHash, randomBytes } from 'node:crypto';
@@ -18,17 +17,16 @@ export class Auth {
       throw new Error( 'Invalid username or password' );
 
     const token = randomBytes( 32 ).toString( 'base64url' );
-    const id = generateId( Config.get( 'ID_LENGTH' ) );
     const now = new Date(), createdAt = now.toISOString();
     const expiresAt = new Date( now.getTime() + Config.get( 'SESSION_LIFETIME_MS' ) ).toISOString();
 
     db.transaction( tx => {
       tx.prepare( 'DELETE FROM sessions WHERE expires_at <= ?' ).run( createdAt );
 
-      tx.prepare( `
+      db.createWithId( id => tx.prepare( `
         INSERT INTO sessions ( id, user_id, token_hash, created_at, expires_at, last_seen_at )
         VALUES ( ?, ?, ?, ?, ?, ? )
-      ` ).run( id, user.id, Auth.hashToken( token ), createdAt, expiresAt, createdAt );
+      ` ).run( id, user.id, Auth.hashToken( token ), createdAt, expiresAt, createdAt ) );
     } );
 
     return { token, expiresAt, user };
