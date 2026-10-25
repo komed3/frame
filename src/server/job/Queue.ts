@@ -120,6 +120,15 @@ export class JobQueue {
       const row = as< JobRow | undefined >( tx.prepare( `
         ${ SELECT_JOB }
         WHERE status = 'pending' AND run_after_ms <= ?
+          AND (
+            kind NOT IN ( 'preview', 'frames', 'wave' )
+            OR NOT EXISTS (
+              SELECT 1 FROM jobs AS prerequisite
+              WHERE prerequisite.media_id = jobs.media_id
+                AND prerequisite.kind = 'metadata'
+                AND prerequisite.status IN ( 'pending', 'running' )
+            )
+          )
         ORDER BY priority DESC, run_after_ms, id
         LIMIT 1
       ` ).get( Date.now() ) );
