@@ -23,7 +23,7 @@ export interface ActiveSessionRow {
   isAdmin: number;
   createdAt: string;
   expiresAt: string;
-  lastSeenAt: string | null;
+  lastSeenAt: string;
 }
 
 export interface ActiveSession extends Omit< ActiveSessionRow, 'isAdmin' > {
