@@ -49,4 +49,12 @@ export class Stream {
   private static etag ( stats: Stats ) : string {
     return `"${ stats.size.toString( 16 ) }-${ Math.trunc( stats.mtimeMs ).toString( 16 ) }-${ stats.ino.toString( 16 ) }"`;
   }
+
+  private static ifRangeMatches ( value: string | undefined, etag: string, stats: Stats ) : boolean {
+    if ( ! value ) return true;
+    if ( value.startsWith( '"' ) ) return value === etag;
+
+    const date = Date.parse( value );
+    return Number.isFinite( date ) && date >= Math.floor( stats.mtimeMs / 1000 ) * 1000;
+  }
 }
