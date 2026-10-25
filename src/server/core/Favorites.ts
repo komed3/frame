@@ -1,19 +1,20 @@
 import { as, conn } from '@/src/server/core/Database';
+import { User } from '@/src/server/core/User';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset } from '@/src/server/utils';
+import { assertLimitOffset } from '@/src/server/utils';
 import type { FavoriteRecord } from '@/src/shared/types/favorites';
 
 
 export class Favorites {
   public static has ( userId: string, mediaId: string ) : boolean {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     return !! conn().prepare( 'SELECT 1 FROM favorites WHERE user_id = ? AND media_id = ?' ).get( userId, mediaId );
   }
 
   public static list ( userId: string, limit = 100, offset = 0 ) : FavoriteRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertLimitOffset( limit, offset );
 
     return as< FavoriteRecord[] >( conn().prepare( `
@@ -26,7 +27,7 @@ export class Favorites {
   }
 
   public static add ( userId: string, mediaId: string ) : boolean {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( `
@@ -39,7 +40,7 @@ export class Favorites {
   }
 
   public static remove ( userId: string, mediaId: string ) : boolean {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( 'DELETE FROM favorites WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
@@ -47,7 +48,7 @@ export class Favorites {
   }
 
   public static clear ( userId: string ) : number {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
 
     const result = conn().prepare( 'DELETE FROM favorites WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
