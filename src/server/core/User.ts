@@ -71,6 +71,13 @@ export class User {
     ).get() ).count <= 1 ) throw new Error( errMsg );
   }
 
+  public static assertUserIdSafe ( userId: string ) : void {
+    assertId( userId, 'user' );
+
+    if ( ! conn().prepare( 'SELECT 1 FROM users WHERE id = ?' ).get( userId ) )
+      throw new Error( `User ${ userId } does not exist` );
+  }
+
   public static validateUsername ( username: string ) : string {
     const value = username.trim();
     if ( ! value || value.length > 64 ) throw new Error( 'Username must contain between 1 and 64 characters' );
