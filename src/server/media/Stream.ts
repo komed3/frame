@@ -57,4 +57,9 @@ export class Stream {
     const date = Date.parse( value );
     return Number.isFinite( date ) && date >= Math.floor( stats.mtimeMs / 1000 ) * 1000;
   }
+
+  private static sendError ( res: Response, status: number, message: string ) : void {
+    if ( res.headersSent ) { res.destroy(); return }
+    res.status( status ).json( { error: message } );
+  }
 }
