@@ -1,4 +1,5 @@
 import { as, conn, db } from '@/src/server/core/Database';
+import { User } from '@/src/server/core/User';
 import { Media } from '@/src/server/media/Media';
 import { assertId, assertLimitOffset } from '@/src/server/utils';
 import type { PlayRecord, PlayRow } from '@/src/shared/types/plays';
@@ -10,7 +11,7 @@ export class Plays {
   }
 
   private static updateRow ( userId: string, playId: string, watchedMs: number, completed: boolean, finished: boolean ) : void {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( playId, 'play' );
 
     const result = conn().prepare( `
@@ -45,7 +46,7 @@ export class Plays {
   }
 
   public static listByUser ( userId: string, limit = 100, offset = 0 ) : PlayRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     return Plays.list( 'user_id = ?', [ userId ], limit, offset );
   }
 
@@ -55,14 +56,14 @@ export class Plays {
   }
 
   public static listByUserAndMedia ( userId: string, mediaId: string, limit = 100, offset = 0 ) : PlayRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     return Plays.list( 'user_id = ? AND media_id = ?', [ userId, mediaId ], limit, offset );
   }
 
   public static get ( userId: string, playId: string ) : PlayRecord | null {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( playId, 'play' );
 
     const row = as< PlayRow | undefined >( conn().prepare( `
@@ -78,8 +79,9 @@ export class Plays {
   }
 
   public static start ( userId: string, mediaId: string, sessionId: string | null = null ) : string {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
+
     if ( sessionId !== null ) assertId( sessionId, 'session' );
 
     return db.createWithId( id => {
@@ -100,7 +102,7 @@ export class Plays {
   }
 
   public static delete ( userId: string, playId: string ) : boolean {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertId( playId, 'play' );
 
     const result = conn().prepare( 'DELETE FROM plays WHERE user_id = ? AND id = ?' ).run( userId, playId );
@@ -108,7 +110,7 @@ export class Plays {
   }
 
   public static clear ( userId: string ) : number {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
 
     const result = conn().prepare( 'DELETE FROM plays WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
