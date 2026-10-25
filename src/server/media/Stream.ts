@@ -62,4 +62,31 @@ export class Stream {
     if ( res.headersSent ) { res.destroy(); return }
     res.status( status ).json( { error: message } );
   }
+
+  private static resolveMedia ( id: string, res: Response ) : MediaRecord | null {
+    let media: MediaRecord | null;
+
+    try { media = Media.get( id ) }
+    catch ( err ) {
+      Stream.sendError( res, 400, err instanceof Error ? err.message : 'Invalid media ID' );
+      return null;
+    }
+
+    if ( ! media ) {
+      Stream.sendError( res, 404, 'Media not found' );
+      return null;
+    }
+
+    if ( ! media.available ) {
+      Stream.sendError( res, 404, 'Media is unavailable' );
+      return null;
+    }
+
+    if ( media.type !== 'video' && media.type !== 'audio' ) {
+      Stream.sendError( res, 415, 'Media type cannot be streamed' );
+      return null;
+    }
+
+    return media;
+  }
 }
