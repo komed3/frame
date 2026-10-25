@@ -1,6 +1,7 @@
 import { as, conn } from '@/src/server/core/Database';
+import { User } from '@/src/server/core/User';
 import { Media } from '@/src/server/media/Media';
-import { assertId, assertLimitOffset } from '@/src/server/utils';
+import { assertLimitOffset } from '@/src/server/utils';
 import type { ProgressRecord, ProgressRow } from '@/src/shared/types/progress';
 
 
@@ -10,7 +11,7 @@ export class Progress {
   }
 
   public static list ( userId: string, limit = 100, offset = 0 ) : ProgressRecord[] {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     assertLimitOffset( limit, offset );
 
     const rows = as< ProgressRow[] >( conn().prepare( `
@@ -27,7 +28,7 @@ export class Progress {
   }
 
   public static get ( userId: string, mediaId: string ) : ProgressRecord | null {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     const row = as< ProgressRow | undefined >( conn().prepare( `
@@ -42,7 +43,7 @@ export class Progress {
   }
 
   public static save ( userId: string, mediaId: string, positionMs: number, completed = false ) : ProgressRecord {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     const row = as< ProgressRow | undefined >( conn().prepare( `
@@ -62,7 +63,7 @@ export class Progress {
   }
 
   public static delete ( userId: string, mediaId: string ) : boolean {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
     Media.assertMediaIdSafe( mediaId );
 
     const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ? AND media_id = ?' ).run( userId, mediaId );
@@ -70,7 +71,7 @@ export class Progress {
   }
 
   public static clear ( userId: string ) : number {
-    assertId( userId, 'user' );
+    User.assertUserIdSafe( userId );
 
     const result = conn().prepare( 'DELETE FROM progress WHERE user_id = ?' ).run( userId );
     return Number( result.changes );
