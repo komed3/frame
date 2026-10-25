@@ -6,7 +6,15 @@ import type { ReadStream } from 'node:fs';
 import { open } from 'node:fs/promises';
 import type { Stats } from 'node:fs';
 import type { FileHandle } from 'node:fs/promises';
+import type { ByteRange } from '@/src/shared/types/stream';
 
 
 const CHUNK_SIZE = 1024 * 1024;
 const STREAM_BUFFER_SIZE = 64 * 1024;
+
+
+export class Stream {
+  private static defaultRange ( size: number ) : ByteRange {
+    return { start: 0, end: Math.min( size - 1, CHUNK_SIZE - 1 ) };
+  }
+}
