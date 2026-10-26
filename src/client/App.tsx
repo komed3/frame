@@ -22,7 +22,7 @@ export function App () {
       <Header />
       <Sidebar />
 
-      <main key= { pathname } className= 'min-h-screen mt-38'>
+      <main key= { pathname } className= 'min-h-screen'>
         <Routing />
       </main>
 
