@@ -1,9 +1,12 @@
 import logo from '@/src/client/assets/logo.svg';
-import { FilterIcon, SearchIcon } from 'lucide-react';
+import { useApi } from '@/src/client/context/ApiContext';
+import { FilterIcon, LogOutIcon, SearchIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
 export function Header () {
+  const { user, logout } = useApi();
+
   return (
     <header className= 'fixed inset-x-0 top-0 z-99 h-18 bg-slate-800 shadow'>
       { /** Logo */ }
@@ -19,7 +22,7 @@ export function Header () {
 
       { /** Search + Filter */ }
       <div className= 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
-        <form className= 'flex items-center gap-8'>
+        <form className= 'flex items-center gap-6'>
           <div className= 'flex h-10 bg-slate-900 rounded-full overflow-hidden'>
             <input
               type= 'text'
@@ -48,7 +51,24 @@ export function Header () {
       </div>
 
       { /** User */ }
-      <div className= 'absolute top-1/2 right-4 transform -translate-y-1/2'></div>
+      <div className= 'absolute top-1/2 right-4 transform -translate-y-1/2'>
+        <div className= 'flex items-center gap-6'>
+          <span className= 'text-sm'>
+            Hi, <b>{ user?.username }</b>
+          </span>
+
+          <button
+            onClick= { () => logout().catch( () => {} ) }
+            className= {
+              'flex items-center gap-2 h-8.5 px-3 text-sm font-medium text-slate-900 ' +
+              'bg-slate-200 rounded transition hover:bg-white'
+            }
+          >
+            <LogOutIcon size= { 16 } />
+            <span>Sign out</span>
+          </button>
+        </div>
+      </div>
     </header>
   );
 }
