@@ -151,6 +151,45 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   const [ user, setUser ] = useState< ApiSession[ 'user' ] | null >( null );
   const [ loading, setLoading ] = useState( true );
   const [ error, setError ] = useState< string | null >( null );
+
+  const request = useCallback( async < T, > ( path: string, options: ApiRequestOptions = {} ) : Promise< T > => {
+    const url = new URL( `${ API }${ path }`, window.location.origin );
+
+    for ( const [ key, value ] of Object.entries( options.query ?? {} ) )
+      if ( value !== undefined && value !== null ) url.searchParams.set( key, String( value ) );
+
+    const headers = new Headers( options.headers );
+    if ( token ) headers.set( 'Authorization', `Bearer ${ token }` );
+
+    if ( options.body !== undefined && ! headers.has( 'Content-Type' ) )
+      headers.set( 'Content-Type', 'application/json' );
+
+    const response = await fetch( url, { ...options, headers } );
+
+    if ( response.status === 401 && path !== '/auth/login' ) {
+      setToken( null ), setUser( null );
+      sessionStorage.removeItem( TOKEN_KEY );
+    }
+
+    if ( ! response.ok ) {
+      let message = response.statusText || 'API request failed';
+
+      try {
+        const body = await response.json() as { error?: string };
+        if ( body.error ) message = body.error;
+      } catch {}
+
+      const apiError = new ApiError( message, response.status );
+      setError( message );
+      throw apiError;
+    }
+
+    if ( response.status === 204 ) return undefined as T;
+    if ( response.headers.get( 'Content-Type' )?.includes( 'application/json' ) )
+      return response.json() as Promise< T >;
+
+    return response as T;
+  }, [ token ] );
 }
 
 
