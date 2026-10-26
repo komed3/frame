@@ -310,6 +310,27 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       list: id => request( `/assets/${ e( id ) }` ),
       url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ e( id ) }/${ kind }/${ e( variant ) }`
     },
+
+    stream: ( id, options = {} ) => {
+      const headers = new Headers();
+      if ( token ) headers.set( 'Authorization', `Bearer ${ token }` );
+      if ( options.range ) headers.set( 'Range', options.range );
+
+      return fetch( `${ API }/stream/${ encodeURIComponent( id ) }`, { headers, signal: options.signal } ).then( async res => {
+        if ( ! res.ok && res.status !== 206 ) {
+          let message = res.statusText || 'Stream request failed';
+
+          try {
+            const body = await res.json() as { error?: string };
+            if ( body.error ) message = body.error;
+          } catch {}
+
+          throw new ApiError( message, res.status );
+        }
+
+        return res;
+      } );
+    },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
