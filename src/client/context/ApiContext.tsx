@@ -261,6 +261,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
   const clearError = useCallback( () => setError( null ), [] );
   const pageQuery = ( page?: ApiPage ) => ( { limit: page?.limit, offset: page?.offset } );
+  const e = encodeURIComponent;
 
 
   const value = useMemo< ApiContextValue >( () => ( {
@@ -269,21 +270,21 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     media: {
       list: options => request< MediaRecord[] >( '/media', { query: options } ),
-      get: id => request< MediaRecord | null >( `/media/${ encodeURIComponent( id ) }` ),
-      metadata: id => request< MediaMetadataRecord[] >( `/media/${ encodeURIComponent( id ) }/metadata` ),
+      get: id => request< MediaRecord | null >( `/media/${ e( id ) }` ),
+      metadata: id => request< MediaMetadataRecord[] >( `/media/${ e( id ) }/metadata` ),
       setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >(
-        `/media/${ encodeURIComponent( id ) }/metadata/${ encodeURIComponent( key ) }`,
+        `/media/${ e( id ) }/metadata/${ e( key ) }`,
         { method: 'PUT', body: JSON.stringify( { value } ) }
       ),
-      deleteMetadata: ( id, key ) => request( `/media/${ encodeURIComponent( id ) }/metadata/${ encodeURIComponent( key ) }`, {
+      deleteMetadata: ( id, key ) => request( `/media/${ e( id ) }/metadata/${ e( key ) }`, {
         method: 'DELETE'
       } ),
-      tags: id => request( `/media/${ encodeURIComponent( id ) }/tags` ),
-      setTags: ( id, tagIds ) => request( `/media/${ encodeURIComponent( id ) }/tags`, {
+      tags: id => request( `/media/${ e( id ) }/tags` ),
+      setTags: ( id, tagIds ) => request( `/media/${ e( id ) }/tags`, {
         method: 'PUT', body: JSON.stringify( { tagIds } )
       } ),
-      categories: id => request( `/media/${ encodeURIComponent( id ) }/categories` ),
-      setCategories: ( id, categoryIds ) => request( `/media/${ encodeURIComponent( id ) }/categories`, {
+      categories: id => request( `/media/${ e( id ) }/categories` ),
+      setCategories: ( id, categoryIds ) => request( `/media/${ e( id ) }/categories`, {
         method: 'PUT', body: JSON.stringify( { categoryIds } )
       } )
     },
@@ -294,22 +295,20 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     roots: {
       list: () => request< MediaRoot[] >( '/root' ),
-      scan: id => request( `/root/${ encodeURIComponent( id ) }/scan`, { method: 'POST' } ),
+      scan: id => request( `/root/${ e( id ) }/scan`, { method: 'POST' } ),
       scanAll: () => request( '/root/scan-all', { method: 'POST' } )
     },
 
     directories: {
-      tree: rootId => request( `/dir/${ encodeURIComponent( rootId ) }/tree` ),
-      list: ( rootId, directoryId, page ) => request( `/dir/${ encodeURIComponent( rootId ) }`, {
+      tree: rootId => request( `/dir/${ e( rootId ) }/tree` ),
+      list: ( rootId, directoryId, page ) => request( `/dir/${ e( rootId ) }`, {
         query: { directoryId, ...pageQuery( page ) }
       } )
     },
 
     assets: {
-      list: id => request( `/assets/${ encodeURIComponent( id ) }` ),
-      url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ encodeURIComponent( id ) }/${ kind }/${
-        encodeURIComponent( variant )
-      }`
+      list: id => request( `/assets/${ e( id ) }` ),
+      url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ e( id ) }/${ kind }/${ e( variant ) }`
     },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
