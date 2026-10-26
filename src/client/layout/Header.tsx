@@ -1,5 +1,6 @@
+import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
-import { FilterIcon, LogOutIcon, MenuIcon, SearchIcon } from 'lucide-react';
+import { FilterIcon, LogOutIcon, SearchIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
@@ -10,20 +11,13 @@ export function Header () {
     <header className= 'fixed inset-x-0 top-0 z-99 h-18 bg-slate-800 shadow'>
       { /** Menu */ }
       <div className= 'absolute top-1/2 left-4 transform -translate-y-1/2'>
-        <div className= 'flex items-center gap-6'>
-          <button
-            className= {
-              'flex items-center gap-2 h-8.5 px-2.5 text-sm font-medium text-slate-900 ' +
-              'bg-slate-200 rounded transition hover:bg-white'
-            }
-          >
-            <MenuIcon size= { 16 } />
-          </button>
-
-          <Link to= '/' className= 'text-lg font-black tracking-wide'>
-            Frame
-          </Link>
-        </div>
+        <Link to= '/'>
+          <img
+            src= { logo }
+            className= 'w-12 h-12'
+            alt= 'Frame'
+          />
+        </Link>
       </div>
 
       { /** Search + Filter */ }
