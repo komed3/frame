@@ -1,8 +1,8 @@
+import type { MediaAssetKind, MediaAssetRecord } from '@/src/shared/types/assets';
 import type { DatabaseStats } from '@/src/shared/types/database';
-import type { MediaAssetRecord, MediaAssetKind } from '@/src/shared/types/assets';
 import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryTree } from '@/src/shared/types/directories';
 import type { FavoriteRecord } from '@/src/shared/types/favorites';
-import type { JobKind, JobListFilters, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
+import type { EnqueueJob, JobListFilters, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaListOptions, MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
