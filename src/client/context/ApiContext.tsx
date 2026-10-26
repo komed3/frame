@@ -152,6 +152,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   const [ loading, setLoading ] = useState( true );
   const [ error, setError ] = useState< string | null >( null );
 
+
   const request = useCallback( async < T, > ( path: string, options: ApiRequestOptions = {} ) : Promise< T > => {
     const url = new URL( `${ API }${ path }`, window.location.origin );
 
@@ -189,6 +190,26 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       return response.json() as Promise< T >;
 
     return response as T;
+  }, [ token ] );
+
+
+  const refreshSession = useCallback( async () => {
+    const sessionToken = token ?? sessionStorage.getItem( TOKEN_KEY );
+    if ( ! sessionToken ) { setUser( null ), setLoading( false ); return }
+    if ( ! token ) setToken( sessionToken );
+
+    try {
+      const response = await fetch( `${ API }/auth/me`, { headers: { Authorization: `Bearer ${ sessionToken }` } } );
+      if ( ! response.ok ) throw new ApiError( 'Session expired', response.status );
+
+      const result = await response.json() as ApiSession;
+      setUser( result.user ), setError( null );
+    } catch {
+      setToken( null ), setUser( null );
+      sessionStorage.removeItem( TOKEN_KEY );
+    } finally {
+      setLoading( false );
+    }
   }, [ token ] );
 }
 
