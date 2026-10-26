@@ -13,6 +13,6 @@
 
 @layer base {
   html, body {
-    @apply text-white bg-slate-900;
+    @apply text-white bg-slate-900 select-none;
   }
 }
