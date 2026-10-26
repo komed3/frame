@@ -395,6 +395,13 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       stats: () => request< Record< string, unknown > >( '/db/stats' )
     }
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
+
+
+  return (
+    <ApiContext.Provider value= { value }>
+      { children }
+    </ApiContext.Provider>
+  );
 }
 
 
