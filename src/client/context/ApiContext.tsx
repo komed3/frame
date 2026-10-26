@@ -237,40 +237,40 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     playlists: {
       list: page => request< PlaylistRecord[] >( '/playlist', { query: pageQuery( page ) } ),
-      get: id => request( `/playlist/${ e( id ) }` ),
-      create: ( name, description ) => request( '/playlist', { method: 'POST', body: JSON.stringify( { name, description } ) } ),
-      update: ( id, data ) => request( `/playlist/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( data ) } ),
-      delete: id => request( `/playlist/${ e( id ) }`, { method: 'DELETE' } ),
-      items: ( id, page ) => request( `/playlist/${ e( id ) }/items`, { query: pageQuery( page ) } ),
-      add: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'POST' } ),
-      remove: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' } ),
-      clear: id => request( `/playlist/${ e( id ) }/items`, { method: 'DELETE' } ),
-      move: ( id, mediaId, position ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
-        method: 'PATCH', body: JSON.stringify( { position } )
+      get: id => request< PlaylistRecord | null >( `/playlist/${ e( id ) }` ),
+      create: ( name, description ) => request< PlaylistRecord | null >( '/playlist', { method: 'POST', body: s( { name, description } ) } ),
+      update: ( id, data ) => request< PlaylistRecord | null >( `/playlist/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
+      delete: id => request< void >( `/playlist/${ e( id ) }`, { method: 'DELETE' } ),
+      items: ( id, page ) => request< PlaylistItemRecord[] >( `/playlist/${ e( id ) }/items`, { query: pageQuery( page ) } ),
+      add: ( id, mediaId ) => request< PlaylistItemRecord[] >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'POST' } ),
+      remove: ( id, mediaId ) => request< void >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' } ),
+      clear: id => request< ApiPlaylistClearResult >( `/playlist/${ e( id ) }/items`, { method: 'DELETE' } ),
+      move: ( id, mediaId, position ) => request< PlaylistItemRecord[] >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
+        method: 'PATCH', body: s( { position } )
       } ),
-      contains: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }` ),
-      forMedia: ( mediaId, page ) => request( `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) } ),
-      next: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next` ),
-      previous: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev` )
+      contains: ( id, mediaId ) => request< ApiPlaylistContainsResult >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }` ),
+      forMedia: ( mediaId, page ) => request< PlaylistRecord[] >( `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) } ),
+      next: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next` ),
+      previous: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev` )
     },
 
     prefs: {
-      all: () => request( '/pref' ),
-      get: key => request( `/pref/${ key }` ),
-      set: ( key, value ) => request( `/pref/${ key }`, { method: 'PUT', body: JSON.stringify( { value } ) } ),
-      reset: key => request( `/pref/${ key }`, { method: 'DELETE' } ),
-      resetAll: () => request( '/pref', { method: 'DELETE' } )
+      all: () => request< ApiPreferences >( '/pref' ),
+      get: key => request< ApiPreference< PrefValue< typeof key > > >( `/pref/${ key }` ),
+      set: ( key, value ) => request< ApiPreference< PrefValue< typeof key > > >( `/pref/${ key }`, { method: 'PUT', body: s( { value } ) } ),
+      reset: key => request< ApiDeleteResult >( `/pref/${ key }`, { method: 'DELETE' } ),
+      resetAll: () => request< ApiDeleteResult >( '/pref', { method: 'DELETE' } )
     },
 
     jobs: {
       list: filters => request< JobRecord[] >( '/job', { query: filters } ),
-      get: id => request( `/job/${ e( id ) }` ),
+      get: id => request< JobRecord | null >( `/job/${ e( id ) }` ),
       stats: () => request< JobStats >( '/job/stats' ),
-      enqueue: data => request( '/job', { method: 'POST', body: JSON.stringify( data ) } )
+      enqueue: data => request< ApiEnqueueResult >( '/job', { method: 'POST', body: s( data ) } )
     },
 
     database: {
-      stats: () => request< Record< string, unknown > >( '/db/stats' )
+      stats: () => request< DatabaseStats >( '/db/stats' )
     }
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 
