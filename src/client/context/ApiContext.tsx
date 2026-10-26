@@ -244,6 +244,12 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
   const clearError = useCallback( () => setError( null ), [] );
   const query = ( page?: ApiPage ) => ( { limit: page?.limit, offset: page?.offset } );
+
+
+  const value = useMemo< ApiContextValue >( () => ( {
+    user, token, authenticated: user !== null, loading, error, request, login, logout,
+    refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
+  } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
 
