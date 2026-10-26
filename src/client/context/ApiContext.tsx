@@ -1,15 +1,19 @@
 import type {
-  ApiHealth, ApiLogin, ApiLoginResult, ApiPage, ApiPreference, ApiPreferences,
-  ApiSession, ApiStreamOptions, ApiDeleteResult, ApiFavorite
+  ApiDeleteResult, ApiFavorite, ApiHealth, ApiLogin, ApiLoginResult, ApiPage,
+  ApiPreference, ApiPreferences, ApiSession, ApiStreamOptions
 } from '@/src/shared/types/api';
-import type { MediaRecord, MediaListOptions, MediaType, MediaUpdate } from '@/src/shared/types/media';
+import type { MediaRecord, MediaListOptions } from '@/src/shared/types/media';
 import type { MediaSearchOptions, MediaSearchResult } from '@/src/shared/types/search';
 import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryTree } from '@/src/shared/types/directories';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import type { TagRecord, CategoryRecord } from '@/src/shared/types/taxonomy';
 import type { PlaylistRecord, PlaylistItemRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
-import type { MediaAssetRecord } from '@/src/shared/types/assets';
+import type { MediaAssetKind } from '@/src/shared/types/assets';
+import type { FavoriteRecord } from '@/src/shared/types/favorites';
+import type { JobKind, JobRecord, JobStats, JobStatus, EnqueueJob } from '@/src/shared/types/job';
+import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
+import type { PrefName, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
