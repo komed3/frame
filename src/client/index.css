@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 
 
+@font-face {
+  font-family: 'Inter';
+  font-weight: 100 900;
+  src: url( ./assets/Inter.woff2 ) format( 'woff2' );
+}
+
 @layer base {
   html, body {
     @apply text-white bg-slate-900;
