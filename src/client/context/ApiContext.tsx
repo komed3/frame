@@ -199,36 +199,40 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     tags: {
       list: () => request< TagRecord[] >( '/tag' ),
-      get: id => request( `/tag/${ e( id ) }` ),
-      create: name => request( '/tag', { method: 'POST', body: JSON.stringify( { name } ) } ),
-      rename: ( id, name ) => request( `/tag/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( { name } ) } ),
-      delete: id => request( `/tag/${ e( id ) }`, { method: 'DELETE' } )
+      get: id => request< TagRecord | null >( `/tag/${ e( id ) }` ),
+      create: name => request< TagRecord | null >( '/tag', { method: 'POST', body: s( { name } ) } ),
+      rename: ( id, name ) => request< TagRecord | null >( `/tag/${ e( id ) }`, { method: 'PATCH', body: s( { name } ) } ),
+      delete: id => request< void >( `/tag/${ e( id ) }`, { method: 'DELETE' } )
     },
 
     categories: {
       list: () => request< CategoryRecord[] >( '/category' ),
-      get: id => request( `/category/${ e( id ) }` ),
-      create: ( name, parentId = null ) => request( '/category', { method: 'POST', body: JSON.stringify( { name, parentId } ) } ),
-      rename: ( id, name ) => request( `/category/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( { name } ) } ),
-      setParent: ( id, parentId ) => request( `/category/${ e( id ) }/parent`, { method: 'PUT', body: JSON.stringify( { parentId } ) } ),
-      delete: id => request( `/category/${ e( id ) }`, { method: 'DELETE' } )
+      get: id => request< CategoryRecord | null >( `/category/${ e( id ) }` ),
+      create: ( name, parentId = null ) => request< CategoryRecord | null >( '/category', { method: 'POST', body: s( { name, parentId } ) } ),
+      rename: ( id, name ) => request< CategoryRecord | null >( `/category/${ e( id ) }`, { method: 'PATCH', body: s( { name } ) } ),
+      setParent: ( id, parentId ) => request< CategoryRecord | null >( `/category/${ e( id ) }/parent`, {
+        method: 'PUT', body: s( { parentId } )
+      } ),
+      delete: id => request< void >( `/category/${ e( id ) }`, { method: 'DELETE' } )
     },
 
     favorites: {
       list: page => request< FavoriteRecord[] >( '/favorite', { query: pageQuery( page ) } ),
-      has: mediaId => request( `/favorite/${ e( mediaId ) }` ),
-      add: mediaId => request( `/favorite/${ e( mediaId ) }`, { method: 'POST' } ),
-      remove: mediaId => request( `/favorite/${ e( mediaId ) }`, { method: 'DELETE' } )
+      has: mediaId => request< ApiFavorite >( `/favorite/${ e( mediaId ) }` ),
+      add: mediaId => request< ApiFavoriteAddResult >( `/favorite/${ e( mediaId ) }`, { method: 'POST' } ),
+      remove: mediaId => request< void >( `/favorite/${ e( mediaId ) }`, { method: 'DELETE' } )
     },
 
     markers: {
       list: page => request< MarkerRecord[] >( '/marker', { query: pageQuery( page ) } ),
-      get: id => request( `/marker/${ e( id ) }` ),
-      update: ( id, data ) => request( `/marker/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( data ) } ),
-      delete: id => request( `/marker/${ e( id ) }`, { method: 'DELETE' } ),
-      forMedia: ( id, page ) => request( `/media/${ e( id ) }/markers`, { query: pageQuery( page ) } ),
-      createForMedia: ( id, data ) => request( `/media/${ e( id ) }/markers`, { method: 'POST', body: JSON.stringify( data ) } ),
-      clearForMedia: id => request( `/media/${ e( id ) }/markers`, { method: 'DELETE' } )
+      get: id => request< MarkerRecord | null >( `/marker/${ e( id ) }` ),
+      update: ( id, data ) => request< MarkerRecord | null >( `/marker/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
+      delete: id => request< void >( `/marker/${ e( id ) }`, { method: 'DELETE' } ),
+      forMedia: ( id, page ) => request< MarkerRecord[] >( `/media/${ e( id ) }/markers`, { query: pageQuery( page ) } ),
+      createForMedia: ( id, data ) => request< Pick< MarkerRecord, 'id' > >( `/media/${ e( id ) }/markers`, {
+        method: 'POST', body: s( data )
+      } ),
+      clearForMedia: id => request< ApiMarkerClearResult >( `/media/${ e( id ) }/markers`, { method: 'DELETE' } )
     },
 
     playlists: {
