@@ -8,8 +8,14 @@ import { useLocation } from 'react-router';
 
 
 export function App () {
-  const { user } = useApi();
+  const { user, loading } = useApi();
   const { pathname } = useLocation();
+
+  if ( loading ) return (
+    <div className= 'flex justify-center items-center min-h-screen'>
+      <span>Loading Frame …</span>
+    </div>
+  );
 
   return ! user ? <Login /> : (
     <>
