@@ -68,7 +68,7 @@ interface ApiContextValue {
     list: ( rootId: string, directoryId?: string | null, page?: ApiPage ) => Promise< {
       root: { id: string; name?: string };
       current: MediaDirectory | null;
-      breadcrumbs: Pick< MediaDirectory, 'id' | 'name' | 'path' >[];
+      breadcrumbs: { id: string | null; name: string | undefined; path: string }[];
       directories: MediaDirectoryEntry[];
       media: MediaRecord[];
       limit: number;
@@ -76,35 +76,48 @@ interface ApiContextValue {
     } >;
   };
   assets: {
-    list: ( mediaId: string ) => Promise< MediaAssetRecord[] >;
-    url: ( mediaId: string, kind: string, variant?: string ) => string;
+    list: ( mediaId: string ) => Promise< {
+      id: string;
+      mediaId: string;
+      kind: MediaAssetKind;
+      variant: string;
+      fingerprint: string | null;
+      mimeType: string | null;
+      sizeBytes: number | null;
+      width: number | null;
+      height: number | null;
+      data: Record< string, unknown >;
+      createdAt: string;
+      url: string;
+    }[] >;
+    url: ( mediaId: string, kind: MediaAssetKind, variant?: string ) => string;
   };
   stream: ( id: string, options?: ApiStreamOptions ) => Promise< Response >;
   tags: {
     list: () => Promise< TagRecord[] >;
-    get: ( id: string ) => Promise< TagRecord >;
-    create: ( name: string ) => Promise< TagRecord >;
-    rename: ( id: string, name: string ) => Promise< TagRecord >;
+    get: ( id: string ) => Promise< TagRecord | null >;
+    create: ( name: string ) => Promise< TagRecord | null >;
+    rename: ( id: string, name: string ) => Promise< TagRecord | null >;
     delete: ( id: string ) => Promise< void >;
   };
   categories: {
     list: () => Promise< CategoryRecord[] >;
-    get: ( id: string ) => Promise< CategoryRecord >;
-    create: ( name: string, parentId?: string | null ) => Promise< CategoryRecord >;
-    rename: ( id: string, name: string ) => Promise< CategoryRecord >;
-    setParent: ( id: string, parentId: string | null ) => Promise< CategoryRecord >;
+    get: ( id: string ) => Promise< CategoryRecord | null >;
+    create: ( name: string, parentId?: string | null ) => Promise< CategoryRecord | null >;
+    rename: ( id: string, name: string ) => Promise< CategoryRecord | null >;
+    setParent: ( id: string, parentId: string | null ) => Promise< CategoryRecord | null >;
     delete: ( id: string ) => Promise< void >;
   };
   favorites: {
-    list: ( page?: ApiPage ) => Promise< MediaRecord[] >;
+    list: ( page?: ApiPage ) => Promise< FavoriteRecord[] >;
     has: ( mediaId: string ) => Promise< ApiFavorite >;
-    add: ( mediaId: string ) => Promise< ApiFavorite >;
+    add: ( mediaId: string ) => Promise< ApiFavorite & { added: boolean } >;
     remove: ( mediaId: string ) => Promise< void >;
   };
   markers: {
     list: ( page?: ApiPage ) => Promise< MarkerRecord[] >;
-    get: ( id: string ) => Promise< MarkerRecord >;
-    update: ( id: string, data: MarkerUpdate ) => Promise< MarkerRecord >;
+    get: ( id: string ) => Promise< MarkerRecord | null >;
+    update: ( id: string, data: MarkerUpdate ) => Promise< MarkerRecord | null >;
     delete: ( id: string ) => Promise< void >;
     forMedia: ( id: string, page?: ApiPage ) => Promise< MarkerRecord[] >;
     createForMedia: ( id: string, data: Pick< MarkerRecord, 'positionMs' > &
@@ -113,9 +126,9 @@ interface ApiContextValue {
   };
   playlists: {
     list: ( page?: ApiPage ) => Promise< PlaylistRecord[] >;
-    get: ( id: string ) => Promise< PlaylistRecord >;
-    create: ( name: string, description?: string ) => Promise< PlaylistRecord >;
-    update: ( id: string, data: PlaylistUpdate ) => Promise< PlaylistRecord >;
+    get: ( id: string ) => Promise< PlaylistRecord | null >;
+    create: ( name: string, description?: string ) => Promise< PlaylistRecord | null >;
+    update: ( id: string, data: PlaylistUpdate ) => Promise< PlaylistRecord | null >;
     delete: ( id: string ) => Promise< void >;
     items: ( id: string, page?: ApiPage ) => Promise< PlaylistItemRecord[] >;
     add: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord[] >;
@@ -128,20 +141,20 @@ interface ApiContextValue {
     previous: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord | null >;
   };
   prefs: {
-    all: () => Promise< ApiPreferences >;
-    get: < T > ( key: string ) => Promise< ApiPreference< T > >;
-    set: < T > ( key: string, value: T ) => Promise< ApiPreference< T > >;
-    reset: ( key: string ) => Promise< ApiDeleteResult >;
+    all: () => Promise< { schema: PrefTable; values: PrefSchema } >;
+    get: < K extends PrefName > ( key: K ) => Promise< ApiPreference< PrefValue< K > > >;
+    set: < K extends PrefName > ( key: K, value: PrefValue< K > ) => Promise< ApiPreference< PrefValue< K > > >;
+    reset: ( key: PrefName ) => Promise< ApiDeleteResult >;
     resetAll: () => Promise< ApiDeleteResult >;
   };
   jobs: {
-    list: ( query?: Record< string, string | number | undefined > ) => Promise< unknown[] >;
-    get: ( id: string ) => Promise< unknown >;
-    stats: () => Promise< Record< string, number > >;
-    enqueue: ( data: unknown ) => Promise< { job: unknown } >;
+    list: ( filters?: { status?: JobStatus; kind?: JobKind; rootId?: string; mediaId?: string } & ApiPage ) => Promise< JobRecord[] >;
+    get: ( id: string ) => Promise< JobRecord | null >;
+    stats: () => Promise< JobStats >;
+    enqueue: ( data: EnqueueJob ) => Promise< { job: JobRecord | null } >;
   };
   database: {
-    stats: () => Promise< Record< string, number > >;
+    stats: () => Promise< Record< string, unknown > >;
   };
 }
 
