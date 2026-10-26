@@ -172,29 +172,29 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     },
 
     assets: {
-      list: id => request( `/assets/${ e( id ) }` ),
+      list: id => request< ApiAssetRecord[] >( `/assets/${ e( id ) }` ),
       url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ e( id ) }/${ kind }/${ e( variant ) }`
     },
 
-    stream: async ( id, o = {} ) => {
+    stream: async ( id, options = {} ) => {
       const headers = new Headers();
       if ( token ) headers.set( 'Authorization', `Bearer ${ token }` );
-      if ( o.range ) headers.set( 'Range', o.range );
+      if ( options.range ) headers.set( 'Range', options.range );
 
-      return fetch( `${ API }/stream/${ e( id ) }`, { headers, signal: o.signal } ).then( async res => {
-        if ( ! res.ok && res.status !== 206 ) {
-          let message = res.statusText || 'Stream request failed';
+      const res = await fetch( `${ API }/stream/${ e( id ) }`, { headers, signal: options.signal } );
 
-          try {
-            const body = await res.json() as { error?: string };
-            if ( body.error ) message = body.error;
-          } catch {}
+      if ( ! res.ok && res.status !== 206 ) {
+        let message = res.statusText || 'Stream request failed';
 
-          throw new ApiError( message, res.status );
-        }
+        try {
+          const body = await res.json() as { error?: string };
+          if ( body.error ) message = body.error;
+        } catch {}
 
-        return res;
-      } );
+        throw new ApiError( message, res.status );
+      }
+
+      return res;
     },
 
     tags: {
