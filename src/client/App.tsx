@@ -4,6 +4,7 @@ import { Header } from '@/src/client/layout/Header';
 import { Sidebar } from '@/src/client/layout/Sidebar';
 import { Routing } from '@/src/client/Routing';
 import { Login } from '@/src/client/views/Login';
+import { Loader2Icon } from 'lucide-react';
 import { useLocation } from 'react-router';
 
 
@@ -13,7 +14,7 @@ export function App () {
 
   if ( loading ) return (
     <div className= 'flex justify-center items-center min-h-screen'>
-      <span>Loading Frame …</span>
+      <Loader2Icon size= { 60 } strokeWidth= { 0.8 } className= 'animate-spin' />
     </div>
   );
 
