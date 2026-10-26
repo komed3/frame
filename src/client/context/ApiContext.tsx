@@ -375,6 +375,41 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       } ),
       clearForMedia: id => request( `/media/${ e( id ) }/markers`, { method: 'DELETE' } )
     },
+
+    playlists: {
+      list: page => request< PlaylistRecord[] >( '/playlist', { query: pageQuery( page ) } ),
+      get: id => request( `/playlist/${ e( id ) }` ),
+      create: ( name, description ) => request( '/playlist', {
+        method: 'POST', body: JSON.stringify( { name, description } )
+      } ),
+      update: ( id, data ) => request( `/playlist/${ e( id ) }`, {
+        method: 'PATCH', body: JSON.stringify( data )
+      } ),
+      delete: id => request( `/playlist/${ e( id ) }`, { method: 'DELETE' } ),
+      items: ( id, page ) => request( `/playlist/${ e( id ) }/items`, { query: pageQuery( page ) } ),
+      add: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
+        method: 'POST'
+      } ),
+      remove: ( id, mediaId ) => request(
+        `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' }
+      ),
+      clear: id => request( `/playlist/${ e( id ) }/items`, { method: 'DELETE' } ),
+      move: ( id, mediaId, position ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
+        method: 'PATCH', body: JSON.stringify( { position } )
+      } ),
+      contains: ( id, mediaId ) => request(
+        `/playlist/${ e( id ) }/items/${ e( mediaId ) }`
+      ),
+      forMedia: ( mediaId, page ) => request(
+        `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) }
+      ),
+      next: ( id, mediaId ) => request(
+        `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next`
+      ),
+      previous: ( id, mediaId ) => request(
+        `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev`
+      )
+    },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
