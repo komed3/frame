@@ -144,29 +144,31 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       list: o => request< MediaRecord[] >( '/media', { query: o } ),
       get: id => request< MediaRecord | null >( `/media/${ e( id ) }` ),
       metadata: id => request< MediaMetadataRecord[] >( `/media/${ e( id ) }/metadata` ),
-      setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >(
-        `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'PUT', body: JSON.stringify( { value } ) }
-      ),
-      deleteMetadata: ( id, key ) => request( `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'DELETE' } ),
-      tags: id => request( `/media/${ e( id ) }/tags` ),
-      setTags: ( id, tagIds ) => request( `/media/${ e( id ) }/tags`, { method: 'PUT', body: JSON.stringify( { tagIds } ) } ),
-      categories: id => request( `/media/${ e( id ) }/categories` ),
-      setCategories: ( id, catIds ) => request( `/media/${ e( id ) }/categories`, {
-        method: 'PUT', body: JSON.stringify( { categoryIds: catIds } )
+      setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >( `/media/${ e( id ) }/metadata/${ e( key ) }`, {
+        method: 'PUT', body: s( { value } )
+      } ),
+      deleteMetadata: ( id, key ) => request< void >( `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'DELETE' } ),
+      tags: id => request< TagRecord[] >( `/media/${ e( id ) }/tags` ),
+      setTags: ( id, tagIds ) => request< TagRecord[] >( `/media/${ e( id ) }/tags`, { method: 'PUT', body: s( { tagIds } ) } ),
+      categories: id => request< CategoryRecord[] >( `/media/${ e( id ) }/categories` ),
+      setCategories: ( id, categoryIds ) => request< CategoryRecord[] >( `/media/${ e( id ) }/categories`, {
+        method: 'PUT', body: s( { categoryIds } )
       } )
     },
 
-    search: o => request< MediaSearchResult >( '/search', { method: 'POST', body: JSON.stringify( o ) } ),
+    search: options => request< MediaSearchResult >( '/search', { method: 'POST', body: s( options ) } ),
 
     roots: {
       list: () => request< MediaRoot[] >( '/root' ),
-      scan: id => request( `/root/${ e( id ) }/scan`, { method: 'POST' } ),
-      scanAll: () => request( '/root/scan-all', { method: 'POST' } )
+      scan: id => request< ApiRootScanResult >( `/root/${ e( id ) }/scan`, { method: 'POST' } ),
+      scanAll: () => request< ApiRootScanAllResult >( '/root/scan-all', { method: 'POST' } )
     },
 
     directories: {
-      tree: rootId => request( `/dir/${ e( rootId ) }/tree` ),
-      list: ( rootId, directoryId, page ) => request( `/dir/${ e( rootId ) }`, { query: { directoryId, ...pageQuery( page ) } } )
+      tree: rootId => request< ApiDirectoryTreeResult >( `/dir/${ e( rootId ) }/tree` ),
+      list: ( rootId, directoryId, page ) => request< ApiDirectoryListResult >( `/dir/${ e( rootId ) }`, {
+        query: { directoryId, ...pageQuery( page ) }
+      } )
     },
 
     assets: {
