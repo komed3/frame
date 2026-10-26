@@ -141,3 +141,6 @@ interface ApiContextValue {
     stats: () => Promise< Record< string, number > >;
   };
 }
+
+
+const ApiContext = createContext< ApiContextValue | null >( null );
