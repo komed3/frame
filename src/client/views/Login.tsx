@@ -7,7 +7,6 @@ export function Login () {
   const [ username, setUsername ] = useState( '' );
   const [ password, setPassword ] = useState( '' );
 
-
   const handleSubmit = async ( event: SubmitEvent< HTMLFormElement > ) => {
     event.preventDefault();
     try { await login( { username, password } ) } catch {}
@@ -59,6 +58,23 @@ export function Login () {
               }
             />
           </div>
+
+          { error && (
+            <p role= 'alert' className= 'font-semibold text-red-400'>
+              { error }
+            </p>
+          ) }
+
+          <button
+            type= 'submit'
+            disabled= { loading || ! username.trim() || ! password }
+            className= {
+              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-200 rounded ' +
+              'transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50'
+            }
+          >
+            { loading ? 'Signing in …' : 'Sign in' }
+          </button>
         </form>
       </div>
     </div>
