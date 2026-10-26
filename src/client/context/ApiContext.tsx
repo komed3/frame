@@ -211,6 +211,9 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       setLoading( false );
     }
   }, [ token ] );
+
+
+  useEffect( () => void refreshSession(), [] );
 }
 
 
