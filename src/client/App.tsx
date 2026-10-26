@@ -1,10 +1,23 @@
 import { Footer } from '@/src/client/layout/Footer';
 import { Header } from '@/src/client/layout/Header';
+import { Sidebar } from '@/src/client/layout/Sidebar';
 import { Routing } from '@/src/client/Routing';
+import { useLocation } from 'react-router';
 
 
 export function App () {
+  const { pathname } = useLocation();
+
   return (
-    <></>
+    <>
+      <Header />
+      <Sidebar />
+
+      <main key= { pathname } className= 'min-h-screen mt-38'>
+        <Routing />
+      </main>
+
+      <Footer />
+    </>
   );
 }
