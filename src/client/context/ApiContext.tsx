@@ -1,21 +1,21 @@
 import type {
   ApiDeleteResult, ApiFavorite, ApiHealth, ApiLogin, ApiLoginResult, ApiPage,
-  ApiPreference, ApiPreferences, ApiSession, ApiStreamOptions
+  ApiPreference, ApiSession, ApiStreamOptions
 } from '@/src/shared/types/api';
-import type { MediaRecord, MediaListOptions } from '@/src/shared/types/media';
-import type { MediaSearchOptions, MediaSearchResult } from '@/src/shared/types/search';
-import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryTree } from '@/src/shared/types/directories';
-import type { MediaRoot } from '@/src/shared/types/roots';
-import type { TagRecord, CategoryRecord } from '@/src/shared/types/taxonomy';
-import type { PlaylistRecord, PlaylistItemRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
-import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaAssetKind } from '@/src/shared/types/assets';
+import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryTree } from '@/src/shared/types/directories';
 import type { FavoriteRecord } from '@/src/shared/types/favorites';
-import type { JobKind, JobRecord, JobStats, JobStatus, EnqueueJob } from '@/src/shared/types/job';
+import type { EnqueueJob, JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
+import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
+import type { MediaListOptions, MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
+import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 import type { PrefName, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import type { MediaRoot } from '@/src/shared/types/roots';
+import type { MediaSearchOptions, MediaSearchResult } from '@/src/shared/types/search';
+import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 
 const API = '/api';
