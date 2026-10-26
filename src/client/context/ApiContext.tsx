@@ -249,6 +249,20 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   const value = useMemo< ApiContextValue >( () => ( {
     user, token, authenticated: user !== null, loading, error, request, login, logout,
     refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
+
+    media: {} as any,
+    roots: {} as any,
+    directories: {} as any,
+    assets: {} as any,
+    stream: ( id, options = {} ) => {},
+    tags: {} as any,
+    categories: {} as any,
+    favorites: {} as any,
+    markers: {} as any,
+    playlists: {} as any,
+    prefs: {} as any,
+    jobs: {} as any,
+    database: {} as any
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
