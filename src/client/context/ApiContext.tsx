@@ -48,17 +48,16 @@ interface ApiContextValue {
   health: () => Promise< ApiHealth >;
   media: {
     list: ( options?: MediaListOptions ) => Promise< MediaRecord[] >;
-    get: ( id: string ) => Promise< MediaRecord >;
-    update: ( id: string, data: MediaUpdate ) => Promise< MediaRecord >;
-    search: ( options: MediaSearchOptions ) => Promise< MediaSearchResult >;
-    metadata: ( id: string ) => Promise< unknown[] >;
-    setMetadata: ( id: string, key: string, value: unknown ) => Promise< unknown >;
+    get: ( id: string ) => Promise< MediaRecord | null >;
+    metadata: ( id: string ) => Promise< MediaMetadataRecord[] >;
+    setMetadata: ( id: string, key: string, value: string ) => Promise< MediaMetadataRecord | null >;
     deleteMetadata: ( id: string, key: string ) => Promise< void >;
     tags: ( id: string ) => Promise< TagRecord[] >;
     setTags: ( id: string, tagIds: string[] ) => Promise< TagRecord[] >;
     categories: ( id: string ) => Promise< CategoryRecord[] >;
     setCategories: ( id: string, categoryIds: string[] ) => Promise< CategoryRecord[] >;
   };
+  search: ( options: MediaSearchOptions ) => Promise< MediaSearchResult >;
   roots: {
     list: () => Promise< MediaRoot[] >;
     scan: ( id: string ) => Promise< { jobId: string } >;
