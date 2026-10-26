@@ -286,7 +286,11 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       setCategories: ( id, categoryIds ) => request( `/media/${ encodeURIComponent( id ) }/categories`, {
         method: 'PUT', body: JSON.stringify( { categoryIds } )
       } )
-    }
+    },
+
+    search: options => request< MediaSearchResult >( '/search', {
+      method: 'POST', body: JSON.stringify( options )
+    } ),
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
