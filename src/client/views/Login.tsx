@@ -17,7 +17,7 @@ export function Login () {
   };
 
   return (
-    <div className= 'flex justify-center items-center min-h-screen px-4'>
+    <div className= 'flex flex-col justify-center items-center gap-6 min-h-screen px-4'>
       <div className= 'w-full max-w-md px-10 py-8 bg-slate-50/10 rounded shadow'>
         <div className= 'flex items-center gap-4'>
           <img
@@ -89,6 +89,10 @@ export function Login () {
           </button>
         </form>
       </div>
+
+      <p className= 'text-xs font-light text-slate-500'>
+        Copyright &copy; 2026 komed3. All rights reserved.
+      </p>
     </div>
   );
 }
