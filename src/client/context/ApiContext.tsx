@@ -132,8 +132,8 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const clearError = useCallback( () => setError( null ), [] );
-  const pageQuery = ( page?: ApiPage ) => ( { limit: page?.limit, offset: page?.offset } );
-  const e = encodeURIComponent;
+  const pageQuery = ( page?: Partial< ApiPage > ) => ( { limit: page?.limit, offset: page?.offset } );
+  const e = encodeURIComponent, s = JSON.stringify;
 
 
   const value = useMemo< ApiContextValue >( () => ( {
