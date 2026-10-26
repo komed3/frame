@@ -15,4 +15,8 @@
   html, body {
     @apply text-white bg-slate-900 select-none;
   }
+
+  button, select {
+    @apply cursor-pointer;
+  }
 }
