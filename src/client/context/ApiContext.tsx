@@ -410,6 +410,27 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
         `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev`
       )
     },
+
+    prefs: {
+      all: () => request( '/pref' ),
+      get: key => request( `/pref/${ key }` ),
+      set: ( key, value ) => request( `/pref/${ key }`, {
+        method: 'PUT', body: JSON.stringify( { value } )
+      } ),
+      reset: key => request( `/pref/${ key }`, { method: 'DELETE' } ),
+      resetAll: () => request( '/pref', { method: 'DELETE' } )
+    },
+
+    jobs: {
+      list: filters => request< JobRecord[] >( '/job', { query: filters } ),
+      get: id => request( `/job/${ e( id ) }` ),
+      stats: () => request< JobStats >( '/job/stats' ),
+      enqueue: data => request( '/job', { method: 'POST', body: JSON.stringify( data ) } )
+    },
+
+    database: {
+      stats: () => request< Record< string, unknown > >( '/db/stats' )
+    }
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
