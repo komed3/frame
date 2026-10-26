@@ -21,6 +21,10 @@
     background-size: 180px 180px;
   }
 
+  input, textarea, button, select {
+    @apply font-sans;
+  }
+
   button, select {
     @apply cursor-pointer;
   }
