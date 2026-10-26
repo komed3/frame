@@ -12,3 +12,7 @@ import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaAssetRecord } from '@/src/shared/types/assets';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+
+
+const API = '/api';
+const TOKEN_KEY = 'frame.session';
