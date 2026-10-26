@@ -177,11 +177,11 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     const headers = new Headers( options.headers );
     if ( token ) headers.set( 'Authorization', `Bearer ${ token }` );
-
     if ( options.body !== undefined && ! headers.has( 'Content-Type' ) )
       headers.set( 'Content-Type', 'application/json' );
 
-    const res = await fetch( url, { ...options, headers } );
+    const { query: _, ...init } = options;
+    const res = await fetch( url, { ...init, headers } );
 
     if ( res.status === 401 && path !== '/auth/login' ) {
       setToken( null ), setUser( null );
@@ -196,10 +196,11 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
         if ( body.error ) message = body.error;
       } catch {}
 
-      const apiError = new ApiError( message, res.status );
       setError( message );
-      throw apiError;
+      throw new ApiError( message, res.status );
     }
+
+    setError( null );
 
     if ( res.status === 204 ) return undefined as T;
     if ( res.headers.get( 'Content-Type' )?.includes( 'application/json' ) ) return res.json() as Promise< T >;
@@ -230,7 +231,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   }, [ token ] );
 
 
-  useEffect( () => void refreshSession(), [] );
+  useEffect( () => void refreshSession(), [ refreshSession ] );
 
 
   const login = useCallback( async ( credentials: ApiLogin ) => {
@@ -259,26 +260,33 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const clearError = useCallback( () => setError( null ), [] );
-  const query = ( page?: ApiPage ) => ( { limit: page?.limit, offset: page?.offset } );
+  const pageQuery = ( page?: ApiPage ) => ( { limit: page?.limit, offset: page?.offset } );
 
 
   const value = useMemo< ApiContextValue >( () => ( {
     user, token, authenticated: user !== null, loading, error, request, login, logout,
     refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
 
-    media: {},
-    roots: {},
-    directories: {},
-    assets: {},
-    stream: ( id, options = {} ) => {},
-    tags: {},
-    categories: {},
-    favorites: {},
-    markers: {},
-    playlists: {},
-    prefs: {},
-    jobs: {},
-    database: {}
+    media: {
+      list: options => request< MediaRecord[] >( '/media', { query: options } ),
+      get: id => request< MediaRecord | null >( `/media/${ encodeURIComponent( id ) }` ),
+      metadata: id => request< MediaMetadataRecord[] >( `/media/${ encodeURIComponent( id ) }/metadata` ),
+      setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >(
+        `/media/${ encodeURIComponent( id ) }/metadata/${ encodeURIComponent( key ) }`,
+        { method: 'PUT', body: JSON.stringify( { value } ) }
+      ),
+      deleteMetadata: ( id, key ) => request( `/media/${ encodeURIComponent( id ) }/metadata/${ encodeURIComponent( key ) }`, {
+        method: 'DELETE'
+      } ),
+      tags: id => request( `/media/${ encodeURIComponent( id ) }/tags` ),
+      setTags: ( id, tagIds ) => request( `/media/${ encodeURIComponent( id ) }/tags`, {
+        method: 'PUT', body: JSON.stringify( { tagIds } )
+      } ),
+      categories: id => request( `/media/${ encodeURIComponent( id ) }/categories` ),
+      setCategories: ( id, categoryIds ) => request( `/media/${ encodeURIComponent( id ) }/categories`, {
+        method: 'PUT', body: JSON.stringify( { categoryIds } )
+      } )
+    }
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
