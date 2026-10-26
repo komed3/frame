@@ -240,6 +240,10 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       setToken( null ), setUser( null );
     }
   }, [ request, token ] );
+
+
+  const clearError = useCallback( () => setError( null ), [] );
+  const query = ( page?: ApiPage ) => ( { limit: page?.limit, offset: page?.offset } );
 }
 
 
