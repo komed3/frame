@@ -13,7 +13,18 @@
 
 @layer base {
   html, body {
-    @apply text-white bg-slate-900 select-none;
+    @apply text-white bg-slate-900 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  *, *::before, *::after {
+    @apply select-none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  ::-webkit-scrollbar, *::-webkit-scrollbar {
+    @apply hidden;
   }
 
   body {
