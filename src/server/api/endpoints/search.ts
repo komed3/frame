@@ -6,6 +6,6 @@ import { Router } from 'express';
 export const search = Router();
 
 
-search.get( '', ( req, res ) => res.json( MediaSearch.search( {
+search.post( '', ( req, res ) => res.json( MediaSearch.search( {
   ...req.body as MediaSearchOptions, userId: res.locals.user.id
 } ) ) );
