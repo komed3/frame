@@ -304,6 +304,13 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
         query: { directoryId, ...pageQuery( page ) }
       } )
     },
+
+    assets: {
+      list: id => request( `/assets/${ encodeURIComponent( id ) }` ),
+      url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ encodeURIComponent( id ) }/${ kind }/${
+        encodeURIComponent( variant )
+      }`
+    },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
