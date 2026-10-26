@@ -1,4 +1,5 @@
 import { useApi } from '@/src/client/context/ApiContext';
+import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { type SubmitEvent, useState } from 'react';
 
 
@@ -6,6 +7,8 @@ export function Login () {
   const { login, loading, error, clearError } = useApi();
   const [ username, setUsername ] = useState( '' );
   const [ password, setPassword ] = useState( '' );
+
+  usePageTitle( 'Login' );
 
   const handleSubmit = async ( e: SubmitEvent< HTMLFormElement > ) => {
     e.preventDefault();
