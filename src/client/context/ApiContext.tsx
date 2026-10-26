@@ -16,3 +16,11 @@ import type { ReactNode } from 'react';
 
 const API = '/api';
 const TOKEN_KEY = 'frame.session';
+
+
+export class ApiError extends Error {
+  constructor ( message: string, public status: number ) {
+    super( message );
+    this.name = 'ApiError';
+  }
+}
