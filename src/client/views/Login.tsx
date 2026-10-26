@@ -1,3 +1,4 @@
+import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { type SubmitEvent, useState } from 'react';
@@ -17,9 +18,18 @@ export function Login () {
 
   return (
     <div className= 'flex justify-center items-center min-h-screen px-4'>
-      <div className= 'w-full max-w-sm px-10 py-8 bg-slate-50/10 rounded shadow'>
-        <h1 className= 'text-3xl font-semibold'>Frame</h1>
-        <p className= 'text-sm text-slate-400'>Private media library</p>
+      <div className= 'w-full max-w-md px-10 py-8 bg-slate-50/10 rounded shadow'>
+        <div className= 'flex items-center gap-4'>
+          <img
+            src= { logo }
+            className= 'w-12 h-12'
+            alt= 'Frame'
+          />
+
+          <span className= 'uppercase text-2xl font-extralight text-slate-400 tracking-widest'>
+            Frame Login
+          </span>
+        </div>
 
         <form onSubmit= { handleSubmit } className= 'mt-8 space-y-4'>
           <div className= 'space-y-1'>
@@ -36,8 +46,8 @@ export function Login () {
               onChange= { e => { setUsername( e.target.value ); clearError() } }
               disabled= { loading }
               className= {
-                'w-full px-3 py-2.5 text-sm bg-slate-900 border border-slate-900 rounded outline-none ' +
-                'transition focus:border-slate-400 disabled:text-slate-300'
+                'w-full px-3 py-2.5 text-sm bg-slate-900/60 border border-transparent rounded ' +
+                'outline-none transition focus:border-slate-400 disabled:text-slate-300'
               }
             />
           </div>
@@ -55,8 +65,8 @@ export function Login () {
               onChange= { e => { setPassword( e.target.value ); clearError() } }
               disabled= { loading }
               className= {
-                'w-full px-3 py-2.5 text-sm bg-slate-900 border border-slate-900 rounded outline-none ' +
-                'transition focus:border-slate-400 disabled:text-slate-300'
+                'w-full px-3 py-2.5 text-sm bg-slate-900/60 border border-transparent rounded ' +
+                'outline-none transition focus:border-slate-400 disabled:text-slate-300'
               }
             />
           </div>
@@ -71,11 +81,11 @@ export function Login () {
             type= 'submit'
             disabled= { loading || ! username.trim() || ! password }
             className= {
-              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-200 rounded ' +
-              'transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50'
+              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-50/60 ' +
+              'rounded transition hover:bg-white disabled:pointer-events-none'
             }
           >
-            { loading ? 'Signing in …' : 'Sign in' }
+            { loading ? 'Logging In …' : 'Log In' }
           </button>
         </form>
       </div>
