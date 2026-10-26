@@ -1,5 +1,5 @@
 import logo from '@/src/client/assets/logo.svg';
-import { SearchIcon } from 'lucide-react';
+import { FilterIcon, SearchIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
@@ -17,9 +17,9 @@ export function Header () {
         </Link>
       </div>
 
-      { /** Search */ }
+      { /** Search + Filter */ }
       <div className= 'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
-        <form>
+        <form className= 'flex items-center gap-8'>
           <div className= 'flex h-10 bg-slate-900 rounded-full overflow-hidden'>
             <input
               type= 'text'
@@ -29,11 +29,21 @@ export function Header () {
 
             <button
               type= 'submit'
-              className= 'w-12 h-10 pl-3'
+              className= 'w-12 h-10 pl-2'
             >
-              <SearchIcon size= { 20 } />
+              <SearchIcon size= { 22 } />
             </button>
           </div>
+
+          <button
+            className= {
+              'flex items-center gap-2 h-8.5 px-3 text-sm font-medium text-slate-900 ' +
+              'bg-slate-200 rounded transition hover:bg-white'
+            }
+          >
+            <FilterIcon size= { 16 } />
+            <span>Filter</span>
+          </button>
         </form>
       </div>
 
