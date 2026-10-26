@@ -291,6 +291,12 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     search: options => request< MediaSearchResult >( '/search', {
       method: 'POST', body: JSON.stringify( options )
     } ),
+
+    roots: {
+      list: () => request< MediaRoot[] >( '/root' ),
+      scan: id => request( `/root/${ encodeURIComponent( id ) }/scan`, { method: 'POST' } ),
+      scanAll: () => request( '/root/scan-all', { method: 'POST' } )
+    },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
