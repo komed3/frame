@@ -23,7 +23,7 @@
     "build:server": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "build:client": "vite build",
     "format": "prettier --ignore-path \"\" --write \"dist/**/*.js\" --log-level warn",
-    "build": "npm run build:server && npm run build:client && npm run format",
+    "build": "npm run build:server && npm run format && npm run build:client",
     "start": "cross-env NODE_ENV=production node dist/server/run.js",
     "frame": "node dist/maintenance/run.js"
   },
