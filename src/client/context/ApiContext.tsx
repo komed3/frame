@@ -144,3 +144,10 @@ interface ApiContextValue {
 
 
 const ApiContext = createContext< ApiContextValue | null >( null );
+
+
+export function useApi () : ApiContextValue {
+  const context = useContext( ApiContext );
+  if ( ! context ) throw new Error( 'useApi must be used within ApiProvider' );
+  return context;
+}
