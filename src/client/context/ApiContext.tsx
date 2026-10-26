@@ -165,31 +165,30 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     if ( options.body !== undefined && ! headers.has( 'Content-Type' ) )
       headers.set( 'Content-Type', 'application/json' );
 
-    const response = await fetch( url, { ...options, headers } );
+    const res = await fetch( url, { ...options, headers } );
 
-    if ( response.status === 401 && path !== '/auth/login' ) {
+    if ( res.status === 401 && path !== '/auth/login' ) {
       setToken( null ), setUser( null );
       sessionStorage.removeItem( TOKEN_KEY );
     }
 
-    if ( ! response.ok ) {
-      let message = response.statusText || 'API request failed';
+    if ( ! res.ok ) {
+      let message = res.statusText || 'API request failed';
 
       try {
-        const body = await response.json() as { error?: string };
+        const body = await res.json() as { error?: string };
         if ( body.error ) message = body.error;
       } catch {}
 
-      const apiError = new ApiError( message, response.status );
+      const apiError = new ApiError( message, res.status );
       setError( message );
       throw apiError;
     }
 
-    if ( response.status === 204 ) return undefined as T;
-    if ( response.headers.get( 'Content-Type' )?.includes( 'application/json' ) )
-      return response.json() as Promise< T >;
+    if ( res.status === 204 ) return undefined as T;
+    if ( res.headers.get( 'Content-Type' )?.includes( 'application/json' ) ) return res.json() as Promise< T >;
 
-    return response as T;
+    return res as T;
   }, [ token ] );
 
 
@@ -199,10 +198,10 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     if ( ! token ) setToken( sessionToken );
 
     try {
-      const response = await fetch( `${ API }/auth/me`, { headers: { Authorization: `Bearer ${ sessionToken }` } } );
-      if ( ! response.ok ) throw new ApiError( 'Session expired', response.status );
+      const res = await fetch( `${ API }/auth/me`, { headers: { Authorization: `Bearer ${ sessionToken }` } } );
+      if ( ! res.ok ) throw new ApiError( 'Session expired', res.status );
 
-      const result = await response.json() as ApiSession;
+      const result = await res.json() as ApiSession;
       setUser( result.user ), setError( null );
     } catch {
       setToken( null ), setUser( null );
@@ -214,6 +213,20 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   useEffect( () => void refreshSession(), [] );
+
+
+  const login = useCallback( async ( credentials: ApiLogin ) => {
+    setLoading( true ), setError( null );
+
+    try {
+      const res = await request< ApiLoginResult >( '/auth/login', { method: 'POST', body: JSON.stringify( credentials ) } );
+
+      sessionStorage.setItem( TOKEN_KEY, res.token );
+      setToken( res.token ), setUser( res.user );
+    } finally {
+      setLoading( false );
+    }
+  }, [ request ] );
 }
 
 
