@@ -316,7 +316,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       if ( token ) headers.set( 'Authorization', `Bearer ${ token }` );
       if ( options.range ) headers.set( 'Range', options.range );
 
-      return fetch( `${ API }/stream/${ encodeURIComponent( id ) }`, { headers, signal: options.signal } ).then( async res => {
+      return fetch( `${ API }/stream/${ e( id ) }`, { headers, signal: options.signal } ).then( async res => {
         if ( ! res.ok && res.status !== 206 ) {
           let message = res.statusText || 'Stream request failed';
 
@@ -330,6 +330,29 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
         return res;
       } );
+    },
+
+    tags: {
+      list: () => request< TagRecord[] >( '/tag' ),
+      get: id => request( `/tag/${ e( id ) }` ),
+      create: name => request( '/tag', { method: 'POST', body: JSON.stringify( { name } ) } ),
+      rename: ( id, name ) => request( `/tag/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( { name } ) } ),
+      delete: id => request( `/tag/${ e( id ) }`, { method: 'DELETE' } )
+    },
+
+    categories: {
+      list: () => request< CategoryRecord[] >( '/category' ),
+      get: id => request( `/category/${ e( id ) }` ),
+      create: ( name, parentId = null ) => request( '/category', {
+        method: 'POST', body: JSON.stringify( { name, parentId } )
+      } ),
+      rename: ( id, name ) => request( `/category/${ e( id ) }`, {
+        method: 'PATCH', body: JSON.stringify( { name } )
+      } ),
+      setParent: ( id, parentId ) => request( `/category/${ e( id ) }/parent`, {
+        method: 'PUT', body: JSON.stringify( { parentId } )
+      } ),
+      delete: id => request( `/category/${ e( id ) }`, { method: 'DELETE' } )
     },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
