@@ -269,29 +269,22 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
 
     media: {
-      list: options => request< MediaRecord[] >( '/media', { query: options } ),
+      list: o => request< MediaRecord[] >( '/media', { query: o } ),
       get: id => request< MediaRecord | null >( `/media/${ e( id ) }` ),
       metadata: id => request< MediaMetadataRecord[] >( `/media/${ e( id ) }/metadata` ),
       setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >(
-        `/media/${ e( id ) }/metadata/${ e( key ) }`,
-        { method: 'PUT', body: JSON.stringify( { value } ) }
+        `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'PUT', body: JSON.stringify( { value } ) }
       ),
-      deleteMetadata: ( id, key ) => request( `/media/${ e( id ) }/metadata/${ e( key ) }`, {
-        method: 'DELETE'
-      } ),
+      deleteMetadata: ( id, key ) => request( `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'DELETE' } ),
       tags: id => request( `/media/${ e( id ) }/tags` ),
-      setTags: ( id, tagIds ) => request( `/media/${ e( id ) }/tags`, {
-        method: 'PUT', body: JSON.stringify( { tagIds } )
-      } ),
+      setTags: ( id, tagIds ) => request( `/media/${ e( id ) }/tags`, { method: 'PUT', body: JSON.stringify( { tagIds } ) } ),
       categories: id => request( `/media/${ e( id ) }/categories` ),
-      setCategories: ( id, categoryIds ) => request( `/media/${ e( id ) }/categories`, {
-        method: 'PUT', body: JSON.stringify( { categoryIds } )
+      setCategories: ( id, catIds ) => request( `/media/${ e( id ) }/categories`, {
+        method: 'PUT', body: JSON.stringify( { categoryIds: catIds } )
       } )
     },
 
-    search: options => request< MediaSearchResult >( '/search', {
-      method: 'POST', body: JSON.stringify( options )
-    } ),
+    search: o => request< MediaSearchResult >( '/search', { method: 'POST', body: JSON.stringify( o ) } ),
 
     roots: {
       list: () => request< MediaRoot[] >( '/root' ),
@@ -301,9 +294,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     directories: {
       tree: rootId => request( `/dir/${ e( rootId ) }/tree` ),
-      list: ( rootId, directoryId, page ) => request( `/dir/${ e( rootId ) }`, {
-        query: { directoryId, ...pageQuery( page ) }
-      } )
+      list: ( rootId, directoryId, page ) => request( `/dir/${ e( rootId ) }`, { query: { directoryId, ...pageQuery( page ) } } )
     },
 
     assets: {
@@ -311,12 +302,12 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ e( id ) }/${ kind }/${ e( variant ) }`
     },
 
-    stream: ( id, options = {} ) => {
+    stream: async ( id, o = {} ) => {
       const headers = new Headers();
       if ( token ) headers.set( 'Authorization', `Bearer ${ token }` );
-      if ( options.range ) headers.set( 'Range', options.range );
+      if ( o.range ) headers.set( 'Range', o.range );
 
-      return fetch( `${ API }/stream/${ e( id ) }`, { headers, signal: options.signal } ).then( async res => {
+      return fetch( `${ API }/stream/${ e( id ) }`, { headers, signal: o.signal } ).then( async res => {
         if ( ! res.ok && res.status !== 206 ) {
           let message = res.statusText || 'Stream request failed';
 
@@ -343,15 +334,9 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     categories: {
       list: () => request< CategoryRecord[] >( '/category' ),
       get: id => request( `/category/${ e( id ) }` ),
-      create: ( name, parentId = null ) => request( '/category', {
-        method: 'POST', body: JSON.stringify( { name, parentId } )
-      } ),
-      rename: ( id, name ) => request( `/category/${ e( id ) }`, {
-        method: 'PATCH', body: JSON.stringify( { name } )
-      } ),
-      setParent: ( id, parentId ) => request( `/category/${ e( id ) }/parent`, {
-        method: 'PUT', body: JSON.stringify( { parentId } )
-      } ),
+      create: ( name, parentId = null ) => request( '/category', { method: 'POST', body: JSON.stringify( { name, parentId } ) } ),
+      rename: ( id, name ) => request( `/category/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( { name } ) } ),
+      setParent: ( id, parentId ) => request( `/category/${ e( id ) }/parent`, { method: 'PUT', body: JSON.stringify( { parentId } ) } ),
       delete: id => request( `/category/${ e( id ) }`, { method: 'DELETE' } )
     },
 
@@ -365,58 +350,36 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     markers: {
       list: page => request< MarkerRecord[] >( '/marker', { query: pageQuery( page ) } ),
       get: id => request( `/marker/${ e( id ) }` ),
-      update: ( id, data ) => request( `/marker/${ e( id ) }`, {
-        method: 'PATCH', body: JSON.stringify( data )
-      } ),
+      update: ( id, data ) => request( `/marker/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( data ) } ),
       delete: id => request( `/marker/${ e( id ) }`, { method: 'DELETE' } ),
       forMedia: ( id, page ) => request( `/media/${ e( id ) }/markers`, { query: pageQuery( page ) } ),
-      createForMedia: ( id, data ) => request( `/media/${ e( id ) }/markers`, {
-        method: 'POST', body: JSON.stringify( data )
-      } ),
+      createForMedia: ( id, data ) => request( `/media/${ e( id ) }/markers`, { method: 'POST', body: JSON.stringify( data ) } ),
       clearForMedia: id => request( `/media/${ e( id ) }/markers`, { method: 'DELETE' } )
     },
 
     playlists: {
       list: page => request< PlaylistRecord[] >( '/playlist', { query: pageQuery( page ) } ),
       get: id => request( `/playlist/${ e( id ) }` ),
-      create: ( name, description ) => request( '/playlist', {
-        method: 'POST', body: JSON.stringify( { name, description } )
-      } ),
-      update: ( id, data ) => request( `/playlist/${ e( id ) }`, {
-        method: 'PATCH', body: JSON.stringify( data )
-      } ),
+      create: ( name, description ) => request( '/playlist', { method: 'POST', body: JSON.stringify( { name, description } ) } ),
+      update: ( id, data ) => request( `/playlist/${ e( id ) }`, { method: 'PATCH', body: JSON.stringify( data ) } ),
       delete: id => request( `/playlist/${ e( id ) }`, { method: 'DELETE' } ),
       items: ( id, page ) => request( `/playlist/${ e( id ) }/items`, { query: pageQuery( page ) } ),
-      add: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
-        method: 'POST'
-      } ),
-      remove: ( id, mediaId ) => request(
-        `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' }
-      ),
+      add: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'POST' } ),
+      remove: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' } ),
       clear: id => request( `/playlist/${ e( id ) }/items`, { method: 'DELETE' } ),
       move: ( id, mediaId, position ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
         method: 'PATCH', body: JSON.stringify( { position } )
       } ),
-      contains: ( id, mediaId ) => request(
-        `/playlist/${ e( id ) }/items/${ e( mediaId ) }`
-      ),
-      forMedia: ( mediaId, page ) => request(
-        `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) }
-      ),
-      next: ( id, mediaId ) => request(
-        `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next`
-      ),
-      previous: ( id, mediaId ) => request(
-        `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev`
-      )
+      contains: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }` ),
+      forMedia: ( mediaId, page ) => request( `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) } ),
+      next: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next` ),
+      previous: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev` )
     },
 
     prefs: {
       all: () => request( '/pref' ),
       get: key => request( `/pref/${ key }` ),
-      set: ( key, value ) => request( `/pref/${ key }`, {
-        method: 'PUT', body: JSON.stringify( { value } )
-      } ),
+      set: ( key, value ) => request( `/pref/${ key }`, { method: 'PUT', body: JSON.stringify( { value } ) } ),
       reset: key => request( `/pref/${ key }`, { method: 'DELETE' } ),
       resetAll: () => request( '/pref', { method: 'DELETE' } )
     },
