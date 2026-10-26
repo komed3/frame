@@ -7,8 +7,8 @@ export function Login () {
   const [ username, setUsername ] = useState( '' );
   const [ password, setPassword ] = useState( '' );
 
-  const handleSubmit = async ( event: SubmitEvent< HTMLFormElement > ) => {
-    event.preventDefault();
+  const handleSubmit = async ( e: SubmitEvent< HTMLFormElement > ) => {
+    e.preventDefault();
     try { await login( { username, password } ) } catch {}
   };
 
