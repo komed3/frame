@@ -297,6 +297,13 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       scan: id => request( `/root/${ encodeURIComponent( id ) }/scan`, { method: 'POST' } ),
       scanAll: () => request( '/root/scan-all', { method: 'POST' } )
     },
+
+    directories: {
+      tree: rootId => request( `/dir/${ encodeURIComponent( rootId ) }/tree` ),
+      list: ( rootId, directoryId, page ) => request( `/dir/${ encodeURIComponent( rootId ) }`, {
+        query: { directoryId, ...pageQuery( page ) }
+      } )
+    },
   } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 }
 
