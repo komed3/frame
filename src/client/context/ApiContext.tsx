@@ -198,9 +198,11 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     if ( ! token ) setToken( sessionToken );
 
     try {
-      const res = await fetch( `${ API }/auth/me`, { headers: { Authorization: `Bearer ${ sessionToken }` } } );
-      if ( ! res.ok ) throw new ApiError( 'Session expired', res.status );
+      const res = await fetch( `${ API }/auth/me`, {
+        headers: { Authorization: `Bearer ${ sessionToken }` }
+      } );
 
+      if ( ! res.ok ) throw new ApiError( 'Session expired', res.status );
       const result = await res.json() as ApiSession;
       setUser( result.user ), setError( null );
     } catch {
@@ -219,7 +221,9 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     setLoading( true ), setError( null );
 
     try {
-      const res = await request< ApiLoginResult >( '/auth/login', { method: 'POST', body: JSON.stringify( credentials ) } );
+      const res = await request< ApiLoginResult >( '/auth/login', {
+        method: 'POST', body: JSON.stringify( credentials )
+      } );
 
       sessionStorage.setItem( TOKEN_KEY, res.token );
       setToken( res.token ), setUser( res.user );
@@ -227,6 +231,15 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       setLoading( false );
     }
   }, [ request ] );
+
+
+  const logout = useCallback( async () => {
+    try { if ( token ) await request< void >( '/auth/logout', { method: 'POST' } ) }
+    finally {
+      sessionStorage.removeItem( TOKEN_KEY );
+      setToken( null ), setUser( null );
+    }
+  }, [ request, token ] );
 }
 
 
