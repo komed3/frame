@@ -1,1 +1,8 @@
 @import 'tailwindcss';
+
+
+@layer base {
+  html, body {
+    @apply text-white bg-slate-900;
+  }
+}
