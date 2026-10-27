@@ -1,8 +1,8 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
 import {
-  BookmarkIcon, FilterIcon, FolderIcon, HeartIcon, HomeIcon, ListVideoIcon, MenuIcon,
-  PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
+  BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon,
+  ListVideoIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
@@ -22,9 +22,9 @@ const NAV = [
 ] as const;
 
 const USER = [
-  [ 'Account', '/me' ],
-  [ 'History', '/history' ],
-  [ 'Settings', '/settings' ]
+  [ 'Account', '/me', UserIcon ],
+  [ 'History', '/history', GalleryVerticalEndIcon ],
+  [ 'Settings', '/settings', SettingsIcon ]
 ] as const;
 
 
@@ -100,10 +100,19 @@ export function Header () {
               </button>
 
               { userOpen && (
-                <div className= 'absolute left-1/2 -bottom-12 transform -translate-x-1/2'>
-                  <div className= 'bg-slate-700'>
-                    { USER.map( ( [ label, url ] ) => (
-                      <></>
+                <div className= 'absolute left-1/2 top-18 transform -translate-x-1/2'>
+                  <div className= 'w-40 py-4 bg-slate-700'>
+                    { USER.map( ( [ label, url, Icon ] ) => (
+                      <NavLink
+                        to= { url }
+                        className= { ( { isActive } ) =>
+                          'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors delay-75 text-sm ' +
+                          ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
+                        }
+                      >
+                        <Icon size= { 16 } />
+                        <span>{ label }</span>
+                      </NavLink>
                     ) ) }
                   </div>
                 </div>
@@ -140,7 +149,7 @@ export function Header () {
               to= { url }
               className= { ( { isActive } ) =>
                 'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors delay-75 ' +
-                ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/5' )
+                ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
               }
             >
               <Icon size= { 20 } />
