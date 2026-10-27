@@ -8,6 +8,7 @@ export function MediaThumbnail ( { media }: { media: MediaRecord } ) {
   const { request } = useApi();
   const [ src, setSrc ] = useState< string | null >( null );
 
+
   useEffect( () => {
     if ( ! [ 'video', 'audio', 'image' ].includes( media.type ) ) return setSrc( null );
 
@@ -29,6 +30,7 @@ export function MediaThumbnail ( { media }: { media: MediaRecord } ) {
       if ( objectUrl ) URL.revokeObjectURL( objectUrl );
     };
   }, [ media.id, media.type, request ] );
+
 
   return (
     <div className= 'flex justify-center items-center aspect-video overflow-hidden bg-slate-800 rounded'>
