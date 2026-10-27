@@ -161,7 +161,7 @@ export function Header () {
     if ( filters.favorite ) params.set( 'favorite', filters.favorite );
     if ( filters.played ) params.set( 'played', filters.played );
     if ( filters.progress ) params.set( 'progress', filters.progress as MediaSearchProgress );
-    if ( filters.sortBy !== 'title' ) params.set( 'sortBy', filters.sortBy );
+    if ( filters.sortBy !== 'relevance' ) params.set( 'sortBy', filters.sortBy );
     if ( filters.sortDirection !== 'asc' ) params.set( 'sortDirection', filters.sortDirection );
 
     const search = params.toString();
