@@ -133,7 +133,23 @@ export function MediaBrowser ( {
       </div>
 
       { view === 'grid' ? (
-        <></>
+        <>
+          { directories.length > 0 && (
+            <section className= 'space-y-4'>
+              <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Folders</h2>
+              <FolderGrid directories= { directories } onOpenDirectory= { onOpenDirectory } />
+            </section>
+          ) }
+
+          { media.length > 0 && (
+            <section className= 'space-y-4'>
+              { directories.length > 0 && (
+                <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Media</h2>
+              ) }
+              <MediaGrid media= { media } onOpenMedia= { onOpenMedia } />
+            </section>
+          ) }
+        </>
       ) : (
         <MediaList
           directories= { directories }
