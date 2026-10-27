@@ -21,4 +21,13 @@ export function Pagination ( { offset, limit = MEDIA_PAGE_SIZE, itemCount, total
 
   const start = itemCount > 0 ? offset + 1 : 0, end = offset + itemCount;
   const summary = total === undefined ? `${ start }–${ end }` : `${ start }–${ end } of ${ total }`;
+
+
+  return (
+    <nav aria-label= 'Pagination' className= 'flex justify-between items-center gap-4'>
+      <span className= 'text-sm text-slate-400'>
+        { summary }
+      </span>
+    </nav>
+  );
 }
