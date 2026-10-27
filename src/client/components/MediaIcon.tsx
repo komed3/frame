@@ -3,7 +3,7 @@ import { FileAudioIcon, FileIcon, FileImageIcon, FileTextIcon, FileVideoIcon } f
 
 
 export function MediaIcon ( { type }: { type: MediaType } ) {
-  const props = { size: 18, className: 'shrink-0 text-slate-400' };
+  const props = { size: 22, className: 'shrink-0 text-slate-400' };
 
   switch ( type ) {
     case 'video': return <FileVideoIcon { ...props } />;
