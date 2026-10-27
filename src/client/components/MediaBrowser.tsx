@@ -36,13 +36,37 @@ interface MediaBrowserProps {
 
 function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
   return directories.length > 0 && (
-    <div className= 'grid grid-cols-8 gap-3'></div>
+    <div className= 'grid grid-cols-4 gap-3'>
+      { directories.map( directory => (
+        <button
+          key= { directory.id }
+          onClick= { () => onOpenDirectory?.( directory ) }
+          disabled= { ! onOpenDirectory }
+          className= {
+            'flex items-center gap-4 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
+            'duration-100 hover:bg-slate-50/10 disabled:cursor-default'
+          }
+        >
+          <FolderIcon size= { 26 } strokeWidth= { 1.4 } />
+
+          <div className= 'flex flex-col items-start gap-0.5'>
+            <span className= 'w-full truncate text-center text-sm font-medium'>
+              { directory.name }
+            </span>
+
+            <span className= 'text-xs text-slate-400'>
+              { directory.mediaCount } { directory.mediaCount === 1 ? 'item' : 'items' }
+            </span>
+          </div>
+        </button>
+      ) ) }
+    </div>
   );
 }
 
 function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
   return media.length > 0 && (
-    <div className= 'grid-cols-4 gap-x-3 gap-y-5'></div>
+    <div className= 'grid-cols-3 gap-x-3 gap-y-5'></div>
   );
 }
 
