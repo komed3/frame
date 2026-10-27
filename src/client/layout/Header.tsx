@@ -1,11 +1,13 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
 import { FilterIcon, MenuIcon, SearchIcon, UserIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 
 export function Header () {
   const { user } = useApi();
+  const [ menuOpen, setMenuOpen ] = useState( false );
 
   return (
     <>
@@ -73,6 +75,8 @@ export function Header () {
           </div>
         </div>
       </header>
+
+      <div className= ''></div>
     </>
   );
 }
