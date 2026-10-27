@@ -1,6 +1,6 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
-import { FilterIcon, MenuIcon, SearchIcon, UserIcon } from 'lucide-react';
+import { FilterIcon, MenuIcon, SearchIcon, UserIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
@@ -68,15 +68,30 @@ export function Header () {
             </button>
 
             <button
+              onClick= { () => setMenuOpen( ! menuOpen ) }
               className= 'inline-flex justify-center items-center w-10 h-10'
             >
-              <MenuIcon size= { 22 } />
+              { menuOpen ? <XIcon size= { 22 } /> : <MenuIcon size= { 22 } /> }
             </button>
           </div>
         </div>
       </header>
 
-      <div className= ''></div>
+      <div className= { 'fixed top-16 inset-x-0 z-99 bottom-0 flex ' + ( ! menuOpen && 'pointer-events-none' ) }>
+        <div
+          onClick= { () => setMenuOpen( false ) }
+          className= { 'flex-1 bg-slate-900/70 transition-opacity ' + ( ! menuOpen && 'opacity-0' ) }
+        />
+
+        <div
+          className= {
+            'shrink-0 w-96 bg-slate-50/10 p-8 transition-transform duration-150 ease-out transform ' +
+            ( menuOpen ? 'translate-x-0' : 'translate-x-full' )
+          }
+        >
+          ...
+        </div>
+      </div>
     </>
   );
 }
