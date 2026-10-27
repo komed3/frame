@@ -123,15 +123,13 @@ export function Header () {
 
 
   const close = ( { menu = true, user = true, filter = true } = {} ) => {
-    menu && setMenuOpen( false );
-    user && setUserOpen( false );
-    filter && setFilterOpen( false );
+    menu && setMenuOpen( false ); user && setUserOpen( false ); filter && setFilterOpen( false );
   };
 
-  useEffect( close, [ pathname ] );
   useEffect( () => { if ( menuOpen ) close( { menu: false } ) }, [ menuOpen ] );
   useEffect( () => { if ( userOpen ) close( { user: false } ) }, [ userOpen ] );
   useEffect( () => { if ( filterOpen ) close( { filter: false } ) }, [ filterOpen ] );
+  useEffect( close, [ pathname ] );
 
   useEffect( () => {
     let active = true;
