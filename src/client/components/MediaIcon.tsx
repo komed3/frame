@@ -9,7 +9,7 @@ type MediaIconProps = ComponentProps< typeof FileIcon > & {
 
 
 export function MediaIcon ( { type, ...props }: MediaIconProps ) {
-  const p = { ...{ size: 20, className: 'text-slate-400' }, ...props };
+  const p = { ...{ size: 20 }, ...props };
 
   switch ( type ) {
     case 'video': return <FileVideoIcon { ...p } />;
