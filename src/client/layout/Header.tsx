@@ -101,7 +101,7 @@ export function Header () {
 
               <div
                 className= {
-                  'absolute left-1/2 top-18 transform -translate-x-1/2 transition-all duration-100 delay-75 ease-out ' +
+                  'absolute left-1/2 top-18 transform -translate-x-1/2 shadow transition-all duration-100 delay-75 ease-out ' +
                   ( userOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
                 }
               >
@@ -155,7 +155,7 @@ export function Header () {
 
       <div
         className= {
-          'fixed top-16 right-0 bottom-0 z-99 bg-slate-700 py-12 transition-all duration-150 ' + 
+          'fixed top-16 right-0 bottom-0 z-99 bg-slate-700 py-12 shadow transition-all duration-150 ' + 
           'ease-out delay-75 transform overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
         }
       >
