@@ -50,14 +50,14 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
   return (
     <div className= 'overflow-x-auto'>
       <table className= 'w-full text-left text-sm whitespace-nowrap'>
-        <thead className= 'text-xs text-slate-400 border-b border-slate-700'>
-          <tr>
-            <th scope= 'col' className= 'px-3 py-3 font-medium'>Name</th>
-            <th scope= 'col' className= 'px-3 py-3 font-medium'>Format</th>
-            <th scope= 'col' className= 'px-3 py-3 font-medium text-right'>Size</th>
-            <th scope= 'col' className= 'px-3 py-3 font-medium text-right'>Duration</th>
-            <th scope= 'col' className= 'px-3 py-3 font-medium text-right'>Resolution</th>
-            <th scope= 'col' className= 'px-3 py-3 font-medium'>Modified</th>
+        <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
+          <tr className= '*:font-medium *:px-3 *:py-2'>
+            <th scope= 'col' className= 'pl-0!'>Name</th>
+            <th scope= 'col'>Format</th>
+            <th scope= 'col' className= 'text-right'>Size</th>
+            <th scope= 'col' className= 'text-right'>Duration</th>
+            <th scope= 'col' className= 'text-right'>Resolution</th>
+            <th scope= 'col' className= 'pr-0!'>Modified</th>
           </tr>
         </thead>
       </table>
