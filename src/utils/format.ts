@@ -35,3 +35,9 @@ export function formatDate ( value: string | null | undefined ) : string {
 
   return new Intl.DateTimeFormat( 'en-us', { dateStyle: 'medium' } ).format( date );
 }
+
+
+export function formatFileFormat ( fileName: string, container?: string | null ) : string {
+  const extension = fileName.match( /\.([^.\/\\]+)$/ )?.[ 1 ];
+  return extension ? extension.toUpperCase() : container?.split( ',' )[ 0 ].toUpperCase() ?? '—';
+}
