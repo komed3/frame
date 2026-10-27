@@ -6,3 +6,16 @@ import type { MediaDirectoryEntry } from '@/src/shared/types/directories';
 import type { MediaRecord, MediaType } from '@/src/shared/types/media';
 import { formatBytes, formatDate, formatDimensions, formatDuration, formatFileFormat, formatMediaType } from '@/src/client/utils/format';
 import { useEffect, useState } from 'react';
+
+
+interface MediaBrowserProps {
+  directories?: MediaDirectoryEntry[];
+  media: MediaRecord[];
+  offset: number;
+  limit?: number;
+  total?: number;
+  hasNext?: boolean;
+  onPageChange: ( offset: number ) => void;
+  onOpenDirectory?: ( directory: MediaDirectoryEntry ) => void;
+  onOpenMedia: ( media: MediaRecord ) => void;
+}
