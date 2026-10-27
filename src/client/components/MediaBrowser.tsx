@@ -9,6 +9,18 @@ import { FolderIcon } from 'lucide-react';
 import { useState } from 'react';
 
 
+interface FolderProps {
+  directories: MediaDirectoryEntry[];
+  onOpenDirectory?: ( directory: MediaDirectoryEntry ) => void;
+}
+
+interface MediaProps {
+  media: MediaRecord[];
+  onOpenMedia: ( media: MediaRecord ) => void;
+}
+
+type ListProps = FolderProps & MediaProps;
+
 interface MediaBrowserProps {
   directories?: MediaDirectoryEntry[];
   media: MediaRecord[];
@@ -19,6 +31,28 @@ interface MediaBrowserProps {
   onPageChange: ( offset: number ) => void;
   onOpenDirectory?: ( directory: MediaDirectoryEntry ) => void;
   onOpenMedia: ( media: MediaRecord ) => void;
+}
+
+
+function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
+  return directories.length > 0 && (
+    <div className= 'grid grid-cols-8 gap-3'></div>
+  );
+}
+
+function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
+  return media.length > 0 && (
+    <div className= 'grid-cols-4 gap-x-3 gap-y-5'></div>
+  );
+}
+
+function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListProps ) {
+  return (
+    <div className= 'overflow-x-auto'>
+      <table className= 'w-full text-left text-sm whitespace-nowrap'>
+      </table>
+    </div>
+  );
 }
 
 
