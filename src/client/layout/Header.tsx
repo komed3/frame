@@ -248,7 +248,7 @@ export function Header () {
       </header>
 
       <div
-        onClick= { () => { setMenuOpen( false ), setUserOpen( false ), setFilterOpen( false ) } }
+        onClick= { () => close() }
         className= {
           'fixed inset-0 z-98 bg-slate-900 transition-opacity ' +
           ( menuOpen || userOpen || filterOpen ? 'opacity-50' : 'opacity-0 pointer-events-none' )
