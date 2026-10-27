@@ -174,7 +174,7 @@ export function Header () {
 
   return (
     <>
-      <header className= 'fixed top-0 inset-x-0 z-99 h-16 bg-slate-700 shadow'>
+      <header className= 'fixed top-0 inset-x-0 z-99 h-16 bg-slate-700 shadow-lg'>
         <div className= 'absolute top-1/2 left-4 transform -translate-y-1/2'>
           <Link to= '/'>
             <img
@@ -240,7 +240,7 @@ export function Header () {
 
               <div
                 className= {
-                  'absolute left-1/2 top-17 transform -translate-x-1/2 shadow transition-all duration-100 delay-75 ease-out ' +
+                  'absolute left-1/2 top-17 transform -translate-x-1/2 shadow-lg transition-all duration-100 delay-75 ease-out ' +
                   ( userOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
                 }
               >
@@ -288,14 +288,14 @@ export function Header () {
       <div
         onClick= { () => close() }
         className= {
-          'fixed inset-0 z-98 bg-slate-900 transition-opacity ' +
+          'fixed inset-0 z-97 bg-slate-900 transition-opacity ' +
           ( menuOpen || userOpen || filterOpen ? 'opacity-50' : 'opacity-0 pointer-events-none' )
         }
       />
 
       <div
         className= {
-          'fixed top-16 right-0 bottom-0 z-99 bg-slate-700 py-12 shadow transition-all duration-150 ' +
+          'fixed top-16 right-0 bottom-0 z-98 bg-slate-700 py-12 shadow-lg transition-all duration-150 ' +
           'ease-out delay-75 transform overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
         }
       >
@@ -320,7 +320,7 @@ export function Header () {
 
       <div
         className= {
-          'fixed left-1/2 top-20 z-99 transform -translate-x-1/2 shadow transition-all duration-100 delay-75 ' +
+          'fixed left-1/2 top-20 z-99 transform -translate-x-1/2 shadow-lg transition-all duration-100 delay-75 ' +
           'ease-out ' + ( filterOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
         }
       >

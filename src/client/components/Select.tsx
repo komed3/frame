@@ -72,7 +72,7 @@ export function Select ( { label, value, options, onChange, placeholder = 'Selec
           aria-label= { label }
           className= {
             'absolute top-full left-0 z-110 mt-1 w-full max-h-56 overflow-y-auto bg-slate-800 ' +
-            'border border-slate-600 rounded shadow'
+            'border border-slate-600 rounded shadow-lg'
           }
         >
           { options.map( option => (

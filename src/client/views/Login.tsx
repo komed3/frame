@@ -18,7 +18,7 @@ export function Login () {
 
   return (
     <div className= 'flex flex-col justify-center items-center gap-6 min-h-screen px-4'>
-      <div className= 'w-full max-w-md px-10 py-8 bg-slate-700 rounded shadow'>
+      <div className= 'w-full max-w-md px-10 py-8 bg-slate-700 rounded shadow-lg'>
         <div className= 'flex items-center gap-4'>
           <img
             src= { logo }
