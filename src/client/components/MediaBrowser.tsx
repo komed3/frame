@@ -51,7 +51,7 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
     <div className= 'overflow-x-auto'>
       <table className= 'w-full text-left text-sm whitespace-nowrap'>
         <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
-          <tr className= '*:font-medium *:px-3 *:py-2'>
+          <tr className= '*:font-medium *:px-4 *:py-3'>
             <th scope= 'col'>Name</th>
             <th scope= 'col'>Format</th>
             <th scope= 'col' className= 'text-right'>Size</th>
@@ -65,14 +65,14 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
           { directories.map( d => (
             <tr
               key= { `directory-${ d.id }` }
-              className= 'group cursor-pointer hover:bg-slate-50/5 *:p-3'
               onClick= { () => onOpenDirectory?.( d ) }
+              className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
             >
               <td colSpan= { 6 }>
                 <div className= 'flex items-center gap-3 min-w-0'>
                   <FolderIcon size= { 16 } />
 
-                  <span className= 'truncate group-hover:text-sky-400'>
+                  <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
                     { d.name }
                   </span>
                 </div>
@@ -83,14 +83,14 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
           { media.map( item => (
             <tr
               key= { item.id }
-              className= 'group cursor-pointer hover:bg-slate-50/5 *:p-3'
               onClick= { () => onOpenMedia( item ) }
+              className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
             >
               <td>
                 <div className= 'flex items-center gap-3 min-w-0'>
                   <MediaIcon type= { item.type } size= { 16 } />
 
-                  <span className= 'truncate group-hover:text-sky-400'>
+                  <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
                     { item.title || item.fileName }
                   </span>
                 </div>
