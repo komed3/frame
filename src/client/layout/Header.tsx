@@ -1,8 +1,14 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
-import { FilterIcon, MenuIcon, SearchIcon, UserIcon, XIcon } from 'lucide-react';
+import { FilterIcon, HeartIcon, LucideIcon, MenuIcon, PlayIcon, SearchIcon, UserIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, NavLink } from 'react-router';
+
+
+const NAV = [
+  [ 'Media Library', '/', PlayIcon ],
+  [ 'Favorites', '/favorites', HeartIcon ]
+] as const;
 
 
 export function Header () {
@@ -79,17 +85,30 @@ export function Header () {
 
       <div className= { 'fixed top-16 inset-x-0 z-99 bottom-0 flex ' + ( ! menuOpen && 'pointer-events-none' ) }>
         <div
-          onClick= { () => setMenuOpen( false ) }
           className= { 'flex-1 bg-slate-900/70 transition-opacity ' + ( ! menuOpen && 'opacity-0' ) }
+          onClick= { () => setMenuOpen( false ) }
         />
 
         <div
           className= {
-            'shrink-0 w-96 bg-slate-50/10 p-8 transition-transform duration-150 ease-out transform ' +
+            'shrink-0 w-96 bg-slate-50/10 py-12 transition-transform duration-150 ease-out transform ' +
             ( menuOpen ? 'translate-x-0' : 'translate-x-full' )
           }
         >
-          ...
+          <nav>
+            { NAV.map( ( [ label, url, Icon ] ) => (
+              <NavLink
+                to= { url }
+                className= { ( { isActive } ) =>
+                  'flex items-center gap-4 w-full px-6 py-2.5 transition-colors ' +
+                  ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/5' )
+                }
+              >
+                <Icon size= { 20 } />
+                <span>{ label }</span>
+              </NavLink>
+            ) ) }
+          </nav>
         </div>
       </div>
     </>
