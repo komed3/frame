@@ -50,6 +50,16 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
   return (
     <div className= 'overflow-x-auto'>
       <table className= 'w-full text-left text-sm whitespace-nowrap'>
+        <thead className= 'text-xs text-slate-400 border-b border-slate-700'>
+          <tr>
+            <th scope= 'col' className= 'px-3 py-3 font-medium'>Name</th>
+            <th scope= 'col' className= 'px-3 py-3 font-medium'>Format</th>
+            <th scope= 'col' className= 'px-3 py-3 font-medium text-right'>Size</th>
+            <th scope= 'col' className= 'px-3 py-3 font-medium text-right'>Duration</th>
+            <th scope= 'col' className= 'px-3 py-3 font-medium text-right'>Resolution</th>
+            <th scope= 'col' className= 'px-3 py-3 font-medium'>Modified</th>
+          </tr>
+        </thead>
       </table>
     </div>
   );
@@ -63,10 +73,21 @@ export function MediaBrowser ( {
   const [ view, setView ] = useState< MediaViewMode >( 'grid' );
 
   return (
-    <div className= 'space-y-4'>
+    <div className= 'space-y-8'>
       <div className= 'flex justify-end'>
         <ViewToggle value= { view } onChange= { setView } />
       </div>
+
+      { view === 'grid' ? (
+        <></>
+      ) : (
+        <MediaList
+          directories= { directories }
+          media= { media }
+          onOpenDirectory= { onOpenDirectory }
+          onOpenMedia= { onOpenMedia }
+        />
+      ) }
     </div>
   );
 }
