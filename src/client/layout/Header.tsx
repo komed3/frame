@@ -60,7 +60,7 @@ export function Header () {
                 placeholder= 'Search Frame …'
                 className= {
                   'w-[30vw] h-10 pl-3 pr-13 font-light tracking-wide bg-slate-800 border ' +
-                  'border-transparent rounded outline-none transition focus:border-slate-400'
+                  'border-transparent rounded outline-none transition focus:border-slate-500'
                 }
               />
 
