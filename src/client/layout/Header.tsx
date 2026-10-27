@@ -35,7 +35,7 @@ export function Header () {
   const [ menuOpen, setMenuOpen ] = useState( false );
   const [ userOpen, setUserOpen ] = useState( false );
 
-  useEffect( () => setMenuOpen( false ), [ pathname ] );
+  useEffect( () => { setMenuOpen( false ), setUserOpen( false ) }, [ pathname ] );
   useEffect( () => { if ( menuOpen ) setUserOpen( false ) }, [ menuOpen ] );
   useEffect( () => { if ( userOpen ) setMenuOpen( false ) }, [ userOpen ] );
 
@@ -88,7 +88,7 @@ export function Header () {
           <div className= 'flex items-center gap-2'>
             <div className= 'relative'>
               <button
-                onClick= { () => setUserOpen( true ) }
+                onClick= { () => setUserOpen( ! userOpen ) }
                 className= 'inline-flex justify-center items-center gap-3 h-10 px-2.5'
               >
                 <span className= 'text-sm'>
@@ -99,24 +99,29 @@ export function Header () {
                 </div>
               </button>
 
-              { userOpen && (
-                <div className= 'absolute left-1/2 top-18 transform -translate-x-1/2'>
-                  <div className= 'w-40 py-4 bg-slate-700'>
-                    { USER.map( ( [ label, url, Icon ] ) => (
-                      <NavLink
-                        to= { url }
-                        className= { ( { isActive } ) =>
-                          'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors delay-75 text-sm ' +
-                          ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
-                        }
-                      >
-                        <Icon size= { 16 } />
-                        <span>{ label }</span>
-                      </NavLink>
-                    ) ) }
-                  </div>
+              <div
+                className= {
+                  'absolute left-1/2 top-18 transform -translate-x-1/2 transition-all duration-100 delay-75 ease-out ' +
+                  ( userOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
+                }
+              >
+                <div className= 'absolute -top-2 left-1/2 transform -translate-x-1/2 rotate-45 w-4 h-4 bg-slate-700' />
+
+                <div className= 'relative z-1 w-42 py-4 bg-slate-700'>
+                  { USER.map( ( [ label, url, Icon ] ) => (
+                    <NavLink
+                      to= { url }
+                      className= { ( { isActive } ) =>
+                        'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors delay-75 text-sm ' +
+                        ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
+                      }
+                    >
+                      <Icon size= { 16 } />
+                      <span>{ label }</span>
+                    </NavLink>
+                  ) ) }
                 </div>
-              ) }
+              </div>
             </div>
 
             <button
@@ -140,7 +145,7 @@ export function Header () {
       <div
         className= {
           'fixed top-16 right-0 bottom-0 z-99 bg-slate-700 py-12 transition-all duration-150 ' + 
-          'ease-out transform overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
+          'ease-out delay-75 transform overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
         }
       >
         <nav>
