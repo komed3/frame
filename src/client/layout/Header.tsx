@@ -396,14 +396,14 @@ export function Header () {
             />
 
             <Select
-              label= 'Search mode'
+              label= 'Search Mode'
               value= { filters.queryMode }
               options= { QUERY_MODE_OPTIONS }
               onChange= { v => setFilter( 'queryMode', v ) }
             />
 
             <Select
-              label= 'Sort by'
+              label= 'Sort By'
               value= { filters.sortBy }
               options= { SORT_OPTIONS }
               onChange= { v => setFilter( 'sortBy', v ) }
@@ -415,6 +415,28 @@ export function Header () {
               options= { DIRECTION_OPTIONS }
               onChange= { v => setFilter( 'sortDirection', v ) }
             />
+          </div>
+
+          <div className= 'flex justify-end items-center gap-4'>
+            <button
+              onClick= { () => setFilters( { ...DEFAULT_FILTERS } ) }
+              className= {
+                'px-3.5 py-2 text-sm font-medium text-slate-300 bg-slate-50/10 rounded ' +
+                'transition-colors hover:bg-slate-50/20'
+              }
+            >
+              Reset
+            </button>
+
+            <button
+              onClick= { applyFilters }
+              className= {
+                'px-3.5 py-2 text-sm font-medium text-slate-900 bg-slate-200 rounded ' +
+                'transition-colors hover:bg-white'
+              }
+            >
+              Apply filters
+            </button>
           </div>
         </div>
       </div>
