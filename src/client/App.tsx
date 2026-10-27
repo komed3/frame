@@ -1,7 +1,6 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import { Footer } from '@/src/client/layout/Footer';
 import { Header } from '@/src/client/layout/Header';
-import { Sidebar } from '@/src/client/layout/Sidebar';
 import { Routing } from '@/src/client/Routing';
 import { Login } from '@/src/client/views/Login';
 import { Loader2Icon } from 'lucide-react';
@@ -21,7 +20,6 @@ export function App () {
   return ! user ? <Login /> : (
     <>
       <Header />
-      <Sidebar />
 
       <main key= { pathname } className= 'min-h-screen'>
         <Routing />
