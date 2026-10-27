@@ -35,7 +35,7 @@ const ApiContext = createContext< ApiContextValue | null >( null );
 
 
 export function ApiProvider ( { children }: { children: ReactNode } ) {
-  const [ token, setToken ] = useState< string | null >( null );
+  const [ token, setToken ] = useState< string | null >( () => localStorage.getItem( TOKEN_KEY ) );
   const [ user, setUser ] = useState< ApiSession[ 'user' ] | null >( null );
   const [ loading, setLoading ] = useState( true );
   const [ error, setError ] = useState< string | null >( null );
@@ -57,7 +57,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     if ( res.status === 401 && path !== '/auth/login' ) {
       setToken( null ), setUser( null );
-      sessionStorage.removeItem( TOKEN_KEY );
+      localStorage.removeItem( TOKEN_KEY );
     }
 
     if ( ! res.ok ) {
@@ -82,7 +82,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const refreshSession = useCallback( async () => {
-    const sessionToken = token ?? sessionStorage.getItem( TOKEN_KEY );
+    const sessionToken = token ?? localStorage.getItem( TOKEN_KEY );
     if ( ! sessionToken ) { setUser( null ), setLoading( false ); return }
     if ( ! token ) setToken( sessionToken );
 
@@ -92,11 +92,12 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       } );
 
       if ( ! res.ok ) throw new ApiError( 'Session expired', res.status );
+
       const result = await res.json() as ApiSession;
       setUser( result.user ), setError( null );
     } catch {
       setToken( null ), setUser( null );
-      sessionStorage.removeItem( TOKEN_KEY );
+      localStorage.removeItem( TOKEN_KEY );
     } finally {
       setLoading( false );
     }
@@ -114,7 +115,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
         method: 'POST', body: JSON.stringify( credentials )
       } );
 
-      sessionStorage.setItem( TOKEN_KEY, res.token );
+      localStorage.setItem( TOKEN_KEY, res.token );
       setToken( res.token ), setUser( res.user );
     } finally {
       setLoading( false );
@@ -125,7 +126,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   const logout = useCallback( async () => {
     try { if ( token ) await request< void >( '/auth/logout', { method: 'POST' } ) }
     finally {
-      sessionStorage.removeItem( TOKEN_KEY );
+      localStorage.removeItem( TOKEN_KEY );
       setToken( null ), setUser( null );
     }
   }, [ request, token ] );
