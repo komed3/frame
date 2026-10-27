@@ -1,5 +1,8 @@
 import logo from '@/src/client/assets/logo.svg';
+import { type SelectOption } from '@/src/client/components/Select';
 import { useApi } from '@/src/client/context/ApiContext';
+import type { MediaType } from '@/src/shared/types/media';
+import type { MediaSearchProgress, MediaSearchQueryMode, MediaSearchSort } from '@/src/shared/types/search';
 import {
   BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon, ListVideoIcon,
   LogOutIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
