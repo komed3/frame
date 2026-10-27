@@ -114,10 +114,12 @@ export function Header () {
 
   const [ menuOpen, setMenuOpen ] = useState( false );
   const [ userOpen, setUserOpen ] = useState( false );
+  const [ filterOpen, setFilterOpen ] = useState( false );
 
-  useEffect( () => { setMenuOpen( false ), setUserOpen( false ) }, [ pathname ] );
-  useEffect( () => { if ( menuOpen ) setUserOpen( false ) }, [ menuOpen ] );
-  useEffect( () => { if ( userOpen ) setMenuOpen( false ) }, [ userOpen ] );
+  const [ query, setQuery ] = useState( '' );
+  const [ filters, setFilters ] = useState< SearchFilters >( { ...DEFAULT_FILTERS } );
+  const [ tagRecords, setTagRecords ] = useState< { id: string; name: string }[] >( [] );
+  const [ categoryRecords, setCategoryRecords ] = useState< { id: string; name: string }[] >( [] );
 
 
   return (
@@ -134,10 +136,12 @@ export function Header () {
         </div>
 
         <div className= 'absolute top-1/2 left-1/2 transform -translate-1/2'>
-          <div className= 'flex items-center gap-6'>
+          <form onSubmit= { handleSearch } className= 'flex items-center gap-6'>
             <div className= 'relative'>
               <input
                 type= 'text'
+                value= { query }
+                onChange= { e => setQuery( e.target.value ) }
                 placeholder= 'Search Frame …'
                 className= {
                   'w-[30vw] h-10 pl-3 pr-13 font-light tracking-wide bg-slate-800 border ' +
@@ -147,6 +151,7 @@ export function Header () {
 
               <button
                 type= 'submit'
+                aria-label= 'Search'
                 className= 'absolute top-0 right-0 inline-flex justify-center items-center w-10 h-10'
               >
                 <SearchIcon size= { 20 } />
@@ -154,6 +159,9 @@ export function Header () {
             </div>
 
             <button
+              type= 'button'
+              aria-expanded= { filterOpen }
+              onClick= { () => setFilterOpen( ! filterOpen ) }
               className= {
                 'flex items-center gap-2 h-8 px-3 text-sm font-medium text-slate-900 ' +
                 'bg-slate-200 rounded transition hover:bg-white'
@@ -162,7 +170,7 @@ export function Header () {
               <FilterIcon size= { 16 } />
               <span>Filter</span>
             </button>
-          </div>
+          </form>
         </div>
 
         <div className= 'absolute top-1/2 right-4 transform -translate-y-1/2'>
@@ -191,6 +199,7 @@ export function Header () {
                 <div className= 'relative z-1 w-48 py-4 bg-slate-700'>
                   { USER.map( ( [ label, url, Icon ] ) => (
                     <NavLink
+                      key= { url }
                       to= { url }
                       className= { ( { isActive } ) =>
                         'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors delay-75 text-sm ' +
@@ -227,22 +236,23 @@ export function Header () {
       </header>
 
       <div
-        onClick= { () => { setMenuOpen( false ), setUserOpen( false ) } }
+        onClick= { () => { setMenuOpen( false ), setUserOpen( false ), setFilterOpen( false ) } }
         className= {
           'fixed inset-0 z-98 bg-slate-900 transition-opacity ' +
-          ( menuOpen || userOpen ? 'opacity-50' : 'opacity-0 pointer-events-none' )
+          ( menuOpen || userOpen || filterOpen ? 'opacity-50' : 'opacity-0 pointer-events-none' )
         }
       />
 
       <div
         className= {
-          'fixed top-16 right-0 bottom-0 z-99 bg-slate-700 py-12 shadow transition-all duration-150 ' + 
+          'fixed top-16 right-0 bottom-0 z-99 bg-slate-700 py-12 shadow transition-all duration-150 ' +
           'ease-out delay-75 transform overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
         }
       >
         <nav>
-          { NAV.map( ( [ label, url, Icon ] ) => label ? (
+          { NAV.map( ( [ label, url, Icon ], i ) => label ? (
             <NavLink
+              key= { url }
               to= { url }
               className= { ( { isActive } ) =>
                 'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors delay-75 ' +
@@ -253,7 +263,7 @@ export function Header () {
               <span>{ label }</span>
             </NavLink>
           ) : (
-            <hr className= 'mx-6 my-5 border-dashed border-slate-50/20' />
+            <hr key= { `separator-${ i }` } className= 'mx-6 my-5 border-dashed border-slate-50/20' />
           ) ) }
         </nav>
       </div>
