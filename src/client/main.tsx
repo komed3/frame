@@ -21,3 +21,6 @@ async function start () {
     </StrictMode>
   );
 }
+
+
+start().catch( err => console.error( '[Frame] Failed to initialize:', err ) );
