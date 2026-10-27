@@ -47,7 +47,7 @@ export function Login () {
               disabled= { loading }
               className= {
                 'w-full px-3 py-2.5 text-sm bg-slate-800 border border-transparent rounded ' +
-                'outline-none transition focus:border-slate-400 disabled:text-slate-300'
+                'outline-none transition focus:border-slate-500 disabled:text-slate-300'
               }
             />
           </div>
@@ -66,7 +66,7 @@ export function Login () {
               disabled= { loading }
               className= {
                 'w-full px-3 py-2.5 text-sm bg-slate-800 border border-transparent rounded ' +
-                'outline-none transition focus:border-slate-400 disabled:text-slate-300'
+                'outline-none transition focus:border-slate-500 disabled:text-slate-300'
               }
             />
           </div>
