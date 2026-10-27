@@ -9,13 +9,9 @@ export function MediaThumbnail ( { media }: { media: MediaRecord } ) {
   const [ src, setSrc ] = useState< string | null >( null );
 
   useEffect( () => {
-    if ( ! [ 'video', 'audio', 'image' ].includes( media.type ) ) {
-      setSrc( null );
-      return;
-    }
+    if ( ! [ 'video', 'audio', 'image' ].includes( media.type ) ) return setSrc( null );
 
-    let active = true;
-    let objectUrl: string | null = null;
+    let active = true, objectUrl: string | null = null;
     const controller = new AbortController();
 
     request< Response >( `/assets/${ encodeURIComponent( media.id ) }/thumb/default`, {
