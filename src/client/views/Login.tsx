@@ -81,7 +81,7 @@ export function Login () {
             type= 'submit'
             disabled= { loading || ! username.trim() || ! password }
             className= {
-              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-50/60 ' +
+              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-50/80 ' +
               'rounded transition hover:bg-white disabled:pointer-events-none'
             }
           >
