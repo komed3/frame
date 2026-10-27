@@ -60,6 +60,23 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
             <th scope= 'col' className= 'pr-0!'>Modified</th>
           </tr>
         </thead>
+
+        <tbody className= 'divide-y divide-slate-700/70'>
+          { directories.map( d => (
+            <tr
+              key= { `directory-${ d.id }` }
+              className= 'cursor-pointer hover:bg-slate-50/5'
+              onClick= { () => onOpenDirectory?.( d ) }
+            >
+              <td colSpan= { 6 } className= 'px-3 py-3'>
+                <div className= 'flex items-center gap-3'>
+                  <FolderIcon size= { 16 } />
+                  <span>{ d.name }</span>
+                </div>
+              </td>
+            </tr>
+          ) ) }
+        </tbody>
       </table>
     </div>
   );
