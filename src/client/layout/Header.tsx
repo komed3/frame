@@ -21,6 +21,12 @@ const NAV = [
   [ 'Admin', '/server', SettingsIcon ]
 ] as const;
 
+const USER = [
+  [ 'Account', '/me' ],
+  [ 'History', '/history' ],
+  [ 'Settings', '/settings' ]
+] as const;
+
 
 export function Header () {
   const { pathname } = useLocation();
@@ -95,7 +101,11 @@ export function Header () {
 
               { userOpen && (
                 <div className= 'absolute left-1/2 -bottom-12 transform -translate-x-1/2'>
-                  <div className= 'bg-slate-700'>...</div>
+                  <div className= 'bg-slate-700'>
+                    { USER.map( ( [ label, url ] ) => (
+                      <></>
+                    ) ) }
+                  </div>
                 </div>
               ) }
             </div>
