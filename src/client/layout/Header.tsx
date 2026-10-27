@@ -22,16 +22,19 @@ export function Header () {
 
         <div className= 'absolute top-1/2 left-1/2 transform -translate-1/2'>
           <div className= 'flex items-center gap-6'>
-            <div className= 'flex h-10 bg-slate-900/60 rounded'>
+            <div className= 'relative'>
               <input
                 type= 'text'
-                className= 'w-[30vw] h-10 pl-3 font-light tracking-wide outline-none'
                 placeholder= 'Search Frame …'
+                className= {
+                  'w-[30vw] h-10 pl-3 pr-13 font-light tracking-wide bg-slate-900/60 border ' +
+                  'border-transparent rounded outline-none transition focus:border-slate-400'
+                }
               />
 
               <button
                 type= 'submit'
-                className= 'inline-flex justify-center items-center w-10 h-10'
+                className= 'absolute top-0 right-0 inline-flex justify-center items-center w-10 h-10'
               >
                 <SearchIcon size= { 20 } />
               </button>
