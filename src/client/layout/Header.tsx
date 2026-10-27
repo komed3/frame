@@ -133,6 +133,46 @@ export function Header () {
   useEffect( () => { if ( userOpen ) close( { user: false } ) }, [ userOpen ] );
   useEffect( () => { if ( filterOpen ) close( { filter: false } ) }, [ filterOpen ] );
 
+  useEffect( () => {
+    let active = true;
+
+    Promise.all( [ tags.list(), categories.list() ] ).then( ( [ tagRecords, categoryRecords ] ) => {
+      if ( ! active ) return;
+
+      setTagRecords( tagRecords );
+      setCategoryRecords( categoryRecords );
+    } ).catch( () => {} );
+
+    return () => { active = false };
+  }, [ tags, categories ] );
+
+
+  const setFilter = ( key: keyof SearchFilters, value: string ) => {
+    setFilters( current => ( { ...current, [ key ]: value } ) );
+  };
+
+  const applyFilters = () => {
+    const params = new URLSearchParams();
+
+    if ( query.trim() ) params.set( 'query', query.trim() );
+    if ( filters.queryMode !== 'all' ) params.set( 'queryMode', filters.queryMode );
+    if ( filters.type ) params.append( 'types', filters.type as MediaType );
+    if ( filters.categoryId ) params.append( 'categoryIds', filters.categoryId );
+    if ( filters.tagId ) params.append( 'tagIds', filters.tagId );
+    if ( filters.availability ) params.set( 'available', filters.availability );
+    if ( filters.favorite ) params.set( 'favorite', filters.favorite );
+    if ( filters.played ) params.set( 'played', filters.played );
+    if ( filters.progress ) params.set( 'progress', filters.progress as MediaSearchProgress );
+    if ( filters.sortBy !== 'title' ) params.set( 'sortBy', filters.sortBy );
+    if ( filters.sortDirection !== 'asc' ) params.set( 'sortDirection', filters.sortDirection );
+
+    const search = params.toString();
+    navigate( `/search${ search ? `?${ search }` : '' }` );
+    setFilterOpen( false );
+  };
+
+  const handleSearch = ( e: SubmitEvent< HTMLFormElement > ) => { e.preventDefault(), applyFilters() };
+
 
   return (
     <>
