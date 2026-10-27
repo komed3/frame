@@ -21,6 +21,21 @@ export function Pagination ( { offset, limit = MEDIA_PAGE_SIZE, itemCount, total
 
   return prev && next && (
     <nav aria-label= 'Pagination' className= 'flex justify-between items-center gap-4'>
+      <div className= 'w-60'>
+        <button
+          aria-label= 'Previous page'
+          disabled= { ! prev }
+          onClick= { () => onChange( Math.max( 0, offset - limit ) ) }
+          className= {
+            'flex justify-center items-center gap-2 h-10 pl-2 pr-3.5 text-sm bg-slate-50/10 rounded ' +
+            'transition-colors hover:bg-slate-50/20 disabled:pointer-events-none disabled:opacity-40'
+          }
+        >
+          <ChevronLeftIcon size= { 20 } />
+          <span>Previous</span>
+        </button>
+      </div>
+
       <span className= 'text-sm text-slate-400'>
         { total === undefined ? `${ start }–${ end }` : `${ start }–${ end } of ${ total }` }
       </span>
