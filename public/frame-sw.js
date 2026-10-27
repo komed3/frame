@@ -12,3 +12,16 @@ self.addEventListener( 'message', e => {
 
   e.ports[ 0 ]?.postMessage( { ready: true } );
 } );
+
+self.addEventListener( 'fetch', e => {
+  const { request: r, clientId } = e, url = new URL( r.url );
+  if ( r.method !== 'GET' || url.origin !== self.location.origin || ! /^\/api\/(?:assets|stream)\//.test( url.pathname ) ) return;
+
+  const token = tokens.get( clientId );
+  if ( ! token ) return;
+
+  const headers = new Headers( r.headers );
+  headers.set( 'Authorization', `Bearer ${ token }` );
+
+  e.respondWith( fetch( new Request( r, { headers } ) ) );
+} );
