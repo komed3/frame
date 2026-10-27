@@ -339,7 +339,7 @@ export function Header () {
             </button>
           </div>
 
-          <div className= 'grid grid-cols-3 gap-4 w-240'>
+          <div className= 'grid grid-cols-3 gap-x-6 gap-y-4 w-240'>
             <Select
               label= 'Media Type'
               value= { filters.type }
@@ -351,7 +351,27 @@ export function Header () {
               label= 'Availability'
               value= { filters.availability }
               options= { AVAILABILITY_OPTIONS }
-              onChange= { value => setFilter( 'availability', value ) }
+              onChange= { v => setFilter( 'availability', v ) }
+            />
+
+            <Select
+              label= 'Category'
+              value= { filters.categoryId }
+              options= { [
+                { value: '', label: 'All categories' },
+                ...categoryRecords.map( ( { id, name } ) => ( { value: id, label: name } ) )
+              ] }
+              onChange= { v => setFilter( 'categoryId', v ) }
+            />
+
+            <Select
+              label= 'Tag'
+              value= { filters.tagId }
+              options= { [
+                { value: '', label: 'All tags' },
+                ...tagRecords.map( ( { id, name } ) => ( { value: id, label: name } ) )
+              ] }
+              onChange= { v => setFilter( 'tagId', v ) }
             />
           </div>
         </div>
