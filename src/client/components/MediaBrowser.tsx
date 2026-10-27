@@ -88,6 +88,15 @@ export function MediaBrowser ( {
           onOpenMedia= { onOpenMedia }
         />
       ) }
+
+      <Pagination
+        offset= { offset }
+        limit= { limit }
+        itemCount= { media.length }
+        total= { total }
+        hasNext= { hasNext }
+        onChange= { onPageChange }
+      />
     </div>
   );
 }
