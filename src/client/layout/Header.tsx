@@ -44,6 +44,68 @@ const USER = [
   [ 'Settings', '/settings', SettingsIcon ]
 ] as const;
 
+const DEFAULT_FILTERS: SearchFilters = {
+  type: '', categoryId: '', tagId: '', availability: '', favorite: '', played: '',
+  progress: '', queryMode: 'all', sortBy: 'title', sortDirection: 'asc'
+};
+
+const TYPE_OPTIONS: SelectOption[] = [
+  { value: '', label: 'All media types' },
+  { value: 'video', label: 'Video' },
+  { value: 'audio', label: 'Audio' },
+  { value: 'image', label: 'Image' },
+  { value: 'text', label: 'Text' },
+  { value: 'other', label: 'Other' }
+];
+
+const AVAILABILITY_OPTIONS: SelectOption[] = [
+  { value: '', label: 'All media' },
+  { value: 'true', label: 'Available' },
+  { value: 'false', label: 'Missing files' }
+];
+
+const FAVORITE_OPTIONS: SelectOption[] = [
+  { value: '', label: 'All media' },
+  { value: 'true', label: 'Favorites only' },
+  { value: 'false', label: 'Exclude favorites' }
+];
+
+const PLAYED_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Any playback status' },
+  { value: 'true', label: 'Played' },
+  { value: 'false', label: 'Not played' }
+];
+
+const PROGRESS_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Any progress' },
+  { value: 'not-started', label: 'Not started' },
+  { value: 'started', label: 'Started' },
+  { value: 'in-progress', label: 'In progress' },
+  { value: 'completed', label: 'Completed' }
+];
+
+const QUERY_MODE_OPTIONS: SelectOption[] = [
+  { value: 'all', label: 'All terms' },
+  { value: 'any', label: 'Any term' },
+  { value: 'phrase', label: 'Exact phrase' }
+];
+
+const SORT_OPTIONS: SelectOption[] = [
+  { value: 'title', label: 'Title' },
+  { value: 'createdAt', label: 'Date added' },
+  { value: 'modifiedAt', label: 'Last modified' },
+  { value: 'sizeBytes', label: 'File size' },
+  { value: 'durationMs', label: 'Duration' },
+  { value: 'rating', label: 'Rating' },
+  { value: 'releasedAt', label: 'Release date' },
+  { value: 'relevance', label: 'Relevance' }
+];
+
+const DIRECTION_OPTIONS: SelectOption[] = [
+  { value: 'asc', label: 'Ascending' },
+  { value: 'desc', label: 'Descending' }
+];
+
 
 export function Header () {
   const { pathname } = useLocation();
