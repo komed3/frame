@@ -394,6 +394,27 @@ export function Header () {
               options= { PROGRESS_OPTIONS }
               onChange= { v => setFilter( 'progress', v ) }
             />
+
+            <Select
+              label= 'Search mode'
+              value= { filters.queryMode }
+              options= { QUERY_MODE_OPTIONS }
+              onChange= { v => setFilter( 'queryMode', v ) }
+            />
+
+            <Select
+              label= 'Sort by'
+              value= { filters.sortBy }
+              options= { SORT_OPTIONS }
+              onChange= { v => setFilter( 'sortBy', v ) }
+            />
+
+            <Select
+              label= 'Direction'
+              value= { filters.sortDirection }
+              options= { DIRECTION_OPTIONS }
+              onChange= { v => setFilter( 'sortDirection', v ) }
+            />
           </div>
         </div>
       </div>
