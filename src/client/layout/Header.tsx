@@ -326,7 +326,7 @@ export function Header () {
       >
         <div className= 'absolute -top-1.5 left-1/2 transform -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
 
-        <div className= 'relative z-1 p-6 bg-slate-700 rounded'>
+        <div className= 'relative z-1 p-6 space-y-6 bg-slate-700 rounded'>
           <div className= 'flex justify-between items-center gap-4'>
             <h2 className= 'font-medium'>Media Filter</h2>
 
@@ -338,6 +338,8 @@ export function Header () {
               <XIcon size= { 20 } />
             </button>
           </div>
+
+          <div className= 'grid grid-cols-3 gap-4'></div>
         </div>
       </div>
     </>
