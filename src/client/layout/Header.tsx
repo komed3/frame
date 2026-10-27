@@ -122,6 +122,18 @@ export function Header () {
   const [ categoryRecords, setCategoryRecords ] = useState< { id: string; name: string }[] >( [] );
 
 
+  const close = ( { menu = true, user = true, filter = true } = {} ) => {
+    menu && setMenuOpen( false );
+    user && setUserOpen( false );
+    filter && setFilterOpen( false );
+  };
+
+  useEffect( close, [ pathname ] );
+  useEffect( () => { if ( menuOpen ) close( { menu: false } ) }, [ menuOpen ] );
+  useEffect( () => { if ( userOpen ) close( { user: false } ) }, [ userOpen ] );
+  useEffect( () => { if ( filterOpen ) close( { filter: false } ) }, [ filterOpen ] );
+
+
   return (
     <>
       <header className= 'fixed top-0 inset-x-0 z-99 h-16 bg-slate-700 shadow'>
