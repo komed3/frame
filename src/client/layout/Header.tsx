@@ -40,7 +40,7 @@ export function Header () {
             <button
               className= {
                 'flex items-center gap-2 h-8 px-3 text-sm font-medium text-slate-900 ' +
-                'bg-slate-50/60 rounded transition hover:bg-white'
+                'bg-slate-50/80 rounded transition hover:bg-white'
               }
             >
               <FilterIcon size= { 16 } />
