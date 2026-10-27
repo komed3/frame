@@ -1,5 +1,5 @@
 import type { MediaType } from '@/src/shared/types/media';
-import { FileAudioIcon, FileIcon, FileImageIcon, FileTextIcon, FileVideoIcon } from 'lucide-react';
+import { FileIcon, HeadphonesIcon, ImageIcon, SquarePlayIcon, SquareTextIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 
 
@@ -12,10 +12,10 @@ export function MediaIcon ( { type, ...props }: MediaIconProps ) {
   const p = { ...{ size: 20 }, ...props };
 
   switch ( type ) {
-    case 'video': return <FileVideoIcon { ...p } />;
-    case 'audio': return <FileAudioIcon { ...p } />;
-    case 'image': return <FileImageIcon { ...p } />;
-    case 'text': return <FileTextIcon { ...p } />;
+    case 'video': return <SquarePlayIcon { ...p } />;
+    case 'audio': return <HeadphonesIcon { ...p } />;
+    case 'image': return <ImageIcon { ...p } />;
+    case 'text': return <SquareTextIcon { ...p } />;
     default: return <FileIcon { ...p } />;
   }
 }
