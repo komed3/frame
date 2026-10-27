@@ -1,13 +1,24 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
-import { FilterIcon, HeartIcon, LucideIcon, MenuIcon, PlayIcon, SearchIcon, UserIcon, XIcon } from 'lucide-react';
+import {
+  BookmarkIcon, FilterIcon, FolderIcon, HeartIcon, HomeIcon, ListVideoIcon, MenuIcon,
+  PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router';
 
 
 const NAV = [
-  [ 'Media Library', '/', PlayIcon ],
-  [ 'Favorites', '/favorites', HeartIcon ]
+  [ 'Home', '/', HomeIcon ],
+  [ 'All Media', '/all', PlayIcon ],
+  [ 'Categories', '/categories', FolderIcon ],
+  [ 'Tags', '/tags', TagIcon ],
+  [],
+  [ 'Playlists', '/playlists', ListVideoIcon ],
+  [ 'Favorites', '/favorites', HeartIcon ],
+  [ 'Markers', '/markers', BookmarkIcon ],
+  [],
+  [ 'Admin', '/server', SettingsIcon ]
 ] as const;
 
 
@@ -91,22 +102,24 @@ export function Header () {
 
         <div
           className= {
-            'shrink-0 w-96 bg-slate-50/10 py-12 transition-transform duration-150 ease-out transform ' +
+            'shrink-0 w-80 bg-slate-50/10 py-12 transition-transform duration-150 ease-out transform ' +
             ( menuOpen ? 'translate-x-0' : 'translate-x-full' )
           }
         >
           <nav>
-            { NAV.map( ( [ label, url, Icon ] ) => (
+            { NAV.map( ( [ label, url, Icon ] ) => label ? (
               <NavLink
                 to= { url }
                 className= { ( { isActive } ) =>
-                  'flex items-center gap-4 w-full px-6 py-2.5 transition-colors ' +
+                  'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors ' +
                   ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/5' )
                 }
               >
                 <Icon size= { 20 } />
                 <span>{ label }</span>
               </NavLink>
+            ) : (
+              <hr className= 'mx-6 my-5 border-dashed border-slate-50/20' />
             ) ) }
           </nav>
         </div>
