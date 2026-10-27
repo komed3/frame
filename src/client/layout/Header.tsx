@@ -57,7 +57,7 @@ export function Header () {
               <span className= 'text-sm'>
                 Hi, <b>{ user?.username }</b>
               </span>
-              <div className= 'inline-flex justify-center items-center w-8 h-8 bg-slate-50/70 rounded-full'>
+              <div className= 'inline-flex justify-center items-center w-8 h-8 bg-slate-50/80 rounded-full'>
                 <UserIcon size= { 20 } className= 'text-slate-900' />
               </div>
             </button>
