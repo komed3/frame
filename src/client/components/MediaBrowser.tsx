@@ -19,16 +19,3 @@ interface MediaBrowserProps {
   onOpenDirectory?: ( directory: MediaDirectoryEntry ) => void;
   onOpenMedia: ( media: MediaRecord ) => void;
 }
-
-
-function MediaIcon ( { type }: { type: MediaType } ) {
-  const props = { size: 18, strokeWidth: 1.6, className: 'shrink-0 text-slate-400' };
-
-  switch ( type ) {
-    case 'video': return <FileVideoIcon { ...props } />;
-    case 'audio': return <FileAudioIcon { ...props } />;
-    case 'image': return <FileImageIcon { ...props } />;
-    case 'text': return <FileTextIcon { ...props } />;
-    default: return <FileIcon { ...props } />;
-  }
-}
