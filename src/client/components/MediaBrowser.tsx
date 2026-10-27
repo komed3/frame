@@ -56,7 +56,10 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
 }
 
 
-export function MediaBrowser ( {}: MediaBrowserProps ) {
+export function MediaBrowser ( {
+  directories = [], media, offset, limit = MEDIA_PAGE_SIZE, total, hasNext,
+  onPageChange, onOpenDirectory, onOpenMedia
+}: MediaBrowserProps ) {
   return (
     <></>
   );
