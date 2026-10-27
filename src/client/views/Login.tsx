@@ -18,7 +18,7 @@ export function Login () {
 
   return (
     <div className= 'flex flex-col justify-center items-center gap-6 min-h-screen px-4'>
-      <div className= 'w-full max-w-md px-10 py-8 bg-slate-50/10 rounded shadow'>
+      <div className= 'w-full max-w-md px-10 py-8 bg-slate-700 rounded shadow'>
         <div className= 'flex items-center gap-4'>
           <img
             src= { logo }
@@ -46,7 +46,7 @@ export function Login () {
               onChange= { e => { setUsername( e.target.value ); clearError() } }
               disabled= { loading }
               className= {
-                'w-full px-3 py-2.5 text-sm bg-slate-900/60 border border-transparent rounded ' +
+                'w-full px-3 py-2.5 text-sm bg-slate-800 border border-transparent rounded ' +
                 'outline-none transition focus:border-slate-400 disabled:text-slate-300'
               }
             />
@@ -65,7 +65,7 @@ export function Login () {
               onChange= { e => { setPassword( e.target.value ); clearError() } }
               disabled= { loading }
               className= {
-                'w-full px-3 py-2.5 text-sm bg-slate-900/60 border border-transparent rounded ' +
+                'w-full px-3 py-2.5 text-sm bg-slate-800 border border-transparent rounded ' +
                 'outline-none transition focus:border-slate-400 disabled:text-slate-300'
               }
             />
@@ -81,8 +81,8 @@ export function Login () {
             type= 'submit'
             disabled= { loading || ! username.trim() || ! password }
             className= {
-              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-50/80 ' +
-              'rounded transition hover:bg-white disabled:pointer-events-none'
+              'mt-6 w-full px-4 py-2.5 text-sm font-semibold text-slate-900 bg-slate-200 rounded ' +
+              'transition hover:bg-white disabled:pointer-events-none disabled:opacity-60'
             }
           >
             { loading ? 'Logging In …' : 'Log In' }
