@@ -341,10 +341,17 @@ export function Header () {
 
           <div className= 'grid grid-cols-3 gap-4 w-240'>
             <Select
-              label= 'Media type'
+              label= 'Media Type'
               value= { filters.type }
               options= { TYPE_OPTIONS }
               onChange= { v => setFilter( 'type', v ) }
+            />
+
+            <Select
+              label= 'Availability'
+              value= { filters.availability }
+              options= { AVAILABILITY_OPTIONS }
+              onChange= { value => setFilter( 'availability', value ) }
             />
           </div>
         </div>
