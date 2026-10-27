@@ -25,9 +25,13 @@ const NAV = [
 export function Header () {
   const { pathname } = useLocation();
   const { user } = useApi();
+
   const [ menuOpen, setMenuOpen ] = useState( false );
+  const [ userOpen, setUserOpen ] = useState( false );
 
   useEffect( () => setMenuOpen( false ), [ pathname ] );
+  useEffect( () => { if ( menuOpen ) setUserOpen( false ) }, [ menuOpen ] );
+  useEffect( () => { if ( userOpen ) setMenuOpen( false ) }, [ userOpen ] );
 
   return (
     <>
@@ -77,6 +81,7 @@ export function Header () {
         <div className= 'absolute top-1/2 right-4 transform -translate-y-1/2'>
           <div className= 'flex items-center gap-2'>
             <button
+              onClick= { () => setUserOpen( true ) }
               className= 'inline-flex justify-center items-center gap-3 h-10 px-2.5'
             >
               <span className= 'text-sm'>
@@ -97,6 +102,10 @@ export function Header () {
         </div>
       </header>
 
+      { /** User Overlay */ }
+      <div className= ''></div>
+
+      { /** Aside Menu */ }
       <div className= { 'fixed top-16 inset-x-0 z-99 bottom-0 flex ' + ( ! menuOpen && 'pointer-events-none' ) }>
         <div
           className= { 'flex-1 bg-slate-900/70 transition-opacity ' + ( ! menuOpen && 'opacity-0' ) }
