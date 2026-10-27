@@ -105,7 +105,7 @@ export function Header () {
 
         <div
           className= {
-            'shrink-0 bg-slate-50/10 py-12 transition duration-150 ease-out transform overflow-hidden ' + 
+            'shrink-0 bg-slate-50/10 py-12 transition-all duration-150 ease-out transform overflow-hidden ' + 
             ( menuOpen ? 'w-80' : 'w-0' )
           }
         >
