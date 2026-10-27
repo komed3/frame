@@ -9,7 +9,20 @@ import { FolderIcon } from 'lucide-react';
 import { useState } from 'react';
 
 
-export function MediaBrowser () {
+interface MediaBrowserProps {
+  directories?: MediaDirectoryEntry[];
+  media: MediaRecord[];
+  offset: number;
+  limit?: number;
+  total?: number;
+  hasNext?: boolean;
+  onPageChange: ( offset: number ) => void;
+  onOpenDirectory?: ( directory: MediaDirectoryEntry ) => void;
+  onOpenMedia: ( media: MediaRecord ) => void;
+}
+
+
+export function MediaBrowser ( {}: MediaBrowserProps ) {
   return (
     <></>
   );
