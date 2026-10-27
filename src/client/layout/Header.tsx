@@ -8,7 +8,7 @@ import {
   LogOutIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
 } from 'lucide-react';
 import { type SubmitEvent, useEffect, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router';
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router';
 
 
 interface SearchFilters {
@@ -111,6 +111,7 @@ export function Header () {
   const { user, logout, tags, categories } = useApi();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [ searchParams ] = useSearchParams();
 
   const [ menuOpen, setMenuOpen ] = useState( false );
   const [ userOpen, setUserOpen ] = useState( false );
@@ -130,6 +131,8 @@ export function Header () {
   useEffect( () => { if ( userOpen ) close( { user: false } ) }, [ userOpen ] );
   useEffect( () => { if ( filterOpen ) close( { filter: false } ) }, [ filterOpen ] );
   useEffect( close, [ pathname ] );
+
+  useEffect( () => setQuery( pathname === '/search' ? searchParams.get( 'query' ) ?? '' : '' ), [ pathname, searchParams ] );
 
   useEffect( () => {
     let active = true;
