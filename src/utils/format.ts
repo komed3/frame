@@ -10,3 +10,13 @@ export function formatBytes ( bytes: number | null | undefined ) : string {
     maximumFractionDigits: index === 0 ? 0 : 1
   } ).format( value ) } ${ units[ index ] }`;
 }
+
+
+export function formatDuration ( ms: number | null | undefined ) : string {
+  if ( ms === null || ms === undefined || ! Number.isFinite( ms ) || ms < 0 ) return '—';
+  const seconds = Math.floor( ms / 1000 );
+
+  return [ Math.floor( seconds / 3600 ), Math.floor( seconds % 3600 / 60 ), seconds % 60 ].map(
+    ( value, i ) => i > 0 || value > 0 ? String( value ).padStart( 2, '0' ) : null
+  ).filter( Boolean ).join( ':' );
+}
