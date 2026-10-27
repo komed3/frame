@@ -20,12 +20,13 @@ export function ViewToggle ( { value, onChange }: ViewToggleProps ) {
     <div className= 'inline-flex items-center gap-1 p-1 bg-slate-800 rounded'>
       { BTN.map( ( [ option, label, Icon ] ) => (
         <button
+          key= { option }
           aria-label= { label }
           aria-pressed= { value === option }
           onClick= { () => onChange( option ) }
           className= {
             'flex justify-center items-center gap-2 h-9 px-3 text-sm rounded transition-colors ' +
-            ( value === option && 'bg-slate-50/20' )
+            ( value === option ? 'bg-slate-50/20' : '' )
           }
         >
           <Icon size= { 18 } />
