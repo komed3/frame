@@ -1,6 +1,6 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
-import { MenuIcon, SearchIcon, UserIcon } from 'lucide-react';
+import { FilterIcon, MenuIcon, SearchIcon, UserIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
@@ -21,7 +21,7 @@ export function Header () {
         </div>
 
         <div className= 'absolute top-1/2 left-1/2 transform -translate-1/2'>
-          <div className= 'flex items-center gap-4'>
+          <div className= 'flex items-center gap-6'>
             <div className= 'flex h-10 bg-slate-900/60 rounded'>
               <input
                 type= 'text'
@@ -36,6 +36,16 @@ export function Header () {
                 <SearchIcon size= { 20 } />
               </button>
             </div>
+
+            <button
+              className= {
+                'flex items-center gap-2 h-8 px-3 text-sm font-medium text-slate-900 ' +
+                'bg-slate-50/60 rounded transition hover:bg-white'
+              }
+            >
+              <FilterIcon size= { 16 } />
+              <span>Filter</span>
+            </button>
           </div>
         </div>
 
