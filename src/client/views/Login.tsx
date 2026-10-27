@@ -18,7 +18,7 @@ export function Login () {
   return (
     <div className= 'flex justify-center items-center min-h-screen px-4'>
       { /** Login Form */ }
-      <div className= 'w-full max-w-sm px-10 py-8 bg-slate-800 rounded shadow'>
+      <div className= 'w-full max-w-sm px-10 py-8 bg-slate-50/10 rounded shadow'>
         <h1 className= 'text-3xl font-semibold'>Frame</h1>
         <p className= 'text-sm text-slate-400'>Private media library</p>
 
