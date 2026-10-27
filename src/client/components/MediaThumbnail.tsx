@@ -1,3 +1,4 @@
+import { MediaIcon } from '@/src/client/components/MediaIcon';
 import { useApi } from '@/src/client/context/ApiContext';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { useEffect, useState } from 'react';
