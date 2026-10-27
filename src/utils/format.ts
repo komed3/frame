@@ -25,3 +25,13 @@ export function formatDuration ( ms: number | null | undefined ) : string {
 export function formatDimensions ( width: number | null | undefined, height: number | null | undefined ) : string {
   return width && height ? `${ width } × ${ height }` : '—';
 }
+
+
+export function formatDate ( value: string | null | undefined ) : string {
+  if ( ! value ) return '—';
+
+  const date = new Date( value );
+  if ( Number.isNaN( date.getTime() ) ) return '—';
+
+  return new Intl.DateTimeFormat( 'en-us', { dateStyle: 'medium' } ).format( date );
+}
