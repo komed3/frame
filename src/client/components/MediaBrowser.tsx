@@ -52,12 +52,12 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
       <table className= 'w-full text-left text-sm whitespace-nowrap'>
         <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
           <tr className= '*:font-medium *:px-3 *:py-2'>
-            <th scope= 'col' className= 'pl-0!'>Name</th>
+            <th scope= 'col'>Name</th>
             <th scope= 'col'>Format</th>
             <th scope= 'col' className= 'text-right'>Size</th>
             <th scope= 'col' className= 'text-right'>Duration</th>
             <th scope= 'col' className= 'text-right'>Resolution</th>
-            <th scope= 'col' className= 'pr-0!'>Modified</th>
+            <th scope= 'col'>Modified</th>
           </tr>
         </thead>
 
@@ -65,15 +65,52 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
           { directories.map( d => (
             <tr
               key= { `directory-${ d.id }` }
-              className= 'cursor-pointer hover:bg-slate-50/5'
+              className= 'group cursor-pointer hover:bg-slate-50/5 *:p-3'
               onClick= { () => onOpenDirectory?.( d ) }
             >
-              <td colSpan= { 6 } className= 'px-3 py-3'>
-                <div className= 'flex items-center gap-3'>
+              <td colSpan= { 6 }>
+                <div className= 'flex items-center gap-3 min-w-0'>
                   <FolderIcon size= { 16 } />
-                  <span>{ d.name }</span>
+
+                  <span className= 'truncate group-hover:text-sky-400'>
+                    { d.name }
+                  </span>
                 </div>
               </td>
+            </tr>
+          ) ) }
+
+          { media.map( item => (
+            <tr
+              key= { item.id }
+              className= 'group cursor-pointer hover:bg-slate-50/5 *:p-3'
+              onClick= { () => onOpenMedia( item ) }
+            >
+              <td>
+                <div className= 'flex items-center gap-3 min-w-0'>
+                  <MediaIcon type= { item.type } size= { 16 } />
+
+                  <span className= 'truncate group-hover:text-sky-400'>
+                    { item.title || item.fileName }
+                  </span>
+                </div>
+              </td>
+
+              <td>{ formatFileFormat( item.fileName, item.container ) }</td>
+
+              <td className= 'text-right tabular-nums'>
+                { formatBytes( item.sizeBytes ) }
+              </td>
+
+              <td className= 'text-right tabular-nums'>
+                { item.type === 'video' || item.type === 'audio' ? formatDuration( item.durationMs ) : '—' }
+              </td>
+
+              <td className= 'text-right tabular-nums'>
+                { formatDimensions( item.width, item.height ) }
+              </td>
+
+              <td>{ formatDate( item.modifiedAt ) }</td>
             </tr>
           ) ) }
         </tbody>
