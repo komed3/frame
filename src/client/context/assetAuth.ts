@@ -43,3 +43,10 @@ export function initializeAssetAuth () : Promise< ServiceWorkerContainer > {
 
   return ready;
 }
+
+
+export async function updateAssetAuth ( token: string | null ) {
+  const serviceWorker = await initializeAssetAuth(), controller = serviceWorker.controller;
+  if ( ! controller ) throw new Error( 'Frame Service Worker is not controlling this page.' );
+  await sendToken( controller, token );
+}
