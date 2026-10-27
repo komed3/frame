@@ -21,7 +21,7 @@ export function App () {
     <>
       <Header />
 
-      <main key= { pathname } className= 'min-h-screen'>
+      <main key= { pathname } className= 'min-h-screen pt-18'>
         <Routing />
       </main>
 
