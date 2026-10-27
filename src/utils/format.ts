@@ -20,3 +20,8 @@ export function formatDuration ( ms: number | null | undefined ) : string {
     ( value, i ) => i > 0 || value > 0 ? String( value ).padStart( 2, '0' ) : null
   ).filter( Boolean ).join( ':' );
 }
+
+
+export function formatDimensions ( width: number | null | undefined, height: number | null | undefined ) : string {
+  return width && height ? `${ width } × ${ height }` : '—';
+}
