@@ -1,8 +1,8 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
 import {
-  BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon,
-  ListVideoIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
+  BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon, ListVideoIcon,
+  LogOutIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
@@ -22,7 +22,7 @@ const NAV = [
 ] as const;
 
 const USER = [
-  [ 'Account', '/me', UserIcon ],
+  [ 'My Account', '/me', UserIcon ],
   [ 'History', '/history', GalleryVerticalEndIcon ],
   [ 'Settings', '/settings', SettingsIcon ]
 ] as const;
@@ -30,7 +30,7 @@ const USER = [
 
 export function Header () {
   const { pathname } = useLocation();
-  const { user } = useApi();
+  const { user, logout } = useApi();
 
   const [ menuOpen, setMenuOpen ] = useState( false );
   const [ userOpen, setUserOpen ] = useState( false );
@@ -107,7 +107,7 @@ export function Header () {
               >
                 <div className= 'absolute -top-2 left-1/2 transform -translate-x-1/2 rotate-45 w-4 h-4 bg-slate-700' />
 
-                <div className= 'relative z-1 w-42 py-4 bg-slate-700'>
+                <div className= 'relative z-1 w-48 py-4 bg-slate-700'>
                   { USER.map( ( [ label, url, Icon ] ) => (
                     <NavLink
                       to= { url }
@@ -120,6 +120,17 @@ export function Header () {
                       <span>{ label }</span>
                     </NavLink>
                   ) ) }
+
+                  <button
+                    onClick= { logout }
+                    className= {
+                      'flex items-center gap-3 mt-4 w-full px-6 py-2 tracking-wider transition-colors ' +
+                      'delay-75 text-sm text-amber-300 hover:bg-slate-50/10'
+                    }
+                  >
+                    <LogOutIcon size= { 16 } />
+                    <span>Log Out</span>
+                  </button>
                 </div>
               </div>
             </div>
