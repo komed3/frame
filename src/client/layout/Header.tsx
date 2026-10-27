@@ -240,11 +240,11 @@ export function Header () {
 
               <div
                 className= {
-                  'absolute left-1/2 top-18 transform -translate-x-1/2 shadow transition-all duration-100 delay-75 ease-out ' +
+                  'absolute left-1/2 top-17 transform -translate-x-1/2 shadow transition-all duration-100 delay-75 ease-out ' +
                   ( userOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
                 }
               >
-                <div className= 'absolute -top-2 left-1/2 transform -translate-x-1/2 rotate-45 w-4 h-4 bg-slate-700' />
+                <div className= 'absolute -top-1.5 left-1/2 transform -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
 
                 <div className= 'relative z-1 w-48 py-4 bg-slate-700'>
                   { USER.map( ( [ label, url, Icon ] ) => (
@@ -320,11 +320,25 @@ export function Header () {
 
       <div
         className= {
-          'fixed left-1/2 top-21 z-99 transform -translate-x-1/2 bg-slate-700 shadow transition-all duration-100 ' +
-          'delay-75 ease-out ' + ( filterOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
+          'fixed left-1/2 top-20 z-99 transform -translate-x-1/2 transition-all duration-100 delay-75 ease-out ' +
+          ( filterOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
         }
       >
-        ...
+        <div className= 'absolute -top-1.5 left-1/2 transform -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+
+        <div className= 'relative z-1 p-6 bg-slate-700 rounded shadow'>
+          <div className= 'flex justify-between items-center gap-4'>
+            <h2 className= 'font-medium'>Media Filter</h2>
+
+            <button
+              aria-label= 'Close filters'
+              onClick= { () => setFilterOpen( false ) }
+              className= 'inline-flex justify-center items-center w-6 h-6'
+            >
+              <XIcon size= { 20 } />
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
