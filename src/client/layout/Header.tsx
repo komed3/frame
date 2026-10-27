@@ -7,8 +7,22 @@ import {
   BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon, ListVideoIcon,
   LogOutIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router';
+import { type SubmitEvent, useEffect, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router';
+
+
+interface SearchFilters {
+  type: string;
+  categoryId: string;
+  tagId: string;
+  availability: string;
+  favorite: string;
+  played: string;
+  progress: string;
+  queryMode: MediaSearchQueryMode;
+  sortBy: MediaSearchSort;
+  sortDirection: 'asc' | 'desc';
+}
 
 
 const NAV = [
