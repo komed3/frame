@@ -373,6 +373,27 @@ export function Header () {
               ] }
               onChange= { v => setFilter( 'tagId', v ) }
             />
+
+            <Select
+              label= 'Favorites'
+              value= { filters.favorite }
+              options= { FAVORITE_OPTIONS }
+              onChange= { v => setFilter( 'favorite', v ) }
+            />
+
+            <Select
+              label= 'Playback'
+              value= { filters.played }
+              options= { PLAYED_OPTIONS }
+              onChange= { v => setFilter( 'played', v ) }
+            />
+
+            <Select
+              label= 'Progress'
+              value= { filters.progress }
+              options= { PROGRESS_OPTIONS }
+              onChange= { v => setFilter( 'progress', v ) }
+            />
           </div>
         </div>
       </div>
