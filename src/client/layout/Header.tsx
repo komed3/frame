@@ -1,5 +1,5 @@
 import logo from '@/src/client/assets/logo.svg';
-import { type SelectOption } from '@/src/client/components/Select';
+import { Select, type SelectOption } from '@/src/client/components/Select';
 import { useApi } from '@/src/client/context/ApiContext';
 import type { MediaType } from '@/src/shared/types/media';
 import type { MediaSearchProgress, MediaSearchQueryMode, MediaSearchSort } from '@/src/shared/types/search';
@@ -339,7 +339,14 @@ export function Header () {
             </button>
           </div>
 
-          <div className= 'grid grid-cols-3 gap-4'></div>
+          <div className= 'grid grid-cols-3 gap-4 w-240'>
+            <Select
+              label= 'Media type'
+              value= { filters.type }
+              options= { TYPE_OPTIONS }
+              onChange= { v => setFilter( 'type', v ) }
+            />
+          </div>
         </div>
       </div>
     </>
