@@ -89,6 +89,12 @@ export function MediaBrowser ( {
         />
       ) }
 
+      { ! directories.length && ! media.length && (
+        <p className= 'py-16 text-center text-slate-500'>
+          No media found.
+        </p>
+      ) }
+
       <Pagination
         offset= { offset }
         limit= { limit }
