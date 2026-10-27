@@ -46,7 +46,7 @@ const USER = [
 
 const DEFAULT_FILTERS: SearchFilters = {
   type: '', categoryId: '', tagId: '', availability: '', favorite: '', played: '',
-  progress: '', queryMode: 'all', sortBy: 'title', sortDirection: 'asc'
+  progress: '', queryMode: 'all', sortBy: 'relevance', sortDirection: 'asc'
 };
 
 const TYPE_OPTIONS: SelectOption[] = [
@@ -91,14 +91,14 @@ const QUERY_MODE_OPTIONS: SelectOption[] = [
 ];
 
 const SORT_OPTIONS: SelectOption[] = [
+  { value: 'relevance', label: 'Relevance' },
   { value: 'title', label: 'Title' },
   { value: 'createdAt', label: 'Date added' },
   { value: 'modifiedAt', label: 'Last modified' },
   { value: 'sizeBytes', label: 'File size' },
   { value: 'durationMs', label: 'Duration' },
   { value: 'rating', label: 'Rating' },
-  { value: 'releasedAt', label: 'Release date' },
-  { value: 'relevance', label: 'Relevance' }
+  { value: 'releasedAt', label: 'Release date' }
 ];
 
 const DIRECTION_OPTIONS: SelectOption[] = [
