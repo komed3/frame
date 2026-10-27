@@ -1,6 +1,6 @@
 import logo from '@/src/client/assets/logo.svg';
 import { useApi } from '@/src/client/context/ApiContext';
-import { MenuIcon, UserIcon } from 'lucide-react';
+import { MenuIcon, SearchIcon, UserIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
@@ -18,6 +18,25 @@ export function Header () {
               alt= 'Frame'
             />
           </Link>
+        </div>
+
+        <div className= 'absolute top-1/2 left-1/2 transform -translate-1/2'>
+          <div className= 'flex items-center gap-4'>
+            <div className= 'flex h-10 bg-slate-900/60 rounded'>
+              <input
+                type= 'text'
+                className= 'w-[30vw] h-10 pl-3 font-light tracking-wide outline-none'
+                placeholder= 'Search Frame …'
+              />
+
+              <button
+                type= 'submit'
+                className= 'inline-flex justify-center items-center w-10 h-10'
+              >
+                <SearchIcon size= { 20 } />
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className= 'absolute top-1/2 right-4 transform -translate-y-1/2'>
