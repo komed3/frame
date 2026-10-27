@@ -4,8 +4,8 @@ import {
   BookmarkIcon, FilterIcon, FolderIcon, HeartIcon, HomeIcon, ListVideoIcon, MenuIcon,
   PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
 } from 'lucide-react';
-import { useState } from 'react';
-import { Link, NavLink } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router';
 
 
 const NAV = [
@@ -23,8 +23,11 @@ const NAV = [
 
 
 export function Header () {
+  const { pathname } = useLocation();
   const { user } = useApi();
   const [ menuOpen, setMenuOpen ] = useState( false );
+
+  useEffect( () => setMenuOpen( false ), [ pathname ] );
 
   return (
     <>
@@ -102,8 +105,8 @@ export function Header () {
 
         <div
           className= {
-            'shrink-0 w-80 bg-slate-50/10 py-12 transition-transform duration-150 ease-out transform ' +
-            ( menuOpen ? 'translate-x-0' : 'translate-x-full' )
+            'shrink-0 bg-slate-50/10 py-12 transition duration-150 ease-out transform overflow-hidden ' + 
+            ( menuOpen ? 'w-80' : 'w-0' )
           }
         >
           <nav>
@@ -111,7 +114,7 @@ export function Header () {
               <NavLink
                 to= { url }
                 className= { ( { isActive } ) =>
-                  'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors ' +
+                  'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors delay-75 ' +
                   ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/5' )
                 }
               >
