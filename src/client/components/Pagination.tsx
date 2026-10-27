@@ -17,16 +17,12 @@ export const MEDIA_PAGE_SIZE = 64;
 export function Pagination ( { offset, limit = MEDIA_PAGE_SIZE, itemCount, total, hasNext, onChange }: PaginationProps ) {
   const prev = offset > 0;
   const next = hasNext ?? ( total === undefined ? itemCount === limit : offset + itemCount < total );
-  if ( ! prev && ! next ) return null;
-
   const start = itemCount > 0 ? offset + 1 : 0, end = offset + itemCount;
-  const summary = total === undefined ? `${ start }–${ end }` : `${ start }–${ end } of ${ total }`;
 
-
-  return (
+  return prev && next && (
     <nav aria-label= 'Pagination' className= 'flex justify-between items-center gap-4'>
       <span className= 'text-sm text-slate-400'>
-        { summary }
+        { total === undefined ? `${ start }–${ end }` : `${ start }–${ end } of ${ total }` }
       </span>
     </nav>
   );
