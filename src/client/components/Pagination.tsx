@@ -19,6 +19,7 @@ export function Pagination ( { offset, limit = MEDIA_PAGE_SIZE, itemCount, total
   const next = hasNext ?? ( total === undefined ? itemCount === limit : offset + itemCount < total );
   const start = itemCount > 0 ? offset + 1 : 0, end = offset + itemCount;
 
+
   return prev && next && (
     <nav aria-label= 'Pagination' className= 'flex justify-between items-center gap-4'>
       <div className= 'w-60'>
