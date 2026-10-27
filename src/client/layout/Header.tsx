@@ -108,8 +108,9 @@ const DIRECTION_OPTIONS: SelectOption[] = [
 
 
 export function Header () {
+  const { user, logout, tags, categories } = useApi();
   const { pathname } = useLocation();
-  const { user, logout } = useApi();
+  const navigate = useNavigate();
 
   const [ menuOpen, setMenuOpen ] = useState( false );
   const [ userOpen, setUserOpen ] = useState( false );
