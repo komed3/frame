@@ -41,3 +41,14 @@ export function formatFileFormat ( fileName: string, container?: string | null )
   const extension = fileName.match( /\.([^.\/\\]+)$/ )?.[ 1 ];
   return extension ? extension.toUpperCase() : container?.split( ',' )[ 0 ].toUpperCase() ?? '—';
 }
+
+
+export function formatMediaType ( type: string ) : string {
+  switch ( type ) {
+    case 'video': return 'Video';
+    case 'audio': return 'Audio';
+    case 'image': return 'Image';
+    case 'text': return 'Text';
+    default: return 'File';
+  }
+}
