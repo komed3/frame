@@ -319,6 +319,15 @@ export function Header () {
           ) ) }
         </nav>
       </div>
+
+      <div
+        className= {
+          'fixed left-1/2 top-21 z-99 transform -translate-x-1/2 bg-slate-700 shadow transition-all duration-100 ' +
+          'delay-75 ease-out ' + ( filterOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
+        }
+      >
+        ...
+      </div>
     </>
   );
 }
