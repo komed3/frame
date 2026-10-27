@@ -60,7 +60,13 @@ export function MediaBrowser ( {
   directories = [], media, offset, limit = MEDIA_PAGE_SIZE, total, hasNext,
   onPageChange, onOpenDirectory, onOpenMedia
 }: MediaBrowserProps ) {
+  const [ view, setView ] = useState< MediaViewMode >( 'grid' );
+
   return (
-    <></>
+    <div className= 'space-y-4'>
+      <div className= 'flex justify-end'>
+        <ViewToggle value= { view } onChange= { setView } />
+      </div>
+    </div>
   );
 }
