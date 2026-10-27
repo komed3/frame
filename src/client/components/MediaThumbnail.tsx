@@ -1,45 +1,26 @@
 import { MediaIcon } from '@/src/client/components/MediaIcon';
 import { useApi } from '@/src/client/context/ApiContext';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { useEffect, useState } from 'react';
 
 
-export function MediaThumbnail ( { media }: { media: MediaRecord } ) {
-  const { request } = useApi();
-  const [ src, setSrc ] = useState< string | null >( null );
+interface MediaThumbnailProps {
+  media: MediaRecord;
+  aspectRatio?: string;
+}
 
 
-  useEffect( () => {
-    if ( ! [ 'video', 'audio', 'image' ].includes( media.type ) ) return setSrc( null );
-
-    let active = true, objectUrl: string | null = null;
-    const controller = new AbortController();
-
-    request< Response >( `/assets/${ encodeURIComponent( media.id ) }/thumb/default`, {
-      signal: controller.signal
-    } ).then( response => response.blob() ).then( blob => {
-      if ( ! active ) return;
-
-      objectUrl = URL.createObjectURL( blob );
-      setSrc( objectUrl );
-    } ).catch( () => {} );
-
-    return () => {
-      active = false;
-      controller.abort();
-      if ( objectUrl ) URL.revokeObjectURL( objectUrl );
-    };
-  }, [ media.id, media.type, request ] );
-
+export function MediaThumbnail ( { media, aspectRatio = 'aspect-video' }: MediaThumbnailProps ) {
+  const { assets } = useApi();
+  const url = [ 'video', 'audio', 'image' ].includes( media.type ) && assets.url( media.id, 'thumb', 'default' );
 
   return (
-    <div className= 'flex justify-center items-center aspect-video overflow-hidden bg-slate-800 rounded'>
-      { src ? (
+    <div className= { 'flex justify-center items-center overflow-hidden bg-slate-50/10 rounded ' + aspectRatio }>
+      { url ? (
         <img
-          src= { src }
-          alt= ''
-          loading= 'lazy'
+          src= { url }
           className= 'w-full h-full object-cover'
+          alt= { media.title ?? '' }
+          loading= 'lazy'
         />
       ) : (
         <MediaIcon type= { media.type } />
