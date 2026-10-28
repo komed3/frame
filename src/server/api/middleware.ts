@@ -3,6 +3,11 @@ import type { ErrorRequestHandler, Request, RequestHandler } from 'express';
 
 
 export function getToken ( req: Request ) : string | null {
+  if ( req.originalUrl.startsWith( '/api/assets/' ) ) {
+    const token = req.headers.cookie?.match( /(?:^|;\s*)frame\.asset-session=([^;]*)/ )?.[ 1 ];
+    if ( token ) return token;
+  }
+
   return req.get( 'authorization' )?.match( /^Bearer\s+(\S+)$/i )?.[ 1 ] ?? null;
 }
 
