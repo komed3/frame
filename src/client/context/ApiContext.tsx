@@ -95,9 +95,11 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
       const result = await res.json() as ApiSession;
       setUser( result.user ), setError( null );
-    } catch {
-      setToken( null ), setUser( null );
-      localStorage.removeItem( TOKEN_KEY );
+    } catch ( err ) {
+      if ( err instanceof ApiError && err.status === 401 )
+        setToken( null ), setUser( null ), localStorage.removeItem( TOKEN_KEY );
+
+      else setError( 'Could not verify session. Please check your connection.' );
     } finally {
       setLoading( false );
     }
