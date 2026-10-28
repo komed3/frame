@@ -155,39 +155,43 @@ export function Admin () {
           />
         </div>
 
-        <div className= 'overflow-x-auto'>
-          <table className= 'w-full text-left text-sm whitespace-nowrap'>
-            <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
-              <tr className= '*:font-medium *:px-4 *:py-3'>
-                <th scope= 'col'>Kind</th>
-                <th scope= 'col'>Status</th>
-                <th scope= 'col'>Created</th>
-                <th scope= 'col'>Details</th>
-              </tr>
-            </thead>
+        { ! jobList.length ? <Loading /> : (
+          <>
+            <div className= 'overflow-x-auto'>
+              <table className= 'w-full text-left text-sm whitespace-nowrap'>
+                <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
+                  <tr className= '*:font-medium *:px-4 *:py-3'>
+                    <th scope= 'col'>Kind</th>
+                    <th scope= 'col'>Status</th>
+                    <th scope= 'col'>Created</th>
+                    <th scope= 'col'>Details</th>
+                  </tr>
+                </thead>
 
-            <tbody className= 'divide-y divide-slate-700/70 divide-dashed'>
-              { jobList.map( job => (
-                <tr key= { job.id } className= 'align-top whitespace-nowrap *:p-4'>
-                  <td>{ job.kind.toUpperCase() }</td>
-                  <td>{ job.status }</td>
-                  <td>{ formatDate( job.createdAt ) }</td>
-                  <td className= 'max-w-md wrap-break-words'>
-                    { job.error || job.worker || '—' }
-                  </td>
-                </tr>
-              ) ) }
-            </tbody>
-          </table>
-        </div>
+                <tbody className= 'divide-y divide-slate-700/70 divide-dashed'>
+                  { jobList.map( job => (
+                    <tr key= { job.id } className= 'align-top whitespace-nowrap *:p-4'>
+                      <td>{ job.kind.toUpperCase() }</td>
+                      <td>{ job.status }</td>
+                      <td>{ formatDate( job.createdAt ) }</td>
+                      <td className= 'max-w-md wrap-break-words'>
+                        { job.error || job.worker || '—' }
+                      </td>
+                    </tr>
+                  ) ) }
+                </tbody>
+              </table>
+            </div>
 
-        <Pagination
-          offset= { offset }
-          limit= { PAGE_SIZE }
-          itemCount= { jobList.length }
-          hasNext= { jobList.length === PAGE_SIZE }
-          onChange= { setOffset }
-        />
+            <Pagination
+              offset= { offset }
+              limit= { PAGE_SIZE }
+              itemCount= { jobList.length }
+              hasNext= { jobList.length === PAGE_SIZE }
+              onChange= { setOffset }
+            />
+          </>
+        ) }
       </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
