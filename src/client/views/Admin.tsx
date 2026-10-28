@@ -1,9 +1,9 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { DatabaseStats } from '@/src/shared/types/database';
-import type { JobRecord, JobStats } from '@/src/shared/types/job';
+import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 
 const PAGE_SIZE = 25;
@@ -46,6 +46,29 @@ export function Admin () {
   const refreshing = useRef( false );
 
   usePageTitle( 'Server Administration' );
+
+
+  const refresh = useCallback( async () => {
+    if ( refreshing.current ) return;
+    refreshing.current = true;
+
+    try {
+      const [ stats, db, mediaRoots, jobList ] = await Promise.all( [
+        jobs.stats(), database.stats(), roots.list(), jobs.list( {
+          limit: PAGE_SIZE, offset, status: status ? status as JobStatus : undefined,
+          kind: kind ? kind as JobKind : undefined
+        } )
+      ] );
+
+      setStats( stats ), setDb( db ), setMediaRoots( mediaRoots );
+      setJobList( jobList ), setError( null );
+    } catch ( err ) {
+      setError( err instanceof Error ? err.message : 'Could not load server information.' );
+    } finally {
+      setLoading( false );
+      refreshing.current = false;
+    }
+  }, [ database, jobs, roots, offset, status, kind ] );
 
 
   return (
