@@ -45,7 +45,6 @@ export function Admin () {
   const [ status, setStatus ] = useState( '' );
   const [ kind, setKind ] = useState( '' );
   const [ offset, setOffset ] = useState( 0 );
-  const [ loading, setLoading ] = useState( true );
   const [ scanning, setScanning ] = useState( false );
   const [ error, setError ] = useState< string | null >( null );
   const refreshing = useRef( false );
@@ -67,12 +66,10 @@ export function Admin () {
 
       setStats( stats ), setDb( db ), setMediaRoots( mediaRoots );
       setJobList( jobList ), setError( null );
-    } catch ( err ) {
-      setError( err instanceof Error ? err.message : 'Could not load server information.' );
-    } finally {
-      setLoading( false );
-      refreshing.current = false;
     }
+
+    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not load server information.' ) }
+    finally { refreshing.current = false }
   }, [ database, jobs, roots, offset, status, kind ] );
 
   const scanAll = async () => {
@@ -155,7 +152,11 @@ export function Admin () {
           />
         </div>
 
-        { ! jobList.length ? <Loading /> : (
+        { ! mediaRoots.length ? (
+          <p className= 'py-4 text-sm text-slate-400'>
+            No Jobs found.
+          </p>
+        ) : (
           <>
             <div className= 'overflow-x-auto'>
               <table className= 'w-full text-left text-sm whitespace-nowrap'>
