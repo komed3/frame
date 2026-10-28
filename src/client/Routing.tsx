@@ -1,4 +1,5 @@
 import { Account } from '@/src/client/views/Account';
+import { Admin } from '@/src/client/views/Admin';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
@@ -14,6 +15,7 @@ export function Routing () {
       <Route path= '/search' element= { <Search /> } />
 
       <Route path= '/me' element= { <Account /> } />
+      <Route path= '/server' element= { <Admin /> } />
 
       <Route path= '/' element= { <></> } />
       <Route path= '*' element= { <NotFound /> } />
