@@ -3,7 +3,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 
 const PAGE_SIZE = 25;
@@ -69,6 +69,13 @@ export function Admin () {
       refreshing.current = false;
     }
   }, [ database, jobs, roots, offset, status, kind ] );
+
+
+  useEffect( () => {
+    refresh();
+    const timer = window.setInterval( refresh, REFRESH_INTERVAL );
+    return () => window.clearInterval( timer );
+  }, [ refresh ] );
 
 
   return (
