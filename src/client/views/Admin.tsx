@@ -104,6 +104,12 @@ export function Admin () {
           { scanning ? 'Starting scan …' : 'Scan all roots' }
         </button>
       </div>
+
+      { error && (
+        <p role= 'alert' className= 'font-semibold text-red-400'>
+          { error }
+        </p>
+      ) }
     </div>
   );
 }
