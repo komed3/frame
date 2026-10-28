@@ -1,7 +1,7 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatDate } from '@/src/client/utils/format';
-import { GalleryVerticalEndIcon, HeartIcon, ListVideoIcon, SettingsIcon } from 'lucide-react';
+import { GalleryVerticalEndIcon, HeartIcon, ListVideoIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
@@ -14,7 +14,7 @@ const NAV = [
 
 
 export function Account () {
-  const { user } = useApi();
+  const { user, logout } = useApi();
 
   usePageTitle( 'My Account' );
 
@@ -65,6 +65,17 @@ export function Account () {
             <span>{ label }</span>
           </Link>
         ) ) }
+
+        <button
+          onClick= { logout }
+          className= {
+              'flex flex-col justify-center items-center gap-1 pt-4 pb-3 text-center bg-slate-50/10 ' +
+              'rounded shadow-lg transition-colors duration-100 hover:bg-slate-50/20'
+            }
+          >
+            <LogOutIcon size= { 16 } />
+            <span>Log Out</span>
+          </button>
       </div>
     </div>
   );
