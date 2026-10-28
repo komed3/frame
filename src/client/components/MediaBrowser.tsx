@@ -186,8 +186,8 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
               className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
             >
               <td>
-                <div className= 'flex items-center gap-3 min-w-0'>
-                  <MediaIcon type= { item.type } size= { 16 } />
+                <div className= 'flex items-center gap-3 min-w-0 max-w-[15vw]'>
+                  <MediaIcon type= { item.type } size= { 16 } className= 'shrink-0' />
 
                   <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
                     { item.title || item.fileName }
