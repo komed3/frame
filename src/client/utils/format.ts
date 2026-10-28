@@ -1,3 +1,9 @@
+export function formatNumber ( value: number | null | undefined, options?: Intl.NumberFormatOptions ) : string {
+  if ( value === null || value === undefined || ! Number.isFinite( value ) ) return '—';
+  return new Intl.NumberFormat( 'en-us', options ).format( value );
+}
+
+
 export function formatBytes ( bytes: number | null | undefined ) : string {
   if ( bytes === null || bytes === undefined || ! Number.isFinite( bytes ) || bytes < 0 ) return '—';
   if ( bytes === 0 ) return '0 B';
