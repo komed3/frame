@@ -1,6 +1,6 @@
-import { formatBytes } from '@/src/client/utils/format';
+import { formatBytes, formatDate } from '@/src/client/utils/format';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { WeightIcon } from 'lucide-react';
+import { CalendarIcon, GlobeIcon, LinkIcon, UserIcon, WeightIcon } from 'lucide-react';
 
 
 interface MediaInfoProps {
@@ -10,7 +10,13 @@ interface MediaInfoProps {
 
 export function MediaInfo ( { media }: MediaInfoProps ) {
   const items = [
-    [ 'Size', formatBytes( media.sizeBytes ), WeightIcon ]
+    [ 'Size', formatBytes( media.sizeBytes ), WeightIcon ],
+    [ 'Modified', formatDate( media.modifiedAt ), CalendarIcon ],
+    [ 'Added', formatDate( media.createdAt ), CalendarIcon ],
+    [ 'Creator', media.creator ?? '—', UserIcon ],
+    [ 'Language', media.language ?? '—', GlobeIcon ],
+    [ 'Published', formatDate( media.releasedAt ), LinkIcon ],
+    [ 'Recorded', formatDate( media.recordedAt ), CalendarIcon ]
   ] as const;
 
   return (
@@ -19,7 +25,7 @@ export function MediaInfo ( { media }: MediaInfoProps ) {
         Informationen
       </h2>
 
-      <div className= 'grid grid-cols-2 gap-x-8'>
+      <div className= 'grid grid-cols-2 gap-x-8 gap-y-1'>
         { items.map( ( [ label, value, Icon ] ) => (
           <div key= { label } className= 'flex flex-wrap items-start gap-8'>
             <div className= 'flex flex-wrap items-center gap-2 h-8 text-slate-400'>
