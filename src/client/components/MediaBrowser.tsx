@@ -43,7 +43,7 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
           onClick= { () => onOpenDirectory?.( directory ) }
           disabled= { ! onOpenDirectory }
           className= {
-            'flex items-center gap-4 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
+            'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
             'duration-100 hover:bg-slate-50/10 disabled:cursor-default'
           }
         >
@@ -66,7 +66,7 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
 
 function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
   return media.length > 0 && (
-    <div className= 'grid grid-cols-3 gap-x-3 gap-y-5'>
+    <div className= 'grid grid-cols-3 gap-x-5 gap-y-8'>
       { media.map( item => (
         <button
           key= { item.id }
@@ -77,8 +77,10 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
             <MediaThumbnail media= { item } />
           </div>
 
-          <div className= ''>
-            ...
+          <div className= 'flex justify-between items-start gap-6'>
+            <span className= 'flex-1 min-w-0 text-sm line-clamp-2 wrap-break-words'>
+              { item.title || item.fileName }
+            </span>
           </div>
         </button>
       ) ) }
