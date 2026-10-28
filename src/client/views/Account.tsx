@@ -1,6 +1,16 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatDate } from '@/src/client/utils/format';
+import { GalleryVerticalEndIcon, HeartIcon, ListVideoIcon, SettingsIcon } from 'lucide-react';
+import { Link } from 'react-router';
+
+
+const NAV = [
+  [ 'Settings', '/settings', SettingsIcon ],
+  [ 'History', '/history', GalleryVerticalEndIcon ],
+  [ 'Playlists', '/playlists', ListVideoIcon ],
+  [ 'Favorites', '/favorites', HeartIcon ]
+] as const;
 
 
 export function Account () {
@@ -39,6 +49,19 @@ export function Account () {
             </div>
           ) ) }
         </div>
+      </div>
+
+      <div className= 'grid grid-cols-5 gap-4'>
+        { NAV.map( ( [ label, url, Icon ] ) => (
+          <Link
+            key= { url }
+            to= { url }
+            className= ''
+          >
+            <Icon size= { 18 } />
+            <span>{ label }</span>
+          </Link>
+        ) ) }
       </div>
     </div>
   );
