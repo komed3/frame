@@ -64,6 +64,12 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
           { media.title || media.fileName }
         </h1>
       </div>
+
+      <div className= 'border-t border-slate-700 pt-5 space-y-5'>
+        { tags.length > 0 && (
+          <MediaTaxonomy type= 'tag' items= { tags } />
+        ) }
+      </div>
     </div>
   );
 }
