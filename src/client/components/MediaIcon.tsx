@@ -16,6 +16,7 @@ export function MediaIcon ( { type, ...props }: MediaIconProps ) {
     case 'audio': return <HeadphonesIcon { ...p } />;
     case 'image': return <ImageIcon { ...p } />;
     case 'text': return <SquareTextIcon { ...p } />;
+
     default: return <FileIcon { ...p } />;
   }
 }
