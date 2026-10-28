@@ -1,4 +1,5 @@
 import { Loading } from '@/src/client/components/Loading';
+import { Select } from '@/src/client/components/Select';
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatBytes, formatDate, formatNumber } from '@/src/client/utils/format';
@@ -136,6 +137,22 @@ export function Admin () {
             ) ) }
           </div>
         ) }
+
+        <div className= 'grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-900/50 rounded'>
+          <Select
+            label= 'Status'
+            value= { status }
+            options= { JOB_STATUS_OPTIONS }
+            onChange= { v => { setStatus( v ); setOffset( 0 ) } }
+          />
+
+          <Select
+            label= 'Job Type'
+            value= { kind }
+            options= { JOB_KIND_OPTIONS }
+            onChange= { v => { setKind( v ); setOffset( 0 ) } }
+          />
+        </div>
       </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
