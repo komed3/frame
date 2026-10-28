@@ -52,4 +52,12 @@ export function Search () {
 
     return () => { active = false; };
   }, [ search, searchParams, query, user?.id ] );
+
+
+  const changePage = ( offset: number ) => {
+    const params = new URLSearchParams( searchParams );
+    params.set( 'offset', String( offset ) );
+    navigate( `/search?${ params.toString() }` );
+    window.scrollTo( 0, 0 );
+  };
 }
