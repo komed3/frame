@@ -3,6 +3,7 @@ import { Admin } from '@/src/client/views/Admin';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
+import { Watch } from '@/src/client/views/Watch';
 import { Route, Routes } from 'react-router';
 
 
@@ -13,6 +14,7 @@ export function Routing () {
       <Route path= '/all/:rootId' element= { <Media /> } />
       <Route path= '/all' element= { <Media /> } />
       <Route path= '/search' element= { <Search /> } />
+      <Route path= '/watch/:id' element= { <Watch /> } />
 
       <Route path= '/me' element= { <Account /> } />
       <Route path= '/server' element= { <Admin /> } />
