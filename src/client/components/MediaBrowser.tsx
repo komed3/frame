@@ -71,16 +71,27 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
         <button
           key= { item.id }
           onClick= { () => onOpenMedia( item ) }
-          className= 'flex flex-col items-start gap-3'
+          className= 'group flex flex-col gap-3'
         >
-          <div className= 'w-full aspect-video'>
+          <div className= 'w-full aspect-video transition-opacity duration-100 group-hover:opacity-80'>
             <MediaThumbnail media= { item } />
           </div>
 
           <div className= 'flex justify-between items-start gap-6'>
-            <span className= 'flex-1 min-w-0 text-sm line-clamp-2 wrap-break-words'>
+            <span
+              className= {
+                'flex-1 min-w-0 text-left text-sm font-medium line-clamp-2 wrap-break-words ' +
+                'transition-colors duration-100 group-hover:text-sky-400'
+              }
+            >
               { item.title || item.fileName }
             </span>
+
+            { ( item.type === 'video' || item.type === 'audio' ) && item.durationMs !== null && (
+              <span className= 'shrink-0 text-sm text-slate-400'>
+                { formatDuration( item.durationMs ) }
+              </span>
+            ) }
           </div>
         </button>
       ) ) }
