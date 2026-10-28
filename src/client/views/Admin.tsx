@@ -119,6 +119,23 @@ export function Admin () {
           <ClockIcon size= { 18 } />
           <span>Background Jobs</span>
         </h2>
+
+        { ! stats ? <Loading /> : (
+          <div className= 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4'>
+            { [
+              [ 'Total', formatNumber( stats.total ) ],
+              [ 'Pending', formatNumber( stats.byStatus.pending ) ],
+              [ 'Running', formatNumber( stats.byStatus.running ) ],
+              [ 'Failed', formatNumber( stats.byStatus.failed ) ],
+              [ 'Scheduled', formatNumber( stats.pendingScheduled ) ]
+            ].map( ( [ label, value ] ) => (
+              <div key= { label } className= 'p-4 space-y-0.5 text-right bg-slate-900/50 rounded'>
+                <div className= 'uppercase text-xs text-slate-400'>{ label }</div>
+                <div className= 'text-3xl font-extralight'>{ value }</div>
+              </div>
+            ) ) }
+          </div>
+        ) }
       </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
