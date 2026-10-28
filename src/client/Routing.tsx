@@ -1,4 +1,5 @@
 import { Media } from '@/src/client/views/Media';
+import { Search } from '@/src/client/views/Search';
 import { Route, Routes } from 'react-router';
 
 
@@ -8,6 +9,7 @@ export function Routing () {
       <Route path= '/all/:rootId/:directoryId' element= { <Media /> } />
       <Route path= '/all/:rootId' element= { <Media /> } />
       <Route path= '/all' element= { <Media /> } />
+      <Route path= '/search' element= { <Search /> } />
 
       <Route path= '/' element= { <></> } />
       <Route path= '*' element= { <></> } />
