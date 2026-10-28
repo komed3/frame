@@ -29,7 +29,7 @@ interface MediaProps {
 type ListProps = RootProps & FolderProps & MediaProps;
 
 interface MediaBrowserProps {
-  roots: MediaRoot[];
+  roots?: MediaRoot[];
   directories?: MediaDirectoryEntry[];
   media: MediaRecord[];
   loading?: boolean;
