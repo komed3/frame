@@ -47,7 +47,6 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
 
   usePageTitle( media.title || media.fileName );
 
-
   return (
     <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
       <Breadcrumbs
@@ -66,8 +65,14 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
         </h1>
       </div>
 
-      <div className= 'border-t border-slate-700 pt-5 space-y-6'>
+      <div className= 'border-t border-slate-700 pt-5 space-y-8'>
         <MediaInfo media= { media } />
+
+        { media.description && (
+          <p className= 'max-w-3xl text-lg leading-relaxed'>
+            { media.description }
+          </p>
+        ) }
 
         { tags.length > 0 && (
           <MediaTaxonomy type= 'tag' items= { tags } />
