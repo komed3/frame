@@ -101,7 +101,8 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
           onClick= { () => onOpenMedia( item ) }
           className= 'group flex flex-col gap-3'
         >
-          <div className= 'w-full aspect-video'>
+          <div className= 'relative w-full aspect-video'>
+            <MediaIcon type= { item.type } className= 'absolute top-4 right-4 opacity-50' />
             <MediaThumbnail media= { item } />
           </div>
 
