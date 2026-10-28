@@ -160,6 +160,12 @@ export function Admin () {
             </div>
           ) ) }
         </div>
+
+        { ! mediaRoots.length && (
+          <p className= 'py-4 text-sm text-slate-400'>
+            No media roots configured.
+          </p>
+        ) }
       </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
