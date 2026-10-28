@@ -42,9 +42,7 @@ interface MediaBrowserProps {
 }
 
 
-function rootName ( root: MediaRoot ) {
-  return root.path.split( /[\\/]/ ).filter( Boolean ).pop() ?? root.path;
-}
+const rootName = ( root: MediaRoot ) => root.path.split( /[\\/]/ ).filter( Boolean ).pop() ?? root.path;
 
 function RootGrid ( { roots, onOpenRoot }: RootProps ) {
   return roots.length > 0 && (
