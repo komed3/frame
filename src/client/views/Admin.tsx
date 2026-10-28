@@ -1,4 +1,5 @@
 import { Loading } from '@/src/client/components/Loading';
+import { Pagination } from '@/src/client/components/Pagination';
 import { Select } from '@/src/client/components/Select';
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
@@ -153,6 +154,14 @@ export function Admin () {
             onChange= { v => { setKind( v ); setOffset( 0 ) } }
           />
         </div>
+
+        <Pagination
+          offset= { offset }
+          limit= { PAGE_SIZE }
+          itemCount= { jobList.length }
+          hasNext= { jobList.length === PAGE_SIZE }
+          onChange= { setOffset }
+        />
       </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
