@@ -1,7 +1,7 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatDate } from '@/src/client/utils/format';
-import { GalleryVerticalEndIcon, HeartIcon, ListVideoIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
+import { GalleryVerticalEndIcon, HeartIcon, ListVideoIcon, LogOutIcon, SettingsIcon, UserIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
@@ -26,8 +26,9 @@ export function Account () {
       </h1>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
-        <h2 className= 'text-lg font-medium'>
-          Account Information
+        <h2 className= 'flex items-center gap-3 text-lg font-medium'>
+          <UserIcon size= { 18 } />
+          <span>Account Information</span>
         </h2>
 
         <div className= 'divide-y divide-dashed divide-slate-700/70'>
@@ -39,13 +40,8 @@ export function Account () {
             [ 'Account Status', user.disabledAt ? 'Disabled' : 'Active' ]
           ].map( ( [ label, value ] ) => (
             <div key= { label } className= 'flex justify-between items-center gap-6 py-4'>
-              <span className= 'font-extralight'>
-                { label }
-              </span>
-
-              <b className= 'text-right font-medium break-all'>
-                { value }
-              </b>
+              <span className= 'font-extralight'>{ label }</span>
+              <b className= 'text-right font-medium break-all'>{ value }</b>
             </div>
           ) ) }
         </div>
