@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
@@ -66,6 +67,8 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
       </div>
 
       <div className= 'border-t border-slate-700 pt-5 space-y-5'>
+        <MediaInfo media= { media } />
+
         { tags.length > 0 && (
           <MediaTaxonomy type= 'tag' items= { tags } />
         ) }

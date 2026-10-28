@@ -7,4 +7,12 @@ interface MediaInfoProps {
 }
 
 
-export function MediaInfo ( { media }: MediaInfoProps ) {}
+export function MediaInfo ( { media }: MediaInfoProps ) {
+  return (
+    <div className= 'space-y-3'>
+      <h2 className= 'text-sm font-medium tracking-wide text-slate-300'>
+        Informationen
+      </h2>
+    </div>
+  );
+}
