@@ -152,7 +152,7 @@ export function Admin () {
           />
         </div>
 
-        { ! mediaRoots.length ? (
+        { ! jobList.length ? (
           <p className= 'py-4 text-sm text-slate-400'>
             No Jobs found.
           </p>
