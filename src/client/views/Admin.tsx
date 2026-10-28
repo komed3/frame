@@ -1,7 +1,7 @@
 import { Loading } from '@/src/client/components/Loading';
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
-import { formatBytes, formatNumber } from '@/src/client/utils/format';
+import { formatBytes, formatDate, formatNumber } from '@/src/client/utils/format';
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
@@ -143,6 +143,23 @@ export function Admin () {
           <FolderIcon size= { 18 } />
           <span>Media Roots</span>
         </h2>
+
+        <div className= 'divide-y divide-dashed divide-slate-700/70'>
+          { mediaRoots.map( root => (
+            <div key= { root.id } className= 'flex flex-wrap justify-between items-start gap-3 py-4'>
+              <div className= 'min-w-0 space-y-1'>
+                <div className= 'break-all'>{ root.path }</div>
+                <div className= 'text-xs text-slate-400'>
+                  Last scan: { formatDate( root.scannedAt ) }
+                </div>
+              </div>
+
+              <span className= { root.enabled ? 'text-green-400' : 'text-slate-400' }>
+                { root.enabled ? 'Enabled' : 'Disabled' }
+              </span>
+            </div>
+          ) ) }
+        </div>
       </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
