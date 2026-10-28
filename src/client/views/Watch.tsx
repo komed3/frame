@@ -1,5 +1,6 @@
 import { Loading } from '@/src/client/components/Loading';
 import { useApi } from '@/src/client/context/ApiContext';
+import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { NotFound } from '@/src/client/views/NotFound';
 import { AudioPlayer } from '@/src/client/views/watch/AudioPlayer';
 import { ImageViewer } from '@/src/client/views/watch/ImageViewer';
@@ -24,15 +25,19 @@ export function Watch () {
 
     if ( ! id ) { setLoading( false ); return }
 
-    mediaApi.get( id ).then( res => { if ( active ) setMedia( res?.available && res.type !== 'other' ? res : null ) } )
-      .catch( () => { if ( active ) setMedia( null ) } ).finally( () => { if ( active ) setLoading( false ) } );
+    mediaApi.get( id )
+      .then( res => { if ( active ) setMedia( res?.available && res.type !== 'other' ? res : null ) } )
+      .catch( () => { if ( active ) setMedia( null ) } )
+      .finally( () => { if ( active ) setLoading( false ) } );
 
     return () => { active = false };
   }, [ id, mediaApi ] );
 
+  usePageTitle( media?.title || media?.fileName || '' );
 
-  if ( loading ) return <Loading className= 'min-h-[50vh]' />;
+
   if ( ! media ) return <NotFound />;
+  if ( loading ) return <Loading className= 'min-h-[50vh]' />;
 
   switch ( media.type ) {
     case 'video': return <VideoPlayer media= { media } />;
