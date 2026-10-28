@@ -1,6 +1,6 @@
-import { formatBytes, formatDate } from '@/src/client/utils/format';
+import { formatBytes, formatDate, formatDuration, formatNumber } from '@/src/client/utils/format';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { CalendarIcon, GlobeIcon, LinkIcon, UserIcon, WeightIcon } from 'lucide-react';
+import { CalendarPlusIcon, ClockIcon, Columns3Icon, Disc3Icon, FilmIcon, GlobeIcon, HourglassIcon, LinkIcon, UserIcon, VideoIcon } from 'lucide-react';
 
 
 interface MediaInfoProps {
@@ -10,13 +10,16 @@ interface MediaInfoProps {
 
 export function MediaInfo ( { media }: MediaInfoProps ) {
   const items = [
-    [ 'Size', formatBytes( media.sizeBytes ), WeightIcon ],
-    [ 'Modified', formatDate( media.modifiedAt ), CalendarIcon ],
-    [ 'Added', formatDate( media.createdAt ), CalendarIcon ],
+    [ 'Duration', formatDuration( media.durationMs ), HourglassIcon ],
+    [ 'File Size', formatBytes( media.sizeBytes ), Disc3Icon ],
+    [ 'Modified', formatDate( media.modifiedAt ), ClockIcon ],
+    [ 'Added', formatDate( media.createdAt ), CalendarPlusIcon ],
     [ 'Creator', media.creator ?? '—', UserIcon ],
     [ 'Language', media.language ?? '—', GlobeIcon ],
     [ 'Published', formatDate( media.releasedAt ), LinkIcon ],
-    [ 'Recorded', formatDate( media.recordedAt ), CalendarIcon ]
+    [ 'Recorded', formatDate( media.recordedAt ), VideoIcon ],
+    [ 'FPS', formatNumber( media.fps ), FilmIcon ],
+    [ 'Bitrate', formatNumber( media.bitrate ), Columns3Icon ]
   ] as const;
 
   return (
@@ -25,7 +28,7 @@ export function MediaInfo ( { media }: MediaInfoProps ) {
         Informationen
       </h2>
 
-      <div className= 'grid grid-cols-2 gap-x-8 gap-y-1'>
+      <div className= 'grid grid-cols-3 gap-x-8 gap-y-1'>
         { items.map( ( [ label, value, Icon ] ) => (
           <div key= { label } className= 'flex flex-wrap items-start gap-8'>
             <div className= 'flex flex-wrap items-center gap-2 h-8 text-slate-400'>
