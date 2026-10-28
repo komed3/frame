@@ -2,7 +2,7 @@ import { Config } from '@/src/server/core/Config';
 import { assetPath, assetSignal, getAssetSource, mediaExtension, runFfmpeg } from '@/src/server/job/handler/assets';
 import { MediaAssets } from '@/src/server/media/Assets';
 import { execFileAsync } from '@/src/server/utils';
-import type { JobContext, JobHandler } from '@/src/shared/types/job';
+import type { AssetSource, JobContext, JobHandler } from '@/src/shared/types/job';
 import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';
@@ -26,10 +26,7 @@ export class PreviewJob implements JobHandler {
     return ( probe.streams ?? [] ).some( stream => stream.disposition?.attached_pic === 1 );
   }
 
-  private async createImage (
-    source: Awaited< ReturnType< typeof getAssetSource > > & {},
-    kind: 'poster' | 'thumb', signal: AbortSignal
-  ) : Promise< void > {
+  private async createImage ( source: AssetSource, kind: 'poster' | 'thumb', signal: AbortSignal ) : Promise< void > {
     if ( ! source ) return;
 
     const { media, path } = source;

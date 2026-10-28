@@ -31,7 +31,7 @@ export class WaveJob implements JobHandler {
 
     const timeoutMs = Config.get( 'WAVE_TIMEOUT_MS' );
     let timedOut = false, closed = false, stderr = '';
-    let killTimer: ReturnType< typeof setTimeout > | undefined;
+    let killTimer: NodeJS.Timeout | undefined;
 
     const timeout = setTimeout( () => { timedOut = true, child.kill( 'SIGKILL' ) }, timeoutMs );
     timeout.unref();

@@ -1,10 +1,11 @@
 import { parseNumber, resolveId } from '@/src/maintenance/utils/parse';
 import { ui } from '@/src/maintenance/utils/ui';
 import { Plays } from '@/src/server/core/Plays';
+import type { PlayRecord } from '@/src/shared/types/plays';
 import { Command } from 'commander';
 
 
-const showPlays = ( records: ReturnType< typeof Plays.listByUser > ) : void => {
+const showPlays = ( records: PlayRecord[] ) : void => {
   if ( ! records.length ) return ui.info( 'No playback history found.' );
   console.table( records );
 };
