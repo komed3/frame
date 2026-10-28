@@ -1,3 +1,4 @@
+import { Account } from '@/src/client/views/Account';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
@@ -11,6 +12,8 @@ export function Routing () {
       <Route path= '/all/:rootId' element= { <Media /> } />
       <Route path= '/all' element= { <Media /> } />
       <Route path= '/search' element= { <Search /> } />
+
+      <Route path= '/me' element= { <Account /> } />
 
       <Route path= '/' element= { <></> } />
       <Route path= '*' element= { <NotFound /> } />
