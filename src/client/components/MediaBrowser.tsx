@@ -57,7 +57,10 @@ function RootGrid ( { roots, onOpenRoot }: RootProps ) {
           }
         >
           <FolderIcon size= { 26 } strokeWidth= { 1.4 } />
-          <span className= 'truncate text-sm font-medium'>{ rootName( root ) }</span>
+
+          <span className= 'truncate text-sm font-medium'>
+            { rootName( root ) }
+          </span>
         </button>
       ) ) }
     </div>
@@ -71,23 +74,16 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
         <button
           key= { directory.id }
           onClick= { () => onOpenDirectory?.( directory ) }
-          disabled= { ! onOpenDirectory }
           className= {
             'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
-            'duration-100 hover:bg-slate-50/10 disabled:cursor-default'
+            'duration-100 hover:bg-slate-50/10'
           }
         >
           <FolderIcon size= { 26 } strokeWidth= { 1.4 } />
 
-          <div className= 'flex flex-col items-start gap-0.5'>
-            <span className= 'w-full truncate text-center text-sm font-medium'>
-              { directory.name }
-            </span>
-
-            <span className= 'text-xs text-slate-400'>
-              { directory.mediaCount } { directory.mediaCount === 1 ? 'item' : 'items' }
-            </span>
-          </div>
+          <span className= 'truncate text-sm font-medium'>
+            { directory.name }
+          </span>
         </button>
       ) ) }
     </div>
