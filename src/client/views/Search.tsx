@@ -60,4 +60,23 @@ export function Search () {
     navigate( `/search?${ params.toString() }` );
     window.scrollTo( 0, 0 );
   };
+
+
+  return (
+    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-4'>
+      { error ? (
+        <p className= 'py-16 text-center text-red-400'>{ error }</p>
+      ) : (
+        <MediaBrowser
+          media= { result?.items ?? [] }
+          loading= { loading }
+          offset= { result?.offset ?? 0 }
+          limit= { result?.limit ?? MEDIA_PAGE_SIZE }
+          total= { result?.total }
+          onPageChange= { changePage }
+          onOpenMedia= { ( { id } ) => navigate( `/watch/${ id }` ) }
+        />
+      ) }
+    </div>
+  );
 }
