@@ -27,7 +27,12 @@ export function MediaThumbnail ( { media, aspectRatio = 'aspect-video' }: MediaT
           onError= { () => setFailedUrl( url ) }
         />
       ) : (
-        <MediaIcon type= { media.type } size= { 26 } strokeWidth= { 1.4 } />
+        <MediaIcon
+          type= { media.type }
+          size= { 60 }
+          strokeWidth= { 0.6 }
+          className= 'opacity-25'
+        />
       ) }
     </div>
   );
