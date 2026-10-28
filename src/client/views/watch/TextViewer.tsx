@@ -66,7 +66,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
         </h1>
       </div>
 
-      <div className= 'border-t border-slate-700 pt-5 space-y-5'>
+      <div className= 'border-t border-slate-700 pt-5 space-y-6'>
         <MediaInfo media= { media } />
 
         { tags.length > 0 && (
