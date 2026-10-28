@@ -1,9 +1,11 @@
+import { Loading } from '@/src/client/components/Loading';
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatBytes, formatNumber } from '@/src/client/utils/format';
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
+import { DatabaseIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 
@@ -113,37 +115,28 @@ export function Admin () {
       ) }
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
-        <h2 className= 'text-lg font-medium'>
-          Database
+        <h2 className= 'flex items-center gap-3 text-lg font-medium'>
+          <DatabaseIcon size= { 18 } />
+          <span>Database</span>
         </h2>
 
-        { db ? (
-          <>
-            <div className= 'break-all text-sm text-slate-300'>
-              { db.path }
-            </div>
-
-            <div className= 'divide-y divide-slate-700/70'>
-              { [
-                [ 'Integrity', db.integrityCheck.toUpperCase() ],
-                [ 'SQLite version', db.sqliteVersion ],
-                [ 'Database size', formatBytes( db.sizeBytes ) ],
-                [ 'Tables', formatNumber( db.tableCount ) ],
-                [ 'Rows', formatNumber( db.rowCount ) ],
-                [ 'Migrations', formatNumber( db.migrationCount ) ],
-                [ 'Free pages', formatNumber( db.freePages ) ]
-              ].map( ( [ label, value ] ) => (
-                <div key= { label } className= 'flex justify-between items-center gap-6 py-3'>
-                  <span className= 'text-sm text-slate-400'>{ label }</span>
-                  <span className= 'text-right break-all'>{ value }</span>
-                </div>
-              ) ) }
-            </div>
-          </>
-        ) : (
-          <p className= 'text-sm text-slate-400'>
-            { loading ? 'Loading database information…' : 'Database information unavailable.' }
-          </p>
+        { ! db ? <Loading /> : (
+          <div className= 'divide-y divide-dashed divide-slate-700/70'>
+            { [
+              [ 'Integrity', db.integrityCheck.toUpperCase() ],
+              [ 'SQLite version', db.sqliteVersion ],
+              [ 'Database size', formatBytes( db.sizeBytes ) ],
+              [ 'Tables', formatNumber( db.tableCount ) ],
+              [ 'Rows', formatNumber( db.rowCount ) ],
+              [ 'Migrations', formatNumber( db.migrationCount ) ],
+              [ 'Free pages', formatNumber( db.freePages ) ]
+            ].map( ( [ label, value ] ) => (
+              <div key= { label } className= 'flex justify-between items-center gap-6 py-4'>
+                <span className= 'font-extralight'>{ label }</span>
+                <b className= 'text-right font-medium break-all'>{ value }</b>
+              </div>
+            ) ) }
+          </div>
         ) }
       </div>
     </div>
