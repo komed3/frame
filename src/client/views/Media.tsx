@@ -50,7 +50,7 @@ export function Media () {
         offset= { offset }
         limit= { MEDIA_PAGE_SIZE }
         hasNext= { ( result?.media.length ?? 0 ) === MEDIA_PAGE_SIZE }
-        onPageChange= { () => { setOffset( 0 ), window.scrollTo( 0, 0 ) } }
+        onPageChange= { offset => { setOffset( offset ), window.scrollTo( 0, 0 ) } }
         onOpenRoot= { ( { id } ) => navigateTo( `/all/${ id }` ) }
         onOpenDirectory= { ( { rootId, id } ) => navigateTo( `/all/${ rootId }/${ id }` ) }
         onOpenMedia= { ( { id } ) => navigate( `/watch/${ id }` ) }
