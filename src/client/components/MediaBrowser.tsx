@@ -66,7 +66,23 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
 
 function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
   return media.length > 0 && (
-    <div className= 'grid-cols-3 gap-x-3 gap-y-5'></div>
+    <div className= 'grid grid-cols-3 gap-x-3 gap-y-5'>
+      { media.map( item => (
+        <button
+          key= { item.id }
+          onClick= { () => onOpenMedia( item ) }
+          className= 'flex flex-col items-start gap-3'
+        >
+          <div className= 'w-full aspect-video'>
+            <MediaThumbnail media= { item } />
+          </div>
+
+          <div className= ''>
+            ...
+          </div>
+        </button>
+      ) ) }
+    </div>
   );
 }
 
