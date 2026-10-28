@@ -1,6 +1,6 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { HeartIcon, SettingsIcon } from 'lucide-react';
+import { HeartIcon, ListVideoIcon, SettingsIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
@@ -69,7 +69,17 @@ export function MediaActions ( { media }: MediaActionsProps ) {
         }
       >
         <HeartIcon size= { 18 } fill= { favorite ? 'currentColor' : 'none' } />
-        { favorite ? 'Favorite' : 'Add to favourites' }
+        <span>{ favorite ? 'Favorite' : 'Add to favourites' }</span>
+      </button>
+
+      <button
+        className= {
+          'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+          'rounded-full transition duration-100 hover:bg-slate-50/20'
+        }
+      >
+        <ListVideoIcon size= { 18 } />
+        <span>Playlists</span>
       </button>
     </div>
   );
