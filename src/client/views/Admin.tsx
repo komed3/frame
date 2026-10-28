@@ -1,5 +1,6 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
+import { formatBytes, formatNumber } from '@/src/client/utils/format';
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
@@ -110,6 +111,41 @@ export function Admin () {
           { error }
         </p>
       ) }
+
+      <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
+        <h2 className= 'text-lg font-medium'>
+          Database
+        </h2>
+
+        { db ? (
+          <>
+            <div className= 'break-all text-sm text-slate-300'>
+              { db.path }
+            </div>
+
+            <div className= 'divide-y divide-slate-700/70'>
+              { [
+                [ 'Integrity', db.integrityCheck.toUpperCase() ],
+                [ 'SQLite version', db.sqliteVersion ],
+                [ 'Database size', formatBytes( db.sizeBytes ) ],
+                [ 'Tables', formatNumber( db.tableCount ) ],
+                [ 'Rows', formatNumber( db.rowCount ) ],
+                [ 'Migrations', formatNumber( db.migrationCount ) ],
+                [ 'Free pages', formatNumber( db.freePages ) ]
+              ].map( ( [ label, value ] ) => (
+                <div key= { label } className= 'flex justify-between items-center gap-6 py-3'>
+                  <span className= 'text-sm text-slate-400'>{ label }</span>
+                  <span className= 'text-right break-all'>{ value }</span>
+                </div>
+              ) ) }
+            </div>
+          </>
+        ) : (
+          <p className= 'text-sm text-slate-400'>
+            { loading ? 'Loading database information…' : 'Database information unavailable.' }
+          </p>
+        ) }
+      </div>
     </div>
   );
 }
