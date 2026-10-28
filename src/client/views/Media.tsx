@@ -17,16 +17,28 @@ export function Media () {
   const [ rootItems, setRootItems ] = useState< MediaRoot[] >( [] );
   const [ result, setResult ] = useState< ApiDirectoryListResult | null >( null );
   const [ offset, setOffset ] = useState( 0 );
+  const [ loading, setLoading ] = useState( true );
 
 
   usePageTitle( result?.current?.name ?? result?.root.name ?? 'All Media' );
 
   useEffect( () => {
-    if ( rootId ) directories.list( rootId, directoryId ?? null, { limit: MEDIA_PAGE_SIZE, offset } ).then( setResult );
+    setLoading( true ), setResult( null );
+    let active = true;
+
+    if ( rootId ) directories.list( rootId, directoryId ?? null, { limit: MEDIA_PAGE_SIZE, offset } )
+      .then( res => { if ( active ) setResult( res ) } )
+      .finally( () => { if ( active ) setLoading( false ) } );
+
     else {
-      setResult( null ), setOffset( 0 );
-      roots.list().then( items => setRootItems( items.filter( root => root.enabled ) ) );
+      setOffset( 0 );
+
+      roots.list()
+        .then( res => { if ( active ) setRootItems( res.filter( r => r.enabled ) ) } )
+        .finally( () => { if ( active ) setLoading( false ) } );
     }
+
+    return () => { active = false };
   }, [ rootId, directoryId, offset, directories, roots ] );
 
 
@@ -47,6 +59,7 @@ export function Media () {
         roots= { rootId ? [] : rootItems }
         directories= { result?.directories ?? [] }
         media= { result?.media ?? [] }
+        loading= { loading }
         offset= { offset }
         limit= { MEDIA_PAGE_SIZE }
         hasNext= { ( result?.media.length ?? 0 ) === MEDIA_PAGE_SIZE }
