@@ -32,6 +32,7 @@ export class ApiError extends Error {
 
 
 const ApiContext = createContext< ApiContextValue | null >( null );
+const inFlightRequests = new Map< string, Promise< unknown > >();
 
 
 export function ApiProvider ( { children }: { children: ReactNode } ) {
