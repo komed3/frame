@@ -70,6 +70,14 @@ export function Admin () {
     }
   }, [ database, jobs, roots, offset, status, kind ] );
 
+  const scanAll = async () => {
+    setScanning( true );
+
+    try { await roots.scanAll(), await refresh() }
+    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not start scan.' ) }
+    finally { setScanning( false ) }
+  };
+
 
   useEffect( () => {
     refresh();
