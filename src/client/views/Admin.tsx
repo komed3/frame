@@ -155,6 +155,19 @@ export function Admin () {
           />
         </div>
 
+        <div className= 'overflow-x-auto'>
+          <table className= 'w-full text-left text-sm whitespace-nowrap'>
+            <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
+              <tr className= '*:font-medium *:px-4 *:py-3'>
+                <th scope= 'col'>Kind</th>
+                <th scope= 'col'>Status</th>
+                <th scope= 'col'>Created</th>
+                <th scope= 'col'>Details</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+
         <Pagination
           offset= { offset }
           limit= { PAGE_SIZE }
