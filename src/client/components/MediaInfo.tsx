@@ -30,7 +30,7 @@ export function MediaInfo ( { media }: MediaInfoProps ) {
   return (
     <div className= 'space-y-3'>
       <h2 className= 'text-sm font-medium tracking-wide text-slate-300'>
-        Informationen
+        Media Info
       </h2>
 
       <div className= 'grid grid-cols-3 gap-x-8 gap-y-1'>
