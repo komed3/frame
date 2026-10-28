@@ -25,7 +25,7 @@ export function App () {
     <>
       <Header />
 
-      <main key= { pathname } className= 'min-h-screen pt-18'>
+      <main key= { pathname } className= 'min-h-screen py-18'>
         <Routing />
       </main>
 
