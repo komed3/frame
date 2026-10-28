@@ -26,7 +26,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
     setLoading( true ), setError( null ), setContent( '' );
 
     Promise.all( [
-      stream( media.id, { signal: controller.signal } ).then( res => res.text() ),
+      '',
       mediaApi.categories( media.id ).catch( () => [] ), mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null )
     ] ).then( ( [ content, categories, tags, directory ] ) => {
