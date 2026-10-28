@@ -99,7 +99,7 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
           onClick= { () => onOpenMedia( item ) }
           className= 'group flex flex-col gap-3'
         >
-          <div className= 'w-full aspect-video transition-opacity duration-100 group-hover:opacity-80'>
+          <div className= 'w-full aspect-video'>
             <MediaThumbnail media= { item } />
           </div>
 

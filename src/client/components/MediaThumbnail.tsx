@@ -17,7 +17,7 @@ export function MediaThumbnail ( { media, aspectRatio = 'aspect-video' }: MediaT
   const url = [ 'video', 'audio', 'image' ].includes( media.type ) && assets.url( media.id, 'thumb', 'default' );
 
   return (
-    <div className= { 'flex justify-center items-center overflow-hidden bg-slate-50/10 rounded ' + aspectRatio }>
+    <div className= { 'flex justify-center items-center overflow-hidden bg-slate-50/5 rounded ' + aspectRatio }>
       { url && failedUrl !== url ? (
         <img
           src= { url }
