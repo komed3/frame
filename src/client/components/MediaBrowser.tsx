@@ -5,9 +5,15 @@ import { ViewToggle, type MediaViewMode } from '@/src/client/components/ViewTogg
 import { formatBytes, formatDate, formatDimensions, formatDuration, formatFileFormat } from '@/src/client/utils/format';
 import type { MediaDirectoryEntry } from '@/src/shared/types/directories';
 import type { MediaRecord } from '@/src/shared/types/media';
+import type { MediaRoot } from '@/src/shared/types/roots';
 import { FolderIcon } from 'lucide-react';
 import { useState } from 'react';
 
+
+interface RootProps {
+  roots: MediaRoot[];
+  onOpenRoot?: ( root: MediaRoot ) => void;
+}
 
 interface FolderProps {
   directories: MediaDirectoryEntry[];
@@ -19,9 +25,10 @@ interface MediaProps {
   onOpenMedia: ( media: MediaRecord ) => void;
 }
 
-type ListProps = FolderProps & MediaProps;
+type ListProps = RootProps & FolderProps & MediaProps;
 
 interface MediaBrowserProps {
+  roots: MediaRoot[];
   directories?: MediaDirectoryEntry[];
   media: MediaRecord[];
   offset: number;
@@ -29,6 +36,7 @@ interface MediaBrowserProps {
   total?: number;
   hasNext?: boolean;
   onPageChange: ( offset: number ) => void;
+  onOpenRoot?: ( root: MediaRoot ) => void;
   onOpenDirectory?: ( directory: MediaDirectoryEntry ) => void;
   onOpenMedia: ( media: MediaRecord ) => void;
 }
