@@ -1,4 +1,3 @@
-import { updateAssetAuth } from '@/src/client/context/assetAuth';
 import type {
   ApiAssetRecord, ApiContextValue, ApiDeleteResult, ApiDirectoryListResult, ApiDirectoryTreeResult,
   ApiEnqueueResult, ApiFavorite, ApiFavoriteAddResult, ApiHealth, ApiLogin, ApiLoginResult,
@@ -106,10 +105,6 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   useEffect( () => void refreshSession(), [ refreshSession ] );
-
-  useEffect( () => void updateAssetAuth( token ).catch( err => {
-    console.error( '[Frame] Failed to update asset authentication:', err );
-  } ), [ token ] );
 
 
   const login = useCallback( async ( credentials: ApiLogin ) => {
