@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -26,8 +27,9 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
     setLoading( true ), setError( null ), setContent( '' );
 
     Promise.all( [
-      '',
-      mediaApi.categories( media.id ).catch( () => [] ), mediaApi.tags( media.id ).catch( () => [] ),
+      '' /*stream( media.id, { signal: controller.signal } ).then( res => res.text() )*/,
+      [ { id: '', name: 'Wikipedia', parentId: null } ] /*mediaApi.categories( media.id ).catch( () => [] )*/,
+      mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null )
     ] ).then( ( [ content, categories, tags, directory ] ) => {
       if ( ! active ) return;
@@ -43,12 +45,22 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
 
 
   return (
-    <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-6'>
+    <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
       <Breadcrumbs
         items= { directory?.breadcrumbs ?? [] }
         onHome= { () => navigate( '/all' ) }
         onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
       />
+
+      <div className= 'space-y-3'>
+        { categories.length > 0 && (
+          <MediaTaxonomy type= 'category' items= { categories } />
+        ) }
+
+        <h1 className= 'text-2xl font-medium tracking-wide'>
+          { media.title || media.fileName }
+        </h1>
+      </div>
     </div>
   );
 }
