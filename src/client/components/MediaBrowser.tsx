@@ -223,19 +223,33 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
 
 
 export function MediaBrowser ( {
-  directories = [], media, offset, limit = MEDIA_PAGE_SIZE, total, hasNext,
-  onPageChange, onOpenDirectory, onOpenMedia
+  roots = [], directories = [], media, offset, limit = MEDIA_PAGE_SIZE, total, hasNext,
+  onPageChange, onOpenRoot, onOpenDirectory, onOpenMedia
 }: MediaBrowserProps ) {
-  const [ view, setView ] = useState< MediaViewMode >( 'grid' );
+  const [ view, setView ] = useState< MediaViewMode >(
+    () => localStorage.getItem( 'frame.mediaView' ) === 'list' ? 'list' : 'grid'
+  );
+
+  const changeView = ( value: MediaViewMode ) => {
+    localStorage.setItem( 'frame.mediaView', value );
+    setView( value );
+  };
 
   return (
     <div className= 'space-y-8'>
       <div className= 'flex justify-end'>
-        <ViewToggle value= { view } onChange= { setView } />
+        <ViewToggle value= { view } onChange= { changeView } />
       </div>
 
       { view === 'grid' ? (
         <>
+          { roots.length > 0 && (
+            <section className= 'space-y-4'>
+              <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Roots</h2>
+              <RootGrid roots= { roots } onOpenRoot= { onOpenRoot } />
+            </section>
+          ) }
+
           { directories.length > 0 && (
             <section className= 'space-y-4'>
               <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Folders</h2>
@@ -254,27 +268,31 @@ export function MediaBrowser ( {
         </>
       ) : (
         <MediaList
+          roots= { roots }
           directories= { directories }
           media= { media }
+          onOpenRoot= { onOpenRoot }
           onOpenDirectory= { onOpenDirectory }
           onOpenMedia= { onOpenMedia }
         />
       ) }
 
-      { ! directories.length && ! media.length && (
+      { ! roots.length && ! directories.length && ! media.length && (
         <p className= 'py-16 text-center text-slate-500'>
           No media found.
         </p>
       ) }
 
-      <Pagination
-        offset= { offset }
-        limit= { limit }
-        itemCount= { media.length }
-        total= { total }
-        hasNext= { hasNext }
-        onChange= { onPageChange }
-      />
+      { ( ! roots.length || directories.length > 0 || media.length > 0 ) && (
+        <Pagination
+          offset= { offset }
+          limit= { limit }
+          itemCount= { media.length }
+          total= { total }
+          hasNext= { hasNext }
+          onChange= { onPageChange }
+        />
+      ) }
     </div>
   );
 }
