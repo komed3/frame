@@ -42,6 +42,30 @@ interface MediaBrowserProps {
 }
 
 
+function rootName ( root: MediaRoot ) {
+  return root.path.split( /[\\/]/ ).filter( Boolean ).pop() ?? root.path;
+}
+
+function RootGrid ( { roots, onOpenRoot }: RootProps ) {
+  return roots.length > 0 && (
+    <div className= 'grid grid-cols-4 gap-3'>
+      { roots.map( root => (
+        <button
+          key= { root.id }
+          onClick= { () => onOpenRoot?.( root ) }
+          className= {
+            'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
+            'duration-100 hover:bg-slate-50/10'
+          }
+        >
+          <FolderIcon size= { 26 } strokeWidth= { 1.4 } />
+          <span className= 'truncate text-sm font-medium'>{ rootName( root ) }</span>
+        </button>
+      ) ) }
+    </div>
+  );
+}
+
 function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
   return directories.length > 0 && (
     <div className= 'grid grid-cols-4 gap-3'>
