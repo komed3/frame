@@ -1,3 +1,4 @@
+import { Loading } from '@/src/client/components/Loading';
 import { MediaIcon } from '@/src/client/components/MediaIcon';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { MEDIA_PAGE_SIZE, Pagination } from '@/src/client/components/Pagination';
@@ -31,6 +32,7 @@ interface MediaBrowserProps {
   roots: MediaRoot[];
   directories?: MediaDirectoryEntry[];
   media: MediaRecord[];
+  loading?: boolean;
   offset: number;
   limit?: number;
   total?: number;
@@ -217,8 +219,8 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
 
 
 export function MediaBrowser ( {
-  roots = [], directories = [], media, offset, limit = MEDIA_PAGE_SIZE, total, hasNext,
-  onPageChange, onOpenRoot, onOpenDirectory, onOpenMedia
+  roots = [], directories = [], media, loading = false, offset, limit = MEDIA_PAGE_SIZE,
+  total, hasNext, onPageChange, onOpenRoot, onOpenDirectory, onOpenMedia
 }: MediaBrowserProps ) {
   const [ view, setView ] = useState< MediaViewMode >(
     () => localStorage.getItem( 'frame.mediaView' ) === 'list' ? 'list' : 'grid'
@@ -235,57 +237,63 @@ export function MediaBrowser ( {
         <ViewToggle value= { view } onChange= { changeView } />
       </div>
 
-      { view === 'grid' ? (
+      { loading ? (
+        <Loading size= { 32 } className= 'py-32' />
+      ) : (
         <>
-          { roots.length > 0 && (
-            <section className= 'space-y-4'>
-              <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Roots</h2>
-              <RootGrid roots= { roots } onOpenRoot= { onOpenRoot } />
-            </section>
-          ) }
-
-          { directories.length > 0 && (
-            <section className= 'space-y-4'>
-              <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Folders</h2>
-              <FolderGrid directories= { directories } onOpenDirectory= { onOpenDirectory } />
-            </section>
-          ) }
-
-          { media.length > 0 && (
-            <section className= 'space-y-4'>
-              { directories.length > 0 && (
-                <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Media</h2>
+          { view === 'grid' ? (
+            <>
+              { roots.length > 0 && (
+                <section className= 'space-y-4'>
+                  <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Roots</h2>
+                  <RootGrid roots= { roots } onOpenRoot= { onOpenRoot } />
+                </section>
               ) }
-              <MediaGrid media= { media } onOpenMedia= { onOpenMedia } />
-            </section>
+
+              { directories.length > 0 && (
+                <section className= 'space-y-4'>
+                  <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Folders</h2>
+                  <FolderGrid directories= { directories } onOpenDirectory= { onOpenDirectory } />
+                </section>
+              ) }
+
+              { media.length > 0 && (
+                <section className= 'space-y-4'>
+                  { directories.length > 0 && (
+                    <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Media</h2>
+                  ) }
+                  <MediaGrid media= { media } onOpenMedia= { onOpenMedia } />
+                </section>
+              ) }
+            </>
+          ) : (
+            <MediaList
+              roots= { roots }
+              directories= { directories }
+              media= { media }
+              onOpenRoot= { onOpenRoot }
+              onOpenDirectory= { onOpenDirectory }
+              onOpenMedia= { onOpenMedia }
+            />
+          ) }
+
+          { ! roots.length && ! directories.length && ! media.length && (
+            <p className= 'py-16 text-center text-slate-500'>
+              No media found.
+            </p>
+          ) }
+
+          { ( ! roots.length || directories.length > 0 || media.length > 0 ) && (
+            <Pagination
+              offset= { offset }
+              limit= { limit }
+              itemCount= { media.length }
+              total= { total }
+              hasNext= { hasNext }
+              onChange= { onPageChange }
+            />
           ) }
         </>
-      ) : (
-        <MediaList
-          roots= { roots }
-          directories= { directories }
-          media= { media }
-          onOpenRoot= { onOpenRoot }
-          onOpenDirectory= { onOpenDirectory }
-          onOpenMedia= { onOpenMedia }
-        />
-      ) }
-
-      { ! roots.length && ! directories.length && ! media.length && (
-        <p className= 'py-16 text-center text-slate-500'>
-          No media found.
-        </p>
-      ) }
-
-      { ( ! roots.length || directories.length > 0 || media.length > 0 ) && (
-        <Pagination
-          offset= { offset }
-          limit= { limit }
-          itemCount= { media.length }
-          total= { total }
-          hasNext= { hasNext }
-          onChange= { onPageChange }
-        />
       ) }
     </div>
   );
