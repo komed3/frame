@@ -1,6 +1,9 @@
-import { formatBytes, formatDate, formatDuration, formatNumber } from '@/src/client/utils/format';
+import { formatBytes, formatDate, formatDimensions, formatDuration, formatNumber } from '@/src/client/utils/format';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { CalendarPlusIcon, ClockIcon, Columns3Icon, Disc3Icon, FilmIcon, GlobeIcon, HourglassIcon, LinkIcon, UserIcon, VideoIcon } from 'lucide-react';
+import {
+  CalendarPlusIcon, ClockIcon, Columns3Icon, Disc3Icon, FileIcon, FilmIcon, GlobeIcon,
+  HourglassIcon, LinkIcon, SquareDimensionsIcon, UserIcon, VideoIcon
+} from 'lucide-react';
 
 
 interface MediaInfoProps {
@@ -12,6 +15,8 @@ export function MediaInfo ( { media }: MediaInfoProps ) {
   const items = [
     [ 'Duration', formatDuration( media.durationMs ), HourglassIcon ],
     [ 'File Size', formatBytes( media.sizeBytes ), Disc3Icon ],
+    [ 'Dimensions', formatDimensions( media.width, media.height ), SquareDimensionsIcon ],
+    [ 'File Type', media.type, FileIcon ],
     [ 'Modified', formatDate( media.modifiedAt ), ClockIcon ],
     [ 'Added', formatDate( media.createdAt ), CalendarPlusIcon ],
     [ 'Creator', media.creator ?? '—', UserIcon ],
@@ -39,7 +44,7 @@ export function MediaInfo ( { media }: MediaInfoProps ) {
               </span>
             </div>
 
-            <span className= 'min-w-0 py-1.5 text-sm wrap-break-words'>
+            <span className= 'min-w-0 py-1.5 text-sm capitalize wrap-break-words'>
               { value }
             </span>
           </div>
