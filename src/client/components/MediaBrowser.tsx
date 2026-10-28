@@ -144,7 +144,7 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
         </thead>
 
         <tbody className= 'divide-y divide-slate-700/70'>
-        { roots.map( root => (
+          { roots.map( root => (
             <tr
               key= { `root-${ root.id }` }
               onClick= { () => onOpenRoot?.( root ) }
