@@ -42,7 +42,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   const [ error, setError ] = useState< string | null >( null );
 
 
-  const request = useCallback( async < T, > ( path: string, options: ApiRequestOptions = {} ) : Promise< T > => {
+  const request = useCallback( < T, > ( path: string, options: ApiRequestOptions = {} ) : Promise< T > => {
     const url = new URL( `${ API }${ path }`, window.location.origin );
 
     for ( const [ key, value ] of Object.entries( options.query ?? {} ) )
@@ -53,32 +53,56 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     if ( options.body !== undefined && ! headers.has( 'Content-Type' ) )
       headers.set( 'Content-Type', 'application/json' );
 
-    const { query: _, ...init } = options;
-    const res = await fetch( url, { ...init, headers } );
+    const { query: _, ...init } = options, method = ( init.method ?? 'GET' ).toUpperCase();
+    const deduplicate = method === 'GET' && init.body === undefined && init.signal === undefined;
+    const key = JSON.stringify( [ method, url.href, Array.from( headers.entries() ).sort(
+      ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] )
+    ) ] );
 
-    if ( res.status === 401 && path !== '/auth/login' ) {
-      setToken( null ), setUser( null );
-      localStorage.removeItem( TOKEN_KEY );
+    if ( deduplicate ) {
+      const existing = inFlightRequests.get( key );
+      if ( existing ) return existing as Promise< T >;
     }
 
-    if ( ! res.ok ) {
-      let message = res.statusText || 'API request failed';
+    const execute = async () : Promise< T > => {
+      const res = await fetch( url, { ...init, headers } );
 
-      try {
-        const body = await res.json() as { error?: string };
-        if ( body.error ) message = body.error;
-      } catch {}
+      if ( res.status === 401 && path !== '/auth/login' ) {
+        setToken( null ), setUser( null );
+        localStorage.removeItem( TOKEN_KEY );
+      }
 
-      setError( message );
-      throw new ApiError( message, res.status );
+      if ( ! res.ok ) {
+        let message = res.statusText || 'API request failed';
+
+        try {
+          const body = await res.json() as { error?: string };
+          if ( body.error ) message = body.error;
+        } catch {}
+
+        setError( message );
+        throw new ApiError( message, res.status );
+      }
+
+      setError( null );
+
+      if ( res.status === 204 ) return undefined as T;
+      if ( res.headers.get( 'Content-Type' )?.includes( 'application/json' ) ) return res.json() as Promise< T >;
+
+      return res as T;
+    };
+
+    const pending = execute();
+
+    if ( deduplicate ) {
+      inFlightRequests.set( key, pending );
+
+      pending.finally( () => {
+        if ( inFlightRequests.get( key ) === pending ) inFlightRequests.delete( key );
+      } ).catch( () => {} );
     }
 
-    setError( null );
-
-    if ( res.status === 204 ) return undefined as T;
-    if ( res.headers.get( 'Content-Type' )?.includes( 'application/json' ) ) return res.json() as Promise< T >;
-
-    return res as T;
+    return pending;
   }, [ token ] );
 
 
