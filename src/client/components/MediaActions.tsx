@@ -29,6 +29,21 @@ export function MediaActions ( { media }: MediaActionsProps ) {
   }, [ media.id, favorites ] );
 
 
+  const toggleFavorite = async () => {
+    if ( updating || loading ) return;
+    setUpdating( true );
+
+    try {
+      if ( favorite ) await favorites.remove( media.id );
+      else await favorites.add( media.id );
+
+      setFavorite( ! favorite );
+    } finally {
+      setUpdating( false );
+    }
+  };
+
+
   return (
     <></>
   );
