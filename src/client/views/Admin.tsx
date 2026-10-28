@@ -6,6 +6,30 @@ import type { MediaRoot } from '@/src/shared/types/roots';
 import { useRef, useState } from 'react';
 
 
+const PAGE_SIZE = 25;
+const REFRESH_INTERVAL = 10000;
+
+const JOB_STATUS_OPTIONS = [
+  { value: '', label: 'All statuses' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'running', label: 'Running' },
+  { value: 'done', label: 'Done' },
+  { value: 'failed', label: 'Failed' },
+  { value: 'cancelled', label: 'Cancelled' }
+];
+
+const JOB_KIND_OPTIONS = [
+  { value: '', label: 'All job types' },
+  { value: 'scan', label: 'Scan' },
+  { value: 'metadata', label: 'Metadata' },
+  { value: 'tracks', label: 'Tracks' },
+  { value: 'preview', label: 'Preview' },
+  { value: 'frames', label: 'Frames' },
+  { value: 'wave', label: 'Waveform' },
+  { value: 'text', label: 'Text' }
+];
+
+
 export function Admin () {
   const { database, jobs, roots } = useApi();
 
