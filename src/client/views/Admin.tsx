@@ -5,7 +5,7 @@ import { formatBytes, formatNumber } from '@/src/client/utils/format';
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { DatabaseIcon } from 'lucide-react';
+import { ClockIcon, DatabaseIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 
@@ -113,6 +113,13 @@ export function Admin () {
           { error }
         </p>
       ) }
+
+      <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
+        <h2 className= 'flex items-center gap-3 text-lg font-medium'>
+          <ClockIcon size= { 18 } />
+          <span>Background Jobs</span>
+        </h2>
+      </div>
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
         <h2 className= 'flex items-center gap-3 text-lg font-medium'>
