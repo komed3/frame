@@ -39,11 +39,11 @@ export function Account () {
             [ 'Account Status', user.disabledAt ? 'Disabled' : 'Active' ]
           ].map( ( [ label, value ] ) => (
             <div key= { label } className= 'flex justify-between items-center gap-6 py-4'>
-              <span className= 'text-sm font-light'>
+              <span className= 'font-extralight'>
                 { label }
               </span>
 
-              <b className= 'text-right text-sm font-medium break-all'>
+              <b className= 'text-right font-medium break-all'>
                 { value }
               </b>
             </div>
@@ -56,9 +56,12 @@ export function Account () {
           <Link
             key= { url }
             to= { url }
-            className= ''
+            className= {
+              'flex flex-col justify-center items-center gap-1 pt-4 pb-3 text-center bg-slate-50/10 ' +
+              'rounded shadow-lg transition-colors duration-100 hover:bg-slate-50/20'
+            }
           >
-            <Icon size= { 18 } />
+            <Icon size= { 24 } strokeWidth= { 1.6 } />
             <span>{ label }</span>
           </Link>
         ) ) }
