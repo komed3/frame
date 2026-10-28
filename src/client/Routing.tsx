@@ -1,4 +1,5 @@
 import { Media } from '@/src/client/views/Media';
+import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
 import { Route, Routes } from 'react-router';
 
@@ -12,7 +13,7 @@ export function Routing () {
       <Route path= '/search' element= { <Search /> } />
 
       <Route path= '/' element= { <></> } />
-      <Route path= '*' element= { <></> } />
+      <Route path= '*' element= { <NotFound /> } />
     </Routes>
   );
 }
