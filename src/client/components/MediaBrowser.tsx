@@ -131,7 +131,7 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
   );
 }
 
-function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListProps ) {
+function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, onOpenMedia }: ListProps ) {
   return (
     <div className= 'overflow-x-auto'>
       <table className= 'w-full text-left text-sm whitespace-nowrap'>
@@ -147,6 +147,23 @@ function MediaList ( { directories, media, onOpenDirectory, onOpenMedia }: ListP
         </thead>
 
         <tbody className= 'divide-y divide-slate-700/70'>
+        { roots.map( root => (
+            <tr
+              key= { `root-${ root.id }` }
+              onClick= { () => onOpenRoot?.( root ) }
+              className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
+            >
+              <td colSpan= { 6 }>
+                <div className= 'flex items-center gap-3 min-w-0'>
+                  <FolderIcon size= { 16 } />
+                  <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
+                    { rootName( root ) }
+                  </span>
+                </div>
+              </td>
+            </tr>
+          ) ) }
+
           { directories.map( d => (
             <tr
               key= { `directory-${ d.id }` }
