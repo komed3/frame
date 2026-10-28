@@ -1,6 +1,5 @@
 import { Loading } from '@/src/client/components/Loading';
 import { useApi } from '@/src/client/context/ApiContext';
-import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { NotFound } from '@/src/client/views/NotFound';
 import { AudioPlayer } from '@/src/client/views/watch/AudioPlayer';
 import { ImageViewer } from '@/src/client/views/watch/ImageViewer';
@@ -32,8 +31,6 @@ export function Watch () {
 
     return () => { active = false };
   }, [ id, mediaApi ] );
-
-  usePageTitle( media?.title || media?.fileName || '' );
 
 
   if ( ! media ) return <NotFound />;

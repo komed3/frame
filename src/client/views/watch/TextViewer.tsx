@@ -1,6 +1,7 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
+import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -28,7 +29,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
 
     Promise.all( [
       '' /*stream( media.id, { signal: controller.signal } ).then( res => res.text() )*/,
-      [ { id: '', name: 'Wikipedia', parentId: null } ] /*mediaApi.categories( media.id ).catch( () => [] )*/,
+      mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null )
     ] ).then( ( [ content, categories, tags, directory ] ) => {
@@ -42,6 +43,8 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
 
     return () => { active = false; controller.abort() };
   }, [ media.id, media.rootId, media.directoryId, stream, mediaApi, directories ] );
+
+  usePageTitle( media.title || media.fileName );
 
 
   return (
