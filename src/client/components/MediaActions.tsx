@@ -1,6 +1,8 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import type { MediaRecord } from '@/src/shared/types/media';
+import { HeartIcon, SettingsIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 
 
 interface MediaActionsProps {
@@ -45,6 +47,17 @@ export function MediaActions ( { media }: MediaActionsProps ) {
 
 
   return (
-    <></>
+    <div className= 'flex flex-wrap items-center gap-6'>
+      <Link
+        to= { `/edit/${ media.id }` }
+        className= {
+          'flex items-center gap-2 h-8 px-4 text-sm font-medium bg-slate-50/10 ' +
+          'rounded-full transition duration-100 hover:bg-slate-50/20'
+        }
+      >
+        <SettingsIcon size= { 16 } />
+        <span>Edit</span>
+      </Link>
+    </div>
   );
 }
