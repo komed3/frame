@@ -165,6 +165,19 @@ export function Admin () {
                 <th scope= 'col'>Details</th>
               </tr>
             </thead>
+
+            <tbody className= 'divide-y divide-slate-700/70 divide-dashed'>
+              { jobList.map( job => (
+                <tr key= { job.id } className= 'align-top whitespace-nowrap *:p-4'>
+                  <td>{ job.kind.toUpperCase() }</td>
+                  <td>{ job.status }</td>
+                  <td>{ formatDate( job.createdAt ) }</td>
+                  <td className= 'max-w-md wrap-break-words'>
+                    { job.error || job.worker || '—' }
+                  </td>
+                </tr>
+              ) ) }
+            </tbody>
           </table>
         </div>
 
