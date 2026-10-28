@@ -1,3 +1,4 @@
+import { MediaRating } from '@/src/client/components/MediaRating';
 import { useApi } from '@/src/client/context/ApiContext';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { HeartIcon, ListVideoIcon, SettingsIcon } from 'lucide-react';
@@ -81,6 +82,16 @@ export function MediaActions ( { media }: MediaActionsProps ) {
         <ListVideoIcon size= { 18 } />
         <span>Playlists</span>
       </button>
+
+      <div className= 'flex-1' />
+
+      <div className= 'flex items-center gap-4'>
+        <span className= 'text-xs uppercase tracking-wider text-slate-400'>
+          Rating
+        </span>
+
+        <MediaRating media= { media } />
+      </div>
     </div>
   );
 }
