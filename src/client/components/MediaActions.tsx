@@ -12,8 +12,9 @@ interface MediaActionsProps {
 
 
 export function MediaActions ( { media }: MediaActionsProps ) {
-  const { favorites } = useApi();
+  const { env, favorites } = useApi();
 
+  const [ canEdit, setCanEdit ] = useState( false );
   const [ favorite, setFavorite ] = useState( false );
   const [ loading, setLoading ] = useState( true );
   const [ updating, setUpdating ] = useState( false );
@@ -49,16 +50,18 @@ export function MediaActions ( { media }: MediaActionsProps ) {
 
   return (
     <div className= 'flex flex-wrap items-center gap-4'>
-      <Link
-        to= { `/edit/${ media.id }` }
-        className= {
-          'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
-          'rounded-full transition duration-100 hover:bg-slate-50/20'
-        }
-      >
-        <SettingsIcon size= { 16 } />
-        <span>Edit</span>
-      </Link>
+      { canEdit && (
+        <Link
+          to= { `/edit/${ media.id }` }
+          className= {
+            'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+            'rounded-full transition duration-100 hover:bg-slate-50/20'
+          }
+        >
+          <SettingsIcon size= { 16 } />
+          <span>Edit</span>
+        </Link>
+      ) }
 
       <button
         aria-pressed= { favorite }
