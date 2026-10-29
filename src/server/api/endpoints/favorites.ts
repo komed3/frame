@@ -11,15 +11,15 @@ favorites.get( '/', ( req, res ) => {
   res.json( Favorites.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );
 
-favorites.get( '/:mediaId', ( req, res ) => res.json( {
+favorites.get< { mediaId: string } >( '/:mediaId', ( req, res ) => res.json( {
   favorite: Favorites.has( res.locals.user.id, req.params.mediaId )
 } ) );
 
-favorites.post( '/:mediaId', ( req, res ) => res.json( {
+favorites.post< { mediaId: string } >( '/:mediaId', ( req, res ) => res.json( {
   favorite: true, added: Favorites.add( res.locals.user.id, req.params.mediaId )
 } ) );
 
-favorites.delete( '/:mediaId', ( req, res ) => {
+favorites.delete< { mediaId: string } >( '/:mediaId', ( req, res ) => {
   Favorites.remove( res.locals.user.id, req.params.mediaId );
   res.status( 204 ).end();
 } );
