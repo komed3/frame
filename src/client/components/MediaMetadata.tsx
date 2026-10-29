@@ -1,5 +1,4 @@
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
-import { DatabaseIcon } from 'lucide-react';
 
 
 interface MediaMetadataProps {
@@ -15,10 +14,14 @@ export function MediaMetadata ( { items }: MediaMetadataProps ) {
       </h2>
 
       <div className= 'grid grid-cols-3 gap-x-8 gap-y-1'>
-        { items.map( ( item ) => (
-          <div key= { item.id } className= 'flex flex-wrap items-start gap-8'>
+        { items.map( ( { id, key, value } ) => (
+          <div key= { id } className= 'flex flex-wrap items-start gap-8'>
             <div className= 'text-xs uppercase tracking-wider text-slate-400'>
-              { item.key }
+              { key }
+            </div>
+
+            <div className= 'min-w-0 py-1.5 text-sm capitalize wrap-break-words'>
+              { value }
             </div>
           </div>
         ) ) }
