@@ -2,9 +2,8 @@ import { Media } from '@/src/server/media/Media';
 import { MediaRoots } from '@/src/server/media/Roots';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { ByteRange, StreamResult } from '@/src/shared/types/stream';
-import type { ReadStream, Stats } from 'node:fs';
-import type { FileHandle } from 'node:fs/promises';
-import { open } from 'node:fs/promises';
+import { createReadStream, type ReadStream, type Stats } from 'node:fs';
+import { stat } from 'node:fs/promises';
 
 
 const CHUNK_SIZE = 1024 * 1024;
@@ -24,10 +23,6 @@ export class StreamError extends Error {
 
 
 export class Stream {
-  private static defaultRange ( size: number ) : ByteRange {
-    return { start: 0, end: Math.min( size - 1, CHUNK_SIZE - 1 ) };
-  }
-
   private static parseRange ( value: string, size: number ) : ByteRange | null {
     const match = /^bytes=(\d*)-(\d*)$/i.exec( value.trim() );
     if ( ! match || size <= 0 ) return null;
@@ -83,7 +78,7 @@ export class Stream {
     return media;
   }
 
-  private static async openMedia ( media: MediaRecord ) : Promise< [ FileHandle, Stats ] > {
+  private static async openMedia ( media: MediaRecord ) : Promise< [ string, Stats ] > {
     let path: string;
 
     try { path = MediaRoots.resolve( media.rootId, media.path ) }
@@ -95,28 +90,18 @@ export class Stream {
       throw new StreamError( status < 500 ? message : 'Unable to access media', status );
     }
 
-    let file: FileHandle;
+    try {
+      const stats = await stat( path );
+      if ( ! stats.isFile() ) throw new StreamError( 'Media file not found', 404 );
 
-    try { file = await open( path, 'r' ) }
-    catch ( err ) {
+      return [ path, stats ];
+    } catch ( err ) {
+      if ( err instanceof StreamError ) throw err;
+
       const code = ( err as NodeJS.ErrnoException ).code;
-
       if ( code === 'ENOENT' || code === 'ENOTDIR' ) throw new StreamError( 'Media file not found', 404 );
       if ( code === 'EACCES' || code === 'EPERM' ) throw new StreamError( 'Media file cannot be accessed', 403 );
 
-      throw err;
-    }
-
-    try {
-      const stats = await file.stat();
-      if ( ! stats.isFile() ) throw new StreamError( 'Media file not found', 404 );
-
-      return [ file, stats ];
-    } catch ( err ) {
-      try { await file.close() }
-      catch { /** Preserve the original error */ }
-
-      if ( err instanceof StreamError ) throw err;
       throw new StreamError( 'Unable to verify media file', 500 );
     }
   }
@@ -127,48 +112,34 @@ export class Stream {
   }
 
   public static async open ( id: string, rangeHeader?: string, ifRangeHeader?: string, method: 'GET' | 'HEAD' = 'GET' ) : Promise< StreamResult > {
-    const media = Stream.resolveMedia( id ), [ file, stats ] = await Stream.openMedia( media );
-    let body: ReadStream | null = null;
+    const media = Stream.resolveMedia( id ), [ path, stats ] = await Stream.openMedia( media );
+    const size = stats.size, etag = Stream.etag( stats );
 
-    try {
-      const size = stats.size, etag = Stream.etag( stats );
-      const headers: Record< string, string > = {
-        'Accept-Ranges': 'bytes', 'Cache-Control': 'private, no-cache', 'Content-Type': Stream.contentType( media ),
-        'ETag': etag, 'Last-Modified': stats.mtime.toUTCString(), 'X-Content-Type-Options': 'nosniff'
-      };
+    const headers: Record< string, string > = {
+      'Accept-Ranges': 'bytes', 'Cache-Control': 'private, no-cache', 'Content-Type': Stream.contentType( media ),
+      'ETag': etag, 'Last-Modified': stats.mtime.toUTCString(), 'X-Content-Type-Options': 'nosniff'
+    };
 
-      if ( size <= 0 ) throw new StreamError( 'Media file is empty', 416, { 'Content-Range': 'bytes */0' } );
+    if ( size <= 0 ) throw new StreamError( 'Media file is empty', 416, { 'Content-Range': 'bytes */0' } );
 
-      const rangeAllowed = Stream.ifRangeMatches( ifRangeHeader, etag, stats );
-      const range = ! rangeHeader || ! rangeAllowed ? Stream.defaultRange( size ) : Stream.parseRange( rangeHeader, size );
+    const partial = !! rangeHeader && Stream.ifRangeMatches( ifRangeHeader, etag, stats );
+    const range = partial ? Stream.parseRange( rangeHeader!, size ) : { start: 0, end: size - 1 };
 
-      if ( ! range ) throw new StreamError( 'Requested byte range is not satisfiable', 416, {
-        'Content-Range': `bytes */${ size }`
-      } );
+    if ( ! range ) throw new StreamError( 'Requested byte range is not satisfiable', 416, {
+      'Content-Range': `bytes */${ size }`
+    } );
 
-      const length = range.end - range.start + 1;
+    headers[ 'Content-Length' ] = String( range.end - range.start + 1 );
+    if ( partial ) headers[ 'Content-Range' ] = `bytes ${ range.start }-${ range.end }/${ size }`;
 
-      headers[ 'Content-Length' ] = String( length );
-      headers[ 'Content-Range' ] = `bytes ${ range.start }-${ range.end }/${ size }`;
+    const status = partial ? 206 : 200;
 
-      if ( method === 'HEAD' ) {
-        await file.close();
-        return { status: 206, headers, body: null };
-      }
+    if ( method === 'HEAD' ) return { status, headers, body: null };
 
-      body = file.createReadStream( {
-        start: range.start, end: range.end, highWaterMark: STREAM_BUFFER_SIZE,
-        autoClose: true
-      } );
+    const body: ReadStream = createReadStream( path, {
+      start: range.start, end: range.end, highWaterMark: STREAM_BUFFER_SIZE
+    } );
 
-      return { status: 206, headers, body };
-    } catch ( err ) {
-      if ( ! body ) {
-        try { await file.close() }
-        catch { /** Preserve the original error */ }
-      }
-
-      throw err;
-    }
+    return { status, headers, body };
   }
 }
