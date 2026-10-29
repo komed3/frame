@@ -7,7 +7,10 @@ import { formatBytes, formatDate, formatNumber } from '@/src/client/utils/format
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon, Loader2Icon, XIcon } from 'lucide-react';
+import {
+  AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon,
+  Loader2Icon, SquareTextIcon, XIcon
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 
@@ -22,7 +25,7 @@ const JOB_KIND_OPTIONS = [
   { value: 'preview', label: 'Preview' },
   { value: 'frames', label: 'Frames' },
   { value: 'wave', label: 'Waveform', icon: AudioLinesIcon },
-  { value: 'text', label: 'Text' }
+  { value: 'text', label: 'Text', icon: SquareTextIcon }
 ];
 
 const JOB_STATUS_OPTIONS = [
