@@ -9,7 +9,7 @@ import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types
 import type { MediaRoot } from '@/src/shared/types/roots';
 import {
   AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon, GalleryVerticalIcon,
-  ImageIcon, LayersIcon, Loader2Icon, SearchIcon, SquareTextIcon, XIcon
+  HourglassIcon, ImageIcon, LayersIcon, Loader2Icon, SearchIcon, SquareTextIcon, XIcon
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
@@ -31,7 +31,7 @@ const JOB_KIND_OPTIONS = [
 
 const JOB_STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
-  { value: 'pending', label: 'Pending', icon: Loader2Icon, css: 'animate-spin' },
+  { value: 'pending', label: 'Pending', icon: HourglassIcon },
   { value: 'running', label: 'Running', icon: Loader2Icon, css: 'animate-spin' },
   { value: 'done', label: 'Done', icon: CheckIcon },
   { value: 'failed', label: 'Failed', icon: XIcon },
