@@ -1,57 +1,49 @@
 import { MediaBrowser } from '@/src/client/components/MediaBrowser';
 import { MEDIA_PAGE_SIZE } from '@/src/client/components/Pagination';
 import { useApi } from '@/src/client/context/ApiContext';
+import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { MediaType } from '@/src/shared/types/media';
 import type {
   MediaSearchOptions, MediaSearchProgress, MediaSearchQueryMode,
   MediaSearchResult, MediaSearchSort
 } from '@/src/shared/types/search';
-import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 
 export function Search () {
   const { search, user } = useApi();
-  const navigate = useNavigate();
   const [ searchParams ] = useSearchParams();
+  const navigate = useNavigate();
 
-  const [ result, setResult ] = useState< MediaSearchResult | null >( null );
-  const [ loading, setLoading ] = useState( true );
-  const [ error, setError ] = useState< string | null >( null );
   const query = searchParams.get( 'query' ) ?? '';
+  const paramsKey = searchParams.toString();
+  const key = JSON.stringify( [ paramsKey, user?.id ?? null ] );
 
-
-  usePageTitle( query ? `Search: ${ query }` : 'Search' );
-
-  useEffect( () => {
-    let active = true;
-
-    const offset = Math.max( 0, Number( searchParams.get( 'offset' ) ) || 0 );
-    const favorite = searchParams.has( 'favorite' ) ? searchParams.get( 'favorite' ) === 'true' : undefined;
-    const played = searchParams.has( 'played' ) ? searchParams.get( 'played' ) === 'true' : undefined;
-    const progress = searchParams.get( 'progress' ) as MediaSearchProgress | null;
+  const { data: result, loading, error } = useApiData< MediaSearchResult >( key, () => {
+    const params = new URLSearchParams( paramsKey );
+    const offset = Math.max( 0, Number( params.get( 'offset' ) ) || 0 );
+    const favorite = params.has( 'favorite' ) ? params.get( 'favorite' ) === 'true' : undefined;
+    const played = params.has( 'played' ) ? params.get( 'played' ) === 'true' : undefined;
+    const progress = params.get( 'progress' ) as MediaSearchProgress | null;
 
     const options: MediaSearchOptions = {
       query, favorite, played, limit: MEDIA_PAGE_SIZE, offset,
-      queryMode: ( searchParams.get( 'queryMode' ) ?? 'all' ) as MediaSearchQueryMode,
-      types: searchParams.has( 'types' ) ? [ searchParams.get( 'types' ) as MediaType ] : undefined,
-      categoryIds: searchParams.has( 'categoryIds' ) ? [ searchParams.get( 'categoryIds' )! ] : undefined,
-      tagIds: searchParams.has( 'tagIds' ) ? [ searchParams.get( 'tagIds' )! ] : undefined,
-      available: searchParams.has( 'available' ) ? searchParams.get( 'available' ) === 'true' : undefined,
+      queryMode: ( params.get( 'queryMode' ) ?? 'all' ) as MediaSearchQueryMode,
+      types: params.has( 'types' ) ? [ params.get( 'types' ) as MediaType ] : undefined,
+      categoryIds: params.has( 'categoryIds' ) ? [ params.get( 'categoryIds' )! ] : undefined,
+      tagIds: params.has( 'tagIds' ) ? [ params.get( 'tagIds' )! ] : undefined,
+      available: params.has( 'available' ) ? params.get( 'available' ) === 'true' : undefined,
       progress: progress ?? undefined,
       userId: favorite !== undefined || played !== undefined || progress ? user?.id : undefined,
-      sortBy: ( searchParams.get( 'sortBy' ) ?? 'relevance' ) as MediaSearchSort,
-      sortDirection: searchParams.get( 'sortDirection' ) === 'desc' ? 'desc' : 'asc'
+      sortBy: ( params.get( 'sortBy' ) ?? 'relevance' ) as MediaSearchSort,
+      sortDirection: params.get( 'sortDirection' ) === 'desc' ? 'desc' : 'asc'
     };
 
-    setLoading( true ), setError( null );
-    search( options ).then( res => { if ( active ) setResult( res ) } )
-      .catch( err => { if ( active ) setError( err instanceof Error ? err.message : 'Could not load search results.' ) } )
-      .finally( () => { if ( active ) setLoading( false ) } );
+    return search( options );
+  } );
 
-    return () => { active = false; };
-  }, [ search, searchParams, query, user?.id ] );
+  usePageTitle( query ? `Search: ${ query }` : 'Search' );
 
 
   const changePage = ( offset: number ) => {
