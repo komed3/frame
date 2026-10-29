@@ -54,6 +54,36 @@ export function MediaActions ( { media }: MediaActionsProps ) {
     }
   };
 
+  const showMetadata = async () => {
+    setMenuOpen( false ), setMetadataOpen( true ), setMetadataLoading( true );
+
+    try { setMetadata( await mediaApi.metadata( media.id ) ) }
+    catch { setMetadata( [] ) }
+    finally { setMetadataLoading( false ) }
+  };
+
+  const rescanMetadata = () => {
+    setMenuOpen( false );
+    jobs.enqueue( { kind: 'metadata', mediaId: media.id } ).catch( () => {} );
+  };
+
+  const downloadMedia = async () => {
+    setMenuOpen( false ), setDownloading( true );
+
+    try {
+      const url = URL.createObjectURL( await ( await stream( media.id ) ).blob() );
+      const link = document.createElement( 'a' );
+
+      link.href = url;
+      link.download = media.fileName;
+      link.click();
+
+      window.setTimeout( () => URL.revokeObjectURL( url ), 1000 );
+    } finally {
+      setDownloading( false );
+    }
+  };
+
 
   return (
     <div className= 'flex flex-wrap items-center gap-4'>
