@@ -151,24 +151,28 @@ export function Editor () {
 
 
   return (
-    <div className= 'mx-auto my-12 max-w-5xl px-6 space-y-8'>
-      <div className= 'flex flex-wrap justify-between items-center gap-4'>
-        <div className= 'space-y-2'>
-          <Link
-            to= { `/watch/${ media.id }` }
-            className= 'flex items-center gap-2 mb-6 text-sm text-slate-400 hover:text-white'
-          >
-            <ArrowLeftIcon size= { 16 } />
-            <span>Back to media</span>
-          </Link>
+    <div className= 'mx-auto my-12 max-w-5xl px-6 space-y-12'>
+      <div className= 'flex flex-wrap justify-between items-end gap-4'>
+        <div className= 'space-y-3'>
+          <div className= 'flex items-center gap-4'>
+            <Link
+              to= { `/watch/${ media.id }` }
+              className= 'flex items-center gap-2 text-sm text-slate-400 hover:text-white'
+            >
+              <ArrowLeftIcon size= { 16 } />
+              <span>Back to media</span>
+            </Link>
+
+            <span className= 'text-slate-600'>/</span>
+
+            <p className= 'text-sm text-slate-400 break-all'>
+              { media.path }
+            </p>
+          </div>
 
           <h1 className= 'text-2xl font-light tracking-wide'>
             Edit Media
           </h1>
-
-          <p className= 'text-sm text-slate-400 break-all'>
-            { media.path }
-          </p>
         </div>
 
         <button
