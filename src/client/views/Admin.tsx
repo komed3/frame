@@ -208,7 +208,10 @@ export function Admin () {
                       <td>{ formatDate( job.createdAt ) }</td>
                       <td>
                         { ! job.mediaId ? '—' : (
-                          <Link to= { `/watch/${ job.mediaId }` }>
+                          <Link
+                            to= { `/watch/${ job.mediaId }` }
+                            className= 'px-2 py-1 font-mono text-xs bg-slate-50/10 rounded'
+                          >
                             { job.mediaId }
                           </Link>
                         ) }
