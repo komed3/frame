@@ -1,9 +1,15 @@
+import { Loading } from '@/src/client/components/Loading';
+import { MediaMetadata } from '@/src/client/components/MediaMetadata';
 import { MediaRating } from '@/src/client/components/MediaRating';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { HeartIcon, ListVideoIcon, SettingsIcon } from 'lucide-react';
-import { useState } from 'react';
+import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
+import {
+  DatabaseIcon, DownloadIcon, HeartIcon, ListVideoIcon, MoreHorizontalIcon,
+  RefreshCwIcon, SettingsIcon, XIcon
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
 
