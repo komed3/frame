@@ -7,7 +7,7 @@ import { formatBytes, formatDate, formatNumber } from '@/src/client/utils/format
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { CheckIcon, ClockIcon, DatabaseIcon, FolderIcon, Loader2Icon, XIcon } from 'lucide-react';
+import { AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon, Loader2Icon, XIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 
@@ -16,7 +16,7 @@ const REFRESH_INTERVAL = 5_000;
 
 const JOB_STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
-  { value: 'pending', label: 'Pending', icon: Loader2Icon },
+  { value: 'pending', label: 'Pending', icon: Loader2Icon, css: 'animate-spin' },
   { value: 'running', label: 'Running', icon: Loader2Icon, css: 'animate-spin' },
   { value: 'done', label: 'Done', icon: CheckIcon },
   { value: 'failed', label: 'Failed', icon: XIcon },
@@ -30,7 +30,7 @@ const JOB_KIND_OPTIONS = [
   { value: 'tracks', label: 'Tracks' },
   { value: 'preview', label: 'Preview' },
   { value: 'frames', label: 'Frames' },
-  { value: 'wave', label: 'Waveform' },
+  { value: 'wave', label: 'Waveform', icon: AudioLinesIcon },
   { value: 'text', label: 'Text' }
 ];
 
