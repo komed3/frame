@@ -34,10 +34,10 @@ export function Media () {
   const rootItems = data?.roots ?? [];
   const result = data?.result ?? null;
 
-  const navigateTo = ( path: string ) => { setOffset( 0 ), navigate( path ) };
-
-
   usePageTitle( result?.current?.name ?? result?.root.name ?? 'All Media' );
+
+
+  const navigateTo = ( path: string ) => { setOffset( 0 ), navigate( path ) };
 
 
   return (
