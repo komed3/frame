@@ -13,6 +13,12 @@ export function MediaMetadata ( { items }: MediaMetadataProps ) {
       <h2 className= 'text-sm font-medium tracking-wide text-slate-300'>
         Metadata
       </h2>
+
+      <div className= 'grid grid-cols-3 gap-x-8 gap-y-1'>
+        { items.map( ( item ) => (
+          <></>
+        ) ) }
+      </div>
     </div>
   );
 }
