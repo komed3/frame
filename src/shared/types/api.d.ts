@@ -149,6 +149,7 @@ export interface Api {
   media: {
     list: ( options?: MediaListOptions ) => Promise< MediaRecord[] >;
     get: ( id: string ) => Promise< MediaRecord | null >;
+    update: ( id: string, data: Pick< MediaRecord, 'title' | 'description' | 'creator' | 'rating' > ) => Promise< void >;
     metadata: ( id: string ) => Promise< MediaMetadataRecord[] >;
     setMetadata: ( id: string, key: string, value: string ) => Promise< MediaMetadataRecord | null >;
     deleteMetadata: ( id: string, key: string ) => Promise< void >;
