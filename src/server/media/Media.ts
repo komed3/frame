@@ -90,9 +90,11 @@ export class Media {
     assertLimitOffset( limit, offset );
 
     const where = conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '';
-    const rows = as< MediaRow[] >( conn().prepare(
-      `${ SELECT_MEDIA } ${ where } ORDER BY id LIMIT ? OFFSET ?`
-    ).all( ...values, limit, offset ) );
+    const rows = as< MediaRow[] >( conn().prepare( `
+      ${ SELECT_MEDIA } ${ where }
+      ORDER BY COALESCE( NULLIF( title, '' ), file_name ) COLLATE NOCASE, file_name COLLATE NOCASE, id
+      LIMIT ? OFFSET ?
+    ` ).all( ...values, limit, offset ) );
 
     return rows.map( row => Media.mapRow( row ) );
   }
