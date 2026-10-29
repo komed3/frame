@@ -84,7 +84,9 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
         <aside className= 'shink-0 w-80' />
       </div>
 
-      <div className= 'border-t border-slate-700 pt-6 space-y-8'>
+      <hr className= 'border-dashed border-slate-700' />
+
+      <div className= 'space-y-8'>
         <MediaActions media= { media } />
         <MediaInfo media= { media } />
 
