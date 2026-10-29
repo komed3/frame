@@ -7,7 +7,7 @@ import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { ArrowLeftIcon, Grid2X2PlusIcon, InfoIcon, PlusIcon, SaveIcon, TagsIcon } from 'lucide-react';
+import { ArrowLeftIcon, Grid2X2PlusIcon, InfoIcon, PlusIcon, SaveIcon, TagsIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -273,6 +273,37 @@ export function Editor () {
               <span>Add field</span>
             </button>
           </h2>
+
+          { metadata.map( ( item, i ) => (
+            <div key= { i } className= 'grid grid-cols-[1fr_2fr_auto] items-start gap-3'>
+              <input
+                value= { item.key }
+                onChange= { e => setMetadata( metadata.map( ( entry, i ) =>
+                  i === i ? { ...entry, key: e.target.value } : entry
+                ) ) }
+                placeholder= 'Key'
+                className= { INPUT }
+              />
+
+              <textarea
+                value= { item.value }
+                onChange= { e => setMetadata( metadata.map( ( entry, i ) =>
+                  i === i ? { ...entry, value: e.target.value } : entry
+                ) ) }
+                placeholder= 'Value'
+                rows= { 2 }
+                className= { `${ INPUT } resize-y` }
+              />
+
+              <button
+                aria-label= 'Remove metadata field'
+                onClick= { () => setMetadata( metadata.filter( ( _, i ) => i !== i ) ) }
+                className= { `${ BUTTON } text-red-300` }
+              >
+                <Trash2Icon size= { 16 } />
+              </button>
+            </div>
+          ) ) }
         </div>
 
         { saveError && (
