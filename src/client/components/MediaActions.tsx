@@ -174,6 +174,28 @@ export function MediaActions ( { media }: MediaActionsProps ) {
           className= 'fixed inset-0 z-40 bg-slate-900 opacity-50'
         />
       ) }
+
+      { metadataOpen && (
+        <div
+          className= {
+            'fixed top-1/2 left-1/2 -translate-1/2 z-50 w-[90%] max-w-3xl max-h-[70vh] ' +
+            'p-5 bg-slate-700 rounded shadow-lg overflow-y-auto'
+          }
+        >
+          <button
+            aria-label= 'Close metadata'
+            onClick= { () => setMetadataOpen( false ) }
+            className= 'absolute top-4 right-4'
+          >
+            <XIcon size= { 20 } />
+          </button>
+
+          { metadataLoading
+            ? <Loading className= 'min-h-16' />
+            : <MediaMetadata items= { metadata } />
+          }
+        </div>
+      ) }
     </>
   );
 }
