@@ -139,14 +139,7 @@ export interface ApiRequestOptions extends RequestInit {
   query?: object;
 }
 
-export interface ApiContextValue {
-  env: ApiEnv | null;
-  user: ApiSession[ 'user' ] | null;
-  token: string | null;
-  authenticated: boolean;
-  canEdit: boolean;
-  loading: boolean;
-  error: string | null;
+export interface Api {
   request: < T > ( path: string, options?: ApiRequestOptions ) => Promise< T >;
   login: ( credentials: ApiLogin ) => Promise< void >;
   logout: () => Promise< void >;
@@ -241,4 +234,14 @@ export interface ApiContextValue {
   database: {
     stats: () => Promise< DatabaseStats >;
   };
+}
+
+export interface ApiContextValue extends Api {
+  env: ApiEnv | null;
+  user: ApiSession[ 'user' ] | null;
+  token: string | null;
+  loading: boolean;
+  error: string | null;
+  authenticated: boolean;
+  canEdit: boolean;
 }
