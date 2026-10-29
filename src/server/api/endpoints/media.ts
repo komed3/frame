@@ -20,6 +20,17 @@ media.get< { id: string } >( '/:id/metadata', ( req, res ) => res.json( MediaMet
 media.get< { id: string } >( '/:id/tags', ( req, res ) => res.json( MediaTaxonomy.getMediaTags( req.params.id ) ) );
 media.get< { id: string } >( '/:id/categories', ( req, res ) => res.json( MediaTaxonomy.getMediaCategories( req.params.id ) ) );
 
+media.patch< { id: string } >( '/:id', requireEditorAccess, ( req, res ) => {
+  const { title, description, creator, rating } = req.body ?? {};
+
+  Media.update( req.params.id, {
+    title: String( title ), description: String( description ), creator: String( creator ),
+    rating: Math.max( 0, Math.min( 10, Number( rating ) ) )
+  } );
+
+  res.status( 204 ).end();
+} );
+
 media.put< { id: string, key: string } >( '/:id/metadata/:key', requireEditorAccess, ( req, res ) => {
   MediaMetadata.set( req.params.id, req.params.key, req.body?.value, 'manual' );
   res.json( MediaMetadata.get( req.params.id, req.params.key, 'manual' ) );
