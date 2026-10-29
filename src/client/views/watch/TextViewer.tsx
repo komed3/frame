@@ -19,7 +19,6 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
   const [ categories, setCategories ] = useState< CategoryRecord[] >( [] );
   const [ tags, setTags ] = useState< TagRecord[] >( [] );
   const [ directory, setDirectory ] = useState< ApiDirectoryListResult | null >( null );
-  const [ loading, setLoading ] = useState( true );
   const [ error, setError ] = useState< string | null >( null );
 
 
@@ -27,7 +26,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
     const controller = new AbortController();
     let active = true;
 
-    setLoading( true ), setError( null ), setContent( '' );
+    setError( null ), setContent( '' );
 
     Promise.all( [
       '' /*stream( media.id, { signal: controller.signal } ).then( res => res.text() )*/,
@@ -41,7 +40,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
       setTags( tags ), setDirectory( directory );
     } ).catch( err => {
       if ( active && ! controller.signal.aborted ) setError( err instanceof Error ? err.message : 'Unable to load text.' )
-    } ).finally( () => { if ( active ) setLoading( false ) } );
+    } );
 
     return () => { active = false; controller.abort() };
   }, [ media.id, media.rootId, media.directoryId, stream, mediaApi, directories ] );
