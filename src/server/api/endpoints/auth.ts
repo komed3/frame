@@ -22,6 +22,11 @@ auth.post( '/login', async ( req, res ) => {
 
 auth.get( '/me', requireAuth, ( _, res ) => res.json( { user: res.locals.user } ) );
 
+auth.get( '/env', requireAuth, ( _, res ) => res.json( {
+  passwordStrict: Config.get( 'PASSWORD_STRICT' ),
+  editorAdminOnly: Config.get( 'EDITOR_ADMIN_ONLY' )
+} ) )
+
 auth.post( '/logout', requireAuth, ( req, res ) => {
   Auth.logout( getToken( req ) );
   res.clearCookie( 'frame.asset-session', assetCookie );
