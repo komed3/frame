@@ -10,7 +10,7 @@ import { basename } from 'node:path';
 export const directories = Router();
 
 
-directories.get( '/:rootId/tree', ( req, res ) => {
+directories.get< { rootId: string } >( '/:rootId/tree', ( req, res ) => {
   const root = MediaRoots.list().find( item => item.id === req.params.rootId );
 
   res.json( {
@@ -19,7 +19,7 @@ directories.get( '/:rootId/tree', ( req, res ) => {
   } );
 } );
 
-directories.get( '/:rootId', ( req, res ) => {
+directories.get< { rootId: string } >( '/:rootId', ( req, res ) => {
   const rootId = req.params.rootId, value = req.query.directoryId;
   const directoryId = value === undefined ? null : String( value );
   const pagination = parsePagination( req.query.limit, req.query.offset );

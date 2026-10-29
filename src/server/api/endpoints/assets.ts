@@ -6,12 +6,8 @@ import { type RequestHandler, Router } from 'express';
 export const assets = Router();
 
 
-const sendAsset: RequestHandler = ( req, res, next ) => {
-  const asset = MediaAssets.get(
-    req.params.id as string, req.params.kind as MediaAssetKind,
-    req.params.variant as string ?? 'default'
-  );
-
+const sendAsset: RequestHandler< { id: string, kind: MediaAssetKind, variant?: string } > = ( req, res, next ) => {
+  const asset = MediaAssets.get( req.params.id, req.params.kind, req.params.variant ?? 'default' );
   if ( ! asset ) return res.status( 404 ).json( { error: 'Asset not found' } );
 
   res.setHeader( 'Content-Type', asset.mimeType ?? 'application/octet-stream' );
@@ -20,7 +16,7 @@ const sendAsset: RequestHandler = ( req, res, next ) => {
 };
 
 
-assets.get( '/:id', ( req, res ) => res.json( MediaAssets.list( req.params.id ).map(
+assets.get< { id: string } >( '/:id', ( req, res ) => res.json( MediaAssets.list( req.params.id ).map(
   ( { path, ...asset } ) => ( { ...asset, url: `/api/assets/${ req.params.id }/${ asset.kind }/${
     encodeURIComponent( asset.variant )
   }` } )

@@ -12,14 +12,14 @@ markers.get( '/', ( req, res ) => {
   res.json( Markers.list( res.locals.user.id, pagination.limit, pagination.offset ) );
 } );
 
-markers.get( '/:id', ( req, res ) => res.json( Markers.get( res.locals.user.id, req.params.id ) ) );
+markers.get< { id: string } >( '/:id', ( req, res ) => res.json( Markers.get( res.locals.user.id, req.params.id ) ) );
 
-markers.patch( '/:id', ( req, res ) => {
+markers.patch< { id: string } >( '/:id', ( req, res ) => {
   Markers.update( res.locals.user.id, req.params.id, req.body as MarkerUpdate );
   res.json( Markers.get( res.locals.user.id, req.params.id ) );
 } );
 
-markers.delete( '/:id', ( req, res ) => {
+markers.delete< { id: string } >( '/:id', ( req, res ) => {
   Markers.delete( res.locals.user.id, req.params.id );
   res.status( 204 ).end();
 } );
