@@ -70,6 +70,12 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
             { media.title || media.fileName }
           </h1>
         </div>
+
+        { media.description && (
+          <p className= 'max-w-3xl text-lg leading-relaxed'>
+            { media.description }
+          </p>
+        ) }
       </div>
     </>
   );
