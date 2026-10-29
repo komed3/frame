@@ -27,6 +27,8 @@ export interface ConfigSchema {
   SCRUBBER_FPS: number;
   SCRUBBER_MAX_FRAMES: number;
   SCRUBBER_MIN_FRAMES: number;
+
+  EDITOR_ADMIN_ONLY: boolean;
 }
 
 export type ConfigName = keyof ConfigSchema;
