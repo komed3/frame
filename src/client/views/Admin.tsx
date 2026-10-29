@@ -14,15 +14,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const PAGE_SIZE = 25;
 const REFRESH_INTERVAL = 5_000;
 
-const JOB_STATUS_OPTIONS = [
-  { value: '', label: 'All statuses' },
-  { value: 'pending', label: 'Pending', icon: Loader2Icon, css: 'animate-spin' },
-  { value: 'running', label: 'Running', icon: Loader2Icon, css: 'animate-spin' },
-  { value: 'done', label: 'Done', icon: CheckIcon },
-  { value: 'failed', label: 'Failed', icon: XIcon },
-  { value: 'cancelled', label: 'Cancelled', icon: XIcon }
-];
-
 const JOB_KIND_OPTIONS = [
   { value: '', label: 'All job types' },
   { value: 'scan', label: 'Scan' },
@@ -34,11 +25,26 @@ const JOB_KIND_OPTIONS = [
   { value: 'text', label: 'Text' }
 ];
 
+const JOB_STATUS_OPTIONS = [
+  { value: '', label: 'All statuses' },
+  { value: 'pending', label: 'Pending', icon: Loader2Icon, css: 'animate-spin' },
+  { value: 'running', label: 'Running', icon: Loader2Icon, css: 'animate-spin' },
+  { value: 'done', label: 'Done', icon: CheckIcon },
+  { value: 'failed', label: 'Failed', icon: XIcon },
+  { value: 'cancelled', label: 'Cancelled', icon: XIcon }
+];
+
+
+function getKind ( kind: JobKind ) {
+  return (
+    <></>
+  );
+}
 
 function getStatus ( status: JobStatus ) {
   const { label, icon: Icon, css = '' } = JOB_STATUS_OPTIONS.find( s => s.value === status ) ?? {};
 
-  return label && (
+  return ! label ? status : (
     <span className= 'inline-flex items-center gap-3'>
       { Icon && <Icon size= { 16 } className= { css } /> }
       { label }
