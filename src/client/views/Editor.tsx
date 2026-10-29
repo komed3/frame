@@ -7,8 +7,8 @@ import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { ArrowLeftIcon, Grid2X2PlusIcon, InfoIcon, PlusIcon, SaveIcon, TagsIcon, Trash2Icon } from 'lucide-react';
-import { type SubmitEvent, useEffect, useState, type ReactNode } from 'react';
+import { ArrowLeftIcon, Grid2X2PlusIcon, InfoIcon, SaveIcon, TagsIcon } from 'lucide-react';
+import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 
@@ -270,6 +270,24 @@ export function Editor () {
             { saveError }
           </p>
         ) }
+
+        <div className= 'flex flex-wrap justify-end gap-3'>
+          <Link
+            to= { `/watch/${ media.id }` }
+            className= { BUTTON }
+          >
+            Cancel
+          </Link>
+
+          <button
+            type= 'submit'
+            disabled= { saving }
+            className= { BUTTON }
+          >
+            <SaveIcon size= { 16 } />
+            <span>{ saving ? 'Saving …' : 'Save changes' }</span>
+          </button>
+        </div>
       </form>
     </div>
   );
