@@ -13,7 +13,7 @@ interface NameInputProps {
 function uniqueNames ( names: string[] ) : string[] {
   return names.reduce< string[] >( ( res, name ) => {
     const clean = name.trim();
-    if ( clean && ! res.some( item => item.toLowerCase() === clean.toLowerCase() ) ) res.push( clean );
+    if ( clean && ! res.some( i => i.toLowerCase() === clean.toLowerCase() ) ) res.push( clean );
     return res;
   }, [] );
 }
