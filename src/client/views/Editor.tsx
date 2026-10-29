@@ -87,7 +87,7 @@ export function Editor () {
     setTitle( data.media.title ?? '' );
     setDescription( data.media.description ?? '' );
     setCreator( data.media.creator ?? '' );
-    setRating( data.media.rating === null ? '' : String( data.media.rating ) );
+    setRating( data.media.rating === null ? '' : String( Math.round( data.media.rating * 10 ) ) );
     setTagNames( data.tags.map( tag => tag.name ) );
     setCategoryNames( data.categories.map( c => c.name ) );
     setMetadata( data.metadata.filter( i => i.source === 'manual' ).map(
@@ -278,8 +278,8 @@ export function Editor () {
             <div key= { i } className= 'grid grid-cols-[1fr_2fr_auto] items-start gap-3'>
               <input
                 value= { item.key }
-                onChange= { e => setMetadata( metadata.map( ( entry, i ) =>
-                  i === i ? { ...entry, key: e.target.value } : entry
+                onChange= { e => setMetadata( metadata.map( ( entry, j ) =>
+                  i === j ? { ...entry, key: e.target.value } : entry
                 ) ) }
                 placeholder= 'Key'
                 className= { INPUT }
@@ -287,8 +287,8 @@ export function Editor () {
 
               <textarea
                 value= { item.value }
-                onChange= { e => setMetadata( metadata.map( ( entry, i ) =>
-                  i === i ? { ...entry, value: e.target.value } : entry
+                onChange= { e => setMetadata( metadata.map( ( entry, j ) =>
+                  i === j ? { ...entry, value: e.target.value } : entry
                 ) ) }
                 placeholder= 'Value'
                 rows= { 2 }
