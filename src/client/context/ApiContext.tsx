@@ -177,8 +177,11 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const value = useMemo< ApiContextValue >( () => ( {
-    env, user, token, authenticated: user !== null, loading, error, request, login, logout,
-    refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
+    env, user, token, loading, error, authenticated: user !== null,
+    canEdit: !! env && ( ! env.editorAdminOnly || user?.isAdmin === true ),
+
+    request, login, logout, refreshSession, clearError,
+    health: () => request< ApiHealth >( '/health' ),
 
     media: {
       list: o => request< MediaRecord[] >( '/media', { query: o } ),
