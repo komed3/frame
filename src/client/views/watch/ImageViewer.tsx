@@ -1,5 +1,6 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaActions } from '@/src/client/components/MediaActions';
+import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
@@ -76,6 +77,16 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
             { media.description }
           </p>
         ) }
+
+        <hr className= 'border-dashed border-slate-700' />
+
+        <div className= 'space-y-8'>
+          <MediaInfo media= { media } />
+
+          { tags.length > 0 && (
+            <MediaTaxonomy type= 'tag' items= { tags } />
+          ) }
+        </div>
       </div>
     </>
   );
