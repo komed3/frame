@@ -1,6 +1,6 @@
 import type {
   ApiAssetRecord, ApiContextValue, ApiDeleteResult, ApiDirectoryListResult, ApiDirectoryTreeResult,
-  ApiEnqueueResult, ApiFavorite, ApiFavoriteAddResult, ApiHealth, ApiLogin, ApiLoginResult,
+  ApiEnqueueResult, ApiEnv, ApiFavorite, ApiFavoriteAddResult, ApiHealth, ApiLogin, ApiLoginResult,
   ApiMarkerClearResult, ApiPage, ApiPlaylistClearResult, ApiPlaylistContainsResult, ApiPreference,
   ApiPreferences, ApiRequestOptions, ApiRootScanAllResult, ApiRootScanResult, ApiSession
 } from '@/src/shared/types/api';
@@ -165,8 +165,10 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const value = useMemo< ApiContextValue >( () => ( {
-    user, token, authenticated: user !== null, loading, error, request, login, logout,
-    refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
+    user, token, authenticated: user !== null, loading, error,
+    request, login, logout, refreshSession, clearError,
+    health: () => request< ApiHealth >( '/health' ),
+    env: () => request< ApiEnv >( '/auth/env' ),
 
     media: {
       list: o => request< MediaRecord[] >( '/media', { query: o } ),
