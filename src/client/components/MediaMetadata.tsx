@@ -7,4 +7,12 @@ interface MediaMetadataProps {
 }
 
 
-export function MediaMetadata ( { items }: MediaMetadataProps ) {}
+export function MediaMetadata ( { items }: MediaMetadataProps ) {
+  return items.length > 0 && (
+    <div className= 'space-y-3'>
+      <h2 className= 'text-sm font-medium tracking-wide text-slate-300'>
+        Metadata
+      </h2>
+    </div>
+  );
+}
