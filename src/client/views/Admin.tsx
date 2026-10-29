@@ -36,8 +36,13 @@ const JOB_STATUS_OPTIONS = [
 
 
 function getKind ( kind: JobKind ) {
-  return (
-    <></>
+  const { label, icon: Icon } = JOB_KIND_OPTIONS.find( k => k.value === kind ) ?? {};
+
+  return ! label ? kind : (
+    <span className= 'inline-flex items-center gap-3'>
+      { Icon && <Icon size= { 16 } /> }
+      { label }
+    </span>
   );
 }
 
