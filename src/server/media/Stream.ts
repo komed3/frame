@@ -78,9 +78,7 @@ export class Stream {
 
     if ( ! media ) throw new StreamError( 'Media not found', 404 );
     if ( ! media.available ) throw new StreamError( 'Media is unavailable', 404 );
-
-    if ( media.type !== 'video' && media.type !== 'other' )
-      throw new StreamError( 'Media type cannot be streamed', 415 );
+    if ( media.type === 'other' ) throw new StreamError( 'Media type cannot be streamed', 415 );
 
     return media;
   }
