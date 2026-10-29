@@ -108,25 +108,32 @@ export function MediaActions ( { media }: MediaActionsProps ) {
           <span>{ favorite ? 'Favorite' : 'Add to favourites' }</span>
         </button>
 
-      <button
-        className= {
-          'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
-          'rounded-full transition duration-100 hover:bg-slate-50/20'
-        }
-      >
-        <ListVideoIcon size= { 18 } />
-        <span>Playlists</span>
-      </button>
+        <button className= { BUTTON }>
+          <ListVideoIcon size= { 18 } />
+          <span>Playlists</span>
+        </button>
 
-      <div className= 'flex-1' />
+        <div className= 'relative z-50'>
+          <button
+            aria-label= 'More actions'
+            aria-expanded= { menuOpen }
+            onClick= { () => setMenuOpen( ! menuOpen ) }
+            className= { BUTTON + ' justify-center w-10! px-0!' }
+          >
+            <MoreHorizontalIcon size= { 18 } />
+          </button>
+        </div>
 
-      <div className= 'flex items-center gap-4'>
-        <span className= 'text-xs uppercase tracking-wider text-slate-400'>
-          Rating
-        </span>
+        <div className= 'flex-1' />
 
-        <MediaRating media= { media } />
+        <div className= 'flex items-center gap-4'>
+          <span className= 'text-xs uppercase tracking-wider text-slate-400'>
+            Rating
+          </span>
+
+          <MediaRating media= { media } />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
