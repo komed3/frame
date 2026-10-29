@@ -22,6 +22,10 @@ const BUTTON =
   'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
   'rounded-full transition duration-100 hover:bg-slate-50/20';
 
+const CTX_BUTTON =
+  'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors ' +
+  'delay-75 text-sm hover:bg-slate-50/10';
+
 
 export function MediaActions ( { media }: MediaActionsProps ) {
   const { canEdit, favorites, media: mediaApi, jobs, stream } = useApi();
@@ -122,6 +126,35 @@ export function MediaActions ( { media }: MediaActionsProps ) {
           >
             <MoreHorizontalIcon size= { 18 } />
           </button>
+
+          { menuOpen && (
+            <div className= 'absolute top-full left-1/2 -translate-x-1/2 mt-4 w-56 shadow-lg'>
+              <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+
+              <div className= 'relative z-1 py-2 bg-slate-700 rounded'>
+                <button onClick= { showMetadata } className= { CTX_BUTTON }>
+                  <DatabaseIcon size= { 16 } />
+                  <span>View metadata</span>
+                </button>
+
+                { canEdit && (
+                  <button onClick= { rescanMetadata } className= { CTX_BUTTON }>
+                    <RefreshCwIcon size= { 16 } />
+                    <span>Rescan metadata</span>
+                  </button>
+                ) }
+
+                <button
+                  onClick= { downloadMedia }
+                  disabled= { downloading }
+                  className= { CTX_BUTTON }
+                >
+                  <DownloadIcon size= { 16 } />
+                  <span>{ downloading ? 'Downloading …' : 'Download media' }</span>
+                </button>
+              </div>
+            </div>
+          ) }
         </div>
 
         <div className= 'flex-1' />
