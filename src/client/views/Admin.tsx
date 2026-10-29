@@ -198,8 +198,8 @@ export function Admin () {
                 <tbody className= 'divide-y divide-slate-700/70 divide-dashed'>
                   { jobList.map( job => (
                     <tr key= { job.id } className= 'align-top whitespace-nowrap *:p-4'>
-                      <td className= 'capitalize'>{ getKind( job.kind ) }</td>
-                      <td className= 'capitalize'>{ getStatus( job.status ) }</td>
+                      <td>{ getKind( job.kind ) }</td>
+                      <td>{ getStatus( job.status ) }</td>
                       <td>{ formatDate( job.createdAt ) }</td>
                       <td className= 'max-w-md wrap-break-words'>
                         { job.error || job.worker || '—' }
