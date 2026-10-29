@@ -12,9 +12,8 @@ interface MediaActionsProps {
 
 
 export function MediaActions ( { media }: MediaActionsProps ) {
-  const { env, favorites } = useApi();
+  const { env, user, favorites } = useApi();
 
-  const [ canEdit, setCanEdit ] = useState( false );
   const [ favorite, setFavorite ] = useState( false );
   const [ loading, setLoading ] = useState( true );
   const [ updating, setUpdating ] = useState( false );
@@ -50,7 +49,7 @@ export function MediaActions ( { media }: MediaActionsProps ) {
 
   return (
     <div className= 'flex flex-wrap items-center gap-4'>
-      { canEdit && (
+      { env !== null && ( ! env.editorAdminOnly || user?.isAdmin === true ) && (
         <Link
           to= { `/edit/${ media.id }` }
           className= {
