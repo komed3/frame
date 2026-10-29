@@ -1,4 +1,5 @@
 import { Auth } from '@/src/server/core/Auth';
+import { Config } from '@/src/server/core/Config';
 import type { ErrorRequestHandler, Request, RequestHandler } from 'express';
 
 
@@ -18,6 +19,12 @@ export const requireAuth: RequestHandler = ( req, res, next ) => {
 
   res.locals.user = user;
   next();
+};
+
+
+export const requireEditorAccess: RequestHandler = ( _, res, next ) => {
+  if ( ! Config.get( 'EDITOR_ADMIN_ONLY' ) || res.locals.user?.isAdmin ) return next();
+  res.status( 403 ).json( { error: 'Administrator access required' } );
 };
 
 
