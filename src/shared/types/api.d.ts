@@ -37,6 +37,11 @@ export interface ApiLoginResult {
   user: UserRecord;
 }
 
+export interface ApiEnv {
+  passwordStrict: boolean;
+  editorAdminOnly: boolean;
+}
+
 export interface ApiPage {
   limit: number;
   offset: number;
