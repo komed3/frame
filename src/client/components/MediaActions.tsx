@@ -3,6 +3,7 @@ import { MediaMetadata } from '@/src/client/components/MediaMetadata';
 import { MediaRating } from '@/src/client/components/MediaRating';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
+import { useBodyScrollLock } from '@/src/client/hooks/useBodyScrollLock';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import {
@@ -42,6 +43,8 @@ export function MediaActions ( { media }: MediaActionsProps ) {
   const [ downloading, setDownloading ] = useState( false );
 
   const favorite = favoriteOverride?.id === media.id ? favoriteOverride.value : data ?? false;
+
+  useBodyScrollLock( menuOpen || metadataOpen );
 
 
   const toggleFavorite = async () => {
