@@ -144,6 +144,7 @@ export interface ApiContextValue {
   user: ApiSession[ 'user' ] | null;
   token: string | null;
   authenticated: boolean;
+  canEdit: boolean;
   loading: boolean;
   error: string | null;
   request: < T > ( path: string, options?: ApiRequestOptions ) => Promise< T >;
