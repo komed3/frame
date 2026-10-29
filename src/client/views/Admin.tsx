@@ -7,7 +7,7 @@ import { formatBytes, formatDate, formatNumber } from '@/src/client/utils/format
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { ClockIcon, DatabaseIcon, FolderIcon, Loader2Icon } from 'lucide-react';
+import { CheckIcon, ClockIcon, DatabaseIcon, FolderIcon, HourglassIcon, Loader2Icon, XIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 
@@ -16,11 +16,11 @@ const REFRESH_INTERVAL = 5_000;
 
 const JOB_STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'running', label: 'Running' },
-  { value: 'done', label: 'Done' },
-  { value: 'failed', label: 'Failed' },
-  { value: 'cancelled', label: 'Cancelled' }
+  { value: 'pending', label: 'Pending', icon: HourglassIcon },
+  { value: 'running', label: 'Running', icon: Loader2Icon, css: 'animate-spin' },
+  { value: 'done', label: 'Done', icon: CheckIcon },
+  { value: 'failed', label: 'Failed', icon: XIcon },
+  { value: 'cancelled', label: 'Cancelled', icon: XIcon }
 ];
 
 const JOB_KIND_OPTIONS = [
@@ -33,6 +33,15 @@ const JOB_KIND_OPTIONS = [
   { value: 'wave', label: 'Waveform' },
   { value: 'text', label: 'Text' }
 ];
+
+
+function getStatus ( status: JobStatus ) {
+  const { label, icon, css = '' } = JOB_STATUS_OPTIONS.find( s => s.value === status ) ?? {};
+
+  return label && (
+    <span className= ''></span>
+  );
+}
 
 
 export function Admin () {
