@@ -54,10 +54,9 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
         <hr className= 'border-dashed border-slate-700' />
 
         <Breadcrumbs
-          items= { [
-            ...( directory?.breadcrumbs ?? [] ),
-            { id: media.id, name: media.title || media.fileName, path: media.path }
-          ] }
+          items= { [ ...( directory?.breadcrumbs ?? [] ), {
+            id: media.id, name: media.title || media.fileName, path: media.path
+          } ] }
           onHome= { () => navigate( '/all' ) }
           onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
         />

@@ -48,10 +48,9 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
   return (
     <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
       <Breadcrumbs
-        items= { [
-          ...( directory?.breadcrumbs ?? [] ),
-          { id: media.id, name: media.title || media.fileName, path: media.path }
-        ] }
+        items= { [ ...( directory?.breadcrumbs ?? [] ), {
+          id: media.id, name: media.title || media.fileName, path: media.path
+        } ] }
         onHome= { () => navigate( '/all' ) }
         onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
       />
