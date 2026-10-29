@@ -69,6 +69,7 @@ export function Editor () {
   const [ title, setTitle ] = useState( '' );
   const [ description, setDescription ] = useState( '' );
   const [ creator, setCreator ] = useState( '' );
+  const [ language, setLanguage ] = useState( '' );
   const [ rating, setRating ] = useState( '' );
   const [ tagNames, setTagNames ] = useState< string[] >( [] );
   const [ categoryNames, setCategoryNames ] = useState< string[] >( [] );
@@ -87,6 +88,7 @@ export function Editor () {
     setTitle( data.media.title ?? '' );
     setDescription( data.media.description ?? '' );
     setCreator( data.media.creator ?? '' );
+    setLanguage( data.media.language ?? '' );
     setRating( data.media.rating === null ? '' : String( Math.round( data.media.rating * 10 ) ) );
     setTagNames( data.tags.map( tag => tag.name ) );
     setCategoryNames( data.categories.map( c => c.name ) );
@@ -103,7 +105,7 @@ export function Editor () {
     setSaving( true ), setSaveError( null );
 
     try {
-      await mediaApi.update( id, { title, description, creator, rating: rating === '' ? null : Number( rating ) } );
+      await mediaApi.update( id, { title, description, creator, language, rating: rating === '' ? null : Number( rating ) } );
       const allTags = [ ...( data?.allTags ?? [] ) ], allCategories = [ ...( data?.allCategories ?? [] ) ];
 
       const tagIds = await Promise.all( tagNames.map( async n => {
@@ -217,6 +219,14 @@ export function Editor () {
             <input
               value= { creator }
               onChange= { e => setCreator( e.target.value ) }
+              className= { INPUT }
+            />
+          </Field>
+
+          <Field label= 'Language'>
+            <input
+              value= { language }
+              onChange= { e => setLanguage( e.target.value ) }
               className= { INPUT }
             />
           </Field>

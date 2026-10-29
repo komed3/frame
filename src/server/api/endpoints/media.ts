@@ -21,10 +21,11 @@ media.get< { id: string } >( '/:id/tags', ( req, res ) => res.json( MediaTaxonom
 media.get< { id: string } >( '/:id/categories', ( req, res ) => res.json( MediaTaxonomy.getMediaCategories( req.params.id ) ) );
 
 media.patch< { id: string } >( '/:id', requireEditorAccess, ( req, res ) => {
-  const { title, description, creator, rating } = req.body ?? {};
+  const { title, description, creator, language, rating } = req.body ?? {};
 
   Media.update( req.params.id, {
-    title: String( title ), description: String( description ), creator: String( creator ),
+    title: String( title ), description: String( description ),
+    creator: String( creator ), language: String( language ),
     rating: rating === null ? null : Math.max( 0, Math.min( 10, Number( rating ) ) ) / 10
   } );
 
