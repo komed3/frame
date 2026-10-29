@@ -38,5 +38,5 @@ const handleStream: RequestHandler = ( req, res, next ) => void ( async () => {
 } )();
 
 
-stream.get( '/:id', handleStream );
-stream.head( '/:id', handleStream );
+stream.get< { id: string } >( '/:id', handleStream );
+stream.head< { id: string } >( '/:id', handleStream );
