@@ -132,7 +132,7 @@ export function MediaActions ( { media }: MediaActionsProps ) {
 
           { menuOpen && (
             <div className= 'absolute top-full left-1/2 -translate-x-1/2 mt-4 w-56 shadow-lg'>
-              <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+              <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
 
               <div className= 'relative z-1 py-2 bg-slate-700 rounded'>
                 <button onClick= { showMetadata } className= { CTX_BUTTON }>

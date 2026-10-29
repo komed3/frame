@@ -186,7 +186,7 @@ export function Header () {
           <Link to= '/'>
             <img
               src= { logo }
-              className= 'w-10 h-10'
+              className= 'size-9'
               alt= 'Frame'
             />
           </Link>
@@ -209,7 +209,7 @@ export function Header () {
               <button
                 type= 'submit'
                 aria-label= 'Search'
-                className= 'absolute top-0 right-0 inline-flex justify-center items-center w-10 h-10'
+                className= 'absolute top-0 right-0 inline-flex justify-center items-center size-10'
               >
                 <SearchIcon size= { 20 } />
               </button>
@@ -240,7 +240,7 @@ export function Header () {
                 <span className= 'text-sm'>
                   Hi, <b>{ user?.username }</b>
                 </span>
-                <div className= 'inline-flex justify-center items-center w-8 h-8 bg-slate-200 rounded-full'>
+                <div className= 'inline-flex justify-center items-center size-8 bg-slate-200 rounded-full'>
                   <UserIcon size= { 20 } className= 'text-slate-900' />
                 </div>
               </button>
@@ -251,7 +251,7 @@ export function Header () {
                   ( userOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
                 }
               >
-                <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+                <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
 
                 <div className= 'relative z-1 w-48 py-4 bg-slate-700 rounded'>
                   { USER.map( ( [ label, url, Icon ] ) => (
@@ -284,7 +284,7 @@ export function Header () {
 
             <button
               onClick= { () => setMenuOpen( ! menuOpen ) }
-              className= 'inline-flex justify-center items-center w-10 h-10'
+              className= 'inline-flex justify-center items-center size-10'
             >
               { menuOpen ? <XIcon size= { 22 } /> : <MenuIcon size= { 22 } /> }
             </button>
@@ -331,7 +331,7 @@ export function Header () {
           'ease-out ' + ( filterOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
         }
       >
-        <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+        <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
 
         <div className= 'relative z-1 p-6 space-y-6 bg-slate-700 rounded'>
           <div className= 'flex justify-between items-center gap-4'>
@@ -340,7 +340,7 @@ export function Header () {
             <button
               aria-label= 'Close filters'
               onClick= { () => setFilterOpen( false ) }
-              className= 'inline-flex justify-center items-center w-6 h-6'
+              className= 'inline-flex justify-center items-center size-6'
             >
               <XIcon size= { 20 } />
             </button>

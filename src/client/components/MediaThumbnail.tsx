@@ -21,7 +21,7 @@ export function MediaThumbnail ( { media, aspectRatio = 'aspect-video' }: MediaT
       { url && failedUrl !== url ? (
         <img
           src= { url }
-          className= 'w-full h-full object-cover'
+          className= 'size-full object-cover'
           alt= { media.title ?? '' }
           loading= 'lazy'
           onError= { () => setFailedUrl( url ) }

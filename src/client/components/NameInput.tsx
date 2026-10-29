@@ -47,7 +47,7 @@ export function NameInput ( { label, names, suggestions, onChange }: NameInputPr
           list= { listId }
           placeholder= 'Add or select …'
           className= {
-            'w-full h-full px-3 text-sm bg-slate-900 border border-slate-700 rounded ' +
+            'size-full px-3 text-sm bg-slate-900 border border-slate-700 rounded ' +
             'focus:outline-none focus:border-slate-500'
           }
         />
