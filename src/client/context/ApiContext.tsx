@@ -183,6 +183,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     media: {
       list: o => request< MediaRecord[] >( '/media', { query: o } ),
       get: id => request< MediaRecord | null >( `/media/${ e( id ) }` ),
+      update: ( id, data ) => request< void >( `/media/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
       metadata: id => request< MediaMetadataRecord[] >( `/media/${ e( id ) }/metadata` ),
       setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >( `/media/${ e( id ) }/metadata/${ e( key ) }`, {
         method: 'PUT', body: s( { value } )
