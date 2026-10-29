@@ -17,55 +17,55 @@ playlists.post( '/', ( req, res ) => {
   res.status( 201 ).json( Playlists.get( res.locals.user.id, id ) );
 } );
 
-playlists.get( '/for-media/:mediaId', ( req, res ) => {
+playlists.get< { mediaId: string } >( '/for-media/:mediaId', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
   res.json( Playlists.mediaPlaylists( res.locals.user.id, req.params.mediaId, pagination.limit, pagination.offset ) );
 } );
 
-playlists.get( '/:id', ( req, res ) => res.json( Playlists.get( res.locals.user.id, req.params.id ) ) );
+playlists.get< { id: string } >( '/:id', ( req, res ) => res.json( Playlists.get( res.locals.user.id, req.params.id ) ) );
 
-playlists.patch( '/:id', ( req, res ) => {
+playlists.patch< { id: string } >( '/:id', ( req, res ) => {
   Playlists.update( res.locals.user.id, req.params.id, req.body as PlaylistUpdate );
   res.json( Playlists.get( res.locals.user.id, req.params.id ) );
 } );
 
-playlists.delete( '/:id', ( req, res ) => {
+playlists.delete< { id: string } >( '/:id', ( req, res ) => {
   Playlists.delete( res.locals.user.id, req.params.id );
   res.status( 204 ).end();
 } );
 
-playlists.get( '/:id/items', ( req, res ) => {
+playlists.get< { id: string } >( '/:id/items', ( req, res ) => {
   const pagination = parsePagination( req.query.limit, req.query.offset );
   res.json( Playlists.listItems( res.locals.user.id, req.params.id, pagination.limit, pagination.offset ) );
 } );
 
-playlists.delete( '/:id/items', ( req, res ) => res.json( {
+playlists.delete< { id: string } >( '/:id/items', ( req, res ) => res.json( {
   deleted: Playlists.clearItems( res.locals.user.id, req.params.id )
 } ) );
 
-playlists.post( '/:id/items/:mediaId', ( req, res ) => {
+playlists.post< { id: string, mediaId: string } >( '/:id/items/:mediaId', ( req, res ) => {
   Playlists.addItem( res.locals.user.id, req.params.id, req.params.mediaId );
   res.status( 201 ).json( Playlists.listItems( res.locals.user.id, req.params.id ) );
 } );
 
-playlists.get( '/:id/items/:mediaId/next', ( req, res ) => res.json(
+playlists.get< { id: string, mediaId: string } >( '/:id/items/:mediaId/next', ( req, res ) => res.json(
   Playlists.nextItem( res.locals.user.id, req.params.id, req.params.mediaId )
 ) );
 
-playlists.get( '/:id/items/:mediaId/prev', ( req, res ) => res.json(
+playlists.get< { id: string, mediaId: string } >( '/:id/items/:mediaId/prev', ( req, res ) => res.json(
   Playlists.prevItem( res.locals.user.id, req.params.id, req.params.mediaId )
 ) );
 
-playlists.get( '/:id/items/:mediaId', ( req, res ) => res.json( {
+playlists.get< { id: string, mediaId: string } >( '/:id/items/:mediaId', ( req, res ) => res.json( {
   inPlaylist: Playlists.mediaInPlaylist( res.locals.user.id, req.params.id, req.params.mediaId )
 } ) );
 
-playlists.patch( '/:id/items/:mediaId', ( req, res ) => {
+playlists.patch< { id: string, mediaId: string } >( '/:id/items/:mediaId', ( req, res ) => {
   Playlists.moveItem( res.locals.user.id, req.params.id, req.params.mediaId, req.body?.position );
   res.json( Playlists.listItems( res.locals.user.id, req.params.id ) );
 } );
 
-playlists.delete( '/:id/items/:mediaId', ( req, res ) => {
+playlists.delete< { id: string, mediaId: string } >( '/:id/items/:mediaId', ( req, res ) => {
   Playlists.removeItem( res.locals.user.id, req.params.id, req.params.mediaId );
   res.status( 204 ).end();
 } );
