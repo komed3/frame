@@ -36,6 +36,7 @@ const inFlightRequests = new Map< string, Promise< unknown > >();
 
 
 export function ApiProvider ( { children }: { children: ReactNode } ) {
+  const [ env, setEnv ] = useState< ApiEnv | null >( null );
   const [ token, setToken ] = useState< string | null >( () => localStorage.getItem( TOKEN_KEY ) );
   const [ user, setUser ] = useState< ApiSession[ 'user' ] | null >( null );
   const [ loading, setLoading ] = useState( true );
@@ -133,6 +134,17 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
   useEffect( () => void refreshSession(), [ refreshSession ] );
 
+  useEffect( () => {
+    if ( ! user ) { setEnv( null ); return }
+    let active = true;
+
+    request< ApiEnv >( '/auth/env' )
+      .then( res => { if ( active ) setEnv( res ) } )
+      .catch( () => { if ( active ) setEnv( null ) } );
+
+    return () => { active = false };
+  }, [ user, request ] );
+
 
   const login = useCallback( async ( credentials: ApiLogin ) => {
     setLoading( true ), setError( null );
@@ -165,10 +177,8 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const value = useMemo< ApiContextValue >( () => ( {
-    user, token, authenticated: user !== null, loading, error,
-    request, login, logout, refreshSession, clearError,
-    health: () => request< ApiHealth >( '/health' ),
-    env: () => request< ApiEnv >( '/auth/env' ),
+    env, user, token, authenticated: user !== null, loading, error, request, login, logout,
+    refreshSession, clearError, health: () => request< ApiHealth >( '/health' ),
 
     media: {
       list: o => request< MediaRecord[] >( '/media', { query: o } ),
@@ -302,7 +312,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     database: {
       stats: () => request< DatabaseStats >( '/db/stats' )
     }
-  } ), [ user, token, loading, error, request, login, logout, refreshSession, clearError ] );
+  } ), [ env, user, token, loading, error, request, login, logout, refreshSession, clearError ] );
 
 
   return (
