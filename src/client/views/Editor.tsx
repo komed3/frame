@@ -104,7 +104,7 @@ export function Editor () {
 
     try {
       await mediaApi.update( id, { title, description, creator, rating: rating === '' ? null : Number( rating ) } );
-      const allTags = [ ...data!.allTags ], allCategories = [ ...data!.allCategories ];
+      const allTags = [ ...( data?.allTags ?? [] ) ], allCategories = [ ...( data?.allCategories ?? [] ) ];
 
       const tagIds = await Promise.all( tagNames.map( async n => {
         const existing = allTags.find( t => t.name.toLocaleLowerCase() === n.toLocaleLowerCase() );
@@ -127,10 +127,10 @@ export function Editor () {
       await mediaApi.setTags( id, tagIds.filter( ( v ): v is string => v !== undefined ) );
       await mediaApi.setCategories( id, categoryIds.filter( ( v ): v is string => v !== undefined ) );
 
-      const previous = data!.metadata.filter( i => i.source === 'manual' );
+      const previous = data?.metadata.filter( i => i.source === 'manual' );
       const currentKeys = new Set( metadata.map( i => i.key.toLocaleLowerCase() ) );
 
-      await Promise.all( previous
+      await Promise.all( ( previous ?? [] )
         .filter( i => ! currentKeys.has( i.key.toLocaleLowerCase() ) )
         .map( i => mediaApi.deleteMetadata( id, i.key ) )
       );
@@ -242,14 +242,14 @@ export function Editor () {
           <NameInput
             label= 'Categories'
             names= { categoryNames }
-            suggestions= { data!.allCategories.map( item => item.name ) }
+            suggestions= { ( data?.allCategories ?? [] ).map( item => item.name ) }
             onChange= { setCategoryNames }
           />
 
           <NameInput
             label= 'Tags'
             names= { tagNames }
-            suggestions= { data!.allTags.map( item => item.name ) }
+            suggestions= { ( data?.allTags ?? [] ).map( item => item.name ) }
             onChange= { setTagNames }
           />
 
@@ -304,6 +304,26 @@ export function Editor () {
               </button>
             </div>
           ) ) }
+
+          { data?.metadata.some( item => item.source === 'scan' ) && (
+            <div className= 'pt-5 space-y-5 border-t border-dashed border-slate-700'>
+              <h3 className= 'text-sm font-medium text-slate-300'>
+                Scanner Metadata (read-only)
+              </h3>
+
+              { data?.metadata.filter( item => item.source === 'scan' ).map( ( { id, key, value } ) => (
+                <div key= { id } className= 'grid grid-cols-[1fr_2fr] gap-3 text-sm'>
+                  <span className= 'text-slate-400 wrap-break-words'>
+                    { key }
+                  </span>
+
+                  <span className= 'whitespace-pre-wrap wrap-break-words'>
+                    { value }
+                  </span>
+                </div>
+              ) ) }
+            </div>
+          ) }
         </div>
 
         { saveError && (
