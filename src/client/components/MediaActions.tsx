@@ -9,7 +9,7 @@ import {
   DatabaseIcon, DownloadIcon, HeartIcon, ListVideoIcon, MoreHorizontalIcon,
   RefreshCwIcon, SettingsIcon, XIcon
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 
@@ -178,22 +178,27 @@ export function MediaActions ( { media }: MediaActionsProps ) {
       { metadataOpen && (
         <div
           className= {
-            'fixed top-1/2 left-1/2 -translate-1/2 z-50 w-[90%] max-w-3xl max-h-[70vh] ' +
-            'p-5 bg-slate-700 rounded shadow-lg overflow-y-auto'
+            'fixed top-1/2 left-1/2 -translate-1/2 z-50 flex flex-col gap-4 w-[90%] max-w-3xl ' +
+            'max-h-[70vh] p-5 bg-slate-700 rounded shadow-lg'
           }
         >
-          <button
-            aria-label= 'Close metadata'
-            onClick= { () => setMetadataOpen( false ) }
-            className= 'absolute top-4 right-4'
-          >
-            <XIcon size= { 20 } />
-          </button>
+          <div className= 'shrink-0 flex justify-between items-center'>
+            <h2 className= 'font-medium'>Metadata</h2>
 
-          { metadataLoading
-            ? <Loading className= 'min-h-16' />
-            : <MediaMetadata items= { metadata } />
-          }
+            <button
+              aria-label= 'Close metadata'
+              onClick= { () => setMetadataOpen( false ) }
+            >
+              <XIcon size= { 20 } />
+            </button>
+          </div>
+
+          <div className= 'flex-1 overflow-y-auto'>
+            { metadataLoading
+              ? <Loading className= 'min-h-16 h-full' />
+              : <MediaMetadata items= { metadata } />
+            }
+          </div>
         </div>
       ) }
     </>
