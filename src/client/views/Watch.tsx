@@ -33,8 +33,8 @@ export function Watch () {
   }, [ id, mediaApi ] );
 
 
-  if ( ! media ) return <NotFound />;
   if ( loading ) return <Loading className= 'min-h-[50vh]' />;
+  if ( ! media ) return <NotFound />;
 
   switch ( media.type ) {
     case 'video': return <VideoPlayer media= { media } />;
