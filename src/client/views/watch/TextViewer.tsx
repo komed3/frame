@@ -31,7 +31,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
     setLoading( true ), setError( null ), setContent( '' );
 
     Promise.all( [
-      '' /*stream( media.id, { signal: controller.signal } ).then( res => res.text() )*/,
+      stream( media.id, { signal: controller.signal } ).then( res => res.text() ),
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null )
@@ -72,7 +72,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
           { loading ? (
             <Loading size= { 32 } className= 'min-h-64' />
           ) : error ? (
-            <p role= 'alert' className= 'py-12 text-center text-slate-400'>
+            <p role= 'alert' className= 'py-12 font-semibold text-red-400'>
               { error }
             </p>
           ) : (
