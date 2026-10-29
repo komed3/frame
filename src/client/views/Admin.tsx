@@ -9,7 +9,7 @@ import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types
 import type { MediaRoot } from '@/src/shared/types/roots';
 import {
   AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon,
-  Loader2Icon, SquareTextIcon, XIcon
+  ImageIcon, Loader2Icon, SquareTextIcon, XIcon
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -22,7 +22,7 @@ const JOB_KIND_OPTIONS = [
   { value: 'scan', label: 'Scan' },
   { value: 'metadata', label: 'Metadata' },
   { value: 'tracks', label: 'Tracks' },
-  { value: 'preview', label: 'Preview' },
+  { value: 'preview', label: 'Preview', icon: ImageIcon },
   { value: 'frames', label: 'Frames' },
   { value: 'wave', label: 'Waveform', icon: AudioLinesIcon },
   { value: 'text', label: 'Text', icon: SquareTextIcon }
