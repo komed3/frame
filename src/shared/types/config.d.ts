@@ -15,6 +15,7 @@ export interface ConfigSchema {
 
   SESSION_LIFETIME_MS: number;
   PASSWORD_STRICT: boolean;
+  EDITOR_ADMIN_ONLY: boolean;
 
   ASSETS_PATH: string;
   ASSETS_TIMEOUT_MS: number;
@@ -27,8 +28,6 @@ export interface ConfigSchema {
   SCRUBBER_FPS: number;
   SCRUBBER_MAX_FRAMES: number;
   SCRUBBER_MIN_FRAMES: number;
-
-  EDITOR_ADMIN_ONLY: boolean;
 }
 
 export type ConfigName = keyof ConfigSchema;
