@@ -56,7 +56,7 @@ export class MediaRoots {
         id, path, enabled, scan_generation AS scanGeneration,
         scanned_at AS scannedAt, created_at AS createdAt
       FROM roots ${ enabledOnly ? 'WHERE enabled = 1' : '' }
-      ORDER BY id
+      ORDER BY path COLLATE NOCASE, id
     ` ).all() );
 
     return rows.map( row => MediaRoots.mapRow( row ) );
