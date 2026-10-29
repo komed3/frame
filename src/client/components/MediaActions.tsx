@@ -18,6 +18,11 @@ interface MediaActionsProps {
 }
 
 
+const BUTTON =
+  'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+  'rounded-full transition duration-100 hover:bg-slate-50/20';
+
+
 export function MediaActions ( { media }: MediaActionsProps ) {
   const { canEdit, favorites } = useApi();
   const { data, loading } = useApiData< boolean >( media.id, () =>
