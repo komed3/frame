@@ -8,7 +8,7 @@ interface MediaRatingProps {
 
 
 export function MediaRating ( { media }: MediaRatingProps ) {
-  const rating = Math.round( Math.min( 10, Math.max( 0, media.rating ?? 0 ) ) );
+  const rating = Math.round( Math.min( 10, Math.max( 0, ( media.rating ?? 0 ) * 10 ) ) );
 
   return (
     <div className= 'flex items-center space-x-2'>
