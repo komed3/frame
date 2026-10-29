@@ -13,7 +13,7 @@ roots.post( '/scan-all', ( _, res ) => {
   res.status( 202 ).json( { message: 'Scan jobs enqueued' } );
 } );
 
-roots.post( '/:id/scan', ( req, res ) => {
+roots.post< { id: string } >( '/:id/scan', ( req, res ) => {
   const jobId = JobQueue.enqueue( { kind: 'scan', rootId: req.params.id } );
   res.status( 202 ).json( { jobId } );
 } );
