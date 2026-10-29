@@ -17,3 +17,17 @@ function uniqueNames ( names: string[] ) : string[] {
     return res;
   }, [] );
 }
+
+
+export function NameInput ( { label, names, suggestions, onChange }: NameInputProps ) {
+  const [ input, setInput ] = useState( '' );
+  const listId = useId();
+
+
+  const add = ( value = input ) => { onChange( uniqueNames( [ ...names, value ] ) ), setInput( '' ) };
+
+  const onKeyDown = ( e: KeyboardEvent< HTMLInputElement > ) => {
+    if ( e.key === 'Enter' || e.key === ',' ) e.preventDefault(), add();
+    else if ( e.key === 'Backspace' && ! input && names.length ) onChange( names.slice( 0, -1 ) );
+  };
+}
