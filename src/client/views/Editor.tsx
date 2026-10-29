@@ -264,6 +264,12 @@ export function Editor () {
             <span>Custom Metadata</span>
           </h2>
         </div>
+
+        { saveError && (
+          <p role= 'alert' className= 'font-semibold text-red-400'>
+            { saveError }
+          </p>
+        ) }
       </form>
     </div>
   );
