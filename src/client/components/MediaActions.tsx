@@ -24,13 +24,19 @@ const BUTTON =
 
 
 export function MediaActions ( { media }: MediaActionsProps ) {
-  const { canEdit, favorites } = useApi();
+  const { canEdit, favorites, media: mediaApi, jobs, stream } = useApi();
   const { data, loading } = useApiData< boolean >( media.id, () =>
     favorites.has( media.id ).then( res => res.favorite ).catch( () => false )
   );
 
   const [ favoriteOverride, setFavoriteOverride ] = useState< { id: string; value: boolean } | null >( null );
   const [ updating, setUpdating ] = useState( false );
+  const [ menuOpen, setMenuOpen ] = useState( false );
+  const [ metadataOpen, setMetadataOpen ] = useState( false );
+  const [ metadata, setMetadata ] = useState< MediaMetadataRecord[] >( [] );
+  const [ metadataLoading, setMetadataLoading ] = useState( false );
+  const [ downloading, setDownloading ] = useState( false );
+
   const favorite = favoriteOverride?.id === media.id ? favoriteOverride.value : data ?? false;
 
 
