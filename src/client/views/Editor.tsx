@@ -7,8 +7,8 @@ import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { ArrowLeftIcon, PlusIcon, SaveIcon, Trash2Icon } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { ArrowLeftIcon, InfoIcon, PlusIcon, SaveIcon, Trash2Icon } from 'lucide-react';
+import { type SubmitEvent, useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 
@@ -181,6 +181,56 @@ export function Editor () {
           <span>{ saving ? 'Saving …' : 'Save changes' }</span>
         </button>
       </div>
+
+      <form
+        id= 'media-editor'
+        onSubmit= { save }
+        className= 'space-y-8'
+      >
+        <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
+          <h2 className= 'flex items-center gap-3 text-lg font-medium'>
+            <InfoIcon size= { 18 } />
+            <span>Media Information</span>
+          </h2>
+
+          <Field label= 'Title'>
+            <input
+              value= { title }
+              onChange= { e => setTitle( e.target.value ) }
+              className= { INPUT }
+            />
+          </Field>
+
+          <Field label= 'Description'>
+            <textarea
+              value= { description }
+              onChange= { e => setDescription( e.target.value ) }
+              className= { `${ INPUT } min-h-32 resize-y` }
+            />
+          </Field>
+
+          <Field label= 'Creator'>
+            <input
+              value= { creator }
+              onChange= { e => setCreator( e.target.value ) }
+              className= { INPUT }
+            />
+          </Field>
+
+          <Field label= 'Rating'>
+            <input
+              type= 'number'
+              min= '0'
+              max= '10'
+              step= '1'
+              value= { rating }
+              onChange= { e => setRating( e.target.value ) }
+              placeholder= '0–10'
+              className= { INPUT }
+            />
+          </Field>
+        </div>
+      </form>
     </div>
   );
 }
