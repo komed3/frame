@@ -7,7 +7,7 @@ import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { ArrowLeftIcon, Grid2X2PlusIcon, InfoIcon, SaveIcon, TagsIcon } from 'lucide-react';
+import { ArrowLeftIcon, Grid2X2PlusIcon, InfoIcon, PlusIcon, SaveIcon, TagsIcon } from 'lucide-react';
 import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -262,6 +262,16 @@ export function Editor () {
           <h2 className= 'flex items-center gap-3 text-lg font-medium'>
             <Grid2X2PlusIcon size= { 18 } />
             <span>Custom Metadata</span>
+
+            <div className= 'flex-1' />
+
+            <button
+              onClick= { () => setMetadata( [ ...metadata, { key: '', value: '' } ] ) }
+              className= { BUTTON }
+            >
+              <PlusIcon size= { 16 } />
+              <span>Add field</span>
+            </button>
           </h2>
         </div>
 
