@@ -151,6 +151,7 @@ export interface ApiContextValue {
   refreshSession: () => Promise< void >;
   clearError: () => void;
   health: () => Promise< ApiHealth >;
+  env: () => Promise< ApiEnv >;
   media: {
     list: ( options?: MediaListOptions ) => Promise< MediaRecord[] >;
     get: ( id: string ) => Promise< MediaRecord | null >;
