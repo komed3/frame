@@ -62,7 +62,10 @@ export class JobQueue {
 
     const rows = as< JobRow[] >( conn().prepare( `
       ${ SELECT_JOB } ${ conditions.length ? `WHERE ${ conditions.join( ' AND ' ) }` : '' }
-      ORDER BY updated_at DESC, finished_at DESC, created_at DESC, priority DESC, id LIMIT ? OFFSET ?
+      ORDER BY
+        CASE status WHEN 'running' THEN 0 WHEN 'pending' THEN 1 ELSE 2 END,
+        updated_at DESC, finished_at DESC, created_at DESC, priority DESC, id
+      LIMIT ? OFFSET ?
     ` ).all( ...values, limit, offset ) );
 
     return rows.map( JobQueue.mapRow );
