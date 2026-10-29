@@ -2,11 +2,18 @@ import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaBrowser } from '@/src/client/components/MediaBrowser';
 import { MEDIA_PAGE_SIZE } from '@/src/client/components/Pagination';
 import { useApi } from '@/src/client/context/ApiContext';
+import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+
+
+interface MediaPageData {
+  roots: MediaRoot[];
+  result: ApiDirectoryListResult | null;
+}
 
 
 export function Media () {
@@ -14,35 +21,23 @@ export function Media () {
   const { rootId, directoryId } = useParams();
   const navigate = useNavigate();
 
-  const [ rootItems, setRootItems ] = useState< MediaRoot[] >( [] );
-  const [ result, setResult ] = useState< ApiDirectoryListResult | null >( null );
   const [ offset, setOffset ] = useState( 0 );
-  const [ loading, setLoading ] = useState( true );
+  const pageOffset = rootId ? offset : 0;
+  const key = JSON.stringify( [ rootId ?? null, directoryId ?? null, pageOffset ] );
+
+  const { data, loading } = useApiData< MediaPageData >( key, () => rootId
+    ? directories.list( rootId, directoryId ?? null, { limit: MEDIA_PAGE_SIZE, offset: pageOffset } )
+      .then( result => ( { roots: [], result } ) )
+    : roots.list().then( items => ( { roots: items.filter( root => root.enabled ), result: null } ) )
+  );
+
+  const rootItems = data?.roots ?? [];
+  const result = data?.result ?? null;
+
+  const navigateTo = ( path: string ) => { setOffset( 0 ), navigate( path ) };
 
 
   usePageTitle( result?.current?.name ?? result?.root.name ?? 'All Media' );
-
-  useEffect( () => {
-    setLoading( true ), setResult( null );
-    let active = true;
-
-    if ( rootId ) directories.list( rootId, directoryId ?? null, { limit: MEDIA_PAGE_SIZE, offset } )
-      .then( res => { if ( active ) setResult( res ) } )
-      .finally( () => { if ( active ) setLoading( false ) } );
-
-    else {
-      setOffset( 0 );
-
-      roots.list()
-        .then( res => { if ( active ) setRootItems( res.filter( r => r.enabled ) ) } )
-        .finally( () => { if ( active ) setLoading( false ) } );
-    }
-
-    return () => { active = false };
-  }, [ rootId, directoryId, offset, directories, roots ] );
-
-
-  const navigateTo = ( path: string ) => { setOffset( 0 ), navigate( path ) };
 
 
   return (
@@ -60,7 +55,7 @@ export function Media () {
         directories= { result?.directories ?? [] }
         media= { result?.media ?? [] }
         loading= { loading }
-        offset= { offset }
+        offset= { pageOffset }
         limit= { MEDIA_PAGE_SIZE }
         hasNext= { ( result?.media.length ?? 0 ) === MEDIA_PAGE_SIZE }
         onPageChange= { offset => { setOffset( offset ), window.scrollTo( 0, 0 ) } }
