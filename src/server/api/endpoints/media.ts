@@ -25,7 +25,7 @@ media.patch< { id: string } >( '/:id', requireEditorAccess, ( req, res ) => {
 
   Media.update( req.params.id, {
     title: String( title ), description: String( description ), creator: String( creator ),
-    rating: Math.max( 0, Math.min( 10, Number( rating ) ) )
+    rating: rating === null ? null : Math.max( 0, Math.min( 10, Number( rating ) ) ) / 10
   } );
 
   res.status( 204 ).end();
