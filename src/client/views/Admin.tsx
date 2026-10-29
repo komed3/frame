@@ -12,7 +12,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 
 const PAGE_SIZE = 25;
-const REFRESH_INTERVAL = 10000;
+const REFRESH_INTERVAL = 5_000;
 
 const JOB_STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
