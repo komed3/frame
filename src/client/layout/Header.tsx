@@ -1,6 +1,7 @@
 import logo from '@/src/client/assets/logo.svg';
 import { Select, type SelectOption } from '@/src/client/components/Select';
 import { useApi } from '@/src/client/context/ApiContext';
+import { useBodyScrollLock } from '@/src/client/hooks/useBodyScrollLock';
 import type { MediaType } from '@/src/shared/types/media';
 import type { MediaSearchProgress, MediaSearchQueryMode, MediaSearchSort } from '@/src/shared/types/search';
 import {
@@ -126,6 +127,9 @@ export function Header () {
   const close = ( { menu = true, user = true, filter = true } = {} ) => {
     menu && setMenuOpen( false ); user && setUserOpen( false ); filter && setFilterOpen( false );
   };
+
+
+  useBodyScrollLock( menuOpen || userOpen || filterOpen );
 
   useEffect( () => { if ( menuOpen ) close( { menu: false } ) }, [ menuOpen ] );
   useEffect( () => { if ( userOpen ) close( { user: false } ) }, [ userOpen ] );
