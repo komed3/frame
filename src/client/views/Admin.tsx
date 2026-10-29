@@ -7,7 +7,7 @@ import { formatBytes, formatDate, formatNumber } from '@/src/client/utils/format
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { ClockIcon, DatabaseIcon, FolderIcon } from 'lucide-react';
+import { ClockIcon, DatabaseIcon, FolderIcon, Loader2Icon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 
@@ -48,6 +48,9 @@ export function Admin () {
   const [ scanning, setScanning ] = useState( false );
   const [ error, setError ] = useState< string | null >( null );
   const refreshing = useRef( false );
+
+  const running = !! ( stats?.byStatus.pending || stats?.byStatus.running );
+
 
   usePageTitle( 'Server Administration' );
 
@@ -97,13 +100,13 @@ export function Admin () {
 
         <button
           onClick= { scanAll }
-          disabled= { scanning }
+          disabled= { scanning || running }
           className= {
             'px-4 py-2 text-sm font-medium text-slate-900 bg-slate-200 rounded ' +
             'hover:bg-white disabled:opacity-50'
           }
         >
-          { scanning ? 'Starting scan …' : 'Scan all roots' }
+          { running ? 'Active jobs …' : scanning ? 'Starting scan …' : 'Scan all roots' }
         </button>
       </div>
 
@@ -115,7 +118,7 @@ export function Admin () {
 
       <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
         <h2 className= 'flex items-center gap-3 text-lg font-medium'>
-          <ClockIcon size= { 18 } />
+          { running ? <Loader2Icon size= { 18 } className= 'animate-spin' /> : <ClockIcon size= { 18 } /> }
           <span>Background Jobs</span>
         </h2>
 
