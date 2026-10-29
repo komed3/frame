@@ -1,5 +1,5 @@
 import type {
-  ApiAssetRecord, ApiContextValue, ApiDeleteResult, ApiDirectoryListResult, ApiDirectoryTreeResult,
+  Api, ApiAssetRecord, ApiContextValue, ApiDeleteResult, ApiDirectoryListResult, ApiDirectoryTreeResult,
   ApiEnqueueResult, ApiEnv, ApiFavorite, ApiFavoriteAddResult, ApiHealth, ApiLogin, ApiLoginResult,
   ApiMarkerClearResult, ApiPage, ApiPlaylistClearResult, ApiPlaylistContainsResult, ApiPreference,
   ApiPreferences, ApiRequestOptions, ApiRootScanAllResult, ApiRootScanResult, ApiSession
@@ -176,10 +176,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   const e = encodeURIComponent, s = JSON.stringify;
 
 
-  const value = useMemo< ApiContextValue >( () => ( {
-    env, user, token, loading, error, authenticated: user !== null,
-    canEdit: !! env && ( ! env.editorAdminOnly || user?.isAdmin === true ),
-
+  const api = useMemo< Api >( () => ( {
     request, login, logout, refreshSession, clearError,
     health: () => request< ApiHealth >( '/health' ),
 
@@ -315,7 +312,13 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
     database: {
       stats: () => request< DatabaseStats >( '/db/stats' )
     }
-  } ), [ env, user, token, loading, error, request, login, logout, refreshSession, clearError ] );
+  } ), [ request, token, login, logout, refreshSession, clearError ] );
+
+
+  const value = useMemo< ApiContextValue >( () => ( {
+    ...api, env, user, token, loading, error, authenticated: user !== null,
+    canEdit: !! env && ( ! env.editorAdminOnly || user?.isAdmin === true )
+  } ), [ api, env, user, token, loading, error ] );
 
 
   return (
