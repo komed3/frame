@@ -140,6 +140,7 @@ export interface ApiRequestOptions extends RequestInit {
 }
 
 export interface ApiContextValue {
+  env: ApiEnv | null;
   user: ApiSession[ 'user' ] | null;
   token: string | null;
   authenticated: boolean;
@@ -151,7 +152,6 @@ export interface ApiContextValue {
   refreshSession: () => Promise< void >;
   clearError: () => void;
   health: () => Promise< ApiHealth >;
-  env: () => Promise< ApiEnv >;
   media: {
     list: ( options?: MediaListOptions ) => Promise< MediaRecord[] >;
     get: ( id: string ) => Promise< MediaRecord | null >;
