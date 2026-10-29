@@ -224,9 +224,7 @@ export function Editor () {
           <Field label= 'Rating'>
             <input
               type= 'number'
-              min= '0'
-              max= '10'
-              step= '1'
+              min= { 0 } max= { 10 } step= { 1 }
               value= { rating }
               onChange= { e => setRating( e.target.value ) }
               placeholder= '0–10'
