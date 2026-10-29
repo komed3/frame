@@ -11,7 +11,7 @@ interface PaginationProps {
 }
 
 
-export const MEDIA_PAGE_SIZE = 64;
+export const MEDIA_PAGE_SIZE = 72;
 
 
 export function Pagination ( { offset, limit = MEDIA_PAGE_SIZE, itemCount, total, hasNext, onChange }: PaginationProps ) {
