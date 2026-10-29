@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
@@ -19,6 +20,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
   const [ categories, setCategories ] = useState< CategoryRecord[] >( [] );
   const [ tags, setTags ] = useState< TagRecord[] >( [] );
   const [ directory, setDirectory ] = useState< ApiDirectoryListResult | null >( null );
+  const [ loading, setLoading ] = useState( true );
   const [ error, setError ] = useState< string | null >( null );
 
 
@@ -26,7 +28,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
     const controller = new AbortController();
     let active = true;
 
-    setError( null ), setContent( '' );
+    setLoading( true ), setError( null ), setContent( '' );
 
     Promise.all( [
       '' /*stream( media.id, { signal: controller.signal } ).then( res => res.text() )*/,
@@ -40,7 +42,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
       setTags( tags ), setDirectory( directory );
     } ).catch( err => {
       if ( active && ! controller.signal.aborted ) setError( err instanceof Error ? err.message : 'Unable to load text.' )
-    } );
+    } ).finally( () => { if ( active ) setLoading( false ) } );
 
     return () => { active = false; controller.abort() };
   }, [ media.id, media.rootId, media.directoryId, stream, mediaApi, directories ] );
@@ -63,6 +65,24 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
         <h1 className= 'text-2xl font-medium tracking-wide'>
           { media.title || media.fileName }
         </h1>
+      </div>
+
+      <div className= 'flex items-start gap-20'>
+        <div className= 'flex-1 min-w-0'>
+          { loading ? (
+            <Loading size= { 32 } className= 'min-h-64' />
+          ) : error ? (
+            <p role= 'alert' className= 'py-12 text-center text-slate-400'>
+              { error }
+            </p>
+          ) : (
+            <pre className= 'font-sans text-normal whitespace-pre-wrap wrap-break-word leading-relaxed'>
+              { content }
+            </pre>
+          ) }
+        </div>
+
+        <aside className= 'shink-0 w-80' />
       </div>
 
       <div className= 'border-t border-slate-700 pt-6 space-y-8'>
