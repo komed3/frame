@@ -8,7 +8,7 @@ export const jobs = Router();
 
 
 jobs.get( '/stats', ( _, res ) => res.json( JobQueue.getStats() ) );
-jobs.get( '/:id', ( req, res ) => res.json( JobQueue.get( req.params.id ) ) );
+jobs.get< { id: string } >( '/:id', ( req, res ) => res.json( JobQueue.get( req.params.id ) ) );
 
 jobs.get( '/', ( req, res ) => {
   const { status, kind, rootId, mediaId } = req.query;
