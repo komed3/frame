@@ -12,6 +12,7 @@ import {
   ImageIcon, LayersIcon, Loader2Icon, SearchIcon, SquareTextIcon, XIcon
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 
 
 const PAGE_SIZE = 25;
@@ -194,6 +195,7 @@ export function Admin () {
                     <th scope= 'col'>Kind</th>
                     <th scope= 'col'>Status</th>
                     <th scope= 'col'>Created</th>
+                    <th scope= 'col'>Media ID</th>
                     <th scope= 'col'>Details</th>
                   </tr>
                 </thead>
@@ -204,6 +206,13 @@ export function Admin () {
                       <td>{ getKind( job.kind ) }</td>
                       <td>{ getStatus( job.status ) }</td>
                       <td>{ formatDate( job.createdAt ) }</td>
+                      <td>
+                        { ! job.mediaId ? '—' : (
+                          <Link to= { `/watch/${ job.mediaId }` }>
+                            { job.mediaId }
+                          </Link>
+                        ) }
+                      </td>
                       <td className= 'max-w-md wrap-break-words'>
                         { job.error || job.worker || '—' }
                       </td>
