@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
@@ -47,6 +48,10 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
       <div className= 'h-[calc(100vh-64px)] bg-slate-950' />
 
       <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
+        <MediaActions media= { media } />
+
+        <hr className= 'border-dashed border-slate-700' />
+
         <Breadcrumbs
           items= { [
             ...( directory?.breadcrumbs ?? [] ),
