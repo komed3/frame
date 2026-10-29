@@ -1,8 +1,9 @@
 import { MediaRating } from '@/src/client/components/MediaRating';
 import { useApi } from '@/src/client/context/ApiContext';
+import { useApiData } from '@/src/client/hooks/useApiData';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { HeartIcon, ListVideoIcon, SettingsIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 
@@ -13,23 +14,13 @@ interface MediaActionsProps {
 
 export function MediaActions ( { media }: MediaActionsProps ) {
   const { canEdit, favorites } = useApi();
+  const { data, loading } = useApiData< boolean >( media.id, () =>
+    favorites.has( media.id ).then( res => res.favorite ).catch( () => false )
+  );
 
-  const [ favorite, setFavorite ] = useState( false );
-  const [ loading, setLoading ] = useState( true );
+  const [ favoriteOverride, setFavoriteOverride ] = useState< { id: string; value: boolean } | null >( null );
   const [ updating, setUpdating ] = useState( false );
-
-
-  useEffect( () => {
-    setLoading( true );
-    let active = true;
-
-    favorites.has( media.id )
-      .then( res => { if ( active ) setFavorite( res.favorite ) } )
-      .catch( () => { if ( active ) setFavorite( false ) } )
-      .finally( () => { if ( active ) setLoading( false ) } );
-
-    return () => { active = false };
-  }, [ media.id, favorites ] );
+  const favorite = favoriteOverride?.id === media.id ? favoriteOverride.value : data ?? false;
 
 
   const toggleFavorite = async () => {
@@ -40,7 +31,7 @@ export function MediaActions ( { media }: MediaActionsProps ) {
       if ( favorite ) await favorites.remove( media.id );
       else await favorites.add( media.id );
 
-      setFavorite( ! favorite );
+      setFavoriteOverride( { id: media.id, value: ! favorite } );
     } finally {
       setUpdating( false );
     }
