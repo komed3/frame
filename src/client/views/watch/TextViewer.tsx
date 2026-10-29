@@ -24,6 +24,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
   const { stream, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
 
+
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< TextViewerData >( key, async signal => {
     const [ content, categories, tags, directory ] = await Promise.all( [
@@ -39,6 +40,7 @@ export function TextViewer ( { media }: { media: MediaRecord } ) {
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
+
 
   usePageTitle( media.title || media.fileName );
 
