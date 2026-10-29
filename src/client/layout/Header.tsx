@@ -178,7 +178,7 @@ export function Header () {
   return (
     <>
       <header className= 'fixed top-0 inset-x-0 z-99 h-16 bg-slate-700 shadow-lg'>
-        <div className= 'absolute top-1/2 left-4 transform -translate-y-1/2'>
+        <div className= 'absolute top-1/2 left-4 -translate-y-1/2'>
           <Link to= '/'>
             <img
               src= { logo }
@@ -188,7 +188,7 @@ export function Header () {
           </Link>
         </div>
 
-        <div className= 'absolute top-1/2 left-1/2 transform -translate-1/2'>
+        <div className= 'absolute top-1/2 left-1/2 -translate-1/2'>
           <form onSubmit= { handleSearch } className= 'flex items-center gap-6'>
             <div className= 'relative'>
               <input
@@ -226,7 +226,7 @@ export function Header () {
           </form>
         </div>
 
-        <div className= 'absolute top-1/2 right-4 transform -translate-y-1/2'>
+        <div className= 'absolute top-1/2 right-4 -translate-y-1/2'>
           <div className= 'flex items-center gap-2'>
             <div className= 'relative'>
               <button
@@ -243,11 +243,11 @@ export function Header () {
 
               <div
                 className= {
-                  'absolute left-1/2 top-17 transform -translate-x-1/2 shadow-lg transition-all duration-100 delay-75 ease-out ' +
+                  'absolute left-1/2 top-17 -translate-x-1/2 shadow-lg transition-all duration-100 delay-75 ease-out ' +
                   ( userOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
                 }
               >
-                <div className= 'absolute -top-1.5 left-1/2 transform -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+                <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
 
                 <div className= 'relative z-1 w-48 py-4 bg-slate-700 rounded'>
                   { USER.map( ( [ label, url, Icon ] ) => (
@@ -298,8 +298,8 @@ export function Header () {
 
       <div
         className= {
-          'fixed top-16 right-0 bottom-0 z-98 bg-slate-700 py-12 shadow-lg transition-all duration-150 ' +
-          'ease-out delay-75 transform overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
+          'fixed top-16 right-0 bottom-0 z-98 bg-slate-700 py-12 shadow-lg transition-all ' +
+          'duration-150 ease-out delay-75 overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
         }
       >
         <nav>
@@ -323,11 +323,11 @@ export function Header () {
 
       <div
         className= {
-          'fixed left-1/2 top-20 z-99 transform -translate-x-1/2 shadow-lg transition-all duration-100 delay-75 ' +
+          'fixed left-1/2 top-20 z-99 -translate-x-1/2 shadow-lg transition-all duration-100 delay-75 ' +
           'ease-out ' + ( filterOpen ? 'translate-y-0' : 'translate-y-5 opacity-0 pointer-events-none' )
         }
       >
-        <div className= 'absolute -top-1.5 left-1/2 transform -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
+        <div className= 'absolute -top-1.5 left-1/2 -translate-x-1/2 rotate-45 w-3 h-3 bg-slate-700' />
 
         <div className= 'relative z-1 p-6 space-y-6 bg-slate-700 rounded'>
           <div className= 'flex justify-between items-center gap-4'>
