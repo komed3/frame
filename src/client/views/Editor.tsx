@@ -7,7 +7,7 @@ import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { ArrowLeftIcon, InfoIcon, PlusIcon, SaveIcon, Trash2Icon } from 'lucide-react';
+import { ArrowLeftIcon, InfoIcon, PlusIcon, SaveIcon, TagsIcon, Trash2Icon } from 'lucide-react';
 import { type SubmitEvent, useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -233,6 +233,31 @@ export function Editor () {
               className= { INPUT }
             />
           </Field>
+        </div>
+
+        <div className= 'p-6 space-y-5 bg-slate-800 rounded shadow-lg'>
+          <h2 className= 'flex items-center gap-3 text-lg font-medium'>
+            <TagsIcon size= { 18 } />
+            <span>Categories & Tags</span>
+          </h2>
+
+          <NameInput
+            label= 'Categories'
+            names= { categoryNames }
+            suggestions= { data!.allCategories.map( item => item.name ) }
+            onChange= { setCategoryNames }
+          />
+
+          <NameInput
+            label= 'Tags'
+            names= { tagNames }
+            suggestions= { data!.allTags.map( item => item.name ) }
+            onChange= { setTagNames }
+          />
+
+          <p className= 'mt-10 text-xs text-slate-400'>
+            New taxonomies are created automatically when saving.
+          </p>
         </div>
       </form>
     </div>
