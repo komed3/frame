@@ -8,8 +8,8 @@ import type { DatabaseStats } from '@/src/shared/types/database';
 import type { JobKind, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import {
-  AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon,
-  ImageIcon, Loader2Icon, SquareTextIcon, XIcon
+  AudioLinesIcon, CheckIcon, ClockIcon, DatabaseIcon, FolderIcon, GalleryVerticalIcon,
+  ImageIcon, LayersIcon, Loader2Icon, SearchIcon, SquareTextIcon, XIcon
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -19,11 +19,11 @@ const REFRESH_INTERVAL = 5_000;
 
 const JOB_KIND_OPTIONS = [
   { value: '', label: 'All job types' },
-  { value: 'scan', label: 'Scan' },
-  { value: 'metadata', label: 'Metadata' },
-  { value: 'tracks', label: 'Tracks' },
+  { value: 'scan', label: 'Scan', icon: SearchIcon },
+  { value: 'metadata', label: 'Metadata', icon: DatabaseIcon },
+  { value: 'tracks', label: 'Tracks', icon: LayersIcon },
   { value: 'preview', label: 'Preview', icon: ImageIcon },
-  { value: 'frames', label: 'Frames' },
+  { value: 'frames', label: 'Frames', icon: GalleryVerticalIcon },
   { value: 'wave', label: 'Waveform', icon: AudioLinesIcon },
   { value: 'text', label: 'Text', icon: SquareTextIcon }
 ];
