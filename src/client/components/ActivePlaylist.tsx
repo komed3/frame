@@ -71,19 +71,28 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
     if ( entry ) navigate( `/watch/${ entry.id }/${ playlistId }` );
   }, [ entries, navigate, playlistId ] );
 
+  const previous = useCallback( () => {
+    if ( index > 0 ) open( index - 1 );
+    else if ( repeat ) open( entries.length - 1 );
+  }, [ entries.length, index, open, repeat ] );
 
   const next = useCallback( ( auto = false ) => {
     if ( index < 0 || ! entries.length ) return;
     if ( auto && ( ! autoplay || ! [ 'audio', 'video' ].includes( entries[ index ].type ) ) ) return;
 
-    if ( settings.shuffle && entries.length > 1 ) {
+    if ( shuffle && entries.length > 1 ) {
       const choices = entries.map( ( _, i ) => i ).filter( i => i !== index );
       open( choices[ Math.floor( Math.random() * choices.length ) ] );
     }
 
     else if ( index < entries.length - 1 ) open( index + 1 );
-    else if ( settings.repeat ) open( 0 );
-  }, [ autoplay, entries, index, open, settings ] );
+    else if ( repeat ) open( 0 );
+  }, [ autoplay, entries, index, open, repeat, shuffle ] );
+
+
+  const toggleAutoplay = () => { setAutoplay( ! autoplay ), prefs.set( 'PLAYER_AUTOPLAY_NEXT', ! autoplay ) };
+  const toggleRepeat = () => { setRepeat( ! repeat ), prefs.set( 'PLAYER_REPEAT', ! repeat ) };
+  const toggleShuffle = () => { setShuffle( ! shuffle ), prefs.set( 'PLAYER_SHUFFLE', ! shuffle ) };
 
 
   useEffect( () => {
@@ -91,8 +100,53 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
     endedRef.current = ended;
   }, [ ended, next ] );
 
+  useEffect( () => {
+    const move = ( e: PointerEvent ) => {
+      if ( ! drag.current || ! scrollRef.current ) return;
 
-  return data && entries.length > 0 && (
+      const distance = e.clientX - drag.current.x;
+      if ( Math.abs( distance ) > 4 ) drag.current.moved = true, dragged.current = true;
+      if ( drag.current.moved ) scrollRef.current.scrollLeft = drag.current.scrollLeft - distance;
+    };
+
+    const stop = () => drag.current = null;
+
+    window.addEventListener( 'pointermove', move );
+    window.addEventListener( 'pointerup', stop );
+    window.addEventListener( 'pointercancel', stop );
+
+    return () => {
+      window.removeEventListener( 'pointermove', move );
+      window.removeEventListener( 'pointerup', stop );
+      window.removeEventListener( 'pointercancel', stop );
+    };
+  }, [] );
+
+  useEffect( () => {
+    const keydown = ( e: KeyboardEvent ) => {
+      if ( e.altKey || e.ctrlKey || e.metaKey || e.target instanceof HTMLElement && (
+        [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes( e.target.tagName ) || e.target.isContentEditable
+      ) ) return;
+
+      const p = e.preventDefault.bind( e );
+
+      switch ( e.key.toLowerCase() ) {
+        case 'p': p(), previous(); break;
+        case 'n': p(), next(); break;
+        case 'a': p(), toggleAutoplay(); break;
+        case 's': p(), toggleShuffle(); break;
+        case 'r': p(), toggleRepeat(); break;
+      }
+    };
+
+    window.addEventListener( 'keydown', keydown );
+    return () => window.removeEventListener( 'keydown', keydown );
+  }, [ next, previous, autoplay, shuffle, repeat ] );
+
+
+  if ( ! data || ! entries.length ) return null;
+
+  return (
     <div className= 'flex flex-col gap-6 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'>
       <div className= 'flex justify-between items-center gap-4'>
         <Link
