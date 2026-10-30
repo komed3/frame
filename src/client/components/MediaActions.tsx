@@ -200,7 +200,11 @@ export function MediaActions ( { media }: MediaActionsProps ) {
           <span>{ favorite ? 'Favorite' : 'Add to favourites' }</span>
         </button>
 
-        <button className= { BUTTON }>
+        <button
+          aria-expanded= { playlistOpen }
+          onClick= { loadPlaylists }
+          className= { BUTTON }
+        >
           <ListVideoIcon size= { 18 } />
           <span>Playlists</span>
         </button>
