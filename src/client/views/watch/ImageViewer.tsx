@@ -126,6 +126,62 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     setZoom( zoomRef.current ), setView( 'zoom' );
   };
 
+  const handlePointerDown = ( e: React.PointerEvent< HTMLDivElement > ) => {
+    if ( e.button !== 0 || e.target !== imageRef.current ) return;
+
+    const vp = viewportRef.current;
+    if ( ! vp ) return;
+
+    dragRef.current = { active: true, moved: false, x: e.clientX, y: e.clientY, left: vp.scrollLeft, top: vp.scrollTop };
+    setDragging( mode === 'zoom' );
+    e.currentTarget.setPointerCapture( e.pointerId );
+  };
+
+  const handlePointerMove = ( e: React.PointerEvent< HTMLDivElement > ) => {
+    const vp = viewportRef.current, image = imageRef.current;
+    if ( ! vp || ! image ) return;
+
+    if ( dragRef.current.active ) {
+      const dx = e.clientX - dragRef.current.x, dy = e.clientY - dragRef.current.y;
+
+      if ( Math.abs( dx ) + Math.abs( dy ) > 3 ) dragRef.current.moved = true;
+      if ( mode === 'zoom' ) {
+        vp.scrollLeft = dragRef.current.left - dx;
+        vp.scrollTop = dragRef.current.top - dy;
+      }
+    }
+
+    if ( ! magnifier ) return;
+
+    const rect = vp.getBoundingClientRect(), imageRect = image.getBoundingClientRect();
+    const scale = mode === 'zoom' ? imageRect.width / imageSize.width : ( mode === 'fit'
+      ? Math.min( rect.width / imageSize.width, rect.height / imageSize.height )
+      : Math.max( rect.width / imageSize.width, rect.height / imageSize.height ) );
+
+    setPointer( {
+      x: e.clientX - rect.left, y: e.clientY - rect.top,
+      left: imageRect.left - rect.left + ( imageRect.width - imageSize.width * scale ) / 2,
+      top: imageRect.top - rect.top + ( imageRect.height - imageSize.height * scale ) / 2,
+      width: imageSize.width * scale, height: imageSize.height * scale
+    } );
+  };
+
+  const handlePointerUp = () => {
+    const { active, moved } = dragRef.current;
+
+    dragRef.current.active = false;
+    dragRef.current.moved = false;
+    setDragging( false );
+
+    if ( active && ! moved && magnifier ) setMagnifier( c => c === 2 ? 4 : c === 4 ? 8 : 2 );
+  };
+
+  const handlePointerCancel = () => {
+    dragRef.current.active = false;
+    dragRef.current.moved = false;
+    setDragging( false );
+  };
+
 
   return (
     <>
