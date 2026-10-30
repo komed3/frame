@@ -163,21 +163,17 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
 
       <div className= 'flex justify-center items-center gap-3'>
         <button
-          onClick= { () => open( index > 0 ? index - 1 : settings.repeat ? entries.length - 1 : -1 ) }
-          disabled= { index <= 0 && ! settings.repeat }
-          title= 'Previous'
+          onClick= { previous }
+          disabled= { index <= 0 && ! repeat }
+          title= 'Previous [p]'
           className= { BUTTON() }
         >
           <SkipBackIcon size= { 18 } />
         </button>
 
         <button
-          onClick= { () => {
-            const value = ! autoplay;
-            setAutoplay( value );
-            prefs.set( 'PLAYER_AUTOPLAY_NEXT', value );
-          } }
-          title= 'Autoplay'
+          onClick= { toggleAutoplay }
+          title= 'Autoplay [a]'
           aria-pressed= { autoplay }
           className= { BUTTON( autoplay ) }
         >
@@ -186,53 +182,44 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
 
         <button
           onClick= { () => next() }
-          disabled= { index === entries.length - 1 && ! settings.repeat && ! settings.shuffle }
-          title= 'Next'
+          disabled= { index === entries.length - 1 && ! repeat && ! shuffle }
+          title= 'Next [n]'
           className= { BUTTON() }
         >
           <SkipForwardIcon size= { 18 } />
         </button>
 
         <button
-          onClick= { () => setSettings( c => ( { ...c, shuffle: ! c.shuffle } ) ) }
-          title= 'Shuffle'
-          aria-pressed= { settings.shuffle }
-          className= { BUTTON( settings.shuffle ) }
+          onClick= { toggleShuffle }
+          title= 'Shuffle [s]'
+          aria-pressed= { shuffle }
+          className= { BUTTON( shuffle ) }
         >
           <ShuffleIcon size= { 18 } />
         </button>
 
         <button
-          onClick= { () => setSettings( c => ( { ...c, repeat: ! c.repeat } ) ) }
-          title= 'Repeat'
-          aria-pressed= { settings.repeat }
-          className= { BUTTON( settings.repeat ) }
+          onClick= { toggleRepeat }
+          title= 'Repeat [r]'
+          aria-pressed= { repeat }
+          className= { BUTTON( repeat ) }
         >
           <RepeatIcon size= { 18 } />
         </button>
       </div>
 
       <div
+        ref= { scrollRef }
         className= { horizontal
           ? 'w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing'
-          : 'flex flex-col gap-3 max-h-[70vh] overflow-y-auto'
+          : 'flex flex-col gap-3 max-h-[min(60vh,32rem)] overflow-y-auto'
         }
         onPointerDown= { e => {
           if ( ! horizontal || e.pointerType !== 'mouse' || e.button !== 0 ) return;
 
-          drag.current = { x: e.clientX, scrollLeft: e.currentTarget.scrollLeft, moved: false };
           dragged.current = false;
-          e.currentTarget.setPointerCapture( e.pointerId );
+          drag.current = { x: e.clientX, scrollLeft: e.currentTarget.scrollLeft, moved: false };
         } }
-        onPointerMove= { e => {
-          if ( ! drag.current ) return;
-
-          const distance = e.clientX - drag.current.x;
-          if ( Math.abs( distance ) > 4 ) drag.current.moved = true, dragged.current = true;
-          if ( drag.current.moved ) e.currentTarget.scrollLeft = drag.current.scrollLeft - distance;
-        } }
-        onPointerUp= { () => drag.current = null }
-        onPointerCancel= { () => drag.current = null }
         onClickCapture= { e => {
           if ( ! dragged.current ) return;
 
