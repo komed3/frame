@@ -66,6 +66,10 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   const horizontal = orientation === 'horizontal';
 
 
+  useEffect( () => { localStorage.setItem( 'frame.playlist.settings', JSON.stringify( settings ) ) }, [ settings ] );
+  useEffect( () => { prefs.get( 'PLAYER_AUTOPLAY_NEXT' ).then( pref => setAutoplay( pref.value ) ) }, [ prefs ] );
+
+
   return (
     <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
   );
