@@ -6,9 +6,10 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { useBodyScrollLock } from '@/src/client/hooks/useBodyScrollLock';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
+import type { PlaylistRecord } from '@/src/shared/types/playlists';
 import {
-  DatabaseIcon, DownloadIcon, HeartIcon, ListVideoIcon, MoreHorizontalIcon,
-  RefreshCwIcon, SettingsIcon, XIcon
+  CheckIcon, DatabaseIcon, DownloadIcon, HeartIcon, ListVideoIcon, MoreHorizontalIcon,
+  PlusIcon, RefreshCwIcon, SettingsIcon, XIcon
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
