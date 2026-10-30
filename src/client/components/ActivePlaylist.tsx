@@ -1,6 +1,8 @@
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
+import { useKeyControls } from '@/src/client/hooks/useKeyControls';
+import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { PauseIcon, PlayIcon, RepeatIcon, ShuffleIcon, SkipBackIcon, SkipForwardIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -32,12 +34,13 @@ const BUTTON = ( active = false ) =>
 
 
 export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal', ended = false }: ActivePlaylistProps ) {
-  const { media, playlists, prefs } = useApi();
+  const { media, playlists } = useApi();
   const navigate = useNavigate();
 
-  const [ autoplay, setAutoplay ] = useState( false );
-  const [ repeat, setRepeat ] = useState( false );
-  const [ shuffle, setShuffle ] = useState( false );
+  const [ dragging, setDragging ] = useState( false );
+  const [ [ autoplay = false, repeat = false, shuffle = false ], setPref ] = useUserPrefs(
+    [ 'PLAYER_AUTOPLAY_NEXT', 'PLAYER_REPEAT', 'PLAYER_SHUFFLE' ]
+  );
 
   const scrollRef = useRef< HTMLDivElement >( null );
   const drag = useRef< DragState | null >( null );
@@ -57,13 +60,6 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   const entries = data?.entries ?? [];
   const index = entries.findIndex( e => e.id === mediaId );
   const horizontal = orientation === 'horizontal';
-
-
-  useEffect( () => void Promise.all( [
-    prefs.get( 'PLAYER_AUTOPLAY_NEXT' ), prefs.get( 'PLAYER_REPEAT' ), prefs.get( 'PLAYER_SHUFFLE' )
-  ] ).then( ( [ a, r, s ] ) => {
-    setAutoplay( a.value ), setRepeat( r.value ), setShuffle( s.value )
-  } ), [ prefs ] );
 
 
   const open = useCallback( ( nextIndex: number ) => {
@@ -90,10 +86,12 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   }, [ autoplay, entries, index, open, repeat, shuffle ] );
 
 
-  const toggleAutoplay = () => { setAutoplay( ! autoplay ), prefs.set( 'PLAYER_AUTOPLAY_NEXT', ! autoplay ) };
-  const toggleRepeat = () => { setRepeat( ! repeat ), prefs.set( 'PLAYER_REPEAT', ! repeat ) };
-  const toggleShuffle = () => { setShuffle( ! shuffle ), prefs.set( 'PLAYER_SHUFFLE', ! shuffle ) };
+  const toggleAutoplay = () => setPref( 'PLAYER_AUTOPLAY_NEXT', ! autoplay );
+  const toggleRepeat = () => setPref( 'PLAYER_REPEAT', ! repeat );
+  const toggleShuffle = () => setPref( 'PLAYER_SHUFFLE', ! shuffle );
 
+
+  useKeyControls( { p: previous, n: next, a: toggleAutoplay, s: toggleShuffle, r: toggleRepeat } );
 
   useEffect( () => {
     if ( ended && ! endedRef.current ) next( true );
@@ -109,7 +107,7 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
       if ( drag.current.moved ) scrollRef.current.scrollLeft = drag.current.scrollLeft - distance;
     };
 
-    const stop = () => drag.current = null;
+    const stop = () => { drag.current = null, setDragging( false ); };
 
     window.addEventListener( 'pointermove', move );
     window.addEventListener( 'pointerup', stop );
@@ -122,31 +120,8 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
     };
   }, [] );
 
-  useEffect( () => {
-    const keydown = ( e: KeyboardEvent ) => {
-      if ( e.altKey || e.ctrlKey || e.metaKey || e.target instanceof HTMLElement && (
-        [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes( e.target.tagName ) || e.target.isContentEditable
-      ) ) return;
 
-      const p = e.preventDefault.bind( e );
-
-      switch ( e.key.toLowerCase() ) {
-        case 'p': p(), previous(); break;
-        case 'n': p(), next(); break;
-        case 'a': p(), toggleAutoplay(); break;
-        case 's': p(), toggleShuffle(); break;
-        case 'r': p(), toggleRepeat(); break;
-      }
-    };
-
-    window.addEventListener( 'keydown', keydown );
-    return () => window.removeEventListener( 'keydown', keydown );
-  }, [ next, previous, autoplay, shuffle, repeat ] );
-
-
-  if ( ! data || ! entries.length ) return null;
-
-  return (
+  return data && entries.length > 0 && (
     <div className= 'flex flex-col gap-6 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'>
       <div className= 'flex justify-between items-center gap-4'>
         <Link
@@ -211,13 +186,16 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
       <div
         ref= { scrollRef }
         className= { horizontal
-          ? 'w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing'
+          ? 'w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden ' +
+            ( dragging ? 'cursor-grabbing **:cursor-grabbing' : 'cursor-grab **:cursor-grab' )
           : 'flex flex-col gap-3 max-h-[min(60vh,32rem)] overflow-y-auto'
         }
         onPointerDown= { e => {
           if ( ! horizontal || e.pointerType !== 'mouse' || e.button !== 0 ) return;
+
           dragged.current = false;
           drag.current = { x: e.clientX, scrollLeft: e.currentTarget.scrollLeft, moved: false };
+          setDragging( true );
         } }
         onClickCapture= { e => {
           if ( ! dragged.current ) return;
