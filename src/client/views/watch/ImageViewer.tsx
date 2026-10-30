@@ -9,7 +9,10 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { Maximize2Icon, Minimize2Icon, ScanIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
+import {
+  ExpandIcon, Maximize2Icon, Minimize2Icon, MoveIcon, ScanEyeIcon,
+  ScanIcon, ShrinkIcon, ZoomInIcon, ZoomOutIcon
+} from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -48,6 +51,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
 
   const [ mode, setMode ] = useState< 'fit' | 'fill' | 'zoom' >( 'fit' );
   const [ zoom, setZoom ] = useState( 1 );
+  const [ fullscreen, setFullscreen ] = useState( false );
   const [ imageSize, setImageSize ] = useState( { width: media.width || 0, height: media.height || 0 } );
   const [ dragging, setDragging ] = useState( false );
   const [ magnifier, setMagnifier ] = useState< 0 | 2 | 4 | 8 >( 0 );
@@ -86,6 +90,12 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     document.addEventListener( 'keydown', handleKeyDown );
     return () => document.removeEventListener( 'keydown', handleKeyDown );
   }, [ magnifier ] );
+
+  useEffect( () => {
+    const handleFullscreenChange = () => setFullscreen( !! document.fullscreenElement );
+    document.addEventListener( 'fullscreenchange', handleFullscreenChange );
+    return () => document.removeEventListener( 'fullscreenchange', handleFullscreenChange );
+  }, [] );
 
   useEffect( () => {
     const vp = viewportRef.current;
@@ -283,6 +293,33 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
                   </button>
                 </>
               ) }
+
+              <button
+                onClick= { toggleZoom }
+                aria-pressed= { mode === 'zoom' }
+                title= { mode === 'zoom' ? 'Exit zoom mode' : 'Enter zoom mode' }
+                className= { BUTTON + ( mode === 'zoom' ? ' bg-slate-50/10' : '' ) }
+              >
+                <MoveIcon size= { 18 } />
+              </button>
+
+              <button
+                onClick= { () => { setMagnifier( c => c ? 0 : 2 ), setPointer( null ) } }
+                aria-pressed= { magnifier > 0 }
+                title= { magnifier > 0 ? 'Disable magnifier' : 'Enable magnifier' }
+                className= { BUTTON + ( magnifier ? ' bg-slate-50/10' : '' ) }
+              >
+                <ScanEyeIcon size= { 18 } />
+              </button>
+
+              <button
+                onClick= { toggleFullscreen }
+                aria-pressed= { fullscreen }
+                title= 'Toggle fullscreen'
+                className= { BUTTON + ( fullscreen ? ' bg-slate-50/10' : '' ) }
+              >
+                { fullscreen ? <ShrinkIcon size= { 18 } /> : <ExpandIcon size= { 18 } /> }
+              </button>
             </div>
           </>
         ) }
