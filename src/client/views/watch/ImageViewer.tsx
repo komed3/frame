@@ -91,6 +91,8 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
+  const prev = data?.prev ?? null;
+  const next = data?.next ?? null;
 
   useEffect( () => {
     if ( ! data?.image ) return;
