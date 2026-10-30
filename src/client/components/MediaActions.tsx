@@ -284,6 +284,31 @@ export function MediaActions ( { media }: MediaActionsProps ) {
               <XIcon size= { 20 } />
             </button>
           </div>
+
+          <form onSubmit= { createPlaylist } className= 'flex gap-2'>
+            <input
+              value= { playlistName }
+              onChange= { e => setPlaylistName( e.target.value ) }
+              placeholder= 'New playlist'
+              maxLength= { 200 }
+              className= {
+                'flex-1 min-w-0 px-3 py-2 text-sm bg-slate-50/10 border border-slate-500 ' +
+                'rounded focus:outline-none focus:border-slate-400'
+              }
+            />
+
+            <button
+              type= 'submit'
+              disabled= { ! playlistName.trim() || playlistCreating }
+              className= {
+                'flex items-center gap-2 px-4 py-2 text-sm bg-slate-50/10 rounded transition-colors ' +
+                'hover:bg-slate-50/20 disabled:opacity-50 disabled:pointer-events-none'
+              }
+            >
+              <PlusIcon size= { 16 } />
+              <span>Create</span>
+            </button>
+          </form>
         </div>
       ) }
 
