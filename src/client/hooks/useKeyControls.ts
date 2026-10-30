@@ -10,12 +10,13 @@ export function useKeyControls ( controls: KeyControls ) {
 
   useEffect( () => {
     const keydown = ( e: KeyboardEvent ) => {
-      if ( e.altKey || e.ctrlKey || e.metaKey || e.target instanceof HTMLElement && (
+      if ( e.altKey || e.metaKey || e.target instanceof HTMLElement && (
         [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes( e.target.tagName ) ||
         e.target.isContentEditable
       ) ) return;
 
-      const action = controlsRef.current[ e.key.toLowerCase() ];
+      const key = `${ e.ctrlKey ? 'ctrl+' : '' }${ e.key.toLowerCase() }`;
+      const action = controlsRef.current[ key ];
       if ( ! action ) return;
 
       e.preventDefault();
