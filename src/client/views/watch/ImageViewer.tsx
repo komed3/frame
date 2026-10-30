@@ -8,6 +8,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -31,6 +32,21 @@ interface MagnifierPosition {
 export function ImageViewer ( { media }: { media: MediaRecord } ) {
   const { stream, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
+
+
+  const viewerRef = useRef< HTMLDivElement >( null );
+  const viewportRef = useRef< HTMLDivElement >( null );
+  const imageRef = useRef< HTMLImageElement >( null );
+  const zoomRef = useRef( 1 );
+  const dragRef = useRef( { active: false, moved: false, x: 0, y: 0, left: 0, top: 0 } );
+  const wheelRef = useRef( { frame: 0, delta: 0, x: 0, y: 0 } );
+
+  const [ mode, setMode ] = useState< 'fit' | 'fill' | 'zoom' >( 'fit' );
+  const [ zoom, setZoom ] = useState( 1 );
+  const [ imageSize, setImageSize ] = useState( { width: media.width || 0, height: media.height || 0 } );
+  const [ dragging, setDragging ] = useState( false );
+  const [ magnifier, setMagnifier ] = useState< 0 | 2 | 4 | 8 >( 0 );
+  const [ pointer, setPointer ] = useState< MagnifierPosition | null >( null );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
