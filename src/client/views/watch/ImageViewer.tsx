@@ -86,6 +86,19 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   usePageTitle( media.title || media.fileName );
 
 
+  const setView = ( next: 'fit' | 'fill' | 'zoom' ) => {
+    setMode( next ), setPointer( null ), setDragging( false );
+    dragRef.current.active = false;
+  };
+
+  const getFitZoom = () => {
+    const viewport = viewportRef.current;
+    return viewport && imageSize.width && imageSize.height ? Math.min(
+      viewport.clientWidth / imageSize.width, viewport.clientHeight / imageSize.height, 1
+    ) : 1;
+  };
+
+
   return (
     <>
       <div className= 'h-[calc(100vh-64px)] bg-slate-950' />
