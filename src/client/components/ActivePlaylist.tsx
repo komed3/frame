@@ -194,7 +194,29 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
           e.preventDefault(), e.stopPropagation();
           dragged.current = false;
         } }
-      ></div>
+      >
+        <div className= { horizontal ? 'flex w-max min-w-full gap-2' : 'flex flex-col gap-1' }>
+          { entries.map( ( entry, i ) => (
+            <button
+              key= { entry.id }
+              onClick= { () => open( i ) }
+              className= {
+                'shrink-0 flex p-2 text-left rounded-lg transition-colors ' +
+                ( horizontal ? 'flex-col gap-2 w-40 ' : 'items-center gap-4 w-full ' ) +
+                ( i === index ? 'bg-slate-50/10' : 'hover:bg-slate-50/5' )
+              }
+            >
+              <div className= { horizontal ? 'w-full' : 'shrink-0 w-24' }>
+                <MediaThumbnail media= { entry } />
+              </div>
+
+              <span className= { horizontal ? 'w-full text-xs truncate' : 'flex-1 min-w-0 text-sm truncate' }>
+                { entry.title || entry.fileName }
+              </span>
+            </button>
+          ) ) }
+        </div>
+      </div>
     </div>
   );
 }
