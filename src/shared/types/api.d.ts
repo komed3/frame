@@ -148,6 +148,8 @@ export interface Api {
   health: () => Promise< ApiHealth >;
   media: {
     list: ( options?: MediaListOptions ) => Promise< MediaRecord[] >;
+    prev: ( id: string ) => Promise< MediaRecord | null >;
+    next: ( id: string ) => Promise< MediaRecord | null >;
     get: ( id: string ) => Promise< MediaRecord | null >;
     update: ( id: string, data: Pick< MediaRecord, 'title' | 'description' | 'creator' | 'language' | 'rating' > ) => Promise< void >;
     metadata: ( id: string ) => Promise< MediaMetadataRecord[] >;
