@@ -29,7 +29,7 @@ export function MediaThumbnail ( { media, aspectRatio = 'aspect-video' }: MediaT
       ) : (
         <MediaIcon
           type= { media.type }
-          size= { 60 }
+          size= { 36 }
           strokeWidth= { 0.6 }
           className= 'opacity-25'
         />
