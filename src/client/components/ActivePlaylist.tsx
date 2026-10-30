@@ -1,3 +1,4 @@
+import { Loading } from '@/src/client/components/Loading';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
@@ -48,7 +49,7 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   const endedRef = useRef( false );
 
 
-  const { data } = useApiData< ActivePlaylistData >( playlistId, async () => {
+  const { data, loading, error } = useApiData< ActivePlaylistData >( playlistId, async () => {
     const [ playlist, items ] = await Promise.all( [
       playlists.get( playlistId ), playlists.items( playlistId, { limit: 1000, offset: 0 } )
     ] );
@@ -124,7 +125,13 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   }, [] );
 
 
-  return data && entries.length > 0 && (
+  return loading ? (
+    <Loading className= 'h-64' />
+  ) : error ? (
+    <p role= 'alert' className= 'font-semibold text-red-400'>
+      { error }
+    </p>
+  ) : data && entries.length > 0 && (
     <div className= 'flex flex-col gap-6 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'>
       <div className= 'flex justify-between items-center gap-4'>
         <Link
