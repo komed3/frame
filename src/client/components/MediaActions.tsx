@@ -292,8 +292,8 @@ export function MediaActions ( { media }: MediaActionsProps ) {
               placeholder= 'New playlist'
               maxLength= { 200 }
               className= {
-                'flex-1 min-w-0 px-3 py-2 text-sm bg-slate-50/10 border border-slate-500 ' +
-                'rounded focus:outline-none focus:border-slate-400'
+                'flex-1 min-w-0 px-3 py-2 text-sm bg-slate-900 border border-slate-600 ' +
+                'rounded focus:outline-none focus:border-slate-500'
               }
             />
 
@@ -316,7 +316,7 @@ export function MediaActions ( { media }: MediaActionsProps ) {
             </p>
           ) }
 
-          <div className= 'flex-1 min-h-0 overflow-y-auto'>
+          <div className= 'flex-1 min-h-0 space-y-0.5 overflow-y-auto'>
             { playlistLoading ? (
               <Loading className= 'min-h-16 h-full' />
             ) : playlistItems.length ? playlistItems.map( p => {
@@ -326,10 +326,7 @@ export function MediaActions ( { media }: MediaActionsProps ) {
                 <button
                   key= { p.id }
                   onClick= { () => togglePlaylist( p ) }
-                  className= {
-                    'flex items-center gap-3 w-full px-2 py-3 text-left rounded ' +
-                    'cursor-pointer transition-colors hover:bg-slate-50/10'
-                  }
+                  className= 'flex items-center gap-3 w-full py-3 text-left rounded'
                 >
                   <span
                     className= { selected
