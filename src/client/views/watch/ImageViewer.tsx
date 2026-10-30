@@ -245,6 +245,19 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
         { imageUrl && (
           <>
             <div
+              ref= { viewportRef }
+              onPointerDown= { handlePointerDown }
+              onPointerMove= { handlePointerMove }
+              onPointerUp= { handlePointerUp }
+              onPointerCancel= { handlePointerCancel }
+              onPointerLeave= { () => { if ( ! dragRef.current.active ) setPointer( null ) } }
+              className= {
+                `absolute inset-0 overflow-auto ${ mode === 'zoom' ? 'overscroll-none' : 'overscroll-auto' } ` +
+                `${ magnifier ? 'cursor-none' : mode === 'zoom' ? dragging ? 'cursor-grabbing' : 'cursor-grab' : '' }`
+              }
+            ></div>
+
+            <div
               className= {
                 'absolute right-4 bottom-4 z-2 flex items-center gap-1 p-1 rounded-lg ' +
                 'bg-slate-50/10 backdrop-blur'
