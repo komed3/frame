@@ -18,6 +18,15 @@ interface ImageViewerData {
   directory: ApiDirectoryListResult | null;
 }
 
+interface MagnifierPosition {
+  x: number;
+  y: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
 
 export function ImageViewer ( { media }: { media: MediaRecord } ) {
   const { stream, media: mediaApi, directories } = useApi();
