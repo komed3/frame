@@ -102,7 +102,7 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
 
 
   return data && entries.length > 0 && (
-    <div className= 'flex flex-col gap-4 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'>
+    <div className= 'flex flex-col gap-6 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'>
       <div className= 'flex justify-between items-center gap-4'>
         <Link
           to= { `/playlist/${ playlistId }` }
@@ -166,6 +166,35 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
           <RepeatIcon size= { 18 } />
         </button>
       </div>
+
+      <div
+        className= { horizontal
+          ? 'w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing'
+          : 'flex flex-col gap-3 max-h-[70vh] overflow-y-auto'
+        }
+        onPointerDown= { e => {
+          if ( ! horizontal || e.pointerType !== 'mouse' || e.button !== 0 ) return;
+
+          drag.current = { x: e.clientX, scrollLeft: e.currentTarget.scrollLeft, moved: false };
+          dragged.current = false;
+          e.currentTarget.setPointerCapture( e.pointerId );
+        } }
+        onPointerMove= { e => {
+          if ( ! drag.current ) return;
+
+          const distance = e.clientX - drag.current.x;
+          if ( Math.abs( distance ) > 4 ) drag.current.moved = true, dragged.current = true;
+          if ( drag.current.moved ) e.currentTarget.scrollLeft = drag.current.scrollLeft - distance;
+        } }
+        onPointerUp= { () => drag.current = null }
+        onPointerCancel= { () => drag.current = null }
+        onClickCapture= { e => {
+          if ( ! dragged.current ) return;
+
+          e.preventDefault(), e.stopPropagation();
+          dragged.current = false;
+        } }
+      ></div>
     </div>
   );
 }
