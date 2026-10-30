@@ -60,7 +60,7 @@ export function NameInput ( { label, names, suggestions, onChange }: NameInputPr
           onClick= { () => add() }
           className= {
             'shrink-0 flex justify-center items-center gap-2 h-full aspect-square text-sm ' +
-            'bg-slate-50/10 rounded transition-colors duration-100 hover:bg-slate-50/20'
+            'bg-slate-50/10 rounded transition-colors hover:bg-slate-50/20'
           }
         >
           <PlusIcon size= { 16 } />

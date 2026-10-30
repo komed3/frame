@@ -21,11 +21,11 @@ interface MediaActionsProps {
 
 const BUTTON =
   'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
-  'rounded-full transition duration-100 hover:bg-slate-50/20';
+  'rounded-full transition-colors hover:bg-slate-50/20';
 
 const CTX_BUTTON =
   'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors ' +
-  'delay-75 text-sm hover:bg-slate-50/10';
+  'text-sm hover:bg-slate-50/10';
 
 
 export function MediaActions ( { media }: MediaActionsProps ) {

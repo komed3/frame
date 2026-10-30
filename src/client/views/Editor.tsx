@@ -33,7 +33,7 @@ const INPUT =
 
 const BUTTON =
   'flex justify-center items-center gap-2 px-4 py-2 text-sm bg-slate-50/10 rounded ' +
-  'transition-colors duration-100 hover:bg-slate-50/20 disabled:opacity-50';
+  'transition-colors hover:bg-slate-50/20 disabled:opacity-50';
 
 
 function Field ( { label, children }: { label: string; children: ReactNode } ) {

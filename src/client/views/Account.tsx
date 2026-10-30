@@ -54,7 +54,7 @@ export function Account () {
             to= { url }
             className= {
               'flex flex-col justify-center items-center gap-1 pt-4 pb-3 text-center bg-slate-50/10 ' +
-              'rounded shadow-lg transition-colors duration-100 hover:bg-slate-50/20'
+              'rounded shadow-lg transition-colors hover:bg-slate-50/20'
             }
           >
             <Icon size= { 24 } strokeWidth= { 1.6 } />
@@ -66,7 +66,7 @@ export function Account () {
           onClick= { logout }
           className= {
               'flex flex-col justify-center items-center gap-1 pt-4 pb-3 text-center bg-slate-50/10 ' +
-              'rounded shadow-lg transition-colors duration-100 hover:bg-slate-50/20'
+              'rounded shadow-lg transition-colors hover:bg-slate-50/20'
             }
           >
             <LogOutIcon size= { 16 } />

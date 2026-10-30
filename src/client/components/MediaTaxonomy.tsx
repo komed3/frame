@@ -29,7 +29,7 @@ export function MediaTaxonomy ( { type, items, label }: MediaTaxonomyProps ) {
             to= { `/${ type }/${ id }` }
             className= {
               'px-4 py-1.5 text-sm bg-slate-50/10 rounded-full shadow-lg ' +
-              'transition-colors duration-100 hover:bg-slate-50/20'
+              'transition-colors hover:bg-slate-50/20'
             }
           >
             { name }

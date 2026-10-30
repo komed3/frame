@@ -259,7 +259,7 @@ export function Header () {
                       key= { url }
                       to= { url }
                       className= { ( { isActive } ) =>
-                        'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors delay-75 text-sm ' +
+                        'flex items-center gap-3 w-full px-6 py-2 tracking-wider transition-colors text-sm ' +
                         ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
                       }
                     >
@@ -272,7 +272,7 @@ export function Header () {
                     onClick= { logout }
                     className= {
                       'flex items-center gap-3 mt-4 w-full px-6 py-2 tracking-wider transition-colors ' +
-                      'delay-75 text-sm text-amber-300 hover:bg-slate-50/10'
+                      'text-sm text-amber-300 hover:bg-slate-50/10'
                     }
                   >
                     <LogOutIcon size= { 16 } />
@@ -303,7 +303,7 @@ export function Header () {
       <div
         className= {
           'fixed top-16 right-0 bottom-0 z-98 bg-slate-700 py-12 shadow-lg transition-all ' +
-          'duration-150 ease-out delay-75 overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
+          'duration-100 ease-out delay-75 overflow-hidden ' + ( menuOpen ? 'w-80' : 'w-0' )
         }
       >
         <nav>
@@ -312,7 +312,7 @@ export function Header () {
               key= { url }
               to= { url }
               className= { ( { isActive } ) =>
-                'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors delay-75 ' +
+                'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors ' +
                 ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
               }
             >

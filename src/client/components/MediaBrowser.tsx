@@ -54,8 +54,8 @@ function RootGrid ( { roots, onOpenRoot }: RootProps ) {
           key= { root.id }
           onClick= { () => onOpenRoot?.( root ) }
           className= {
-            'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
-            'duration-100 hover:bg-slate-50/10'
+            'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 ' +
+            'rounded transition hover:bg-slate-50/10'
           }
         >
           <FolderIcon size= { 26 } strokeWidth= { 1.4 } />
@@ -77,8 +77,8 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
           key= { directory.id }
           onClick= { () => onOpenDirectory?.( directory ) }
           className= {
-            'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 rounded transition ' +
-            'duration-100 hover:bg-slate-50/10'
+            'flex items-center gap-5 min-w-0 h-16 px-4 bg-slate-50/5 ' +
+            'rounded transition hover:bg-slate-50/10'
           }
         >
           <FolderIcon size= { 26 } strokeWidth= { 1.4 } />
@@ -110,7 +110,7 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
             <span
               className= {
                 'flex-1 min-w-0 text-left text-sm font-medium line-clamp-2 wrap-break-words ' +
-                'transition-colors duration-100 group-hover:text-sky-400'
+                'transition-colors group-hover:text-sky-400'
               }
             >
               { item.title || item.fileName }
@@ -148,12 +148,12 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
             <tr
               key= { `root-${ root.id }` }
               onClick= { () => onOpenRoot?.( root ) }
-              className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
+              className= 'group cursor-pointer *:p-4 transition-colors hover:bg-slate-50/5'
             >
               <td colSpan= { 6 }>
                 <div className= 'flex items-center gap-3 min-w-0'>
                   <FolderIcon size= { 16 } />
-                  <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
+                  <span className= 'truncate transition-colors group-hover:text-sky-400'>
                     { rootName( root ) }
                   </span>
                 </div>
@@ -165,13 +165,13 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
             <tr
               key= { `directory-${ d.id }` }
               onClick= { () => onOpenDirectory?.( d ) }
-              className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
+              className= 'group cursor-pointer *:p-4 transition-colors hover:bg-slate-50/5'
             >
               <td colSpan= { 6 }>
                 <div className= 'flex items-center gap-3 min-w-0'>
                   <FolderIcon size= { 16 } />
 
-                  <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
+                  <span className= 'truncate transition-colors group-hover:text-sky-400'>
                     { d.name }
                   </span>
                 </div>
@@ -183,13 +183,13 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
             <tr
               key= { item.id }
               onClick= { () => onOpenMedia( item ) }
-              className= 'group cursor-pointer *:p-4 transition-colors duration-100 hover:bg-slate-50/5'
+              className= 'group cursor-pointer *:p-4 transition-colors hover:bg-slate-50/5'
             >
               <td>
                 <div className= 'flex items-center gap-3 min-w-0 max-w-[15vw]'>
                   <MediaIcon type= { item.type } size= { 16 } className= 'shrink-0' />
 
-                  <span className= 'truncate transition-colors duration-100 group-hover:text-sky-400'>
+                  <span className= 'truncate transition-colors group-hover:text-sky-400'>
                     { item.title || item.fileName }
                   </span>
                 </div>
