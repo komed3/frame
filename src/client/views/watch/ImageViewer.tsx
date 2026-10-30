@@ -9,7 +9,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { Maximize2Icon, Minimize2Icon } from 'lucide-react';
+import { Maximize2Icon, Minimize2Icon, ScanIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -255,6 +255,34 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
               >
                 <Maximize2Icon size= { 18 } />
               </button>
+
+              <button
+                onClick= { () => { zoomRef.current = 1, setZoom( 1 ), setView( 'zoom' ) } }
+                title= 'Zoom to 100% (1:1)'
+                className= { BUTTON }
+              >
+                <ScanIcon size= { 18 } />
+              </button>
+
+              { mode === 'zoom' && (
+                <>
+                  <button
+                    onClick= { () => changeZoom( 0.8 ) }
+                    title= 'Zoom out'
+                    className= { BUTTON }
+                  >
+                    <ZoomOutIcon size= { 18 } />
+                  </button>
+
+                  <button
+                    onClick= { () => changeZoom( 1.25 ) }
+                    title= 'Zoom in'
+                    className= { BUTTON }
+                  >
+                    <ZoomInIcon size= { 18 } />
+                  </button>
+                </>
+              ) }
             </div>
           </>
         ) }
