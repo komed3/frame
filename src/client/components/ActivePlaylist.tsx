@@ -138,6 +138,33 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
         >
           { autoplay ? <PauseIcon size= { 18 } /> : <PlayIcon size= { 18 } /> }
         </button>
+
+        <button
+          onClick= { () => next() }
+          disabled= { index === entries.length - 1 && ! settings.repeat && ! settings.shuffle }
+          title= 'Next'
+          className= { BUTTON() }
+        >
+          <SkipForwardIcon size= { 18 } />
+        </button>
+
+        <button
+          onClick= { () => setSettings( c => ( { ...c, shuffle: ! c.shuffle } ) ) }
+          title= 'Shuffle'
+          aria-pressed= { settings.shuffle }
+          className= { BUTTON( settings.shuffle ) }
+        >
+          <ShuffleIcon size= { 18 } />
+        </button>
+
+        <button
+          onClick= { () => setSettings( c => ( { ...c, repeat: ! c.repeat } ) ) }
+          title= 'Repeat'
+          aria-pressed= { settings.repeat }
+          className= { BUTTON( settings.repeat ) }
+        >
+          <RepeatIcon size= { 18 } />
+        </button>
       </div>
     </div>
   );
