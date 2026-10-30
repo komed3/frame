@@ -32,6 +32,18 @@ interface DragState {
 
 
 export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal' }: ActivePlaylistProps ) {
+  const { media, playlists, prefs } = useApi();
+  const navigate = useNavigate();
+
+  const [ autoplay, setAutoplay ] = useState( true );
+  const [ settings, setSettings ] = useState< PlaylistSettings >( JSON.parse(
+    localStorage.getItem( 'frame.playlist.settings' ) || '{"shuffle":false,"repeat":false}' )
+  );
+
+  const drag = useRef< DragState | null >( null );
+  const dragged = useRef( false );
+  const endedRef = useRef( false );
+
   return (
     <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
   );
