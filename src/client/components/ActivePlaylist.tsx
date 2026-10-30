@@ -31,7 +31,7 @@ interface DragState {
 }
 
 
-export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal' }: ActivePlaylistProps ) {
+export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal', ended = false }: ActivePlaylistProps ) {
   const { media, playlists, prefs } = useApi();
   const navigate = useNavigate();
 
@@ -88,6 +88,12 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
     else if ( index < entries.length - 1 ) open( index + 1 );
     else if ( settings.repeat ) open( 0 );
   }, [ autoplay, entries, index, open, settings ] );
+
+
+  useEffect( () => {
+    if ( ended && ! endedRef.current ) next( true );
+    endedRef.current = ended;
+  }, [ ended, next ] );
 
 
   return (
