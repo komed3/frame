@@ -348,7 +348,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
             >
               <button
                 onClick= { () => setView( 'fit' ) }
-                title= 'Fit to screen'
+                title= 'Fit to screen [0]'
                 className= { BUTTON }
               >
                 <Minimize2Icon size= { 18 } />
@@ -356,7 +356,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
 
               <button
                 onClick= { () => setView( 'fill' ) }
-                title= 'Fill screen'
+                title= 'Fill screen [f]'
                 className= { BUTTON }
               >
                 <Maximize2Icon size= { 18 } />
@@ -364,7 +364,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
 
               <button
                 onClick= { () => { zoomRef.current = 1, setZoom( 1 ), setView( 'zoom' ) } }
-                title= 'Zoom to 100% (1:1)'
+                title= 'Zoom to 100% (1:1) [1]'
                 className= { BUTTON }
               >
                 <ScanIcon size= { 18 } />
@@ -374,7 +374,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
                 <>
                   <button
                     onClick= { () => changeZoom( 0.8 ) }
-                    title= 'Zoom out'
+                    title= 'Zoom out [-]'
                     className= { BUTTON }
                   >
                     <ZoomOutIcon size= { 18 } />
@@ -382,7 +382,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
 
                   <button
                     onClick= { () => changeZoom( 1.25 ) }
-                    title= 'Zoom in'
+                    title= 'Zoom in [+]'
                     className= { BUTTON }
                   >
                     <ZoomInIcon size= { 18 } />
@@ -393,7 +393,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
               <button
                 onClick= { toggleZoom }
                 aria-pressed= { mode === 'zoom' }
-                title= { mode === 'zoom' ? 'Exit zoom mode' : 'Enter zoom mode' }
+                title= { mode === 'zoom' ? 'Exit zoom mode [z]' : 'Enter zoom mode [z]' }
                 className= { BUTTON + ( mode === 'zoom' ? ' bg-slate-50/10' : '' ) }
               >
                 <MoveIcon size= { 18 } />
@@ -402,7 +402,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
               <button
                 onClick= { () => { setMagnifier( c => c ? 0 : 2 ), setPointer( null ) } }
                 aria-pressed= { magnifier > 0 }
-                title= { magnifier > 0 ? 'Disable magnifier' : 'Enable magnifier' }
+                title= { magnifier > 0 ? 'Disable magnifier [m]' : 'Enable magnifier [m]' }
                 className= { BUTTON + ( magnifier ? ' bg-slate-50/10' : '' ) }
               >
                 <ScanEyeIcon size= { 18 } />
@@ -411,7 +411,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
               <button
                 onClick= { toggleFullscreen }
                 aria-pressed= { fullscreen }
-                title= 'Toggle fullscreen'
+                title= 'Toggle fullscreen [F11]'
                 className= { BUTTON + ( fullscreen ? ' bg-slate-50/10' : '' ) }
               >
                 { fullscreen ? <ShrinkIcon size= { 18 } /> : <ExpandIcon size= { 18 } /> }
