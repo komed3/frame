@@ -9,6 +9,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
+import { Maximize2Icon, Minimize2Icon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -28,6 +29,9 @@ interface MagnifierPosition {
   width: number;
   height: number;
 }
+
+
+const BUTTON = 'p-2 rounded hover:bg-white/20';
 
 
 export function ImageViewer ( { media }: { media: MediaRecord } ) {
@@ -226,6 +230,33 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
           <div className= 'flex justify-center items-center h-full font-semibold text-red-400'>
             { error }
           </div>
+        ) }
+
+        { imageUrl && (
+          <>
+            <div
+              className= {
+                'absolute right-4 bottom-4 z-2 flex items-center gap-1 p-1 rounded-lg ' +
+                'bg-slate-50/10 backdrop-blur'
+              }
+            >
+              <button
+                onClick= { () => setView( 'fit' ) }
+                title= 'Fit to screen'
+                className= { BUTTON }
+              >
+                <Minimize2Icon size= { 18 } />
+              </button>
+
+              <button
+                onClick= { () => setView( 'fill' ) }
+                title= 'Fill screen'
+                className= { BUTTON }
+              >
+                <Maximize2Icon size= { 18 } />
+              </button>
+            </div>
+          </>
         ) }
       </div>
 
