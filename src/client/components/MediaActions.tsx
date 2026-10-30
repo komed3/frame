@@ -267,6 +267,26 @@ export function MediaActions ( { media }: MediaActionsProps ) {
         />
       ) }
 
+      { playlistOpen && (
+        <div
+          className= {
+            'fixed top-1/2 left-1/2 -translate-1/2 z-50 flex flex-col gap-4 w-[90%] max-w-lg ' +
+            'max-h-[70vh] p-5 bg-slate-700 rounded shadow-lg'
+          }
+        >
+          <div className= 'shrink-0 flex justify-between items-center'>
+            <h2 className= 'font-medium'>Playlists</h2>
+
+            <button
+              aria-label= 'Close playlists'
+              onClick= { () => setPlaylistOpen( false ) }
+            >
+              <XIcon size= { 20 } />
+            </button>
+          </div>
+        </div>
+      ) }
+
       { metadataOpen && (
         <div
           className= {
