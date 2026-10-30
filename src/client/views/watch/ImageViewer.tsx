@@ -1,3 +1,4 @@
+import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
@@ -428,6 +429,14 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
 
       <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
         <MediaActions media= { media } />
+
+        { playlistId && (
+          <ActivePlaylist
+            playlistId= { playlistId }
+            mediaId= { media.id }
+            orientation= 'horizontal'
+          />
+        ) }
 
         <hr className= 'border-dashed border-slate-700' />
 

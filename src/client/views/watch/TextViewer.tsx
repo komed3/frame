@@ -1,3 +1,4 @@
+import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
@@ -85,7 +86,15 @@ export function TextViewer ( { media, playlistId }:TextViewerProps ) {
           ) }
         </div>
 
-        <aside className= 'shink-0 w-80' />
+        <aside className= 'shink-0 w-80'>
+          { playlistId && (
+            <ActivePlaylist
+              playlistId= { playlistId }
+              mediaId= { media.id }
+              orientation= 'vertical'
+            />
+          ) }
+        </aside>
       </div>
 
       <hr className= 'border-dashed border-slate-700' />
