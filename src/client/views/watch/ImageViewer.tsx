@@ -255,7 +255,27 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
                 `absolute inset-0 overflow-auto ${ mode === 'zoom' ? 'overscroll-none' : 'overscroll-auto' } ` +
                 `${ magnifier ? 'cursor-none' : mode === 'zoom' ? dragging ? 'cursor-grabbing' : 'cursor-grab' : '' }`
               }
-            ></div>
+            >
+              <div className= { mode === 'zoom' ? 'flex w-max min-w-full h-max min-h-full' : 'contents' }>
+                <img
+                  ref= { imageRef }
+                  src= { imageUrl }
+                  alt= { media.title || media.fileName }
+                  width= { mode === 'zoom' ? Math.round( imageSize.width * zoom ) : undefined }
+                  height= { mode === 'zoom' ? Math.round( imageSize.height * zoom ) : undefined }
+                  onLoad= { e => {
+                    const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
+                    setImageSize( { width, height } );
+                    zoomRef.current = Math.min( viewportRef.current!.clientWidth / width, viewportRef.current!.clientHeight / height, 1 );
+                    setZoom( zoomRef.current );
+                  } }
+                  draggable= { false }
+                  className= { mode === 'zoom' ? 'shrink-0 block m-auto max-w-none' :
+                    `absolute inset-0 w-full h-full ${ mode === 'fit' ? 'object-contain' : 'object-cover' }`
+                  }
+                />
+              </div>
+            </div>
 
             <div
               className= {
