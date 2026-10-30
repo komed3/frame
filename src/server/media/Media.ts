@@ -99,6 +99,35 @@ export class Media {
     return rows.map( row => Media.mapRow( row ) );
   }
 
+  public static adjacent ( id: string, direction: -1 | 1 ) : MediaRecord | null {
+    assertId( id, 'media' );
+
+    const current = Media.get( id );
+    if ( ! current || current.type !== 'image' ) return null;
+
+    const row = as< MediaRow | undefined >( conn().prepare( `
+      WITH ordered AS (
+        SELECT id, ROW_NUMBER() OVER (
+          ORDER BY
+            COALESCE( NULLIF( title, '' ), file_name ) COLLATE NOCASE,
+            file_name COLLATE NOCASE,
+            id
+        ) AS position
+        FROM media
+        WHERE root_id = ?
+          AND directory_id IS ?
+          AND type = 'image'
+          AND available = 1
+      )
+      ${ SELECT_MEDIA }
+      JOIN ordered ON ordered.id = media.id
+      WHERE ordered.position = ( SELECT position FROM ordered WHERE id = ? ) + ?
+      LIMIT 1
+    ` ).get( current.rootId, current.directoryId, id, direction ) );
+
+    return row ? Media.mapRow( row ) : null;
+  }
+
   public static registerFile ( input: MediaFileInput, directoryId: string | null ) : string {
     assertId( input.rootId, 'media root' );
     assertRelativePath( input.path, 'media' );
