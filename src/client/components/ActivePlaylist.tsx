@@ -11,6 +11,23 @@ interface ActivePlaylistProps {
   playlistId: string;
   mediaId: string;
   orientation?: 'horizontal' | 'vertical';
+  ended?: boolean;
+}
+
+interface ActivePlaylistData {
+  name: string;
+  entries: MediaRecord[];
+}
+
+interface PlaylistSettings {
+  shuffle: boolean;
+  repeat: boolean;
+}
+
+interface DragState {
+  x: number;
+  scrollLeft: number;
+  moved: boolean;
 }
 
 
