@@ -294,7 +294,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       contains: ( id, mediaId ) => request< ApiPlaylistContainsResult >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }` ),
       forMedia: ( mediaId, page ) => request< PlaylistRecord[] >( `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) } ),
       next: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next` ),
-      previous: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev` )
+      prev: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev` )
     },
 
     prefs: {
