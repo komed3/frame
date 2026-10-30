@@ -96,7 +96,7 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   }, [ ended, next ] );
 
 
-  return (
-    <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
+  return data && entries.length > 0 && (
+    <div className= 'flex flex-col gap-4 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'></div>
   );
 }
