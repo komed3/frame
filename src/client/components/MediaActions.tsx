@@ -260,9 +260,9 @@ export function MediaActions ( { media }: MediaActionsProps ) {
         </div>
       </div>
 
-      { ( menuOpen || metadataOpen ) && (
+      { ( menuOpen || metadataOpen || playlistOpen ) && (
         <div
-          onClick= { () => { setMenuOpen( false ), setMetadataOpen( false ) } }
+          onClick= { () => { setMenuOpen( false ), setMetadataOpen( false ), setPlaylistOpen( false ) } }
           className= 'fixed inset-0 z-40 bg-slate-900 opacity-50'
         />
       ) }
