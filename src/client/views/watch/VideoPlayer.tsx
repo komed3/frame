@@ -1,7 +1,13 @@
 import type { MediaRecord } from '@/src/shared/types/media';
 
 
-export function VideoPlayer ( { media }: { media: MediaRecord } ) {
+interface VideoPlayerProps {
+  media: MediaRecord;
+  playlistId?: string;
+}
+
+
+export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   return (
     <></>
   );

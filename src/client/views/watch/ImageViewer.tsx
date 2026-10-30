@@ -17,6 +17,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
+interface ImageViewerProps {
+  media: MediaRecord;
+  playlistId?: string;
+}
+
 type MagnifierLevel = 0 | 2 | 4 | 6 | 8;
 
 interface ImageViewerData {
@@ -39,7 +44,7 @@ interface MagnifierPosition {
 const BUTTON = 'p-2 rounded hover:bg-white/20';
 
 
-export function ImageViewer ( { media }: { media: MediaRecord } ) {
+export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
   const { stream, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
 

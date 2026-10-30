@@ -1,7 +1,13 @@
 import type { MediaRecord } from '@/src/shared/types/media';
 
 
-export function AudioPlayer ( { media }: { media: MediaRecord } ) {
+interface AudioPlayerProps {
+  media: MediaRecord;
+  playlistId?: string;
+}
+
+
+export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   return (
     <></>
   );

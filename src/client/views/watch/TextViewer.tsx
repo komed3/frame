@@ -12,6 +12,11 @@ import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import { useNavigate } from 'react-router';
 
 
+interface TextViewerProps {
+  media: MediaRecord;
+  playlistId?: string;
+}
+
 interface TextViewerData {
   content: string;
   categories: CategoryRecord[];
@@ -20,7 +25,7 @@ interface TextViewerData {
 }
 
 
-export function TextViewer ( { media }: { media: MediaRecord } ) {
+export function TextViewer ( { media, playlistId }:TextViewerProps ) {
   const { stream, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
 
