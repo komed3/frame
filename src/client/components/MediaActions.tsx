@@ -30,7 +30,7 @@ const CTX_BUTTON =
 
 
 export function MediaActions ( { media }: MediaActionsProps ) {
-  const { canEdit, favorites, media: mediaApi, jobs, stream } = useApi();
+  const { canEdit, favorites, media: mediaApi, jobs, playlists, stream } = useApi();
   const { data, loading } = useApiData< boolean >( media.id, () =>
     favorites.has( media.id ).then( res => res.favorite ).catch( () => false )
   );
@@ -42,10 +42,18 @@ export function MediaActions ( { media }: MediaActionsProps ) {
   const [ metadata, setMetadata ] = useState< MediaMetadataRecord[] >( [] );
   const [ metadataLoading, setMetadataLoading ] = useState( false );
   const [ downloading, setDownloading ] = useState( false );
+  const [ playlistOpen, setPlaylistOpen ] = useState( false );
+  const [ playlistLoading, setPlaylistLoading ] = useState( false );
+  const [ playlistItems, setPlaylistItems ] = useState< PlaylistRecord[] >( [] );
+  const [ selectedPlaylists, setSelectedPlaylists ] = useState< string[] >( [] );
+  const [ playlistName, setPlaylistName ] = useState( '' );
+  const [ playlistCreating, setPlaylistCreating ] = useState( false );
+  const [ playlistUpdating, setPlaylistUpdating ] = useState< string | null >( null );
+  const [ playlistError, setPlaylistError ] = useState< string | null >( null );
 
   const favorite = favoriteOverride?.id === media.id ? favoriteOverride.value : data ?? false;
 
-  useBodyScrollLock( menuOpen || metadataOpen );
+  useBodyScrollLock( menuOpen || metadataOpen || playlistOpen );
 
 
   const toggleFavorite = async () => {
