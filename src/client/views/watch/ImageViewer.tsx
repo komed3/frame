@@ -31,6 +31,8 @@ interface ImageViewerData {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
+  prev: string | null;
+  next: string | null;
 }
 
 interface MagnifierPosition {
