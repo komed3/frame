@@ -49,7 +49,7 @@ const BUTTON = 'p-2 rounded hover:bg-white/20';
 
 
 export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
-  const { stream, media: mediaApi, directories } = useApi();
+  const { stream, media: mediaApi, directories, playlists } = useApi();
   const navigate = useNavigate();
 
 
@@ -72,14 +72,20 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< ImageViewerData >( key, async signal => {
-    const [ image, categories, tags, directory ] = await Promise.all( [
+    const [ image, categories, tags, directory, prev, next ] = await Promise.all( [
       stream( media.id, { signal } ).then( res => res.blob() ),
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
-      directories.list( media.rootId, media.directoryId ).catch( () => null )
+      directories.list( media.rootId, media.directoryId ).catch( () => null ),
+      playlistId
+        ? playlists.prev( playlistId, media.id ).then( item => item?.mediaId ?? null )
+        : mediaApi.prev( media.id ).then( item => item?.id ?? null ),
+      playlistId
+        ? playlists.next( playlistId, media.id ).then( item => item?.mediaId ?? null )
+        : mediaApi.next( media.id ).then( item => item?.id ?? null )
     ] );
 
-    return { image, categories, tags, directory };
+    return { image, categories, tags, directory, prev, next };
   } );
 
   const categories = data?.categories ?? [];
