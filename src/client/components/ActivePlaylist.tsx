@@ -216,13 +216,11 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
         }
         onPointerDown= { e => {
           if ( ! horizontal || e.pointerType !== 'mouse' || e.button !== 0 ) return;
-
           dragged.current = false;
           drag.current = { x: e.clientX, scrollLeft: e.currentTarget.scrollLeft, moved: false };
         } }
         onClickCapture= { e => {
           if ( ! dragged.current ) return;
-
           e.preventDefault(), e.stopPropagation();
           dragged.current = false;
         } }
@@ -234,7 +232,7 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
               onClick= { () => open( i ) }
               className= {
                 'shrink-0 flex p-2 text-left rounded-lg transition-colors ' +
-                ( horizontal ? 'flex-col gap-2 w-40 ' : 'items-center gap-4 w-full ' ) +
+                ( horizontal ? 'flex-col gap-2 w-46 ' : 'items-center gap-4 w-full ' ) +
                 ( i === index ? 'bg-slate-50/10' : 'hover:bg-slate-50/5' )
               }
             >
