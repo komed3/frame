@@ -116,12 +116,15 @@ export class Media {
         FROM media
         WHERE root_id = ?
           AND directory_id IS ?
-          AND type IS ?
+          AND type = ?
           AND available = 1
       )
       ${ SELECT_MEDIA }
-      JOIN ordered ON ordered.id = media.id
-      WHERE ordered.position = ( SELECT position FROM ordered WHERE id = ? ) + ?
+      WHERE media.id = (
+        SELECT id FROM ordered WHERE position = (
+          SELECT position FROM ordered WHERE id = ?
+        ) + ?
+      )
       LIMIT 1
     ` ).get( current.rootId, current.directoryId, current.type, id, direction ) );
 
