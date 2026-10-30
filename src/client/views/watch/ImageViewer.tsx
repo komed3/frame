@@ -12,8 +12,8 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ExpandIcon, Maximize2Icon, Minimize2Icon, MoveIcon, ScanEyeIcon,
-  ScanIcon, ShrinkIcon, ZoomInIcon, ZoomOutIcon
+  ChevronLeftIcon, ChevronRightIcon, ExpandIcon, Maximize2Icon, Minimize2Icon,
+  MoveIcon, ScanEyeIcon, ScanIcon, ShrinkIcon, ZoomInIcon, ZoomOutIcon
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
