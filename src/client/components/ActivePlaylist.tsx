@@ -44,6 +44,23 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   const dragged = useRef( false );
   const endedRef = useRef( false );
 
+
+  const { data, loading, error } = useApiData< ActivePlaylistData >( playlistId, async () => {
+    const [ playlist, items ] = await Promise.all( [
+      playlists.get( playlistId ), playlists.items( playlistId, { limit: 1000, offset: 0 } )
+    ] );
+
+    const entries = await Promise.all(
+      items.sort( ( a, b ) => a.position - b.position ).map( i => media.get( i.mediaId ) )
+    );
+
+    return {
+      name: playlist?.name ?? '',
+      entries: entries.filter( ( item ): item is MediaRecord => !! item?.available )
+    };
+  } );
+
+
   return (
     <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
   );
