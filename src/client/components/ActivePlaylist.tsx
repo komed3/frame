@@ -76,6 +76,20 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   }, [ entries, navigate, playlistId ] );
 
 
+  const next = useCallback( ( auto = false ) => {
+    if ( index < 0 || ! entries.length ) return;
+    if ( auto && ( ! autoplay || ! [ 'audio', 'video' ].includes( entries[ index ].type ) ) ) return;
+
+    if ( settings.shuffle && entries.length > 1 ) {
+      const choices = entries.map( ( _, i ) => i ).filter( i => i !== index );
+      open( choices[ Math.floor( Math.random() * choices.length ) ] );
+    }
+
+    else if ( index < entries.length - 1 ) open( index + 1 );
+    else if ( settings.repeat ) open( 0 );
+  }, [ autoplay, entries, index, open, settings ] );
+
+
   return (
     <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
   );
