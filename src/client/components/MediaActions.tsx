@@ -315,6 +315,40 @@ export function MediaActions ( { media }: MediaActionsProps ) {
               { playlistError }
             </p>
           ) }
+
+          <div className= 'flex-1 min-h-0 overflow-y-auto'>
+            { playlistLoading ? (
+              <Loading className= 'min-h-16 h-full' />
+            ) : playlistItems.length ? playlistItems.map( p => {
+              const selected = selectedPlaylists.includes( p.id );
+
+              return (
+                <button
+                  key= { p.id }
+                  onClick= { () => togglePlaylist( p ) }
+                  className= {
+                    'flex items-center gap-3 w-full px-2 py-3 text-left rounded ' +
+                    'cursor-pointer transition-colors hover:bg-slate-50/10'
+                  }
+                >
+                  <span
+                    className= { selected
+                      ? 'flex justify-center items-center size-5 text-slate-900 bg-slate-300 rounded'
+                      : 'size-5 border border-slate-400 rounded'
+                    }
+                  >
+                    { selected && <CheckIcon size= { 16 } strokeWidth= { 3 } /> }
+                  </span>
+
+                  <span className= 'flex-1 text-sm'>{ p.name }</span>
+                </button>
+              );
+            } ) : (
+              <p className= 'py-6 text-center text-sm text-slate-400'>
+                No playlists yet.
+              </p>
+            ) }
+          </div>
         </div>
       ) }
 
