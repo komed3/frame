@@ -35,17 +35,17 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   const { media, playlists, prefs } = useApi();
   const navigate = useNavigate();
 
-  const [ autoplay, setAutoplay ] = useState( true );
-  const [ settings, setSettings ] = useState< PlaylistSettings >( JSON.parse(
-    localStorage.getItem( 'frame.playlist.settings' ) || '{"shuffle":false,"repeat":false}' )
-  );
+  const [ autoplay, setAutoplay ] = useState( false );
+  const [ repeat, setRepeat ] = useState( false );
+  const [ shuffle, setShuffle ] = useState( false );
 
+  const scrollRef = useRef< HTMLDivElement >( null );
   const drag = useRef< DragState | null >( null );
   const dragged = useRef( false );
   const endedRef = useRef( false );
 
 
-  const { data, loading, error } = useApiData< ActivePlaylistData >( playlistId, async () => {
+  const { data } = useApiData< ActivePlaylistData >( playlistId, async () => {
     const [ playlist, items ] = await Promise.all( [
       playlists.get( playlistId ), playlists.items( playlistId, { limit: 1000, offset: 0 } )
     ] );
