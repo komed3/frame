@@ -182,6 +182,10 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     setDragging( false );
   };
 
+  const toggleFullscreen = () => {
+    document.fullscreenElement ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
+  };
+
 
   return (
     <>
