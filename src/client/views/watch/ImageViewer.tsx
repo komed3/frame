@@ -8,7 +8,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -61,9 +61,26 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     return { image, categories, tags, directory };
   } );
 
+  const imageUrl = useMemo( () => data?.image ? URL.createObjectURL( data.image ) : '', [ data?.image ] );
+
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
+
+
+  useEffect( () => { if ( imageUrl ) URL.revokeObjectURL( imageUrl ) }, [ imageUrl ] );
+  useEffect( () => cancelAnimationFrame( wheelRef.current.frame ), [] );
+
+  useEffect( () => {
+    const handleKeyDown = ( e: KeyboardEvent ) => {
+      if ( e.key === 'Escape' && magnifier ) setMagnifier( 0 );
+      if ( e.key === 'F11' ) e.preventDefault(), document.fullscreenElement
+        ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
+    };
+
+    document.addEventListener( 'keydown', handleKeyDown );
+    return () => document.removeEventListener( 'keydown', handleKeyDown );
+  }, [ magnifier ] );
 
 
   usePageTitle( media.title || media.fileName );
