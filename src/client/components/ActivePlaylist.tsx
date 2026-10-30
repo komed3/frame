@@ -61,6 +61,11 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   } );
 
 
+  const entries = data?.entries ?? [];
+  const index = entries.findIndex( e => e.id === mediaId );
+  const horizontal = orientation === 'horizontal';
+
+
   return (
     <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
   );
