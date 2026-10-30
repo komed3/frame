@@ -119,6 +119,13 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     } );
   };
 
+  const toggleZoom = () => {
+    if ( mode === 'zoom' ) return setView( 'fit' );
+
+    zoomRef.current = getFitZoom();
+    setZoom( zoomRef.current ), setView( 'zoom' );
+  };
+
 
   return (
     <>
