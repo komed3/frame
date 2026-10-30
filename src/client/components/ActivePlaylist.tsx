@@ -97,6 +97,19 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
 
 
   return data && entries.length > 0 && (
-    <div className= 'flex flex-col gap-4 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'></div>
+    <div className= 'flex flex-col gap-4 w-full max-w-full min-w-0 p-4 bg-slate-50/5 rounded shadow-lg'>
+      <div className= 'flex justify-between items-center gap-4'>
+        <Link
+          to= { `/playlist/${ playlistId }` }
+          className= 'min-w-0 truncate font-medium'
+        >
+          { data.name }
+        </Link>
+
+        <span className= 'shrink-0 text-sm tabular-nums text-slate-400'>
+          { index + 1 } / { entries.length }
+        </span>
+      </div>
+    </div>
   );
 }
