@@ -308,6 +308,32 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
               </div>
             </div>
 
+            <button
+              onClick= { () => navigateAdjacent( prev ) }
+              disabled= { ! prev }
+              title= 'Previous [Ctrl + ←]'
+              aria-label= 'Previous'
+              className= {
+                'absolute top-1/2 left-4 -translate-y-1/2 z-20 p-3 bg-slate-50/10 rounded-full ' +
+                'backdrop-blur hover:bg-slate-50/20 disabled:opacity-20 disabled:pointer-events-none'
+              }
+            >
+              <ChevronLeftIcon size= { 28 } />
+            </button>
+
+            <button
+              onClick= { () => navigateAdjacent( next ) }
+              disabled= { ! next }
+              title= 'Next [Ctrl + →]'
+              aria-label= 'Next'
+              className= {
+                'absolute top-1/2 right-4 -translate-y-1/2 z-20 p-3 bg-slate-50/10 rounded-full ' +
+                'backdrop-blur hover:bg-slate-50/20 disabled:opacity-20 disabled:pointer-events-none'
+              }
+            >
+              <ChevronRightIcon size= { 28 } />
+            </button>
+
             { magnifier > 0 && pointer && (
               <svg
                 className= 'absolute inset-0 z-10 w-full h-full pointer-events-none'
