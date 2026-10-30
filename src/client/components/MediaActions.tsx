@@ -78,6 +78,82 @@ export function MediaActions ( { media }: MediaActionsProps ) {
     finally { setMetadataLoading( false ) }
   };
 
+  const loadPlaylists = async () => {
+    setPlaylistOpen( true ), setPlaylistLoading( true ), setPlaylistError( null );
+
+    try {
+      const [ all, assigned ] = await Promise.all( [ ( async () => {
+        const result: PlaylistRecord[] = [];
+        let offset = 0, page: PlaylistRecord[];
+
+        do {
+          page = await playlists.list( { limit: 100, offset } );
+          result.push( ...page );
+          offset += page.length;
+        } while ( page.length === 100 );
+
+        return result;
+      } )(), ( async () => {
+        const result: PlaylistRecord[] = [];
+        let offset = 0, page: PlaylistRecord[];
+
+        do {
+          page = await playlists.forMedia( media.id, { limit: 100, offset } );
+          result.push( ...page );
+          offset += page.length;
+        } while ( page.length === 100 );
+
+        return result;
+      } )() ] );
+
+      setPlaylistItems( all );
+      setSelectedPlaylists( assigned.map( item => item.id ) );
+    }
+
+    catch ( err ) { setPlaylistError( err instanceof Error ? err.message : 'Could not load playlists.' ) }
+    finally { setPlaylistLoading( false ) }
+  };
+
+  const togglePlaylist = async ( playlist: PlaylistRecord ) => {
+    if ( playlistUpdating ) return;
+    setPlaylistUpdating( playlist.id ), setPlaylistError( null );
+
+    try {
+      if ( selectedPlaylists.includes( playlist.id ) ) {
+        await playlists.remove( playlist.id, media.id );
+        setSelectedPlaylists( current => current.filter( id => id !== playlist.id ) );
+      } else {
+        await playlists.add( playlist.id, media.id );
+        setSelectedPlaylists( current => [ ...current, playlist.id ] );
+      }
+    }
+
+    catch ( err ) { setPlaylistError( err instanceof Error ? err.message : 'Could not update playlist.' ) }
+    finally { setPlaylistUpdating( null ) }
+  };
+
+  const createPlaylist = async ( e: SubmitEvent ) => {
+    e.preventDefault();
+
+    const name = playlistName.trim();
+    if ( ! name || playlistCreating ) return;
+
+    setPlaylistCreating( true ), setPlaylistError( null );
+
+    try {
+      const playlist = await playlists.create( name );
+      if ( ! playlist ) throw new Error( 'Could not create playlist.' );
+      await playlists.add( playlist.id, media.id );
+
+      setPlaylistItems( current => [ playlist, ...current ] );
+      setSelectedPlaylists( current => [ ...current, playlist.id ] );
+      setPlaylistName( '' );
+    }
+
+    catch ( err ) { setPlaylistError( err instanceof Error ? err.message : 'Could not create playlist.' ) }
+    finally { setPlaylistCreating( false ) }
+  };
+
   const rescanMetadata = () => {
     setMenuOpen( false );
     jobs.enqueue( { kind: 'metadata', mediaId: media.id } ).catch( () => {} );
