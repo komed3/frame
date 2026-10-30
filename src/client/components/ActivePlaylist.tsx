@@ -70,6 +70,12 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   useEffect( () => { prefs.get( 'PLAYER_AUTOPLAY_NEXT' ).then( pref => setAutoplay( pref.value ) ) }, [ prefs ] );
 
 
+  const open = useCallback( ( nextIndex: number ) => {
+    const entry = entries[ nextIndex ];
+    if ( entry ) navigate( `/watch/${ entry.id }/${ playlistId }` );
+  }, [ entries, navigate, playlistId ] );
+
+
   return (
     <div className= 'bg-slate-50/10 rounded shadow-lg'></div>
   );
