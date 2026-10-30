@@ -239,9 +239,8 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
     setDragging( false );
   };
 
-  const toggleFullscreen = () => {
-    document.fullscreenElement ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
-  };
+  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
+  const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
 
 
   useKeyControls( {
@@ -255,7 +254,8 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
     arrowup: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollTop -= e.shiftKey ? 160 : 40 ) },
     arrowdown: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollTop += e.shiftKey ? 160 : 40 ) },
     arrowleft: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft -= e.shiftKey ? 160 : 40 ) },
-    arrowright: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft += e.shiftKey ? 160 : 40 ) }
+    arrowright: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft += e.shiftKey ? 160 : 40 ) },
+    'ctrl+arrowleft': () => navigateAdjacent( prev ), 'ctrl+arrowright': () => navigateAdjacent( next )
   } );
 
 
