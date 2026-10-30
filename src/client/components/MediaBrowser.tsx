@@ -284,7 +284,7 @@ export function MediaBrowser ( {
             </p>
           ) }
 
-          { ( ! roots.length || directories.length > 0 || media.length > 0 ) && (
+          { ( roots.length > 0 || directories.length > 0 || media.length > 0 ) && (
             <Pagination
               offset= { offset }
               limit= { limit }
