@@ -28,7 +28,7 @@ interface DragState {
 
 const BUTTON = ( active = false ) =>
   'flex justify-center items-center size-10 rounded-full bg-slate-50/10 disabled:opacity-30 ' +
-  'disabled:pointer-events-none ' + ( active ? 'bg-slate-50/30' : 'hover:bg-slate-50/20' );
+  'disabled:pointer-events-none ' + ( active ? 'bg-slate-50/40' : 'hover:bg-slate-50/20' );
 
 
 export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal', ended = false }: ActivePlaylistProps ) {
