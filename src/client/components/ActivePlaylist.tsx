@@ -31,6 +31,11 @@ interface DragState {
 }
 
 
+const BUTTON = ( active = false ) =>
+  'flex justify-center items-center size-10 rounded-full bg-slate-50/10 hover:bg-slate-50/20 ' +
+  'disabled:opacity-30 disabled:pointer-events-none ' + ( active && 'bg-slate-50/30' );
+
+
 export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal', ended = false }: ActivePlaylistProps ) {
   const { media, playlists, prefs } = useApi();
   const navigate = useNavigate();
@@ -109,6 +114,17 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
         <span className= 'shrink-0 text-sm tabular-nums text-slate-400'>
           { index + 1 } / { entries.length }
         </span>
+      </div>
+
+      <div className= 'flex justify-center items-center gap-3'>
+        <button
+          onClick= { () => open( index > 0 ? index - 1 : settings.repeat ? entries.length - 1 : -1 ) }
+          disabled= { index <= 0 && ! settings.repeat }
+          title= 'Previous'
+          className= { BUTTON() }
+        >
+          <SkipBackIcon size= { 18 } />
+        </button>
       </div>
     </div>
   );
