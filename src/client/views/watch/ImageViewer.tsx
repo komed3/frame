@@ -82,6 +82,32 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     return () => document.removeEventListener( 'keydown', handleKeyDown );
   }, [ magnifier ] );
 
+  useEffect( () => {
+    const vp = viewportRef.current;
+    if ( ! vp ) return;
+
+    const handleWheel = ( e: WheelEvent ) => {
+      if ( mode !== 'zoom' ) return;
+
+      e.preventDefault();
+      wheelRef.current.delta += e.deltaY * ( e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? vp.clientHeight : 1 );
+      wheelRef.current.x = e.clientX - vp.getBoundingClientRect().left;
+      wheelRef.current.y = e.clientY - vp.getBoundingClientRect().top;
+
+      if ( wheelRef.current.frame ) return;
+
+      wheelRef.current.frame = requestAnimationFrame( () => {
+        const { delta, x, y } = wheelRef.current;
+        wheelRef.current.delta = 0;
+        wheelRef.current.frame = 0;
+        changeZoom( Math.exp( -delta * 0.0015 ), x, y );
+      } );
+    };
+
+    vp.addEventListener( 'wheel', handleWheel, { passive: false } );
+    return () => vp.removeEventListener( 'wheel', handleWheel );
+  }, [ mode, zoom, imageSize ] );
+
 
   usePageTitle( media.title || media.fileName );
 
