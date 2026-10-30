@@ -16,7 +16,8 @@ import { Link } from 'react-router';
 
 
 const PAGE_SIZE = 25;
-const REFRESH_INTERVAL = 5_000;
+const ACTIVE_REFRESH_INTERVAL = 500;
+const IDLE_REFRESH_INTERVAL = 30_000;
 
 const JOB_KIND_OPTIONS = [
   { value: '', label: 'All job types' },
@@ -77,6 +78,7 @@ export function Admin () {
   const refreshing = useRef( false );
 
   const running = !! ( stats?.byStatus.pending || stats?.byStatus.running );
+  const refreshInterval = running || scanning ? ACTIVE_REFRESH_INTERVAL : IDLE_REFRESH_INTERVAL;
 
 
   usePageTitle( 'Server Administration' );
@@ -113,9 +115,9 @@ export function Admin () {
 
   useEffect( () => {
     refresh();
-    const timer = window.setInterval( refresh, REFRESH_INTERVAL );
-    return () => window.clearInterval( timer );
-  }, [ refresh ] );
+    const timer = window.setTimeout( refresh, refreshInterval );
+    return () => window.clearTimeout( timer );
+  }, [ refresh, refreshInterval ] );
 
 
   return (
