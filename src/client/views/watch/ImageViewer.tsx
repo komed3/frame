@@ -230,7 +230,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   useEffect( () => {
     const handleKeyDown = ( e: KeyboardEvent ) => {
       const { key, shiftKey, target } = e;
-      const vp = vpRef.current, p = e.preventDefault;
+      const vp = vpRef.current, p = e.preventDefault.bind( e );
 
       if ( target instanceof HTMLElement && (
         target.isContentEditable || [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes( target.tagName )
