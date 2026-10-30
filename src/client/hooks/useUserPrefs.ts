@@ -1,26 +1,31 @@
 import { useApi } from '@/src/client/context/ApiContext';
 import type { PrefName, PrefValue } from '@/src/shared/types/pref';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 
 export function useUserPrefs < K extends PrefName > ( keys: readonly K[] ) {
   const { prefs } = useApi();
+  const keysRef = useRef( keys );
+  keysRef.current = keys;
+
   const [ values, setValues ] = useState< PrefValue< K >[] >( [] );
+  const key = keys.join( '\0' );
+
 
   useEffect( () => {
     let active = true;
 
-    Promise.all( keys.map( key => prefs.get( key ) ) ).then( results => {
+    Promise.all( keysRef.current.map( key => prefs.get( key ) ) ).then( results => {
       if ( active ) setValues( results.map( result => result.value ) );
     } );
 
     return () => { active = false };
-  }, [ keys, prefs ] );
+  }, [ key, prefs ] );
 
   const setPref = useCallback( < P extends K > ( key: P, value: PrefValue< P > ) => {
-    setValues( current => current.map( ( v, i ) => i === keys.indexOf( key ) ? value : v ) );
+    setValues( current => current.map( ( v, i ) => i === keysRef.current.indexOf( key ) ? value : v ) );
     prefs.set( key, value );
-  }, [ keys, prefs ] );
+  }, [ prefs ] );
 
   return [ values, setPref ] as const;
 }
