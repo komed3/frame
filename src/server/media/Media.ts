@@ -116,7 +116,7 @@ export class Media {
         FROM media
         WHERE root_id = ?
           AND directory_id IS ?
-          AND type = ?
+          AND type IS ?
           AND available = 1
       )
       ${ SELECT_MEDIA }
