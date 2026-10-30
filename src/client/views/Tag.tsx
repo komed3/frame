@@ -9,3 +9,9 @@ import type { TagRecord } from '@/src/shared/types/taxonomy';
 import { TagIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
+
+
+interface TagPageData {
+  tag: TagRecord | null;
+  result: MediaSearchResult;
+}
