@@ -7,7 +7,11 @@ interface MediaMetadataProps {
 
 
 export function MediaMetadata ( { items }: MediaMetadataProps ) {
-  return items.length > 0 && (
+  return ! items.length ? (
+    <p className= 'py-16 text-center text-slate-400'>
+      No metadata found.
+    </p>
+  ) : (
     <div className= 'grid grid-cols-2 gap-8'>
       { items.map( ( { id, key, value } ) => (
         <div key= { id } className= 'flex flex-col items-start gap-2'>
