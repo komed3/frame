@@ -19,11 +19,6 @@ interface ActivePlaylistData {
   entries: MediaRecord[];
 }
 
-interface PlaylistSettings {
-  shuffle: boolean;
-  repeat: boolean;
-}
-
 interface DragState {
   x: number;
   scrollLeft: number;
