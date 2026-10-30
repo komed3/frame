@@ -91,7 +91,10 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
   const toggleShuffle = () => setPref( 'PLAYER_SHUFFLE', ! shuffle );
 
 
-  useKeyControls( { p: previous, n: next, a: toggleAutoplay, s: toggleShuffle, r: toggleRepeat } );
+  useKeyControls( {
+    p: previous, n: () => next(), a: toggleAutoplay,
+    s: toggleShuffle, r: toggleRepeat
+  } );
 
   useEffect( () => {
     if ( ended && ! endedRef.current ) next( true );
