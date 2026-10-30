@@ -103,7 +103,7 @@ export class Media {
     assertId( id, 'media' );
 
     const current = Media.get( id );
-    if ( ! current || current.type !== 'image' ) return null;
+    if ( ! current ) return null;
 
     const row = as< MediaRow | undefined >( conn().prepare( `
       WITH ordered AS (
@@ -116,14 +116,14 @@ export class Media {
         FROM media
         WHERE root_id = ?
           AND directory_id IS ?
-          AND type = 'image'
+          AND type = ?
           AND available = 1
       )
       ${ SELECT_MEDIA }
       JOIN ordered ON ordered.id = media.id
       WHERE ordered.position = ( SELECT position FROM ordered WHERE id = ? ) + ?
       LIMIT 1
-    ` ).get( current.rootId, current.directoryId, id, direction ) );
+    ` ).get( current.rootId, current.directoryId, current.type, id, direction ) );
 
     return row ? Media.mapRow( row ) : null;
   }
