@@ -75,7 +75,7 @@ export function Admin () {
   const [ offset, setOffset ] = useState( 0 );
   const [ scanning, setScanning ] = useState( false );
   const [ error, setError ] = useState< string | null >( null );
-  const refreshing = useRef( false );
+  const refreshing = useRef< Promise< void > | null >( null );
 
   const running = !! ( stats?.byStatus.pending || stats?.byStatus.running );
   const refreshInterval = running || scanning ? ACTIVE_REFRESH_INTERVAL : IDLE_REFRESH_INTERVAL;
@@ -84,24 +84,28 @@ export function Admin () {
   usePageTitle( 'Server Administration' );
 
 
-  const refresh = useCallback( async () => {
-    if ( refreshing.current ) return;
-    refreshing.current = true;
+  const refresh = useCallback( () => {
+    if ( refreshing.current ) return refreshing.current;
 
-    try {
-      const [ stats, db, mediaRoots, jobList ] = await Promise.all( [
-        jobs.stats(), database.stats(), roots.list(), jobs.list( {
-          limit: PAGE_SIZE, offset, status: status ? status as JobStatus : undefined,
-          kind: kind ? kind as JobKind : undefined
-        } )
-      ] );
+    const request = ( async () => {
+      try {
+        const [ stats, db, mediaRoots, jobList ] = await Promise.all( [
+          jobs.stats(), database.stats(), roots.list(), jobs.list( {
+            limit: PAGE_SIZE, offset, status: status ? status as JobStatus : undefined,
+            kind: kind ? kind as JobKind : undefined
+          } )
+        ] );
 
-      setStats( stats ), setDb( db ), setMediaRoots( mediaRoots );
-      setJobList( jobList ), setError( null );
-    }
+        setStats( stats ), setDb( db ), setMediaRoots( mediaRoots );
+        setJobList( jobList ), setError( null );
+      }
 
-    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not load server information.' ) }
-    finally { refreshing.current = false }
+      catch ( err ) { setError( err instanceof Error ? err.message : 'Could not load server information.' ) }
+      finally { refreshing.current = null }
+    } )();
+
+    refreshing.current = request;
+    return request;
   }, [ database, jobs, roots, offset, status, kind ] );
 
   const scanAll = async () => {
@@ -114,9 +118,15 @@ export function Admin () {
 
 
   useEffect( () => {
-    refresh();
-    const timer = window.setTimeout( refresh, refreshInterval );
-    return () => window.clearTimeout( timer );
+    let active = true, timer = 0;
+
+    const poll = async () => {
+      await refresh();
+      if ( active ) timer = window.setTimeout( poll, refreshInterval );
+    };
+
+    poll();
+    return () => { active = false, window.clearTimeout( timer ) };
   }, [ refresh, refreshInterval ] );
 
 
