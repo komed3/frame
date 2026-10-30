@@ -219,7 +219,7 @@ export interface Api {
     contains: ( id: string, mediaId: string ) => Promise< ApiPlaylistContainsResult >;
     forMedia: ( mediaId: string, page?: Partial< ApiPage > ) => Promise< PlaylistRecord[] >;
     next: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord | null >;
-    previous: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord | null >;
+    prev: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord | null >;
   };
   prefs: {
     all: () => Promise< ApiPreferences >;
