@@ -17,6 +17,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
+type MagnifierLevel = 0 | 2 | 4 | 6 | 8;
+
 interface ImageViewerData {
   image: Blob;
   categories: CategoryRecord[];
@@ -55,7 +57,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   const [ fullscreen, setFullscreen ] = useState( false );
   const [ imageSize, setImageSize ] = useState( { width: media.width || 0, height: media.height || 0 } );
   const [ dragging, setDragging ] = useState( false );
-  const [ magnifier, setMagnifier ] = useState< 0 | 2 | 4 | 8 >( 0 );
+  const [ magnifier, setMagnifier ] = useState< MagnifierLevel >( 0 );
   const [ pointer, setPointer ] = useState< MagnifierPosition | null >( null );
 
 
@@ -85,17 +87,6 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   }, [ data?.image ] );
 
   useEffect( () => cancelAnimationFrame( wheelRef.current.frame ), [] );
-
-  useEffect( () => {
-    const handleKeyDown = ( e: KeyboardEvent ) => {
-      if ( e.key === 'Escape' && magnifier ) setMagnifier( 0 );
-      if ( e.key === 'F11' ) e.preventDefault(), document.fullscreenElement
-        ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
-    };
-
-    document.addEventListener( 'keydown', handleKeyDown );
-    return () => document.removeEventListener( 'keydown', handleKeyDown );
-  }, [ magnifier ] );
 
   useEffect( () => {
     const handleFullscreenChange = () => setFullscreen( !! document.fullscreenElement );
@@ -220,7 +211,9 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     dragRef.current.moved = false;
     setDragging( false );
 
-    if ( active && ! moved && magnifier ) setMagnifier( c => c === 2 ? 4 : c === 4 ? 8 : 2 );
+    if ( active && ! moved && magnifier ) setMagnifier(
+      c => c === 2 ? 4 : c === 4 ? 6 : c === 6 ? 8 : 2
+    );
   };
 
   const handlePointerCancel = () => {
@@ -232,6 +225,42 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   const toggleFullscreen = () => {
     document.fullscreenElement ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
   };
+
+
+  useEffect( () => {
+    const handleKeyDown = ( e: KeyboardEvent ) => {
+      const { key, shiftKey, target } = e;
+      const vp = vpRef.current, p = e.preventDefault;
+
+      if ( target instanceof HTMLElement && (
+        target.isContentEditable || [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes( target.tagName )
+      ) ) return;
+
+      if ( key === 'F11' ) p(), toggleFullscreen();
+      else if ( key === 'Escape' && magnifier ) setMagnifier( 0 ), setPointer( null );
+      else if ( key === '0' ) p(), setView( 'fit' );
+      else if ( key.toLowerCase() === 'f' ) p(), setView( 'fill' );
+      else if ( key === '1' ) zoomRef.current = 1, setZoom( 1 ), setView( 'zoom' );
+      else if ( key.toLowerCase() === 'z' ) p(), toggleZoom();
+      else if ( key === '+' || key === '=' ) p(), changeZoom( 1.25 );
+      else if ( key === '-' ) p(), changeZoom( 0.8 );
+      else if ( key.toLowerCase() === 'm' ) setMagnifier( c => c ? 0 : 2 ), setPointer( null );
+      else if ( key === '[' ) setMagnifier( c => Math.max( c - 2, 2 ) as MagnifierLevel );
+      else if ( key === ']' ) setMagnifier( c => Math.min( c + 2, 8 ) as MagnifierLevel );
+      else if ( mode === 'zoom' && vp && key.startsWith( 'Arrow' ) ) {
+        p();
+
+        const step = shiftKey ? 160 : 40;
+        if ( key === 'ArrowUp' ) vp.scrollTop -= step;
+        if ( key === 'ArrowDown' ) vp.scrollTop += step;
+        if ( key === 'ArrowLeft' ) vp.scrollLeft -= step;
+        if ( key === 'ArrowRight' ) vp.scrollLeft += step;
+      }
+    };
+
+    document.addEventListener( 'keydown', handleKeyDown );
+    return () => document.removeEventListener( 'keydown', handleKeyDown );
+  }, [ mode, magnifier, imageSize ] );
 
 
   return (
