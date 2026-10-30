@@ -43,7 +43,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
 
 
   const viewerRef = useRef< HTMLDivElement >( null );
-  const viewportRef = useRef< HTMLDivElement >( null );
+  const vpRef = useRef< HTMLDivElement >( null );
   const imageRef = useRef< HTMLImageElement >( null );
   const zoomRef = useRef( 1 );
   const dragRef = useRef( { active: false, moved: false, x: 0, y: 0, left: 0, top: 0 } );
@@ -98,7 +98,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   }, [] );
 
   useEffect( () => {
-    const vp = viewportRef.current;
+    const vp = vpRef.current;
     if ( ! vp ) return;
 
     const handleWheel = ( e: WheelEvent ) => {
@@ -133,14 +133,14 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   };
 
   const getFitZoom = () => {
-    const viewport = viewportRef.current;
+    const viewport = vpRef.current;
     return viewport && imageSize.width && imageSize.height ? Math.min(
       viewport.clientWidth / imageSize.width, viewport.clientHeight / imageSize.height, 1
     ) : 1;
   };
 
   const changeZoom = ( factor: number, x?: number, y?: number ) => {
-    const vp = viewportRef.current, image = imageRef.current;
+    const vp = vpRef.current, image = imageRef.current;
     if ( ! vp || ! image ) return;
 
     const rect = vp.getBoundingClientRect();
@@ -170,7 +170,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   const handlePointerDown = ( e: React.PointerEvent< HTMLDivElement > ) => {
     if ( e.button !== 0 || e.target !== imageRef.current ) return;
 
-    const vp = viewportRef.current;
+    const vp = vpRef.current;
     if ( ! vp ) return;
 
     dragRef.current = { active: true, moved: false, x: e.clientX, y: e.clientY, left: vp.scrollLeft, top: vp.scrollTop };
@@ -179,7 +179,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   };
 
   const handlePointerMove = ( e: React.PointerEvent< HTMLDivElement > ) => {
-    const vp = viewportRef.current, image = imageRef.current;
+    const vp = vpRef.current, image = imageRef.current;
     if ( ! vp || ! image ) return;
 
     if ( dragRef.current.active ) {
@@ -245,7 +245,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
         { imageUrl && (
           <>
             <div
-              ref= { viewportRef }
+              ref= { vpRef }
               onPointerDown= { handlePointerDown }
               onPointerMove= { handlePointerMove }
               onPointerUp= { handlePointerUp }
@@ -266,7 +266,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
                   onLoad= { e => {
                     const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
                     setImageSize( { width, height } );
-                    zoomRef.current = Math.min( viewportRef.current!.clientWidth / width, viewportRef.current!.clientHeight / height, 1 );
+                    zoomRef.current = Math.min( vpRef.current!.clientWidth / width, vpRef.current!.clientHeight / height, 1 );
                     setZoom( zoomRef.current );
                   } }
                   draggable= { false }
@@ -276,6 +276,34 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
                 />
               </div>
             </div>
+
+            { magnifier > 0 && pointer && (
+              <svg
+                className= 'absolute inset-0 z-10 w-full h-full pointer-events-none'
+                viewBox= { `0 0 ${ vpRef.current?.clientWidth || 1 } ${ vpRef.current?.clientHeight || 1 }` }
+              >
+                <defs>
+                  <clipPath id= 'image-magnifier'>
+                    <circle cx= { pointer.x } cy= { pointer.y } r= '120' />
+                  </clipPath>
+                </defs>
+
+                <image
+                  href= { imageUrl }
+                  x= { pointer.x - ( pointer.x - pointer.left ) * magnifier }
+                  y= { pointer.y - ( pointer.y - pointer.top ) * magnifier }
+                  width= { pointer.width * magnifier }
+                  height= { pointer.height * magnifier }
+                  preserveAspectRatio= 'none'
+                  clipPath= 'url(#image-magnifier)'
+                />
+
+                <circle
+                  cx= { pointer.x } cy= { pointer.y } r= '120'
+                  fill= 'none' stroke= 'white' strokeWidth= '2'
+                />
+              </svg>
+            ) }
 
             <div
               className= {
