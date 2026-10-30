@@ -309,6 +309,12 @@ export function MediaActions ( { media }: MediaActionsProps ) {
               <span>Create</span>
             </button>
           </form>
+
+          { playlistError && (
+            <p role= 'alert' className= 'font-semibold text-red-400'>
+              { playlistError }
+            </p>
+          ) }
         </div>
       ) }
 
