@@ -50,24 +50,20 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
       playlists.get( playlistId ), playlists.items( playlistId, { limit: 1000, offset: 0 } )
     ] );
 
-    const entries = await Promise.all(
-      items.sort( ( a, b ) => a.position - b.position ).map( i => media.get( i.mediaId ) )
-    );
-
-    return {
-      name: playlist?.name ?? '',
-      entries: entries.filter( ( item ): item is MediaRecord => !! item?.available )
-    };
+    const entries = await Promise.all( items.sort( ( a, b ) => a.position - b.position ).map( i => media.get( i.mediaId ) ) );
+    return { name: playlist?.name ?? '', entries: entries.filter( ( i ): i is MediaRecord => !! i?.available ) };
   } );
-
 
   const entries = data?.entries ?? [];
   const index = entries.findIndex( e => e.id === mediaId );
   const horizontal = orientation === 'horizontal';
 
 
-  useEffect( () => { localStorage.setItem( 'frame.playlist.settings', JSON.stringify( settings ) ) }, [ settings ] );
-  useEffect( () => { prefs.get( 'PLAYER_AUTOPLAY_NEXT' ).then( pref => setAutoplay( pref.value ) ) }, [ prefs ] );
+  useEffect( () => void Promise.all( [
+    prefs.get( 'PLAYER_AUTOPLAY_NEXT' ), prefs.get( 'PLAYER_REPEAT' ), prefs.get( 'PLAYER_SHUFFLE' )
+  ] ).then( ( [ a, r, s ] ) => {
+    setAutoplay( a.value ), setRepeat( r.value ), setShuffle( s.value )
+  } ), [ prefs ] );
 
 
   const open = useCallback( ( nextIndex: number ) => {
