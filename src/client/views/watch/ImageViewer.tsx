@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
@@ -215,7 +216,18 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
 
   return (
     <>
-      <div className= 'h-[calc(100vh-64px)] bg-slate-950' />
+      <div
+        ref= { viewerRef }
+        className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'
+      >
+        { loading && <Loading className= 'h-full' /> }
+
+        { error && (
+          <div className= 'flex justify-center items-center h-full font-semibold text-red-400'>
+            { error }
+          </div>
+        ) }
+      </div>
 
       <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
         <MediaActions media= { media } />
