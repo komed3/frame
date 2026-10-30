@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 
-type KeyControls = Record< string, () => void >;
+type KeyControls = Record< string, ( e: KeyboardEvent ) => void >;
 
 
 export function useKeyControls ( controls: KeyControls ) {
@@ -19,7 +19,7 @@ export function useKeyControls ( controls: KeyControls ) {
       if ( ! action ) return;
 
       e.preventDefault();
-      action();
+      action( e );
     };
 
     window.addEventListener( 'keydown', keydown );
