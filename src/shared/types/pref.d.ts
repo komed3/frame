@@ -3,6 +3,8 @@ export interface PrefSchema {
   PLAYER_MUTED: boolean;
   PLAYER_PLAYBACK_RATE: number;
   PLAYER_AUTOPLAY_NEXT: boolean;
+  PLAYER_SHUFFLE: boolean;
+  PLAYER_REPEAT: boolean;
   PLAYER_SUBTITLE_MODE: 'auto' | 'on' | 'off';
 }
 
