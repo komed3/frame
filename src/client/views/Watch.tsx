@@ -12,8 +12,8 @@ import { useParams } from 'react-router';
 
 
 export function Watch () {
+  const { id, playlistId } = useParams();
   const { media } = useApi();
-  const { id } = useParams();
 
   const { data, loading, error } = useApiData< MediaRecord | null >( id ?? '', () => id
     ? media.get( id ).then( res => res?.available && res.type !== 'other' ? res : null )
@@ -28,10 +28,10 @@ export function Watch () {
   if ( error || ! data ) return <NotFound />;
 
   switch ( data.type ) {
-    case 'video': return <VideoPlayer media= { data } />;
-    case 'audio': return <AudioPlayer media= { data } />;
-    case 'image': return <ImageViewer media= { data } />;
-    case 'text': return <TextViewer media= { data } />;
+    case 'video': return <VideoPlayer media= { data } playlistId= { playlistId } />;
+    case 'audio': return <AudioPlayer media= { data } playlistId= { playlistId } />;
+    case 'image': return <ImageViewer media= { data } playlistId= { playlistId } />;
+    case 'text': return <TextViewer media= { data } playlistId= { playlistId } />;
 
     default: return <NotFound />;
   }
