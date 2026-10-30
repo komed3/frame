@@ -32,8 +32,8 @@ interface DragState {
 
 
 const BUTTON = ( active = false ) =>
-  'flex justify-center items-center size-10 rounded-full bg-slate-50/10 hover:bg-slate-50/20 ' +
-  'disabled:opacity-30 disabled:pointer-events-none ' + ( active && 'bg-slate-50/30' );
+  'flex justify-center items-center size-10 rounded-full bg-slate-50/10 disabled:opacity-30 ' +
+  'disabled:pointer-events-none ' + ( active ? 'bg-slate-50/30' : 'hover:bg-slate-50/20' );
 
 
 export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizontal', ended = false }: ActivePlaylistProps ) {
@@ -124,6 +124,19 @@ export function ActivePlaylist ( { playlistId, mediaId, orientation = 'horizonta
           className= { BUTTON() }
         >
           <SkipBackIcon size= { 18 } />
+        </button>
+
+        <button
+          onClick= { () => {
+            const value = ! autoplay;
+            setAutoplay( value );
+            prefs.set( 'PLAYER_AUTOPLAY_NEXT', value );
+          } }
+          title= 'Autoplay'
+          aria-pressed= { autoplay }
+          className= { BUTTON( autoplay ) }
+        >
+          { autoplay ? <PauseIcon size= { 18 } /> : <PlayIcon size= { 18 } /> }
         </button>
       </div>
     </div>
