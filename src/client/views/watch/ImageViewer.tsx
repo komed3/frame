@@ -98,6 +98,27 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     ) : 1;
   };
 
+  const changeZoom = ( factor: number, x?: number, y?: number ) => {
+    const vp = viewportRef.current, image = imageRef.current;
+    if ( ! vp || ! image ) return;
+
+    const rect = vp.getBoundingClientRect();
+    const imageRect = image.getBoundingClientRect();
+    const base = mode === 'zoom' ? zoomRef.current : getFitZoom();
+    const next = Math.max( 0.05, Math.min( 32, base * factor ) );
+    const px = x ?? rect.width / 2, py = y ?? rect.height / 2;
+    const imageX = ( px - imageRect.left + rect.left ) / base;
+    const imageY = ( py - imageRect.top + rect.top ) / base;
+
+    zoomRef.current = next;
+    setZoom( next ), setMode( 'zoom' );
+
+    requestAnimationFrame( () => {
+      vp.scrollLeft = Math.max( ( vp.clientWidth - imageSize.width * next ) / 2, 0 ) + imageX * next - px;
+      vp.scrollTop = Math.max( ( vp.clientHeight - imageSize.height * next ) / 2, 0 ) + imageY * next - py;
+    } );
+  };
+
 
   return (
     <>
