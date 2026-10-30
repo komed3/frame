@@ -11,7 +11,7 @@ import {
   CheckIcon, DatabaseIcon, DownloadIcon, HeartIcon, ListVideoIcon, MoreHorizontalIcon,
   PlusIcon, RefreshCwIcon, SettingsIcon, XIcon
 } from 'lucide-react';
-import { useState } from 'react';
+import { type SubmitEvent, useState } from 'react';
 import { Link } from 'react-router';
 
 
