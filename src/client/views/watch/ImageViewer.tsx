@@ -6,6 +6,7 @@ import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
+import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -233,40 +234,19 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
   };
 
 
-  useEffect( () => {
-    const handleKeyDown = ( e: KeyboardEvent ) => {
-      const { key, shiftKey, target } = e;
-      const vp = vpRef.current, p = e.preventDefault.bind( e );
-
-      if ( target instanceof HTMLElement && (
-        target.isContentEditable || [ 'INPUT', 'TEXTAREA', 'SELECT' ].includes( target.tagName )
-      ) ) return;
-
-      if ( key === 'F11' ) p(), toggleFullscreen();
-      else if ( key === 'Escape' && magnifier ) setMagnifier( 0 ), setPointer( null );
-      else if ( key === '0' ) p(), setView( 'fit' );
-      else if ( key.toLowerCase() === 'f' ) p(), setView( 'fill' );
-      else if ( key === '1' ) zoomRef.current = 1, setZoom( 1 ), setView( 'zoom' );
-      else if ( key.toLowerCase() === 'z' ) p(), toggleZoom();
-      else if ( key === '+' || key === '=' ) p(), changeZoom( 1.25 );
-      else if ( key === '-' ) p(), changeZoom( 0.8 );
-      else if ( key.toLowerCase() === 'm' ) setMagnifier( c => c ? 0 : 2 ), setPointer( null );
-      else if ( key === '[' ) setMagnifier( c => Math.max( c - 2, 2 ) as MagnifierLevel );
-      else if ( key === ']' ) setMagnifier( c => Math.min( c + 2, 8 ) as MagnifierLevel );
-      else if ( mode === 'zoom' && vp && key.startsWith( 'Arrow' ) ) {
-        p();
-
-        const step = shiftKey ? 160 : 40;
-        if ( key === 'ArrowUp' ) vp.scrollTop -= step;
-        if ( key === 'ArrowDown' ) vp.scrollTop += step;
-        if ( key === 'ArrowLeft' ) vp.scrollLeft -= step;
-        if ( key === 'ArrowRight' ) vp.scrollLeft += step;
-      }
-    };
-
-    document.addEventListener( 'keydown', handleKeyDown );
-    return () => document.removeEventListener( 'keydown', handleKeyDown );
-  }, [ mode, magnifier, imageSize ] );
+  useKeyControls( {
+    f11: toggleFullscreen, escape: () => { if ( magnifier ) setMagnifier( 0 ), setPointer( null ) },
+    '0': () => setView( 'fit' ), f: () => setView( 'fill' ),
+    '1': () => { zoomRef.current = 1, setZoom( 1 ), setView( 'zoom' ) },
+    z: toggleZoom, '+': () => changeZoom( 1.25 ), '=': () => changeZoom( 1.25 ), '-': () => changeZoom( 0.8 ),
+    m: () => { setMagnifier( c => c ? 0 : 2 ), setPointer( null ) },
+    '[': () => setMagnifier( c => Math.max( c - 2, 2 ) as MagnifierLevel ),
+    ']': () => setMagnifier( c => Math.min( c + 2, 8 ) as MagnifierLevel ),
+    arrowup: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollTop -= e.shiftKey ? 160 : 40 ) },
+    arrowdown: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollTop += e.shiftKey ? 160 : 40 ) },
+    arrowleft: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft -= e.shiftKey ? 160 : 40 ) },
+    arrowright: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft += e.shiftKey ? 160 : 40 ) }
+  } );
 
 
   return (
