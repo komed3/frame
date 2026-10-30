@@ -16,6 +16,7 @@ export function Routing () {
       <Route path= '/all' element= { <Media /> } />
       <Route path= '/search' element= { <Search /> } />
       <Route path= '/watch/:id' element= { <Watch /> } />
+      <Route path= '/watch/:id/:playlistId' element= { <Watch /> } />
       <Route path= '/edit/:id' element= { <Editor /> } />
 
       <Route path= '/me' element= { <Account /> } />
