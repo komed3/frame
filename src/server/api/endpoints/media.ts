@@ -19,6 +19,8 @@ media.get< { id: string } >( '/:id', ( req, res ) => res.json( Media.get( req.pa
 media.get< { id: string } >( '/:id/metadata', ( req, res ) => res.json( MediaMetadata.list( req.params.id ) ) );
 media.get< { id: string } >( '/:id/tags', ( req, res ) => res.json( MediaTaxonomy.getMediaTags( req.params.id ) ) );
 media.get< { id: string } >( '/:id/categories', ( req, res ) => res.json( MediaTaxonomy.getMediaCategories( req.params.id ) ) );
+media.get< { id: string } >( '/:id/prev', ( req, res ) => res.json( Media.adjacent( req.params.id, -1 ) ) );
+media.get< { id: string } >( '/:id/next', ( req, res ) => res.json( Media.adjacent( req.params.id, 1 ) ) );
 
 media.patch< { id: string } >( '/:id', requireEditorAccess, ( req, res ) => {
   const { title, description, creator, language, rating } = req.body ?? {};
