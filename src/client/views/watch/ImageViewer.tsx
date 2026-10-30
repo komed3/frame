@@ -13,7 +13,7 @@ import {
   ExpandIcon, Maximize2Icon, Minimize2Icon, MoveIcon, ScanEyeIcon,
   ScanIcon, ShrinkIcon, ZoomInIcon, ZoomOutIcon
 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -49,6 +49,7 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
   const dragRef = useRef( { active: false, moved: false, x: 0, y: 0, left: 0, top: 0 } );
   const wheelRef = useRef( { frame: 0, delta: 0, x: 0, y: 0 } );
 
+  const [ imageUrl, setImageUrl ] = useState( '' );
   const [ mode, setMode ] = useState< 'fit' | 'fill' | 'zoom' >( 'fit' );
   const [ zoom, setZoom ] = useState( 1 );
   const [ fullscreen, setFullscreen ] = useState( false );
@@ -70,14 +71,19 @@ export function ImageViewer ( { media }: { media: MediaRecord } ) {
     return { image, categories, tags, directory };
   } );
 
-  const imageUrl = useMemo( () => data?.image ? URL.createObjectURL( data.image ) : '', [ data?.image ] );
-
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
 
+  useEffect( () => {
+    if ( ! data?.image ) return;
 
-  useEffect( () => { if ( imageUrl ) URL.revokeObjectURL( imageUrl ) }, [ imageUrl ] );
+    const url = URL.createObjectURL( data.image );
+    setImageUrl( url );
+
+    return () => URL.revokeObjectURL( url );
+  }, [ data?.image ] );
+
   useEffect( () => cancelAnimationFrame( wheelRef.current.frame ), [] );
 
   useEffect( () => {
