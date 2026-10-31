@@ -213,8 +213,8 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   const displayDuration = duration || ( media.durationMs ? media.durationMs / 1000 : 0 );
   const timeLabel = remaining
-    ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) || '0:00' }`
-    : formatDuration( currentTime * 1000 ) || '0:00';
+    ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) }`
+    : formatDuration( currentTime * 1000 );
 
 
   return (
