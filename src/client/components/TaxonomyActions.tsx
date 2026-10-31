@@ -1,11 +1,15 @@
+import { NameInput } from '@/src/client/components/NameInput';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useBodyScrollLock } from '@/src/client/hooks/useBodyScrollLock';
+import type { CategoryRecord } from '@/src/shared/types/taxonomy';
 import { ArrowRightLeftIcon, CheckIcon, SettingsIcon, TrashIcon, XIcon } from 'lucide-react';
 import { type SubmitEvent, useState } from 'react';
 
 
 interface TaxonomyActionsProps {
   kind: 'category' | 'tag';
+  id: string;
+  parentId?: string | null;
   name: string;
   onRename: ( name: string ) => Promise< void >;
   onDelete: () => Promise< void >;
@@ -22,30 +26,78 @@ const ACTION_BUTTON =
   'hover:bg-slate-50/20 disabled:opacity-50 disabled:pointer-events-none';
 
 
-export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {
-  const { canEdit } = useApi();
+function getDescendants ( categories: CategoryRecord[], id: string ): string[] {
+  const descendants: string[] = [], parents = [ id ];
+
+  while ( parents.length ) {
+    const parentId = parents.pop()!;
+
+    categories.forEach( category => {
+      if ( category.parentId !== parentId ) return;
+      descendants.push( category.id ), parents.push( category.id );
+    } );
+  }
+
+  return descendants;
+}
+
+
+export function TaxonomyActions ( { kind, id, parentId = null, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {
+  const { canEdit, categories } = useApi();
 
   const [ open, setOpen ] = useState( false );
   const [ value, setValue ] = useState( name );
+  const [ parent, setParent ] = useState< string[] >( [] );
+  const [ categoryItems, setCategoryItems ] = useState< CategoryRecord[] >( [] );
   const [ error, setError ] = useState< string | null >( null );
   const [ saving, setSaving ] = useState( false );
 
 
   useBodyScrollLock( open );
 
-  const close = () => { if ( saving ) return; setOpen( false ), setError( null ), setValue( name ) };
-  const edit = () => { setValue( name ), setError( null ), setOpen( true ) };
+  const close = () => {
+    if ( saving ) return;
+
+    setOpen( false ), setError( null ), setValue( name );
+    setParent( [] );
+  };
+
+  const edit = async () => {
+    setValue( name ), setError( null );
+
+    if ( kind === 'category' ) {
+      try {
+        const items = await categories.list(), descendants = getDescendants( items, id );
+        setCategoryItems( items.filter( item => item.id !== id && ! descendants.includes( item.id ) ) );
+
+        const currentParent = items.find( item => item.id === parentId );
+        setParent( currentParent ? [ currentParent.name ] : [] );
+      } catch ( err ) {
+        setError( err instanceof Error ? err.message : 'Could not load categories.' );
+      }
+    }
+
+    setOpen( true );
+  };
 
   const save = async ( e: SubmitEvent ) => {
     e.preventDefault();
 
     const next = value.trim();
-    if ( ! next || next === name || saving ) return;
+    const selectedParent = categoryItems.find( item => item.name === parent[ 0 ] )?.id ?? null;
+
+    if ( ! next || saving ) return;
+    if ( next === name && ( kind !== 'category' || selectedParent === parentId ) ) return;
 
     setSaving( true ), setError( null );
 
-    try { await onRename( next ), setOpen( false ) }
-    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not rename entry.' ) }
+    try {
+      if ( next !== name ) await onRename( next );
+      if ( kind === 'category' && selectedParent !== parentId ) await categories.setParent( id, selectedParent );
+      setOpen( false );
+    }
+
+    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not update entry.' ) }
     finally { setSaving( false ) }
   };
 
@@ -149,6 +201,15 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
                 }
               />
 
+              { kind === 'category' && (
+                <NameInput
+                  label= 'Parent category'
+                  names= { parent }
+                  suggestions= { categoryItems.map( item => item.name ) }
+                  onChange= { names => setParent( names.slice( -1 ) ) }
+                />
+              ) }
+
               { error && (
                 <p role= 'alert' className= 'text-sm text-red-400'>
                   { error }
@@ -166,7 +227,9 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
 
                 <button
                   type= 'submit'
-                  disabled= { ! value.trim() || value.trim() === name || saving }
+                  disabled= { ! value.trim() || ( value.trim() === name && ( kind !== 'category' || (
+                    categoryItems.find( item => item.name === parent[ 0 ] )?.id ?? null
+                  ) === parentId ) ) || saving }
                   className= { ACTION_BUTTON + ' bg-slate-50/20 hover:bg-slate-50/30' }
                 >
                   <CheckIcon size= { 16 } />
