@@ -35,6 +35,27 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
       const count = samples.length / 2, points = Math.min( width, 1200 );
       const center = height / 2, played = currentTime / duration;
       const preview = hover === null ? played : Math.max( played, hover );
+
+      for ( let x = 0; x < points; x++ ) {
+        const from = Math.floor( x / points * count );
+        const to = Math.min( count, Math.ceil( ( x + 1 ) / points * count ) );
+        let peak = 0;
+
+        for ( let i = from; i < to; i++ ) peak = Math.max(
+          peak, Math.abs( samples[ i * 2 ] ), Math.abs( samples[ i * 2 + 1 ] )
+        );
+
+        const position = x / points, time = position * duration;
+        const amplitude = Math.max( 1, peak / 32768 * height * 0.9 );
+
+        ctx.fillStyle = position <= played ? '#0ea5e9' : position <= preview && hover !== null ?
+          '#b3c1d3' : buffered.some( r => time >= r.start && time <= r.end ) ? '#94a3b8' : '#475569';
+
+        ctx.fillRect(
+          Math.floor( position * width ), center - amplitude / 2,
+          Math.max( 1, Math.ceil( width / points ) ), amplitude
+        );
+      }
     };
 
     const observer = new ResizeObserver( draw );
