@@ -19,6 +19,13 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
     const canvas = canvasRef.current;
     if ( ! canvas ) return;
 
+    const draw = () => {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      const width = Math.max( 1, Math.floor( rect.width * ratio ) );
+      const height = Math.max( 1, Math.floor( rect.height * ratio ) );
+    };
+
     const observer = new ResizeObserver( draw );
     observer.observe( canvas );
     draw();
