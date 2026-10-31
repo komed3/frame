@@ -324,6 +324,23 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                     <SkipForwardIcon size= { 18 } />
                   </button>
                 </div>
+
+                <div className= 'flex items-center gap-3'>
+                  <button
+                    onClick= { toggleMute }
+                    title= 'Mute / Unmute [m]'
+                    aria-label= { muted ? 'Unmute' : 'Mute' }
+                    className= 'text-slate-300 transition-colors hover:text-white'
+                  >
+                    { muted || volume === 0 ? (
+                      <VolumeXIcon size= { 20 } />
+                    ) : volume < 0.5 ? (
+                      <Volume1Icon size= { 20 } />
+                    ) : (
+                      <Volume2Icon size= { 20 } />
+                    ) }
+                  </button>
+                </div>
               </div>
             </div>
 
