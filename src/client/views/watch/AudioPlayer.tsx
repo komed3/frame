@@ -17,7 +17,7 @@ import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
   ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
-  SkipBackIcon, SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
+  RotateCcwIcon, SkipBackIcon, SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -59,6 +59,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const [ duration, setDuration ] = useState( media.durationMs ? media.durationMs / 1000 : 0 );
   const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
   const [ playing, setPlaying ] = useState( false );
+  const [ ended, setEnded ] = useState( false );
   const [ ready, setReady ] = useState( false );
   const [ remaining, setRemaining ] = useState( false );
   const [ streamError, setStreamError ] = useState< string | null >( null );
@@ -90,7 +91,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
 
   useEffect( () => { setVolume( volumePref ), volumeRef.current = volumePref }, [ volumePref ] );
-  useEffect( () => { let a = audioRef.current; if ( ! a ) return; a.volume = volume, a.muted = muted }, [ volume, muted ] );
+  useEffect( () => { let a = audioRef.current; if ( ! a ) return; a.volume = volume, a.muted = muted }, [ muted ] );
 
   useEffect( () => {
     const controller = new AbortController();
@@ -124,8 +125,9 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       } ) ) );
     };
 
-    const onPlay = () => setPlaying( true );
+    const onPlay = () => { setPlaying( true ), setEnded( false ) };
     const onPause = () => setPlaying( false );
+    const onEnded = () => { setPlaying( false ), setEnded( true ) };
     const onReady = () => setReady( true );
     const onError = () => setStreamError( 'Could not play this audio file.' );
 
@@ -134,6 +136,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     audio.addEventListener( 'progress', update );
     audio.addEventListener( 'play', onPlay );
     audio.addEventListener( 'pause', onPause );
+    audio.addEventListener( 'ended', onEnded );
     audio.addEventListener( 'canplay', onReady );
     audio.addEventListener( 'error', onError );
 
@@ -143,6 +146,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       audio.removeEventListener( 'progress', update );
       audio.removeEventListener( 'play', onPlay );
       audio.removeEventListener( 'pause', onPause );
+      audio.removeEventListener( 'ended', onEnded );
       audio.removeEventListener( 'canplay', onReady );
       audio.removeEventListener( 'error', onError );
     };
@@ -152,7 +156,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     const audio = audioRef.current;
     if ( ! audio ) return;
 
-    setReady( false ), setPlaying( false ), setStreamError( null );
+    setReady( false ), setPlaying( false ), setEnded( false ), setStreamError( null );
     setCurrentTime( 0 ), setDuration( media.durationMs ? media.durationMs / 1000 : 0 );
     setBuffered( [] );
 
@@ -182,7 +186,14 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     else audio.pause();
   };
 
-  const changeVolume = ( v: number ) => { volumeRef.current = Math.max( 0, Math.min( 1, v ) ), setVolume( volumeRef.current ) };
+  const changeVolume = ( v: number ) => {
+    const value = Math.max( 0, Math.min( 1, v ) );
+    volumeRef.current = value;
+    setVolume( value );
+
+    if ( audioRef.current ) audioRef.current.volume = value;
+  };
+
   const saveVolume = () => setPref( 'PLAYER_VOLUME', volumeRef.current );
   const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : playerRef.current?.requestFullscreen();
@@ -300,10 +311,11 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                     onClick= { togglePlay }
                     disabled= { ! ready }
                     title= 'Play / Pause [Space]'
-                    aria-label= { playing ? 'Pause' : 'Play' }
+                    aria-label= { playing ? 'Pause' : ended ? 'Replay' : 'Play' }
                     className= { BUTTON + ' size-12' }
                   >
-                    { playing ? <PauseIcon size= { 22 } /> : <PlayIcon size= { 22 } /> }
+                    { playing ? <PauseIcon size= { 22 } /> : ended ? <RotateCcwIcon size= { 22 } /> :
+                      <PlayIcon size= { 22 } /> }
                   </button>
 
                   <button
@@ -357,10 +369,10 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                     <input
                       type= 'range'
                       min= { 0 } max= { 1 } step= { 0.01 } value= { volume }
-                      onChange= { e => changeVolume( Number( e.target.value ) ) }
+                      onInput= { e => changeVolume( Number( e.currentTarget.value ) ) }
                       onPointerUp= { saveVolume } onKeyUp= { saveVolume } onBlur= { saveVolume }
                       aria-label= 'Volume' title= 'Volume'
-                      className= 'absolute inset-0 size-full appearance-none bg-transparent opacity-0 cursor-pointer'
+                      className= 'absolute -inset-2 appearance-none bg-transparent opacity-0 cursor-pointer'
                     />
                   </div>
                 </div>
