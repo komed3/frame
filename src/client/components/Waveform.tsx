@@ -49,7 +49,7 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
         const amplitude = Math.max( 1, peak / 32768 * height * 0.9 );
 
         ctx.fillStyle = position <= played ? '#0ea5e9' : position <= preview && hover !== null ?
-          '#b3c1d3' : buffered.some( r => time >= r.start && time <= r.end ) ? '#94a3b8' : '#475569';
+          '#b3c1d3' : buffered.some( r => time >= r.start && time <= r.end ) ? '#8899b0' : '#475569';
 
         ctx.fillRect(
           Math.floor( position * width ), center - amplitude / 2,
