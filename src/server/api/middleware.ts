@@ -4,10 +4,13 @@ import type { ErrorRequestHandler, Request, RequestHandler } from 'express';
 
 
 export function getToken ( req: Request ) : string | null {
-  if ( req.originalUrl.startsWith( '/api/assets/' ) ) {
-    const token = req.headers.cookie?.match( /(?:^|;\s*)frame\.asset-session=([^;]*)/ )?.[ 1 ];
-    if ( token ) return token;
-  }
+  const cookie = req.headers.cookie;
+
+  for ( const [ path, name ] of [ [ '/api/stream/', 'frame.stream-session' ], [ '/api/assets/', 'frame.asset-session' ] ] )
+    if ( req.originalUrl.startsWith( path ) ) {
+      const token = cookie?.match( new RegExp( `(?:^|;\\s*)${ name }=([^;]*)` ) )?.[ 1 ];
+      if ( token ) return token;
+    }
 
   return req.get( 'authorization' )?.match( /^Bearer\s+(\S+)$/i )?.[ 1 ] ?? null;
 }
