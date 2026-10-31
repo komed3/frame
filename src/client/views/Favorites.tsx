@@ -24,4 +24,7 @@ export function Favorites () {
       sortBy: 'title', sortDirection: 'asc'
     } );
   } );
+
+
+  usePageTitle( 'Favorites' );
 }
