@@ -7,4 +7,8 @@ interface TaxonomyActionsProps {
 }
 
 
-export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {}
+export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {
+  return (
+    <></>
+  );
+}
