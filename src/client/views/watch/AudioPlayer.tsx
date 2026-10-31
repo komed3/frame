@@ -9,6 +9,7 @@ import { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import { useNavigate } from 'react-router';
+import { MediaInfo } from '../../components/MediaInfo';
 
 
 interface AudioPlayerProps {
@@ -79,6 +80,12 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
           { media.title || media.fileName }
         </h1>
       </div>
+
+      { media.description && (
+        <p className= 'max-w-3xl text-lg leading-relaxed'>
+          { media.description }
+        </p>
+      ) }
     </div>
   );
 }
