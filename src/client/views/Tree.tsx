@@ -46,11 +46,11 @@ function DirectoryNode ( { rootId, directory, depth, expanded, onToggle, onNavig
           onClick= { () => onToggle( directory.id ) }
           disabled= { ! hasChildren }
           className= {
-            'flex justify-center items-center size-6 shrink-0 rounded transition-all' +
-            ( hasChildren ? '' : ' invisible' ) + ( open ? ' rotate-90' : '' )
+            'flex justify-center items-center size-6 shrink-0 rounded transition-colors ' +
+            'hover:bg-slate-50/10 ' + ( ! hasChildren && 'invisible' )
           }
         >
-          <ChevronRightIcon size= { 16 } />
+          <ChevronRightIcon size= { 16 } className= { 'transition-transform ' + ( open && 'rotate-90' ) } />
         </button>
 
         <button
@@ -63,7 +63,7 @@ function DirectoryNode ( { rootId, directory, depth, expanded, onToggle, onNavig
             { directory.name }
           </span>
 
-          <span className= 'shrink-0 ml-auto pr-3 text-xs text-slate-500 tabular-nums'>
+          <span className= 'shrink-0 ml-auto pr-3 text-xs text-slate-400 tabular-nums'>
             { directory.mediaCount }
           </span>
         </button>
@@ -140,11 +140,11 @@ export function Tree () {
                     aria-expanded= { open }
                     onClick= { () => toggle( rootKey ) }
                     className= {
-                      'flex justify-center items-center size-8 shrink-0 rounded transition-all' +
-                      ( open ? ' rotate-90' : '' )
+                      'flex justify-center items-center size-8 shrink-0 rounded ' +
+                      'transition-colors hover:bg-slate-50/10'
                     }
                   >
-                    <ChevronRightIcon size= { 18 } />
+                    <ChevronRightIcon size= { 18 } className= { 'transition-transform ' + ( open && 'rotate-90' ) } />
                   </button>
 
                   <button
