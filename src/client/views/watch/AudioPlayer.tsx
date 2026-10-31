@@ -51,7 +51,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const volumeRef = useRef( 1 );
 
   const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
-  const volumePref = Number( prefs[ 0 ] ) ?? 1, muted = !! prefs[ 1 ];
+  const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
 
   const [ volume, setVolume ] = useState( volumePref );
   const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
@@ -271,6 +271,8 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
           </>
         ) }
       </div>
+
+      <audio ref= { audioRef } preload= 'auto' />
 
       <MediaActions media= { media } />
 
