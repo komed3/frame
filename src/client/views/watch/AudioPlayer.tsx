@@ -261,6 +261,20 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
               </button>
             </div>
 
+            <div className= 'absolute inset-x-0 bottom-0 z-10 p-6 space-y-3'>
+              <div className= 'min-w-0 pr-32'>
+                <h1 className= 'truncate text-xl font-medium'>
+                  { media.title || media.fileName }
+                </h1>
+
+                { media.creator && (
+                  <p className= 'truncate text-sm text-slate-300'>
+                    { media.creator }
+                  </p>
+                ) }
+              </div>
+            </div>
+
             { streamError && (
               <div className= 'absolute inset-x-0 top-24 z-30 flex justify-center px-4'>
                 <p role= 'alert' className= 'px-4 py-2 text-sm text-red-300 bg-slate-950/70 rounded'>
