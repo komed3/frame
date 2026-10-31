@@ -74,6 +74,8 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
         setHover( Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) ) );
       } }
       onMouseLeave= { () => setHover( null ) }
-    ></div>
+    >
+      <canvas ref= { canvasRef } className= 'size-full pointer-events-none' />
+    </div>
   );
 }
