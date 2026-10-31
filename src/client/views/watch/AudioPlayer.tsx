@@ -162,6 +162,12 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     return () => { audio.pause(), audio.removeAttribute( 'src' ), audio.load() };
   }, [ media.id, media.durationMs ] );
 
+  useEffect( () => {
+    const change = () => setFullscreen( !! document.fullscreenElement );
+    document.addEventListener( 'fullscreenchange', change );
+    return () => document.removeEventListener( 'fullscreenchange', change );
+  }, [] );
+
 
   const navigateAdjacent = ( id: string | null ) => id && navigate(
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
