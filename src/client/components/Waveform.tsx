@@ -32,7 +32,7 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
       ctx.clearRect( 0, 0, width, height );
       if ( ! samples?.length || ! duration ) return;
 
-      const count = samples.length / 2, points = Math.min( width, 1200 );
+      const count = samples.length / 2, points = Math.min( width, 3600 );
       const center = height / 2, played = currentTime / duration;
       const preview = hover === null ? played : Math.max( played, hover );
 
