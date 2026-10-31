@@ -26,6 +26,11 @@ interface DirectoryNodeProps {
 }
 
 
+function rootName ( root: MediaRoot ) {
+  return root.path.split( /[\\/]/ ).filter( Boolean ).pop() ?? root.path;
+}
+
+
 export function Tree () {
   return (
     <></>
