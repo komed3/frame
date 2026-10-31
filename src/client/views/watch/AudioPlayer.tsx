@@ -52,6 +52,17 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   const [ [ volumePref = 1, muted = false ], setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
 
+  const [ volume, setVolume ] = useState( volumePref );
+  const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
+  const [ currentTime, setCurrentTime ] = useState( 0 );
+  const [ duration, setDuration ] = useState( media.durationMs ? media.durationMs / 1000 : 0 );
+  const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
+  const [ playing, setPlaying ] = useState( false );
+  const [ ready, setReady ] = useState( false );
+  const [ remaining, setRemaining ] = useState( false );
+  const [ streamError, setStreamError ] = useState< string | null >( null );
+  const [ fullscreen, setFullscreen ] = useState( false );
+
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
