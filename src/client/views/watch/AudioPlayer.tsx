@@ -169,9 +169,24 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   }, [] );
 
 
-  const navigateAdjacent = ( id: string | null ) => id && navigate(
-    `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
-  );
+  const seek = ( time: number ) => {
+    const audio = audioRef.current;
+    if ( ! audio || ! Number.isFinite( audio.duration ) ) return;
+    audio.currentTime = Math.max( 0, Math.min( audio.duration, time ) );
+  };
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if ( ! audio || ! ready ) return;
+    if ( audio.paused ) void audio.play().catch( () => {} );
+    else audio.pause();
+  };
+
+  const changeVolume = ( v: number ) => { volumeRef.current = Math.max( 0, Math.min( 1, v ) ), setVolume( volumeRef.current ) };
+  const saveVolume = () => setPref( 'PLAYER_VOLUME', volumeRef.current );
+  const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
+  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : audioRef.current?.requestFullscreen();
+  const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
 
 
   useKeyControls( {
