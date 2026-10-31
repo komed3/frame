@@ -43,8 +43,14 @@ const BUTTON =
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
-  const { stream, media: mediaApi, directories, playlists } = useApi();
+  const { request, assets, media: mediaApi, directories, playlists } = useApi();
   const navigate = useNavigate();
+
+  const audioRef = useRef< HTMLAudioElement >( null );
+  const playerRef = useRef< HTMLDivElement >( null );
+  const volumeRef = useRef( 1 );
+
+  const [ [ volumePref = 1, muted = false ], setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
