@@ -6,6 +6,7 @@ import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
+import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -58,6 +59,12 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const navigateAdjacent = ( id: string | null ) => id && navigate(
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
   );
+
+
+  useKeyControls( {
+       'ctrl+arrowleft': () => navigateAdjacent( prev ),
+       'ctrl+arrowright': () => navigateAdjacent( next )
+    } );
 
 
   return (
