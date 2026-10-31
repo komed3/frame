@@ -102,6 +102,16 @@ export function Tree () {
   usePageTitle( 'Directories' );
 
 
+  const toggle = ( id: string ) => setExpanded( current => {
+    const next = new Set( current );
+
+    if ( next.has( id ) ) next.delete( id );
+    else next.add( id );
+
+    return next;
+  } );
+
+
   return (
     <></>
   );
