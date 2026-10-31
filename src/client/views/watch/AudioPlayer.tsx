@@ -1,17 +1,24 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
-import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
+import { Waveform } from '@/src/client/components/Waveform';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
-import { ApiDirectoryListResult } from '@/src/shared/types/api';
+import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
+import { formatDuration } from '@/src/client/utils/format';
+import { parseWaveform, type WaveformData } from '@/src/client/utils/waveform';
+import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
-import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
+import {
+  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, PauseIcon, PlayIcon, SkipBackIcon,
+  SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
