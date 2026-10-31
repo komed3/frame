@@ -222,6 +222,13 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
           <>
             <MediaThumbnail media= { media } aspectRatio= 'w-full h-full' />
 
+            <div
+              className= {
+                'absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/30 ' +
+                'to-transparent pointer-events-none'
+              }
+            />
+
             <button
               onClick= { () => navigateAdjacent( prev ) }
               disabled= { ! prev }
