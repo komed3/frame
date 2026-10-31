@@ -34,6 +34,22 @@ export function Favorites () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Favorites
       </h1>
+
+      { error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : (
+        <MediaBrowser
+          media= { result?.items ?? [] }
+          loading= { loading }
+          offset= { result?.offset ?? page }
+          limit= { result?.limit ?? MEDIA_PAGE_SIZE }
+          total= { result?.total }
+          onPageChange= { o => { setPage( o ), window.scrollTo( 0, 0 ) } }
+          onOpenMedia= { ( { id } ) => navigate( `/watch/${ id }` ) }
+        />
+      ) }
     </div>
   );
 }
