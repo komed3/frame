@@ -293,6 +293,38 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
                 <span>{ formatDuration( displayDuration * 1000 ) }</span>
               </div>
+
+              <div className= 'flex justify-between items-center gap-12 mt-6'>
+                <div className= 'flex items-center gap-2'>
+                  <button
+                    onClick= { togglePlay }
+                    disabled= { ! ready }
+                    title= 'Play / Pause [Space]'
+                    aria-label= { playing ? 'Pause' : 'Play' }
+                    className= { BUTTON + ' size-12' }
+                  >
+                    { playing ? <PauseIcon size= { 22 } /> : <PlayIcon size= { 22 } /> }
+                  </button>
+
+                  <button
+                    onClick= { () => seek( currentTime - 10 ) }
+                    title= 'Back 10 seconds'
+                    aria-label= 'Back 10 seconds'
+                    className= { BUTTON }
+                  >
+                    <SkipBackIcon size= { 18 } />
+                  </button>
+
+                  <button
+                    onClick= { () => seek( currentTime + 10 ) }
+                    title= 'Forward 10 seconds'
+                    aria-label= 'Forward 10 seconds'
+                    className= { BUTTON }
+                  >
+                    <SkipForwardIcon size= { 18 } />
+                  </button>
+                </div>
+              </div>
             </div>
 
             { streamError && (
