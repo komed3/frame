@@ -5,8 +5,9 @@ import { useBodyScrollLock } from '@/src/client/hooks/useBodyScrollLock';
 import type { MediaType } from '@/src/shared/types/media';
 import type { MediaSearchProgress, MediaSearchQueryMode, MediaSearchSort } from '@/src/shared/types/search';
 import {
-  BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon, ListVideoIcon,
-  LogOutIcon, MenuIcon, PlayIcon, SearchIcon, SettingsIcon, TagIcon, UserIcon, XIcon
+  BookmarkIcon, FilterIcon, FolderIcon, GalleryVerticalEndIcon, HeartIcon, HomeIcon,
+  LifeBuoyIcon, ListTreeIcon, ListVideoIcon, LogOutIcon, MenuIcon, PlayIcon, SearchIcon,
+  SettingsIcon, TagIcon, UserIcon, XIcon
 } from 'lucide-react';
 import { type SubmitEvent, useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router';
@@ -36,7 +37,9 @@ const NAV = [
   [ 'Favorites', '/favorites', HeartIcon ],
   [ 'Markers', '/markers', BookmarkIcon ],
   [],
-  [ 'Admin', '/server', SettingsIcon ]
+  [ 'Server', '/server', SettingsIcon ],
+  [ 'Directories', '/tree', ListTreeIcon ],
+  [ 'Help', '/help', LifeBuoyIcon ]
 ] as const;
 
 const USER = [
@@ -312,7 +315,7 @@ export function Header () {
               key= { url }
               to= { url }
               className= { ( { isActive } ) =>
-                'flex items-center gap-4 w-full px-6 py-2.5 tracking-wider transition-colors ' +
+                'flex items-center gap-4 w-full px-6 py-3 text-sm tracking-wider transition-colors ' +
                 ( isActive ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
               }
             >
@@ -320,7 +323,10 @@ export function Header () {
               <span>{ label }</span>
             </NavLink>
           ) : (
-            <hr key= { `separator-${ i }` } className= 'mx-6 my-5 border-dashed border-slate-50/20' />
+            <hr
+              key= { `separator-${ i }` }
+              className= 'mx-6 my-5 border-dashed border-slate-50/20'
+            />
           ) ) }
         </nav>
       </div>
