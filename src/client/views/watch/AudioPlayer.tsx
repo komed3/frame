@@ -23,6 +23,8 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
           orientation= 'horizontal'
         />
       ) }
+
+      <hr className= 'border-dashed border-slate-700' />
     </div>
   );
 }
