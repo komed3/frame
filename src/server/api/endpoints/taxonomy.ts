@@ -25,6 +25,11 @@ tags.delete< { id: string } >( '/:id', requireEditorAccess, ( req, res ) => {
   res.status( 204 ).end();
 } );
 
+tags.post< { id: string } >( '/:id/swap', requireEditorAccess, ( req, res ) => {
+  const id = MediaTaxonomy.swapTagToCategory( req.params.id );
+  res.json( MediaTaxonomy.getCategory( id ) );
+} );
+
 
 categories.get( '/', ( _, res ) => res.json( MediaTaxonomy.listCategories() ) );
 categories.get< { id: string } >( '/:id', ( req, res ) => res.json( MediaTaxonomy.getCategory( req.params.id ) ) );
@@ -47,4 +52,9 @@ categories.put< { id: string } >( '/:id/parent', requireEditorAccess, ( req, res
 categories.delete< { id: string } >( '/:id', requireEditorAccess, ( req, res ) => {
   MediaTaxonomy.deleteCategory( req.params.id );
   res.status( 204 ).end();
+} );
+
+categories.post< { id: string } >( '/:id/swap', requireEditorAccess, ( req, res ) => {
+  const id = MediaTaxonomy.swapCategoryToTag( req.params.id );
+  res.json( MediaTaxonomy.getTag( id ) );
 } );
