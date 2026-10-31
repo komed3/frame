@@ -43,7 +43,6 @@ export function Tag () {
 
   if ( ! loading && ! error && data && ! tag ) return <NotFound />;
 
-
   return (
     <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-8'>
       <div className= 'space-y-4'>
