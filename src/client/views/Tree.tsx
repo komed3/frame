@@ -113,6 +113,10 @@ export function Tree () {
 
 
   return (
-    <></>
+    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-8'>
+      <h1 className= 'text-2xl font-light tracking-wide'>
+        Directories
+      </h1>
+    </div>
   );
 }
