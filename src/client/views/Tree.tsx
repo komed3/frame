@@ -10,6 +10,22 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
+interface RootTree {
+  root: MediaRoot;
+  name: string;
+  tree: MediaDirectoryTree[];
+}
+
+interface DirectoryNodeProps {
+  rootId: string;
+  directory: MediaDirectoryTree;
+  depth: number;
+  expanded: Set< string >;
+  onToggle: ( id: string ) => void;
+  onNavigate: ( rootId: string, directoryId: string ) => void;
+}
+
+
 export function Tree () {
   return (
     <></>
