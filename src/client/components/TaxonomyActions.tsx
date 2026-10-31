@@ -14,6 +14,17 @@ interface TaxonomyActionsProps {
 
 
 export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {
+  const { canEdit } = useApi();
+
+  const [ open, setOpen ] = useState( false );
+  const [ value, setValue ] = useState( name );
+  const [ error, setError ] = useState< string | null >( null );
+  const [ saving, setSaving ] = useState( false );
+
+
+  useBodyScrollLock( open );
+
+
   return (
     <></>
   );
