@@ -11,6 +11,12 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 
+interface CategoryPageData {
+  category: CategoryRecord | null;
+  result: MediaSearchResult;
+}
+
+
 export function Category () {
   return (
     <></>
