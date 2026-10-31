@@ -24,6 +24,51 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
 
   useBodyScrollLock( open );
 
+  const close = () => { if ( saving ) return; setOpen( false ), setError( null ), setValue( name ) };
+  const edit = () => { setValue( name ), setError( null ), setOpen( true ) };
+
+  const save = async ( e: SubmitEvent ) => {
+    e.preventDefault();
+
+    const next = value.trim();
+    if ( ! next || next === name || saving ) return;
+
+    setSaving( true ), setError( null );
+
+    try { await onRename( next ), setOpen( false ) }
+    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not rename entry.' ) }
+    finally { setSaving( false ) }
+  };
+
+  const remove = async () => {
+    if ( saving || ! window.confirm( `Delete ${ kind } "${ name }"?` ) ) return;
+
+    setSaving( true ), setError( null );
+
+    try { await onDelete() }
+    catch ( err ) {
+      setError( err instanceof Error ? err.message : 'Could not delete entry.' );
+      setOpen( true );
+    }
+    finally { setSaving( false ) }
+  };
+
+  const swap = async () => {
+    if ( saving ) return;
+
+    const target = kind === 'category' ? 'tag' : 'category';
+    if ( ! window.confirm( `Convert "${ name }" into a ${ target }?` ) ) return;
+
+    setSaving( true ), setError( null );
+
+    try { await onSwap() }
+    catch ( err ) {
+      setError( err instanceof Error ? err.message : 'Could not convert entry.' );
+      setOpen( true );
+    }
+    finally { setSaving( false ) }
+  };
+
 
   return (
     <></>
