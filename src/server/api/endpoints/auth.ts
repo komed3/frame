@@ -6,17 +6,21 @@ import { Router } from 'express';
 
 export const auth = Router();
 
-const assetCookie = {
-  httpOnly: true,
-  sameSite: 'strict' as const,
-  secure: [ 'prod', 'production' ].includes( Config.get( 'NODE_ENV' ) ),
-  path: '/api/assets'
+const cookieOptions = {
+  httpOnly: true, sameSite: 'strict' as const,
+  secure: [ 'prod', 'production' ].includes( Config.get( 'NODE_ENV' ) )
 };
+
+const assetCookie = { ...cookieOptions, path: '/api/assets' };
+const streamCookie = { ...cookieOptions, path: '/api/stream' };
 
 
 auth.post( '/login', async ( req, res ) => {
   const result = await Auth.login( req.body?.username, req.body?.password );
-  res.cookie( 'frame.asset-session', result.token, { ...assetCookie, maxAge: Config.get( 'SESSION_LIFETIME_MS' ) } );
+  const maxAge = Config.get( 'SESSION_LIFETIME_MS' );
+
+  res.cookie( 'frame.asset-session', result.token, { ...assetCookie, maxAge } );
+  res.cookie( 'frame.stream-session', result.token, { ...streamCookie, maxAge } );
   res.json( result );
 } );
 
@@ -29,6 +33,8 @@ auth.get( '/env', requireAuth, ( _, res ) => res.json( {
 
 auth.post( '/logout', requireAuth, ( req, res ) => {
   Auth.logout( getToken( req ) );
+
   res.clearCookie( 'frame.asset-session', assetCookie );
+  res.clearCookie( 'frame.stream-session', streamCookie );
   res.status( 204 ).end();
 } );
