@@ -54,11 +54,13 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
   const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
+  const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
+  const title = media.title || media.fileName;
 
   const [ volume, setVolume ] = useState( volumePref );
   const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
   const [ currentTime, setCurrentTime ] = useState( 0 );
-  const [ duration, setDuration ] = useState( media.durationMs ? media.durationMs / 1000 : 0 );
+  const [ duration, setDuration ] = useState( mediaDuration );
   const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
   const [ playing, setPlaying ] = useState( false );
   const [ ended, setEnded ] = useState( false );
@@ -72,18 +74,17 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   }
 
 
+  const adjacentMedia = ( direction: 'prev' | 'next' ) => playlistId
+    ? playlists[ direction ]( playlistId, media.id ).then( item => item?.mediaId ?? null )
+    : mediaApi[ direction ]( media.id ).then( item => item?.id ?? null );
+
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
     const [ categories, tags, directory, prev, next ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      playlistId
-        ? playlists.prev( playlistId, media.id ).then( item => item?.mediaId ?? null )
-        : mediaApi.prev( media.id ).then( item => item?.id ?? null ),
-      playlistId
-        ? playlists.next( playlistId, media.id ).then( item => item?.mediaId ?? null )
-        : mediaApi.next( media.id ).then( item => item?.id ?? null )
+      adjacentMedia( 'prev' ), adjacentMedia( 'next' )
     ] );
 
     return { categories, tags, directory, prev, next };
@@ -94,7 +95,6 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const directory = data?.directory ?? null;
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
-
 
   useEffect( () => {
     setVolume( volumePref ), volumeRef.current = volumePref;
@@ -148,25 +148,13 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     const onReady = () => setReady( true );
     const onError = () => setStreamError( 'Could not play this audio file.' );
 
-    audio.addEventListener( 'timeupdate', update );
-    audio.addEventListener( 'durationchange', update );
-    audio.addEventListener( 'progress', update );
-    audio.addEventListener( 'play', onPlay );
-    audio.addEventListener( 'pause', onPause );
-    audio.addEventListener( 'ended', onEnded );
-    audio.addEventListener( 'canplay', onReady );
-    audio.addEventListener( 'error', onError );
+    const listeners: [ string, EventListener ][] = [
+      ...[ 'timeupdate', 'durationchange', 'progress' ].map( e => [ e, update ] as [ string, EventListener ] ),
+      [ 'play', onPlay ], [ 'pause', onPause ], [ 'ended', onEnded ], [ 'canplay', onReady ], [ 'error', onError ]
+    ];
 
-    return () => {
-      audio.removeEventListener( 'timeupdate', update );
-      audio.removeEventListener( 'durationchange', update );
-      audio.removeEventListener( 'progress', update );
-      audio.removeEventListener( 'play', onPlay );
-      audio.removeEventListener( 'pause', onPause );
-      audio.removeEventListener( 'ended', onEnded );
-      audio.removeEventListener( 'canplay', onReady );
-      audio.removeEventListener( 'error', onError );
-    };
+    listeners.forEach( ( [ e, listener ] ) => audio.addEventListener( e, listener ) );
+    return () => listeners.forEach( ( [ e, listener ] ) => audio.removeEventListener( e, listener ) );
   }, [] );
 
   useEffect( () => {
@@ -174,8 +162,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     if ( ! audio ) return;
 
     setReady( false ), setPlaying( false ), setEnded( false ), setStreamError( null );
-    setCurrentTime( 0 ), setDuration( media.durationMs ? media.durationMs / 1000 : 0 );
-    setBuffered( [] );
+    setCurrentTime( 0 ), setDuration( mediaDuration ), setBuffered( [] );
 
     audio.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
     audio.load();
@@ -234,7 +221,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   } );
 
 
-  const displayDuration = duration || ( media.durationMs ? media.durationMs / 1000 : 0 );
+  const displayDuration = duration || mediaDuration;
   const timeLabel = remaining
     ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) }`
     : formatDuration( currentTime * 1000 );
@@ -264,25 +251,20 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
             />
 
             <div className= 'absolute top-6 right-6 z-20 flex items-center gap-2'>
-              <button
-                onClick= { () => navigateAdjacent( prev ) }
-                disabled= { ! prev }
-                title= 'Previous [Ctrl + ←]'
-                aria-label= 'Previous'
-                className= { BUTTON }
-              >
-                <ChevronLeftIcon size= { 20 } />
-              </button>
-
-              <button
-                onClick= { () => navigateAdjacent( next ) }
-                disabled= { ! next }
-                title= 'Next [Ctrl + →]'
-                aria-label= 'Next'
-                className= { BUTTON }
-              >
-                <ChevronRightIcon size= { 20 } />
-              </button>
+              { ( [ [ prev, ChevronLeftIcon, 'Previous' ], [ next, ChevronRightIcon, 'Next' ] ] as const ).map(
+                ( [ id, Icon, label ] ) => (
+                  <button
+                    key= { label }
+                    onClick= { () => navigateAdjacent( id ) }
+                    disabled= { ! id }
+                    title= { `${ label } [Ctrl + ${ label === 'Previous' ? '←' : '→' }]` }
+                    aria-label= { label }
+                    className= { BUTTON }
+                  >
+                    <Icon size= { 20 } />
+                  </button>
+                )
+              ) }
 
               <button
                 onClick= { toggleFullscreen }
@@ -298,7 +280,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
             <div className= 'absolute inset-x-0 bottom-0 z-10 p-6 space-y-3'>
               <div className= 'min-w-0 pr-32'>
                 <h1 className= 'truncate text-xl font-medium'>
-                  { media.title || media.fileName }
+                  { title }
                 </h1>
 
                 { media.creator && (
@@ -341,23 +323,19 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                       <PlayIcon size= { 22 } /> }
                   </button>
 
-                  <button
-                    onClick= { () => seek( currentTime - 10 ) }
-                    title= 'Back 10 seconds'
-                    aria-label= 'Back 10 seconds'
-                    className= { BUTTON }
-                  >
-                    <SkipBackIcon size= { 18 } />
-                  </button>
-
-                  <button
-                    onClick= { () => seek( currentTime + 10 ) }
-                    title= 'Forward 10 seconds'
-                    aria-label= 'Forward 10 seconds'
-                    className= { BUTTON }
-                  >
-                    <SkipForwardIcon size= { 18 } />
-                  </button>
+                  { ( [ [ -10, SkipBackIcon, 'Back' ], [ 10, SkipForwardIcon, 'Forward' ] ] as const ).map(
+                    ( [ offset, Icon, direction ] ) => (
+                      <button
+                        key= { direction }
+                        onClick= { () => seek( currentTime + offset ) }
+                        title= { `${ direction } 10 seconds` }
+                        aria-label= { `${ direction } 10 seconds` }
+                        className= { BUTTON }
+                      >
+                        <Icon size= { 18 } />
+                      </button>
+                    )
+                  ) }
                 </div>
 
                 <div className= 'flex items-center gap-4'>
@@ -432,9 +410,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       <hr className= 'border-dashed border-slate-700' />
 
       <Breadcrumbs
-        items= { [ ...( directory?.breadcrumbs ?? [] ), {
-          id: media.id, name: media.title || media.fileName, path: media.path
-        } ] }
+        items= { [ ...( directory?.breadcrumbs ?? [] ), { id: media.id, name: title, path: media.path } ] }
         onHome= { () => navigate( '/all' ) }
         onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
       />
@@ -445,7 +421,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
         ) }
 
         <h1 className= 'text-2xl font-medium tracking-wide'>
-          { media.title || media.fileName }
+          { title }
         </h1>
       </div>
 
