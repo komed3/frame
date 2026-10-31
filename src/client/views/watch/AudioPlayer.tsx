@@ -1,6 +1,7 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaActions } from '@/src/client/components/MediaActions';
+import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { useApi } from '@/src/client/context/ApiContext';
@@ -9,7 +10,6 @@ import { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import { useNavigate } from 'react-router';
-import { MediaInfo } from '../../components/MediaInfo';
 
 
 interface AudioPlayerProps {
@@ -86,6 +86,16 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
           { media.description }
         </p>
       ) }
+
+      <hr className= 'border-dashed border-slate-700' />
+
+      <div className= 'space-y-8'>
+        <MediaInfo media= { media } />
+
+        { tags.length > 0 && (
+          <MediaTaxonomy type= 'tag' items= { tags } />
+        ) }
+      </div>
     </div>
   );
 }
