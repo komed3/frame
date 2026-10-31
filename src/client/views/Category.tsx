@@ -6,7 +6,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaSearchResult } from '@/src/shared/types/search';
 import type { CategoryRecord } from '@/src/shared/types/taxonomy';
-import { FolderIcon } from 'lucide-react';
+import { ArrowRightLeftIcon, FolderIcon, SettingsIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -49,17 +49,51 @@ export function Category () {
         <Link
           to= '/categories'
           className= {
-            'inline-flex items-center gap-2 text-sm uppercase text-slate-400 ' +
+            'inline-flex items-center gap-2 text-sm text-slate-400 ' +
             'transition-colors hover:text-white'
           }
         >
           <FolderIcon size= { 16 } />
-          <span>Category</span>
+          <span>All Categories</span>
         </Link>
 
-        <h1 className= 'text-2xl font-light tracking-wide'>
-          { category?.name ?? 'Category' }
-        </h1>
+        <div className= 'flex justify-between items-center gap-12'>
+          <h1 className= 'text-2xl font-light tracking-wide'>
+            { category?.name ?? 'Category' }
+          </h1>
+
+          <div className= 'flex items-center gap-1'>
+            <button
+              className= {
+                'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+                'rounded-l-full transition-colors hover:bg-slate-50/20'
+              }
+            >
+              <SettingsIcon size= { 16 } />
+              <span>Edit</span>
+            </button>
+
+            <button
+              className= {
+                'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+                'transition-colors hover:bg-slate-50/20'
+              }
+            >
+              <ArrowRightLeftIcon size= { 16 } />
+              <span>Change to Tag</span>
+            </button>
+
+            <button
+              className= {
+                'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+                'rounded-r-full transition-colors hover:bg-slate-50/20'
+              }
+            >
+              <TrashIcon size= { 16 } />
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       { error ? (
