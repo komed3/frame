@@ -281,6 +281,18 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                 buffered= { buffered }
                 onSeek= { seek }
               />
+
+              <div className= 'flex justify-between items-center text-xs text-slate-300 tabular-nums'>
+                <button
+                  onClick= { () => setRemaining( v => ! v ) }
+                  title= 'Switch elapsed / remaining time'
+                  className= 'hover:text-white'
+                >
+                  { timeLabel }
+                </button>
+
+                <span>{ formatDuration( displayDuration * 1000 ) }</span>
+              </div>
             </div>
 
             { streamError && (
