@@ -1,6 +1,6 @@
 import { Account } from '@/src/client/views/Account';
 import { Admin } from '@/src/client/views/Admin';
-//import { Category } from '@/src/client/views/Category';
+import { Category } from '@/src/client/views/Category';
 //import { Categories } from '@/src/client/views/Categories';
 import { Editor } from '@/src/client/views/Editor';
 import { Media } from '@/src/client/views/Media';
@@ -20,8 +20,8 @@ export function Routing () {
       <Route path= '/all' element= { <Media /> } />
       <Route path= '/search' element= { <Search /> } />
 
-      {/*<Route path= '/categories' element= { <Categories /> } />
-      <Route path= '/category/:id' element= { <Category /> } />*/}
+      {/*<Route path= '/categories' element= { <Categories /> } />*/}
+      <Route path= '/category/:id' element= { <Category /> } />
       <Route path= '/tags' element= { <Tags /> } />
       <Route path= '/tag/:id' element= { <Tag /> } />
 
