@@ -260,6 +260,14 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                 { fullscreen ? <Minimize2Icon size= { 20 } /> : <Maximize2Icon size= { 20 } /> }
               </button>
             </div>
+
+            { streamError && (
+              <div className= 'absolute inset-x-0 top-24 z-30 flex justify-center px-4'>
+                <p role= 'alert' className= 'px-4 py-2 text-sm text-red-300 bg-slate-950/70 rounded'>
+                  { streamError }
+                </p>
+              </div>
+            ) }
           </>
         ) }
       </div>
