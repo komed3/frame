@@ -61,6 +61,22 @@ export function Category () {
           { category?.name ?? 'Category' }
         </h1>
       </div>
+
+      { error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : (
+        <MediaBrowser
+          media= { result?.items ?? [] }
+          loading= { loading }
+          offset= { result?.offset ?? offset }
+          limit= { result?.limit ?? MEDIA_PAGE_SIZE }
+          total= { result?.total }
+          onPageChange= { n => { setOffset( n ), window.scrollTo( 0, 0 ) } }
+          onOpenMedia= { ( { id } ) => navigate( `/watch/${ id }` ) }
+        />
+      ) }
     </div>
   );
 }
