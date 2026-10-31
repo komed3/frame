@@ -117,6 +117,22 @@ export function Tree () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Directories
       </h1>
+
+      { loading ? (
+        <Loading size= { 32 } className= 'py-32' />
+      ) : error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : ! data?.length ? (
+        <p className= 'py-16 text-center text-slate-500'>
+          No directories found.
+        </p>
+      ) : (
+        <div className= 'space-y-8'>
+          ...
+        </div>
+      ) }
     </div>
   );
 }
