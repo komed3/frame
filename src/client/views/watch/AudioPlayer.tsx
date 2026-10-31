@@ -1,5 +1,6 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
@@ -27,13 +28,18 @@ interface AudioPlayerProps {
   playlistId?: string;
 }
 
-interface AudioPlayerData  {
+interface AudioPlayerData {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
   prev: string | null;
   next: string | null;
 }
+
+
+const BUTTON =
+  'flex justify-center items-center size-10 rounded-full bg-slate-50/10 transition-colors ' +
+  'hover:bg-slate-50/20 disabled:opacity-30 disabled:pointer-events-none';
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
