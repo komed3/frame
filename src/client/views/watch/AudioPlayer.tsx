@@ -21,6 +21,8 @@ interface AudioPlayerData  {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
+  prev: string | null;
+  next: string | null;
 }
 
 
@@ -31,18 +33,26 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
-    const [ categories, tags, directory ] = await Promise.all( [
+    const [ categories, tags, directory, prev, next ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
-      directories.list( media.rootId, media.directoryId ).catch( () => null )
+      directories.list( media.rootId, media.directoryId ).catch( () => null ),
+      playlistId
+        ? playlists.prev( playlistId, media.id ).then( item => item?.mediaId ?? null )
+        : mediaApi.prev( media.id ).then( item => item?.id ?? null ),
+      playlistId
+        ? playlists.next( playlistId, media.id ).then( item => item?.mediaId ?? null )
+        : mediaApi.next( media.id ).then( item => item?.id ?? null )
     ] );
 
-  return { categories, tags, directory };
+    return { categories, tags, directory, prev, next };
   } );
 
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
+  const prev = data?.prev ?? null;
+  const next = data?.next ?? null;
 
 
   return (
