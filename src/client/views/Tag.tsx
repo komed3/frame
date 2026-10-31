@@ -63,7 +63,9 @@ export function Tag () {
       </div>
 
       { error ? (
-        <p className= 'py-16 text-center text-red-400'>{ error }</p>
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
       ) : (
         <MediaBrowser
           media= { result?.items ?? [] }
