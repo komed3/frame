@@ -157,7 +157,7 @@ export function Tree () {
                       { name }
                     </span>
 
-                    { root.enabled && (
+                    { ! root.enabled && (
                       <span className= 'py-0.5 px-2 text-[10px] uppercase bg-slate-50/10 rounded'>
                         Disabled
                       </span>
