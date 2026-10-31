@@ -98,6 +98,25 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     audio.volume = volume, audio.muted = muted;
   }, [ volume, muted ] );
 
+  useEffect( () => {
+    const controller = new AbortController();
+    let active = true;
+
+    setWaveform( null );
+
+    assets.list( media.id ).then( a => {
+      const wave = a.find( i => i.kind === 'wave' && i.variant === 'default' );
+      if ( wave && active ) return request< Response >(
+        `/assets/${ encodeURIComponent( media.id ) }/wave/${ encodeURIComponent( wave.variant ) }`,
+        { signal: controller.signal }
+      ).then( response => response.arrayBuffer() );
+
+      return null;
+    } ).then( b => { if ( active && b ) setWaveform( parseWaveform( b ) ) } ).catch( () => {} );
+
+    return () => { active = false, controller.abort() };
+  }, [ assets, media.id, request ] );
+
 
   const navigateAdjacent = ( id: string | null ) => id && navigate(
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
