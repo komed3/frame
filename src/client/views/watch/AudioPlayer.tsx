@@ -90,13 +90,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
 
   useEffect( () => { setVolume( volumePref ), volumeRef.current = volumePref }, [ volumePref ] );
-
-  useEffect( () => {
-    const audio = audioRef.current;
-    if ( ! audio ) return;
-
-    audio.volume = volume, audio.muted = muted;
-  }, [ volume, muted ] );
+  useEffect( () => { let a = audioRef.current; if ( ! a ) return; a.volume = volume, a.muted = muted }, [ volume, muted ] );
 
   useEffect( () => {
     const controller = new AbortController();
@@ -116,6 +110,43 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
     return () => { active = false, controller.abort() };
   }, [ assets, media.id, request ] );
+
+  useEffect( () => {
+    const audio = audioRef.current;
+    if ( ! audio ) return;
+
+    const update = () => {
+      setCurrentTime( audio.currentTime || 0 );
+      if ( Number.isFinite( audio.duration ) ) setDuration( audio.duration );
+
+      setBuffered( Array.from( { length: audio.buffered.length }, ( _, i ) => ( {
+        start: audio.buffered.start( i ), end: audio.buffered.end( i )
+      } ) ) );
+    };
+
+    const onPlay = () => setPlaying( true );
+    const onPause = () => setPlaying( false );
+    const onReady = () => setReady( true );
+    const onError = () => setStreamError( 'Could not play this audio file.' );
+
+    audio.addEventListener( 'timeupdate', update );
+    audio.addEventListener( 'durationchange', update );
+    audio.addEventListener( 'progress', update );
+    audio.addEventListener( 'play', onPlay );
+    audio.addEventListener( 'pause', onPause );
+    audio.addEventListener( 'canplay', onReady );
+    audio.addEventListener( 'error', onError );
+
+    return () => {
+      audio.removeEventListener( 'timeupdate', update );
+      audio.removeEventListener( 'durationchange', update );
+      audio.removeEventListener( 'progress', update );
+      audio.removeEventListener( 'play', onPlay );
+      audio.removeEventListener( 'pause', onPause );
+      audio.removeEventListener( 'canplay', onReady );
+      audio.removeEventListener( 'error', onError );
+    };
+  }, [] );
 
 
   const navigateAdjacent = ( id: string | null ) => id && navigate(
