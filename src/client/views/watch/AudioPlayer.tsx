@@ -1,5 +1,6 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
@@ -10,8 +11,8 @@ import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import { Loading } from '../../components/Loading';
 
 
 interface AudioPlayerProps {
