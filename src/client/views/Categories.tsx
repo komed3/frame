@@ -23,6 +23,20 @@ export function Categories () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Categories
       </h1>
+
+      { loading ? (
+        <Loading size= { 32 } className= 'py-32' />
+      ) : error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : items.length > 0 ? (
+        <></>
+      ) : (
+        <p className= 'py-16 text-center text-slate-500'>
+          No categories found.
+        </p>
+      ) }
     </div>
   );
 }
