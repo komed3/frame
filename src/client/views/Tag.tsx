@@ -42,4 +42,40 @@ export function Tag () {
 
 
   if ( ! loading && ! error && data && ! tag ) return <NotFound />;
+
+
+  return (
+    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-8'>
+      <div className= 'space-y-4'>
+        <Link
+          to= '/tags'
+          className= {
+            'inline-flex items-center gap-2 text-sm uppercase text-slate-400 ' +
+            'transition-colors hover:text-white'
+          }
+        >
+          <TagIcon size= { 16 } />
+          <span>Tag</span>
+        </Link>
+
+        <h1 className= 'text-2xl font-light tracking-wide'>
+          { tag?.name ?? 'Tag' }
+        </h1>
+      </div>
+
+      { error ? (
+        <p className= 'py-16 text-center text-red-400'>{ error }</p>
+      ) : (
+        <MediaBrowser
+          media= { result?.items ?? [] }
+          loading= { loading }
+          offset= { result?.offset ?? offset }
+          limit= { result?.limit ?? MEDIA_PAGE_SIZE }
+          total= { result?.total }
+          onPageChange= { n => { setOffset( n ), window.scrollTo( 0, 0 ) } }
+          onOpenMedia= { ( { id } ) => navigate( `/watch/${ id }` ) }
+        />
+      ) }
+    </div>
+  );
 }
