@@ -22,6 +22,26 @@ interface AudioPlayerData  {
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
+  const { stream, media: mediaApi, directories, playlists } = useApi();
+  const navigate = useNavigate();
+
+
+  const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
+    const { data, loading, error } = useApiData< AudioPlayerData >( key, async signal => {
+      const [ categories, tags, directory ] = await Promise.all( [
+        mediaApi.categories( media.id ).catch( () => [] ),
+        mediaApi.tags( media.id ).catch( () => [] ),
+        directories.list( media.rootId, media.directoryId ).catch( () => null )
+      ] );
+  
+      return { categories, tags, directory };
+    } );
+
+    const categories = data?.categories ?? [];
+  const tags = data?.tags ?? [];
+  const directory = data?.directory ?? null;
+
+
   return (
     <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
       <div className= 'relative w-full max-h-130 aspect-2/1 bg-slate-950 rounded' />
