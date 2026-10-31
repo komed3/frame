@@ -8,6 +8,16 @@ import { Link } from 'react-router';
 
 
 export function Categories () {
+  const { categories } = useApi();
+  const { data, loading, error } = useApiData< CategoryRecord[] >( 'categories', () => categories.list() );
+
+  const items = data ?? [];
+  const parents = new Map( items.map( item => [ item.id, item.name ] ) );
+
+
+  usePageTitle( 'Categories' );
+
+
   return (
     <></>
   );
