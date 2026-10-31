@@ -190,6 +190,11 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
 
   useKeyControls( {
+    'f11': toggleFullscreen, ' ': togglePlay, m: toggleMute,
+    arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
+    arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
+    arrowup: () => changeVolume( volumeRef.current + 0.05 ),
+    arrowdown: () => changeVolume( volumeRef.current - 0.05 ),
     'ctrl+arrowleft': () => navigateAdjacent( prev ),
     'ctrl+arrowright': () => navigateAdjacent( next )
   } );
