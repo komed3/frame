@@ -17,6 +17,10 @@ const BUTTON =
   'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
   'transition-colors hover:bg-slate-50/20';
 
+const ACTION_BUTTON =
+  'inline-flex items-center gap-3 px-4 py-2.5 text-sm bg-slate-50/10 rounded transition-colors ' +
+  'hover:bg-slate-50/20 disabled:opacity-50 disabled:pointer-events-none';
+
 
 export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {
   const { canEdit } = useApi();
@@ -131,6 +135,45 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
                 <XIcon size= { 20 } />
               </button>
             </div>
+
+            <form onSubmit= { save } className= 'flex flex-col gap-4'>
+              <input
+                autoFocus
+                value= { value }
+                onChange= { e => setValue( e.target.value ) }
+                placeholder= { kind === 'category' ? 'Category name' : 'Tag name' }
+                maxLength= { 200 }
+                className= {
+                  'w-full px-3 py-2 text-sm bg-slate-900 border border-slate-600 rounded ' +
+                  'focus:outline-none focus:border-slate-500'
+                }
+              />
+
+              { error && (
+                <p role= 'alert' className= 'text-sm text-red-400'>
+                  { error }
+                </p>
+              ) }
+
+              <div className= 'flex justify-end gap-2'>
+                <button
+                  onClick= { close }
+                  disabled= { saving }
+                  className= { ACTION_BUTTON }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type= 'submit'
+                  disabled= { ! value.trim() || value.trim() === name || saving }
+                  className= { ACTION_BUTTON + ' bg-slate-50/20 hover:bg-slate-50/30' }
+                >
+                  <CheckIcon size= { 16 } />
+                  <span>{ saving ? 'Saving …' : 'Save' }</span>
+                </button>
+              </div>
+            </form>
           </div>
         </>
       ) }
