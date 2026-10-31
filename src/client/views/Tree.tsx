@@ -130,7 +130,13 @@ export function Tree () {
         </p>
       ) : (
         <div className= 'space-y-8'>
-          ...
+          { data.map( ( { root, name, tree } ) => {
+            const rootKey = `root-${ root.id }`, open = expanded.has( rootKey );
+
+            return (
+              <></>
+            );
+          } ) }
         </div>
       ) }
     </div>
