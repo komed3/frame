@@ -104,6 +104,22 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
           <span>Delete</span>
         </button>
       </div>
+
+      { open && (
+        <>
+          <div
+            className= 'fixed inset-0 z-40 bg-slate-900 opacity-50'
+            onClick= { close }
+          />
+
+          <div
+            className= {
+              'fixed top-1/2 left-1/2 -translate-1/2 z-50 flex flex-col gap-5 ' +
+              'w-[90%] max-w-lg p-5 bg-slate-700 rounded shadow-lg'
+            }
+          ></div>
+        </>
+      ) }
     </>
   );
 }
