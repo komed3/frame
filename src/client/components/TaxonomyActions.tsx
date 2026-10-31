@@ -13,6 +13,11 @@ interface TaxonomyActionsProps {
 }
 
 
+const BUTTON =
+  'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
+  'transition-colors hover:bg-slate-50/20';
+
+
 export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: TaxonomyActionsProps ) {
   const { canEdit } = useApi();
 
@@ -70,7 +75,35 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
   };
 
 
-  return (
-    <></>
+  return canEdit && (
+    <>
+      <div className= 'flex items-center gap-1'>
+        <button
+          onClick= { edit }
+          className= { BUTTON + ' rounded-l-full' }
+        >
+          <SettingsIcon size= { 16 } />
+          <span>Edit</span>
+        </button>
+
+        <button
+          onClick= { swap }
+          disabled= { saving }
+          className= { BUTTON }
+        >
+          <ArrowRightLeftIcon size= { 16 } />
+          <span>Change to { kind === 'category' ? 'Tag' : 'Category' }</span>
+        </button>
+
+        <button
+          onClick= { remove }
+          disabled= { saving }
+          className= { BUTTON + ' rounded-r-full' }
+        >
+          <TrashIcon size= { 16 } />
+          <span>Delete</span>
+        </button>
+      </div>
+    </>
   );
 }
