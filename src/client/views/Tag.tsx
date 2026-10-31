@@ -15,3 +15,26 @@ interface TagPageData {
   tag: TagRecord | null;
   result: MediaSearchResult;
 }
+
+
+export function Tag () {
+  const { tags, search } = useApi();
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [ offset, setOffset ] = useState( 0 );
+  const key = JSON.stringify( [ id ?? null, offset ] );
+
+  const { data, loading, error } = useApiData< TagPageData >( key, () => {
+    if ( ! id ) return Promise.reject( new Error( 'Tag not found.' ) );
+
+    return Promise.all( [ tags.get( id ), search( {
+      tagIds: [ id ], limit: MEDIA_PAGE_SIZE, offset, sortBy: 'title', sortDirection: 'asc'
+    } ) ] ).then( ( [ tag, result ] ) => ( { tag, result } ) );
+  } );
+
+  const tag = data?.tag ?? null;
+  const result = data?.result;
+
+  usePageTitle( tag?.name ?? 'Tag' );
+}
