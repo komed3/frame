@@ -229,31 +229,37 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
               }
             />
 
-            <button
-              onClick= { () => navigateAdjacent( prev ) }
-              disabled= { ! prev }
-              title= 'Previous [Ctrl + ←]'
-              aria-label= 'Previous'
-              className= {
-                'absolute top-1/2 left-4 -translate-y-1/2 z-20 p-3 bg-slate-50/10 rounded-full ' +
-                'backdrop-blur hover:bg-slate-50/20 disabled:opacity-20 disabled:pointer-events-none'
-              }
-            >
-              <ChevronLeftIcon size= { 28 } />
-            </button>
+            <div className= 'absolute top-6 right-6 z-20 flex items-center gap-2'>
+              <button
+                onClick= { () => navigateAdjacent( prev ) }
+                disabled= { ! prev }
+                title= 'Previous [Ctrl + ←]'
+                aria-label= 'Previous'
+                className= { BUTTON }
+              >
+                <ChevronLeftIcon size= { 19 } />
+              </button>
 
-            <button
-              onClick= { () => navigateAdjacent( next ) }
-              disabled= { ! next }
-              title= 'Next [Ctrl + →]'
-              aria-label= 'Next'
-              className= {
-                'absolute top-1/2 right-4 -translate-y-1/2 z-20 p-3 bg-slate-50/10 rounded-full ' +
-                'backdrop-blur hover:bg-slate-50/20 disabled:opacity-20 disabled:pointer-events-none'
-              }
-            >
-              <ChevronRightIcon size= { 28 } />
-            </button>
+              <button
+                onClick= { () => navigateAdjacent( next ) }
+                disabled= { ! next }
+                title= 'Next [Ctrl + →]'
+                aria-label= 'Next'
+                className= { BUTTON }
+              >
+                <ChevronRightIcon size= { 19 } />
+              </button>
+
+              <button
+                onClick= { toggleFullscreen }
+                aria-pressed= { fullscreen }
+                title= 'Toggle fullscreen [f]'
+                aria-label= 'Fullscreen'
+                className= { BUTTON }
+              >
+                <Maximize2Icon size= { 18 } />
+              </button>
+            </div>
           </>
         ) }
       </div>
