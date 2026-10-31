@@ -1,3 +1,4 @@
+import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import type { MediaRecord } from '@/src/shared/types/media';
 
@@ -14,6 +15,14 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       <div className= 'relative w-full max-h-130 aspect-2/1 bg-slate-950 rounded' />
 
       <MediaActions media= { media } />
+
+      { playlistId && (
+        <ActivePlaylist
+          playlistId= { playlistId }
+          mediaId= { media.id }
+          orientation= 'horizontal'
+        />
+      ) }
     </div>
   );
 }
