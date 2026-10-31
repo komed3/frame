@@ -47,7 +47,7 @@ export function Category () {
     <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-8'>
       <div className= 'space-y-4'>
         <Link
-          to= '/tags'
+          to= '/categories'
           className= {
             'inline-flex items-center gap-2 text-sm uppercase text-slate-400 ' +
             'transition-colors hover:text-white'
