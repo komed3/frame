@@ -181,6 +181,7 @@ export interface Api {
     create: ( name: string ) => Promise< TagRecord | null >;
     rename: ( id: string, name: string ) => Promise< TagRecord | null >;
     delete: ( id: string ) => Promise< void >;
+    swap: ( id: string ) => Promise< CategoryRecord | null >;
   };
   categories: {
     list: () => Promise< CategoryRecord[] >;
@@ -189,6 +190,7 @@ export interface Api {
     rename: ( id: string, name: string ) => Promise< CategoryRecord | null >;
     setParent: ( id: string, parentId: string | null ) => Promise< CategoryRecord | null >;
     delete: ( id: string ) => Promise< void >;
+    swap: ( id: string ) => Promise< TagRecord | null >;
   };
   favorites: {
     list: ( page?: Partial< ApiPage > ) => Promise< FavoriteRecord[] >;
