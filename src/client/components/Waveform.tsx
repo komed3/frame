@@ -11,6 +11,9 @@ interface WaveformProps {
 
 
 export function Waveform ( { samples, duration, currentTime, buffered, onSeek }: WaveformProps ) {
+  const canvasRef = useRef< HTMLCanvasElement >( null );
+  const [ hover, setHover ] = useState< number | null >( null );
+
   return (
     <></>
   );
