@@ -93,6 +93,37 @@ export class MediaTaxonomy {
     MediaTaxonomy.replaceMediaRelations( mediaId, tagIds, 'tags' );
   }
 
+  public static swapTagToCategory ( id: string ) : string {
+    assertId( id, 'tag' );
+
+    const categoryId = db.transaction( tx => {
+      const tag = as< TagRecord | undefined >( tx.prepare( 'SELECT id, name FROM tags WHERE id = ?' ).get( id ) );
+      if ( ! tag ) throw new Error( `Tag ${ id } does not exist` );
+
+      const existing = as< { id: string } | undefined >( tx.prepare(
+        'SELECT id FROM categories WHERE name = ?'
+      ).get( tag.name ) );
+
+      const targetId = existing?.id ?? db.createWithId( categoryId => {
+        tx.prepare( 'INSERT INTO categories ( id, name, parent_id ) VALUES ( ?, ?, NULL )' )
+          .run( categoryId, tag.name );
+
+        return categoryId;
+      } );
+
+      tx.prepare( `
+        INSERT OR IGNORE INTO media_categories ( media_id, category_id )
+        SELECT media_id, ? FROM media_tags WHERE tag_id = ?
+      ` ).run( targetId, id );
+
+      tx.prepare( 'DELETE FROM tags WHERE id = ?' ).run( id );
+
+      return targetId;
+    } );
+
+    return categoryId;
+  }
+
 
   // --- categories ---
 
@@ -187,5 +218,38 @@ export class MediaTaxonomy {
 
   public static setMediaCategories ( mediaId: string, categoryIds: string[] ) : void {
     MediaTaxonomy.replaceMediaRelations( mediaId, categoryIds, 'categories' );
+  }
+
+  public static swapCategoryToTag ( id: string ) : string {
+    assertId( id, 'category' );
+
+    const tagId = db.transaction( tx => {
+      const category = as< CategoryRecord | undefined >( tx.prepare(
+        'SELECT id, name, parent_id AS parentId FROM categories WHERE id = ?'
+      ).get( id ) );
+
+      if ( ! category ) throw new Error( `Category ${ id } does not exist` );
+
+      const existing = as< { id: string } | undefined >( tx.prepare(
+        'SELECT id FROM tags WHERE name = ?'
+      ).get( category.name ) );
+
+      const targetId = existing?.id ?? db.createWithId( tagId => {
+        tx.prepare( 'INSERT INTO tags ( id, name ) VALUES ( ?, ? )' ).run( tagId, category.name );
+        return tagId;
+      } );
+
+      tx.prepare( `
+        INSERT OR IGNORE INTO media_tags ( media_id, tag_id )
+        SELECT media_id, ? FROM media_categories WHERE category_id = ?
+      ` ).run( targetId, id );
+
+      tx.prepare( 'UPDATE categories SET parent_id = ? WHERE parent_id = ?' ).run( category.parentId, id );
+      tx.prepare( 'DELETE FROM categories WHERE id = ?' ).run( id );
+
+      return targetId;
+    } );
+
+    return tagId;
   }
 }
