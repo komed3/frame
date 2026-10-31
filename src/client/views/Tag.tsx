@@ -63,6 +63,7 @@ export function Tag () {
           { tag && (
             <TaxonomyActions
               kind= 'tag'
+              id= { tag.id }
               name= { name }
               onRename= { async next => {
                 await tags.rename( tag.id, next );

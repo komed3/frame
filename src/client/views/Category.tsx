@@ -78,6 +78,8 @@ export function Category () {
           { category && (
             <TaxonomyActions
               kind= 'category'
+              id= { category.id }
+              parentId= { category.parentId }
               name= { name }
               onRename= { async next => {
                 await categories.rename( category.id, next );
