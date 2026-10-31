@@ -38,6 +38,11 @@ export function Category () {
   const result = data?.result;
 
 
+  usePageTitle( category?.name ?? 'Category' );
+
+
+  if ( ! loading && ! error && data && ! category ) return <NotFound />;
+
   return (
     <></>
   );
