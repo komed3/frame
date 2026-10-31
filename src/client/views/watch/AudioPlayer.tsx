@@ -19,7 +19,7 @@ import {
   ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
   RotateCcwIcon, SkipBackIcon, SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -48,6 +48,8 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   const audioRef = useRef< HTMLAudioElement >( null );
   const playerRef = useRef< HTMLDivElement >( null );
+  const volumeControlRef = useRef< HTMLDivElement >( null );
+  const volumeInputRef = useRef< HTMLInputElement >( null );
   const volumeRef = useRef( 1 );
 
   const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
@@ -64,6 +66,10 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const [ remaining, setRemaining ] = useState( false );
   const [ streamError, setStreamError ] = useState< string | null >( null );
   const [ fullscreen, setFullscreen ] = useState( false );
+
+  function updateVolumeUI ( value: number ) {
+    volumeControlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
+  }
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
@@ -90,8 +96,19 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const next = data?.next ?? null;
 
 
-  useEffect( () => { setVolume( volumePref ), volumeRef.current = volumePref }, [ volumePref ] );
-  useEffect( () => { let a = audioRef.current; if ( ! a ) return; a.volume = volume, a.muted = muted }, [ muted ] );
+  useEffect( () => {
+    setVolume( volumePref ), volumeRef.current = volumePref;
+    if ( volumeInputRef.current ) volumeInputRef.current.value = String( volumePref );
+
+    updateVolumeUI( volumePref );
+  }, [ volumePref ] );
+
+  useEffect( () => {
+    const audio = audioRef.current;
+    if ( ! audio ) return;
+
+    audio.volume = volume, audio.muted = muted
+  }, [ muted ] );
 
   useEffect( () => {
     const controller = new AbortController();
@@ -189,11 +206,18 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const changeVolume = ( v: number ) => {
     const value = Math.max( 0, Math.min( 1, v ) );
     volumeRef.current = value;
+    if ( volumeInputRef.current ) volumeInputRef.current.value = String( value );
 
+    updateVolumeUI( value );
     if ( audioRef.current ) audioRef.current.volume = value;
   };
 
-  const saveVolume = () => { setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current ) };
+  const saveVolume = () => {
+    if ( volumeRef.current === volume ) return;
+    setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current );
+  };
+
+  const adjustVolume = ( value: number ) => { changeVolume( value ), saveVolume() };
   const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : playerRef.current?.requestFullscreen();
   const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
@@ -203,8 +227,8 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     'f11': toggleFullscreen, ' ': togglePlay, m: toggleMute,
     arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
     arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
-    arrowup: () => changeVolume( volumeRef.current + 0.05 ),
-    arrowdown: () => changeVolume( volumeRef.current - 0.05 ),
+    arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
+    arrowdown: () => adjustVolume( volumeRef.current - 0.05 ),
     'ctrl+arrowleft': () => navigateAdjacent( prev ),
     'ctrl+arrowright': () => navigateAdjacent( next )
   } );
@@ -352,22 +376,26 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                     ) }
                   </button>
 
-                  <div className= 'relative w-28 h-6 flex items-center'>
+                  <div
+                    ref= { volumeControlRef }
+                    className= 'relative w-28 h-6 flex items-center'
+                    style= { { '--volume': `${ volume * 100 }%` } as CSSProperties }
+                  >
                     <div className= 'relative w-full h-1.5 rounded-full bg-slate-700'>
                       <div
                         className= 'h-full rounded-full bg-slate-300'
-                        style= { { width: `${ volume * 100 }%` } }
+                        style= { { width: 'var(--volume)' } }
                       />
 
                       <div
                         className= 'absolute top-1/2 -translate-1/2 size-4 rounded-full bg-white shadow-lg'
-                        style= { { left: `${ volume * 100 }%` } }
+                        style= { { left: 'var(--volume)' } }
                       />
                     </div>
 
                     <input
-                      type= 'range'
-                      min= { 0 } max= { 1 } step= { 0.01 } value= { volume }
+                      ref= { volumeInputRef } type= 'range'
+                      min= { 0 } max= { 1 } step= { 0.01 } defaultValue= { volume }
                       onInput= { e => changeVolume( Number( e.currentTarget.value ) ) }
                       onPointerUp= { saveVolume } onKeyUp= { saveVolume } onBlur= { saveVolume }
                       aria-label= 'Volume' title= 'Volume'
