@@ -1,14 +1,15 @@
+import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaBrowser } from '@/src/client/components/MediaBrowser';
 import { MEDIA_PAGE_SIZE } from '@/src/client/components/Pagination';
+import { TaxonomyActions } from '@/src/client/components/TaxonomyActions';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaSearchResult } from '@/src/shared/types/search';
 import type { TagRecord } from '@/src/shared/types/taxonomy';
-import { TagIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 
 interface TagPageData {
@@ -23,6 +24,7 @@ export function Tag () {
   const navigate = useNavigate();
 
   const [ offset, setOffset ] = useState( 0 );
+  const [ nameOverride, setNameOverride ] = useState< string | null >( null );
   const key = JSON.stringify( [ id ?? null, offset ] );
 
 
@@ -36,9 +38,10 @@ export function Tag () {
 
   const tag = data?.tag ?? null;
   const result = data?.result;
+  const name = nameOverride ?? tag?.name ?? 'Tag';
 
 
-  usePageTitle( tag?.name ?? 'Tag' );
+  usePageTitle( name );
 
 
   if ( ! loading && ! error && data && ! tag ) return <NotFound />;
@@ -46,20 +49,37 @@ export function Tag () {
   return (
     <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-8'>
       <div className= 'space-y-4'>
-        <Link
-          to= '/tags'
-          className= {
-            'inline-flex items-center gap-2 text-sm uppercase text-slate-400 ' +
-            'transition-colors hover:text-white'
-          }
-        >
-          <TagIcon size= { 16 } />
-          <span>Tag</span>
-        </Link>
+        <Breadcrumbs
+          items={ tag ? [ { id: tag.id, name, path: '' } ] : [] }
+          onHome={ () => navigate( '/tags' ) }
+          onNavigate={ () => navigate( '/tags' ) }
+        />
 
-        <h1 className= 'text-2xl font-light tracking-wide'>
-          { tag?.name ?? 'Tag' }
-        </h1>
+        <div className= 'flex justify-between items-center gap-12'>
+          <h1 className= 'text-2xl font-light tracking-wide'>
+            { name }
+          </h1>
+
+          { tag && (
+            <TaxonomyActions
+              kind= 'tag'
+              name= { name }
+              onRename= { async next => {
+                await tags.rename( tag.id, next );
+                setNameOverride( next );
+              } }
+              onDelete= { async () => {
+                await tags.delete( tag.id );
+                navigate( '/tags' );
+              } }
+              onSwap= { async () => {
+                const category = await tags.swap( tag.id );
+                if ( ! category ) throw new Error( 'Could not convert tag.' );
+                navigate( `/category/${ category.id }` );
+              } }
+            />
+          ) }
+        </div>
       </div>
 
       { error ? (
