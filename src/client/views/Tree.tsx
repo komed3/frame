@@ -164,6 +164,28 @@ export function Tree () {
                     ) }
                   </button>
                 </div>
+
+                { open && (
+                  <div className= 'ml-4 border-l border-slate-700'>
+                    { tree.map( dir => (
+                      <DirectoryNode
+                        key= { dir.id }
+                        rootId= { root.id }
+                        directory= { dir }
+                        depth= { 1 }
+                        expanded= { expanded }
+                        onToggle= { toggle }
+                        onNavigate= { ( r, d ) => navigate( `/all/${ r }/${ d }` ) }
+                      />
+                    ) ) }
+
+                    { ! tree.length && (
+                      <p className= 'py-3 pl-12 text-sm text-slate-500'>
+                        No subdirectories.
+                      </p>
+                    ) }
+                  </div>
+                ) }
               </div>
             );
           } ) }
