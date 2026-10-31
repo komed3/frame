@@ -80,6 +80,32 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
         ) : (
           <>
             <MediaThumbnail media= { media } aspectRatio= 'w-full h-full' />
+
+            <button
+              onClick= { () => navigateAdjacent( prev ) }
+              disabled= { ! prev }
+              title= 'Previous [Ctrl + ←]'
+              aria-label= 'Previous'
+              className= {
+                'absolute top-1/2 left-4 -translate-y-1/2 z-20 p-3 bg-slate-50/10 rounded-full ' +
+                'backdrop-blur hover:bg-slate-50/20 disabled:opacity-20 disabled:pointer-events-none'
+              }
+            >
+              <ChevronLeftIcon size= { 28 } />
+            </button>
+
+            <button
+              onClick= { () => navigateAdjacent( next ) }
+              disabled= { ! next }
+              title= 'Next [Ctrl + →]'
+              aria-label= 'Next'
+              className= {
+                'absolute top-1/2 right-4 -translate-y-1/2 z-20 p-3 bg-slate-50/10 rounded-full ' +
+                'backdrop-blur hover:bg-slate-50/20 disabled:opacity-20 disabled:pointer-events-none'
+              }
+            >
+              <ChevronRightIcon size= { 28 } />
+            </button>
           </>
         ) }
       </div>
