@@ -1,6 +1,7 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaActions } from '@/src/client/components/MediaActions';
+import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
@@ -68,6 +69,16 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
         onHome= { () => navigate( '/all' ) }
         onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
       />
+
+      <div className= 'space-y-3'>
+        { categories.length > 0 && (
+          <MediaTaxonomy type= 'category' items= { categories } />
+        ) }
+
+        <h1 className= 'text-2xl font-medium tracking-wide'>
+          { media.title || media.fileName }
+        </h1>
+      </div>
     </div>
   );
 }
