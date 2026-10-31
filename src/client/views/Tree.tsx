@@ -46,9 +46,8 @@ function DirectoryNode ( { rootId, directory, depth, expanded, onToggle, onNavig
           onClick= { () => onToggle( directory.id ) }
           disabled= { ! hasChildren }
           className= {
-            'flex justify-center items-center size-6 shrink-0 rounded transition-all ' +
-            ( hasChildren ? 'text-slate-400 hover:text-white hover:bg-slate-50/10' : 'invisible' ) +
-            ( open && ' rotate-90' )
+            'flex justify-center items-center size-6 shrink-0 rounded transition-all' +
+            ( hasChildren ? '' : ' invisible' ) + ( open ? ' rotate-90' : '' )
           }
         >
           <ChevronRightIcon size= { 16 } />
@@ -58,7 +57,7 @@ function DirectoryNode ( { rootId, directory, depth, expanded, onToggle, onNavig
           onClick= { () => onNavigate( rootId, directory.id ) }
           className= 'group flex-1 flex items-center gap-3 min-w-0 py-2 text-left'
         >
-          <FolderIcon size= { 17 } className= 'shrink-0 text-slate-400' />
+          <FolderIcon size= { 16 } className= 'shrink-0 text-slate-400' />
 
           <span className= 'truncate text-sm transition-colors group-hover:text-sky-400'>
             { directory.name }
@@ -134,7 +133,38 @@ export function Tree () {
             const rootKey = `root-${ root.id }`, open = expanded.has( rootKey );
 
             return (
-              <></>
+              <div key= { root.id }>
+                <div className= 'flex items-center gap-2 min-h-10'>
+                  <button
+                    aria-label= { open ? 'Collapse root' : 'Expand root' }
+                    aria-expanded= { open }
+                    onClick= { () => toggle( rootKey ) }
+                    className= {
+                      'flex justify-center items-center size-8 shrink-0 rounded transition-all' +
+                      ( open ? ' rotate-90' : '' )
+                    }
+                  >
+                    <ChevronRightIcon size= { 18 } />
+                  </button>
+
+                  <button
+                    onClick= { () => navigate( `/all/${ root.id }` ) }
+                    className= 'group flex-1 flex items-center gap-3 min-w-0 py-2 text-left'
+                  >
+                    <FolderIcon size= { 18 } className= 'shrink-0 text-slate-400' />
+
+                    <span className= 'truncate transition-colors group-hover:text-sky-400'>
+                      { name }
+                    </span>
+
+                    { root.enabled && (
+                      <span className= 'py-0.5 px-2 text-[10px] uppercase bg-slate-50/10 rounded'>
+                        Disabled
+                      </span>
+                    ) }
+                  </button>
+                </div>
+              </div>
             );
           } ) }
         </div>
