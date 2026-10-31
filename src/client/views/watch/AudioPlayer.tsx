@@ -273,6 +273,14 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                   </p>
                 ) }
               </div>
+
+              <Waveform
+                samples= { waveform?.samples ?? null }
+                duration= { displayDuration }
+                currentTime= { currentTime }
+                buffered= { buffered }
+                onSeek= { seek }
+              />
             </div>
 
             { streamError && (
