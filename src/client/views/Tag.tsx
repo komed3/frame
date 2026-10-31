@@ -26,7 +26,7 @@ export function Tag () {
   const key = JSON.stringify( [ id ?? null, offset ] );
 
 
-  const { data, loading, error } = useApiData< TagPageData >( key, () => {
+  const { data, loading, error } = useApiData< TagPageData >( key, async () => {
     if ( ! id ) return Promise.reject( new Error( 'Tag not found.' ) );
 
     return Promise.all( [ tags.get( id ), search( {
