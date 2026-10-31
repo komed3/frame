@@ -76,6 +76,16 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
       onMouseLeave= { () => setHover( null ) }
     >
       <canvas ref= { canvasRef } className= 'size-full pointer-events-none' />
+
+      <input
+        type= 'range'
+        min= { 0 } max= { duration || 1 } step= { 0.05 }
+        value= { Math.min( currentTime, duration || 0 ) }
+        onChange= { e => onSeek( Number( e.target.value ) ) }
+        disabled= { ! duration }
+        aria-label= 'Seek'
+        className= 'absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default'
+      />
     </div>
   );
 }
