@@ -25,6 +25,7 @@ export function Tag () {
   const [ offset, setOffset ] = useState( 0 );
   const key = JSON.stringify( [ id ?? null, offset ] );
 
+
   const { data, loading, error } = useApiData< TagPageData >( key, () => {
     if ( ! id ) return Promise.reject( new Error( 'Tag not found.' ) );
 
@@ -36,5 +37,9 @@ export function Tag () {
   const tag = data?.tag ?? null;
   const result = data?.result;
 
+
   usePageTitle( tag?.name ?? 'Tag' );
+
+
+  if ( ! loading && ! error && data && ! tag ) return <NotFound />;
 }
