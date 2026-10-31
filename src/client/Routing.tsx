@@ -9,6 +9,7 @@ import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
 import { Tag } from '@/src/client/views/Tag';
 import { Tags } from '@/src/client/views/Tags';
+import { Tree } from '@/src/client/views/Tree';
 import { Watch } from '@/src/client/views/Watch';
 import { Route, Routes } from 'react-router';
 
@@ -16,6 +17,7 @@ import { Route, Routes } from 'react-router';
 export function Routing () {
   return (
     <Routes>
+      <Route path= '/tree' element= { <Tree /> } />
       <Route path= '/all/:rootId/:directoryId' element= { <Media /> } />
       <Route path= '/all/:rootId' element= { <Media /> } />
       <Route path= '/all' element= { <Media /> } />
