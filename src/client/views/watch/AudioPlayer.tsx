@@ -50,7 +50,8 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const playerRef = useRef< HTMLDivElement >( null );
   const volumeRef = useRef( 1 );
 
-  const [ [ volumePref = 1, muted = false ], setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
+  const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
+  const volumePref = Number( prefs[ 0 ] ) ?? 1, muted = !! prefs[ 1 ];
 
   const [ volume, setVolume ] = useState( volumePref );
   const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
@@ -88,15 +89,25 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const next = data?.next ?? null;
 
 
+  useEffect( () => { setVolume( volumePref ), volumeRef.current = volumePref }, [ volumePref ] );
+
+  useEffect( () => {
+    const audio = audioRef.current;
+    if ( ! audio ) return;
+
+    audio.volume = volume, audio.muted = muted;
+  }, [ volume, muted ] );
+
+
   const navigateAdjacent = ( id: string | null ) => id && navigate(
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
   );
 
 
   useKeyControls( {
-       'ctrl+arrowleft': () => navigateAdjacent( prev ),
-       'ctrl+arrowright': () => navigateAdjacent( next )
-    } );
+    'ctrl+arrowleft': () => navigateAdjacent( prev ),
+    'ctrl+arrowright': () => navigateAdjacent( next )
+  } );
 
 
   return (
