@@ -99,6 +99,9 @@ export function Tree () {
   );
 
 
+  usePageTitle( 'Directories' );
+
+
   return (
     <></>
   );
