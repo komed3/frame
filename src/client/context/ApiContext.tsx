@@ -245,7 +245,8 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       get: id => request< TagRecord | null >( `/tag/${ e( id ) }` ),
       create: name => request< TagRecord | null >( '/tag', { method: 'POST', body: s( { name } ) } ),
       rename: ( id, name ) => request< TagRecord | null >( `/tag/${ e( id ) }`, { method: 'PATCH', body: s( { name } ) } ),
-      delete: id => request< void >( `/tag/${ e( id ) }`, { method: 'DELETE' } )
+      delete: id => request< void >( `/tag/${ e( id ) }`, { method: 'DELETE' } ),
+      swap: id => request< CategoryRecord | null >( `/tag/${ e( id ) }/swap`, { method: 'POST' } )
     },
 
     categories: {
@@ -256,7 +257,8 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       setParent: ( id, parentId ) => request< CategoryRecord | null >( `/category/${ e( id ) }/parent`, {
         method: 'PUT', body: s( { parentId } )
       } ),
-      delete: id => request< void >( `/category/${ e( id ) }`, { method: 'DELETE' } )
+      delete: id => request< void >( `/category/${ e( id ) }`, { method: 'DELETE' } ),
+      swap: id => request< TagRecord | null >( `/category/${ e( id ) }/swap`, { method: 'POST' } )
     },
 
     favorites: {
