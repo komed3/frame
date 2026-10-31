@@ -18,6 +18,26 @@ interface CategoryPageData {
 
 
 export function Category () {
+  const { categories, search } = useApi();
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [ offset, setOffset ] = useState( 0 );
+  const key = JSON.stringify( [ id ?? null, offset ] );
+
+
+  const { data, loading, error } = useApiData< CategoryPageData >( key, async () => {
+    if ( ! id ) return Promise.reject( new Error( 'Category not found.' ) );
+
+    return Promise.all( [ categories.get( id ), search( {
+      categoryIds: [ id ], limit: MEDIA_PAGE_SIZE, offset, sortBy: 'title', sortDirection: 'asc'
+    } ) ] ).then( ( [ category, result ] ) => ( { category, result } ) );
+  } );
+
+  const category = data?.category ?? null;
+  const result = data?.result;
+
+
   return (
     <></>
   );
