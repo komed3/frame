@@ -7,12 +7,66 @@ import { FolderIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
+interface CategoryNode {
+  category: CategoryRecord;
+  children: CategoryNode[];
+}
+
+
+function CategoryTree ( { nodes }: { nodes: CategoryNode[] } ) {
+  return (
+    <ul className= 'space-y-1'>
+      { nodes.map( ( { category: { id, name }, children } ) => (
+        <li key= { id }>
+          <Link
+            to= { `/category/${ id }` }
+            className= {
+              'group flex items-center gap-3 min-w-0 px-3 py-2.5 rounded ' +
+              'transition-colors hover:bg-slate-50/5'
+            }
+          >
+            <FolderIcon size= { 16 } className= 'shrink-0' />
+
+            <span className= 'truncate text-sm transition-colors group-hover:text-sky-400'>
+              { name }
+            </span>
+          </Link>
+
+          { children.length > 0 && (
+            <div className= 'my-1 ml-5 pl-4 border-l border-slate-700'>
+              <CategoryTree nodes= { children } />
+            </div>
+          ) }
+        </li>
+      ) ) }
+    </ul>
+  );
+}
+
+
 export function Categories () {
   const { categories } = useApi();
   const { data, loading, error } = useApiData< CategoryRecord[] >( 'categories', () => categories.list() );
 
   const items = data ?? [];
-  const parents = new Map( items.map( item => [ item.id, item.name ] ) );
+  const nodes = new Map< string, CategoryNode >();
+  const roots: CategoryNode[] = [];
+
+  items.forEach( c => nodes.set( c.id, { category: c, children: [] } ) );
+  items.forEach( c => {
+    const node = nodes.get( c.id )!;
+    const parent = c.parentId ? nodes.get( c.parentId ) : null;
+
+    if ( parent ) parent.children.push( node );
+    else roots.push( node );
+  } );
+
+  const sort = ( list: CategoryNode[] ) => {
+    list.sort( ( a, b ) => a.category.name.localeCompare( b.category.name ) );
+    list.forEach( node => sort( node.children ) );
+  };
+
+  sort( roots );
 
 
   usePageTitle( 'Categories' );
@@ -30,39 +84,8 @@ export function Categories () {
         <p role= 'alert' className= 'py-16 text-center text-red-400'>
           { error }
         </p>
-      ) : items.length > 0 ? (
-        <div className= 'divide-y divide-slate-700/70 divide-dashed'>
-          { items.map( ( { id, name, parentId } ) => (
-            <Link
-              key= { id }
-              to= { `/category/${ id }` }
-              className= {
-                'group flex justify-between items-center gap-6 p-4 ' +
-                'transition-colors hover:bg-slate-50/5'
-              }
-            >
-              <div className= 'flex items-center gap-4 min-w-0'>
-                <FolderIcon size= { 20 } className= 'shrink-0 text-slate-400' />
-
-                <div className= 'min-w-0'>
-                  <p className= 'truncate transition-colors group-hover:text-sky-400'>
-                    { name }
-                  </p>
-
-                  { parentId && parents.has( parentId ) && (
-                    <p className= 'mt-1 text-xs text-slate-500'>
-                      { parents.get( parentId ) }
-                    </p>
-                  ) }
-                </div>
-              </div>
-
-              <span className= 'text-sm text-slate-500'>
-                View media
-              </span>
-            </Link>
-          ) ) }
-        </div>
+      ) : roots.length > 0 ? (
+        <CategoryTree nodes= { roots } />
       ) : (
         <p className= 'py-16 text-center text-slate-500'>
           No categories found.
