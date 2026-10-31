@@ -128,7 +128,7 @@ export function Tree () {
           No directories found.
         </p>
       ) : (
-        <div className= 'space-y-8'>
+        <div className= 'space-y-4'>
           { data.map( ( { root, name, tree } ) => {
             const rootKey = `root-${ root.id }`, open = expanded.has( rootKey );
 
