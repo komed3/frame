@@ -14,4 +14,14 @@ export function Favorites () {
 
   const [ page, setPage ] = useState( 0 );
   const key = JSON.stringify( [ user?.id ?? null, page ] );
+
+
+  const { data: result, loading, error } = useApiData< MediaSearchResult >( key, () => {
+    if ( ! user ) return Promise.reject( new Error( 'User not found.' ) );
+
+    return search( {
+      favorite: true, userId: user.id, limit: MEDIA_PAGE_SIZE, offset: page,
+      sortBy: 'title', sortDirection: 'asc'
+    } );
+  } );
 }
