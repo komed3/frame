@@ -31,7 +31,38 @@ export function Categories () {
           { error }
         </p>
       ) : items.length > 0 ? (
-        <></>
+        <div className= 'divide-y divide-slate-700/70 divide-dashed'>
+          { items.map( ( { id, name, parentId } ) => (
+            <Link
+              key= { id }
+              to= { `/category/${ id }` }
+              className= {
+                'group flex justify-between items-center gap-6 p-4 ' +
+                'transition-colors hover:bg-slate-50/5'
+              }
+            >
+              <div className= 'flex items-center gap-4 min-w-0'>
+                <FolderIcon size= { 20 } className= 'shrink-0 text-slate-400' />
+
+                <div className= 'min-w-0'>
+                  <p className= 'truncate transition-colors group-hover:text-sky-400'>
+                    { name }
+                  </p>
+
+                  { parentId && parents.has( parentId ) && (
+                    <p className= 'mt-1 text-xs text-slate-500'>
+                      { parents.get( parentId ) }
+                    </p>
+                  ) }
+                </div>
+              </div>
+
+              <span className= 'text-sm text-slate-500'>
+                View media
+              </span>
+            </Link>
+          ) ) }
+        </div>
       ) : (
         <p className= 'py-16 text-center text-slate-500'>
           No categories found.
