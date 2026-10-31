@@ -7,7 +7,7 @@ import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
 import { Tag } from '@/src/client/views/Tag';
-//import { Tags } from '@/src/client/views/Tags';
+import { Tags } from '@/src/client/views/Tags';
 import { Watch } from '@/src/client/views/Watch';
 import { Route, Routes } from 'react-router';
 
@@ -21,8 +21,8 @@ export function Routing () {
       <Route path= '/search' element= { <Search /> } />
 
       {/*<Route path= '/categories' element= { <Categories /> } />
-      <Route path= '/category/:id' element= { <Category /> } />
-      <Route path= '/tags' element= { <Tags /> } />*/}
+      <Route path= '/category/:id' element= { <Category /> } />*/}
+      <Route path= '/tags' element= { <Tags /> } />
       <Route path= '/tag/:id' element= { <Tag /> } />
 
       <Route path= '/watch/:id' element= { <Watch /> } />

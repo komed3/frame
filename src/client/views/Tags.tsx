@@ -8,6 +8,14 @@ import { Link } from 'react-router';
 
 
 export function Tags () {
+  const { tags } = useApi();
+  const { data, loading, error } = useApiData< TagRecord[] >( 'tags', () => tags.list() );
+  const items = [ ...( data ?? [] ) ].sort( ( a, b ) => a.name.localeCompare( b.name ) );
+
+
+  usePageTitle( 'Tags' );
+
+
   return (
     <></>
   );
