@@ -27,17 +27,17 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
-    const { data, loading, error } = useApiData< AudioPlayerData >( key, async signal => {
-      const [ categories, tags, directory ] = await Promise.all( [
-        mediaApi.categories( media.id ).catch( () => [] ),
-        mediaApi.tags( media.id ).catch( () => [] ),
-        directories.list( media.rootId, media.directoryId ).catch( () => null )
-      ] );
-  
-      return { categories, tags, directory };
-    } );
+  const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
+    const [ categories, tags, directory ] = await Promise.all( [
+      mediaApi.categories( media.id ).catch( () => [] ),
+      mediaApi.tags( media.id ).catch( () => [] ),
+      directories.list( media.rootId, media.directoryId ).catch( () => null )
+    ] );
 
-    const categories = data?.categories ?? [];
+  return { categories, tags, directory };
+  } );
+
+  const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
 
