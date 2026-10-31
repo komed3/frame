@@ -57,6 +57,14 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       ) }
 
       <hr className= 'border-dashed border-slate-700' />
+
+      <Breadcrumbs
+        items= { [ ...( directory?.breadcrumbs ?? [] ), {
+          id: media.id, name: media.title || media.fileName, path: media.path
+        } ] }
+        onHome= { () => navigate( '/all' ) }
+        onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
+      />
     </div>
   );
 }
