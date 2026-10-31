@@ -68,7 +68,7 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
 
   return (
     <div
-      className= 'relative w-full h-14'
+      className= 'relative w-full h-20'
       onMouseMove= { e => {
         const rect = e.currentTarget.getBoundingClientRect();
         setHover( Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) ) );
