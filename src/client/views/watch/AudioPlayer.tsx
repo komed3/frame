@@ -14,6 +14,12 @@ interface AudioPlayerProps {
   playlistId?: string;
 }
 
+interface AudioPlayerData  {
+  categories: CategoryRecord[];
+  tags: TagRecord[];
+  directory: ApiDirectoryListResult | null;
+}
+
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   return (
