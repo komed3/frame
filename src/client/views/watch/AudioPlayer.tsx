@@ -1,6 +1,12 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { MediaActions } from '@/src/client/components/MediaActions';
+import { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
+import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
+import { useNavigate } from 'react-router';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
+import { useApi } from '../../context/ApiContext';
+import { useApiData } from '../../hooks/useApiData';
 
 
 interface AudioPlayerProps {
