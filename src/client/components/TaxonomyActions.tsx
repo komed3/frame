@@ -1,3 +1,9 @@
+import { useApi } from '@/src/client/context/ApiContext';
+import { useBodyScrollLock } from '@/src/client/hooks/useBodyScrollLock';
+import { ArrowRightLeftIcon, CheckIcon, SettingsIcon, TrashIcon, XIcon } from 'lucide-react';
+import { type SubmitEvent, useState } from 'react';
+
+
 interface TaxonomyActionsProps {
   kind: 'category' | 'tag';
   name: string;
