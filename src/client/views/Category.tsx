@@ -1,18 +1,20 @@
+import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaBrowser } from '@/src/client/components/MediaBrowser';
 import { MEDIA_PAGE_SIZE } from '@/src/client/components/Pagination';
+import { TaxonomyActions } from '@/src/client/components/TaxonomyActions';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaSearchResult } from '@/src/shared/types/search';
 import type { CategoryRecord } from '@/src/shared/types/taxonomy';
-import { ArrowRightLeftIcon, FolderIcon, SettingsIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 
 interface CategoryPageData {
   category: CategoryRecord | null;
+  categories: CategoryRecord[];
   result: MediaSearchResult;
 }
 
@@ -23,22 +25,36 @@ export function Category () {
   const navigate = useNavigate();
 
   const [ offset, setOffset ] = useState( 0 );
+  const [ nameOverride, setNameOverride ] = useState< string | null >( null );
   const key = JSON.stringify( [ id ?? null, offset ] );
 
 
   const { data, loading, error } = useApiData< CategoryPageData >( key, async () => {
     if ( ! id ) return Promise.reject( new Error( 'Category not found.' ) );
 
-    return Promise.all( [ categories.get( id ), search( {
-      categoryIds: [ id ], limit: MEDIA_PAGE_SIZE, offset, sortBy: 'title', sortDirection: 'asc'
-    } ) ] ).then( ( [ category, result ] ) => ( { category, result } ) );
+    const [ category, allCategories, result ] = await Promise.all( [
+      categories.get( id ), categories.list(), search( {
+        categoryIds: [ id ], limit: MEDIA_PAGE_SIZE, offset, sortBy: 'title', sortDirection: 'asc'
+      } )
+    ] );
+
+    return { category, categories: allCategories, result };
   } );
 
   const category = data?.category ?? null;
   const result = data?.result;
+  const name = nameOverride ?? category?.name ?? 'Category';
+
+  const parents: CategoryRecord[] = [];
+  let current = category;
+
+  while ( current ) {
+    parents.unshift( current );
+    current = current.parentId ? data?.categories.find( item => item.id === current?.parentId ) ?? null : null;
+  }
 
 
-  usePageTitle( category?.name ?? 'Category' );
+  usePageTitle( name );
 
 
   if ( ! loading && ! error && data && ! category ) return <NotFound />;
@@ -46,53 +62,38 @@ export function Category () {
   return (
     <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-8'>
       <div className= 'space-y-4'>
-        <Link
-          to= '/categories'
-          className= {
-            'inline-flex items-center gap-2 text-sm text-slate-400 ' +
-            'transition-colors hover:text-white'
-          }
-        >
-          <FolderIcon size= { 16 } />
-          <span>All Categories</span>
-        </Link>
+        <Breadcrumbs
+          items= { parents.map( ( item, i ) => ( {
+            id: item.id, name: i === parents.length - 1 ? name : item.name, path: ''
+          } ) ) }
+          onHome= { () => navigate( '/categories' ) }
+          onNavigate= { p => navigate( p ? `/category/${ p }` : '/categories' ) }
+        />
 
         <div className= 'flex justify-between items-center gap-12'>
           <h1 className= 'text-2xl font-light tracking-wide'>
-            { category?.name ?? 'Category' }
+            { name }
           </h1>
 
-          <div className= 'flex items-center gap-1'>
-            <button
-              className= {
-                'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
-                'rounded-l-full transition-colors hover:bg-slate-50/20'
-              }
-            >
-              <SettingsIcon size= { 16 } />
-              <span>Edit</span>
-            </button>
-
-            <button
-              className= {
-                'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
-                'transition-colors hover:bg-slate-50/20'
-              }
-            >
-              <ArrowRightLeftIcon size= { 16 } />
-              <span>Change to Tag</span>
-            </button>
-
-            <button
-              className= {
-                'flex items-center gap-2.5 h-10 px-5 text-[15px] font-medium bg-slate-50/10 ' +
-                'rounded-r-full transition-colors hover:bg-slate-50/20'
-              }
-            >
-              <TrashIcon size= { 16 } />
-              <span>Delete</span>
-            </button>
-          </div>
+          { category && (
+            <TaxonomyActions
+              kind= 'category'
+              name= { name }
+              onRename= { async next => {
+                await categories.rename( category.id, next );
+                setNameOverride( next );
+              } }
+              onDelete= { async () => {
+                await categories.delete( category.id );
+                navigate( '/categories' );
+              } }
+              onSwap= { async () => {
+                const tag = await categories.swap( category.id );
+                if ( ! tag ) throw new Error( 'Could not convert category.' );
+                navigate( `/tag/${ tag.id }` );
+              } }
+            />
+          ) }
         </div>
       </div>
 
