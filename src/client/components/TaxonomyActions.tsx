@@ -117,7 +117,21 @@ export function TaxonomyActions ( { kind, name, onRename, onDelete, onSwap }: Ta
               'fixed top-1/2 left-1/2 -translate-1/2 z-50 flex flex-col gap-5 ' +
               'w-[90%] max-w-lg p-5 bg-slate-700 rounded shadow-lg'
             }
-          ></div>
+          >
+            <div className= 'flex justify-between items-center'>
+              <h2 className= 'font-medium'>
+                Edit { kind }
+              </h2>
+
+              <button
+                aria-label= 'Close'
+                onClick= { close }
+                disabled= { saving }
+              >
+                <XIcon size= { 20 } />
+              </button>
+            </div>
+          </div>
         </>
       ) }
     </>
