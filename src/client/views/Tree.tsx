@@ -87,6 +87,18 @@ function DirectoryNode ( { rootId, directory, depth, expanded, onToggle, onNavig
 
 
 export function Tree () {
+  const { roots, directories } = useApi();
+  const navigate = useNavigate();
+
+  const [ expanded, setExpanded ] = useState< Set< string > >( new Set() );
+  const { data, loading, error } = useApiData< RootTree[] >( 'directory-tree', async () =>
+    Promise.all( ( await roots.list() ).map( async root => {
+      const result: ApiDirectoryTreeResult = await directories.tree( root.id );
+      return { root, name: result.root.name ?? rootName( root ), tree: result.tree };
+    } ) )
+  );
+
+
   return (
     <></>
   );
