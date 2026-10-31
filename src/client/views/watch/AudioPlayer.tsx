@@ -189,12 +189,11 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const changeVolume = ( v: number ) => {
     const value = Math.max( 0, Math.min( 1, v ) );
     volumeRef.current = value;
-    setVolume( value );
 
     if ( audioRef.current ) audioRef.current.volume = value;
   };
 
-  const saveVolume = () => setPref( 'PLAYER_VOLUME', volumeRef.current );
+  const saveVolume = () => { setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current ) };
   const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : playerRef.current?.requestFullscreen();
   const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
