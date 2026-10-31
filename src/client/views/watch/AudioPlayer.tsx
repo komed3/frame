@@ -185,7 +185,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const changeVolume = ( v: number ) => { volumeRef.current = Math.max( 0, Math.min( 1, v ) ), setVolume( volumeRef.current ) };
   const saveVolume = () => setPref( 'PLAYER_VOLUME', volumeRef.current );
   const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
-  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : audioRef.current?.requestFullscreen();
+  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : playerRef.current?.requestFullscreen();
   const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
 
 
