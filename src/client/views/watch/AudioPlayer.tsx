@@ -16,8 +16,8 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, PauseIcon, PlayIcon, SkipBackIcon,
-  SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
+  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
+  SkipBackIcon, SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -237,7 +237,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                 aria-label= 'Previous'
                 className= { BUTTON }
               >
-                <ChevronLeftIcon size= { 19 } />
+                <ChevronLeftIcon size= { 20 } />
               </button>
 
               <button
@@ -247,7 +247,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                 aria-label= 'Next'
                 className= { BUTTON }
               >
-                <ChevronRightIcon size= { 19 } />
+                <ChevronRightIcon size= { 20 } />
               </button>
 
               <button
@@ -257,7 +257,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                 aria-label= 'Fullscreen'
                 className= { BUTTON }
               >
-                <Maximize2Icon size= { 18 } />
+                { fullscreen ? <Minimize2Icon size= { 20 } /> : <Maximize2Icon size= { 20 } /> }
               </button>
             </div>
           </>
