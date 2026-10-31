@@ -148,6 +148,20 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     };
   }, [] );
 
+  useEffect( () => {
+    const audio = audioRef.current;
+    if ( ! audio ) return;
+
+    setReady( false ), setPlaying( false ), setStreamError( null );
+    setCurrentTime( 0 ), setDuration( media.durationMs ? media.durationMs / 1000 : 0 );
+    setBuffered( [] );
+
+    audio.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
+    audio.load();
+
+    return () => { audio.pause(), audio.removeAttribute( 'src' ), audio.load() };
+  }, [ media.id, media.durationMs ] );
+
 
   const navigateAdjacent = ( id: string | null ) => id && navigate(
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
