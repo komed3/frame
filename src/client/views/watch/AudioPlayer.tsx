@@ -325,7 +325,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                   </button>
                 </div>
 
-                <div className= 'flex items-center gap-3'>
+                <div className= 'flex items-center gap-4'>
                   <button
                     onClick= { toggleMute }
                     title= 'Mute / Unmute [m]'
@@ -340,6 +340,29 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                       <Volume2Icon size= { 20 } />
                     ) }
                   </button>
+
+                  <div className= 'relative w-28 h-6 flex items-center'>
+                    <div className= 'relative w-full h-1.5 rounded-full bg-slate-700'>
+                      <div
+                        className= 'h-full rounded-full bg-slate-300'
+                        style= { { width: `${ volume * 100 }%` } }
+                      />
+
+                      <div
+                        className= 'absolute top-1/2 -translate-1/2 size-4 rounded-full bg-white shadow-lg'
+                        style= { { left: `${ volume * 100 }%` } }
+                      />
+                    </div>
+
+                    <input
+                      type= 'range'
+                      min= { 0 } max= { 1 } step= { 0.01 } value= { volume }
+                      onChange= { e => changeVolume( Number( e.target.value ) ) }
+                      onPointerUp= { saveVolume } onKeyUp= { saveVolume } onBlur= { saveVolume }
+                      aria-label= 'Volume' title= 'Volume'
+                      className= 'absolute inset-0 size-full appearance-none bg-transparent opacity-0 cursor-pointer'
+                    />
+                  </div>
                 </div>
               </div>
             </div>
