@@ -46,7 +46,7 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
         );
 
         const position = x / points, time = position * duration;
-        const amplitude = Math.max( 1, peak / 32768 * height * 0.9 );
+        const amplitude = Math.max( 1, peak / 32768 * height );
 
         ctx.fillStyle = position <= played ? '#0ea5e9' : position <= preview && hover !== null ?
           '#b3c1d3' : buffered.some( r => time >= r.start && time <= r.end ) ? '#8899b0' : '#475569';
