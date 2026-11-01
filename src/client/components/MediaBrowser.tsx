@@ -9,7 +9,7 @@ import type { MediaDirectoryEntry } from '@/src/shared/types/directories';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { ProgressRecord } from '@/src/shared/types/progress';
 import type { MediaRoot } from '@/src/shared/types/roots';
-import { FolderIcon } from 'lucide-react';
+import { CheckIcon, FolderIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 
@@ -99,35 +99,55 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
 function MediaGrid ( { media, progress, played, onOpenMedia }: MediaProps ) {
   return media.length > 0 && (
     <div className= 'grid grid-cols-3 gap-x-5 gap-y-8'>
-      { media.map( item => (
-        <button
-          key= { item.id }
-          onClick= { () => onOpenMedia( item ) }
-          className= 'group flex flex-col gap-3'
-        >
-          <div className= 'relative w-full aspect-video'>
-            <MediaThumbnail media= { item } progress= { progress?.[ item.id ] } />
-            <MediaIcon type= { item.type } className= 'absolute top-4 right-4 z-1 opacity-50' />
-          </div>
+      { media.map( item => {
+        const itemProgress = progress?.[ item.id ];
+        const percentage = itemProgress?.completed ? 100 : itemProgress && item.durationMs ?
+          Math.max( 0, Math.min( 100, itemProgress.positionMs / item.durationMs * 100 ) ) : 0;
 
-          <div className= 'flex justify-between items-start gap-6'>
-            <span
-              className= {
-                'flex-1 min-w-0 text-left text-sm font-medium line-clamp-2 wrap-break-words ' +
-                'transition-colors group-hover:text-sky-400'
-              }
-            >
-              { item.title || item.fileName }
-            </span>
+        return (
+          <button
+            key= { item.id }
+            onClick= { () => onOpenMedia( item ) }
+            className= 'group flex flex-col gap-3'
+          >
+            <div className= 'relative w-full aspect-video'>
+              <MediaThumbnail media= { item } />
+              <MediaIcon type= { item.type } className= 'absolute top-4 right-4 z-1 opacity-50' />
 
-            { ( item.type === 'video' || item.type === 'audio' ) && item.durationMs !== null && (
-              <span className= 'shrink-0 text-sm text-slate-400'>
-                { formatDuration( item.durationMs ) }
+              { played?.[ item.id ] && (
+                <CheckIcon size= { 20 } className= 'absolute top-4 left-4 z-1 opacity-50' />
+              ) }
+
+              { !! itemProgress && ( itemProgress.completed || itemProgress.positionMs > 0 ) &&
+                ( itemProgress.completed || !! item.durationMs ) && (
+                <div className= 'absolute inset-x-0 bottom-0 h-1 bg-slate-950/60'>
+                  <div
+                    className= 'h-full bg-sky-500'
+                    style= { { width: `${ percentage }%` } }
+                  />
+                </div>
+              ) }
+            </div>
+
+            <div className= 'flex justify-between items-start gap-6'>
+              <span
+                className= {
+                  'flex-1 min-w-0 text-left text-sm font-medium line-clamp-2 wrap-break-words ' +
+                  'transition-colors group-hover:text-sky-400'
+                }
+              >
+                { item.title || item.fileName }
               </span>
-            ) }
-          </div>
-        </button>
-      ) ) }
+
+              { ( item.type === 'video' || item.type === 'audio' ) && item.durationMs !== null && (
+                <span className= 'shrink-0 text-sm text-slate-400'>
+                  { formatDuration( item.durationMs ) }
+                </span>
+              ) }
+            </div>
+          </button>
+        );
+      } ) }
     </div>
   );
 }
