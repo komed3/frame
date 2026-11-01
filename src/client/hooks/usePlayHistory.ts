@@ -53,7 +53,7 @@ export function usePlayHistory ( media: MediaRecord ) {
     let active = true;
 
     plays.start( media.id ).then( async res => {
-      if ( ! active ) { plays.finish( res.id, 0, false ).catch( () => {} ); return }
+      if ( ! active ) { plays.finish( res.id, res.watchedMs, false ).catch( () => {} ); return }
 
       playId.current = res.id, watchedMs.current = res.watchedMs;
       if ( ! hasPlayback ) return;
