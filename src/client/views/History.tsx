@@ -60,37 +60,33 @@ export function History () {
               </thead>
 
               <tbody className= 'divide-y divide-slate-700/70'>
-                { data.map( ( { id, startedAt, media } ) => {
-                  const hasMedia = !! media;
+                { data.map( ( { id, startedAt, media } ) => (
+                  <tr
+                    key= { id }
+                    onClick= { () => media && navigate( `/watch/${ media.id }` ) }
+                    className= { media ? 'group cursor-pointer transition-colors hover:bg-slate-50/5' : '' }
+                  >
+                    <td className= 'px-5 py-4 whitespace-nowrap text-slate-400'>
+                      { formatDateTime( startedAt ) }
+                    </td>
 
-                  return (
-                    <tr
-                      key= { id }
-                      onClick= { () => hasMedia && navigate( `/watch/${ media.id }` ) }
-                      className= { hasMedia ? 'group cursor-pointer transition-colors hover:bg-slate-50/5' : '' }
-                    >
-                      <td className= 'px-5 py-4 whitespace-nowrap text-slate-400'>
-                        { formatDateTime( startedAt ) }
-                      </td>
+                    <td className= 'px-5 py-4 min-w-64'>
+                      { media ? (
+                        <div className= 'group flex items-center gap-2'>
+                          <MediaIcon type= { media.type } size= { 16 } />
 
-                      <td className= 'px-5 py-4 min-w-64'>
-                        { hasMedia ? (
-                          <div className= 'group flex items-center gap-2'>
-                            <MediaIcon type= { media.type } size= { 16 } />
-
-                            <span className='font-medium transition-colors group-hover:text-sky-400'>
-                              { media.title || media.fileName }
-                            </span>
-                          </div>
-                        ) : (
-                          <span className= 'text-slate-500'>
-                            Unavailable media
+                          <span className='font-medium transition-colors group-hover:text-sky-400'>
+                            { media.title || media.fileName }
                           </span>
-                        ) }
-                      </td>
-                    </tr>
-                  );
-                } ) }
+                        </div>
+                      ) : (
+                        <span className= 'text-slate-500'>
+                          Unavailable media
+                        </span>
+                      ) }
+                    </td>
+                  </tr>
+                ) ) }
               </tbody>
             </table>
           </div>
