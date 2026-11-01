@@ -1,10 +1,13 @@
-import { useApi } from '@/src/client/context/ApiContext';
+import { ApiContextValue } from '@/src/shared/types/api';
 import { MediaRecord } from '@/src/shared/types/media';
 
 
-export function adjacentMedia ( media: MediaRecord, dir: 'prev' | 'next', playlistId?: string ) : Promise< string | null > {
-  const { media: mediaApi, playlists } = useApi();
+export function adjacentMedia ( api: ApiContextValue, media: MediaRecord, playlistId?: string ) {
+  const { media: mediaApi, playlists } = api;
 
-  return playlistId ? playlists[ dir ]( playlistId, media.id ).then( i => i?.mediaId ?? null ) :
-    mediaApi[ dir ]( media.id ).then( i => i?.id ?? null );
+  const adjacent = ( dir: 'prev' | 'next' ) => playlistId
+    ? playlists[ dir ]( playlistId, media.id ).then( i => i?.mediaId ?? null )
+    : mediaApi[ dir ]( media.id ).then( i => i?.id ?? null );
+
+  return [ adjacent( 'prev' ), adjacent( 'next' ) ];
 }
