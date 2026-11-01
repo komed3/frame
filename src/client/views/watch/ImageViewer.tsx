@@ -7,7 +7,7 @@ import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
-import { usePageTitle } from '@/src/client/hooks/usePageTitle';
+import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -133,7 +133,7 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
   }, [ mode, zoom, imageSize ] );
 
 
-  usePageTitle( media.title || media.fileName );
+  usePlayHistory( media );
 
 
   const setView = ( next: 'fit' | 'fill' | 'zoom' ) => {
