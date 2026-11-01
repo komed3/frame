@@ -3,12 +3,14 @@ import { MediaIcon } from '@/src/client/components/MediaIcon';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { MEDIA_PAGE_SIZE, Pagination } from '@/src/client/components/Pagination';
 import { ViewToggle, type MediaViewMode } from '@/src/client/components/ViewToggle';
+import { useApi } from '@/src/client/context/ApiContext';
 import { formatBytes, formatDate, formatDimensions, formatDuration, formatFileFormat } from '@/src/client/utils/format';
 import type { MediaDirectoryEntry } from '@/src/shared/types/directories';
 import type { MediaRecord } from '@/src/shared/types/media';
+import type { ProgressRecord } from '@/src/shared/types/progress';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import { FolderIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 
 interface RootProps {
@@ -23,6 +25,7 @@ interface FolderProps {
 
 interface MediaProps {
   media: MediaRecord[];
+  progress: Record< string, ProgressRecord >;
   onOpenMedia: ( media: MediaRecord ) => void;
 }
 
@@ -92,7 +95,7 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
   );
 }
 
-function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
+function MediaGrid ( { media, progress, onOpenMedia }: MediaProps ) {
   return media.length > 0 && (
     <div className= 'grid grid-cols-3 gap-x-5 gap-y-8'>
       { media.map( item => (
@@ -103,7 +106,7 @@ function MediaGrid ( { media, onOpenMedia }: MediaProps ) {
         >
           <div className= 'relative w-full aspect-video'>
             <MediaIcon type= { item.type } className= 'absolute top-4 right-4 opacity-50' />
-            <MediaThumbnail media= { item } />
+            <MediaThumbnail media= { item } progress= { progress[ item.id ] } />
           </div>
 
           <div className= 'flex justify-between items-start gap-6'>
@@ -223,6 +226,10 @@ export function MediaBrowser ( {
   roots = [], directories = [], media, loading = false, offset, limit = MEDIA_PAGE_SIZE,
   total, hasNext, onPageChange, onOpenRoot, onOpenDirectory, onOpenMedia
 }: MediaBrowserProps ) {
+  const { progress } = useApi();
+  const [ progressByMedia, setProgressByMedia ] = useState< Record< string, ProgressRecord > >( {} );
+  const mediaIds = media.map( ( { id } ) => id ).join( ',' );
+
   const [ view, setView ] = useState< MediaViewMode >(
     () => localStorage.getItem( 'frame.mediaView' ) === 'list' ? 'list' : 'grid'
   );
@@ -231,6 +238,21 @@ export function MediaBrowser ( {
     localStorage.setItem( 'frame.mediaView', value );
     setView( value );
   };
+
+
+  useEffect( () => {
+    let active = true;
+
+    setProgressByMedia( {} );
+    if ( view !== 'grid' || ! mediaIds ) return;
+
+    progress.list( mediaIds.split( ',' ) ).then( rec => {
+      if ( active ) setProgressByMedia( Object.fromEntries( rec.map( i => [ i.mediaId, i ] ) ) );
+    } ).catch( () => { if ( active ) setProgressByMedia( {} ) } );
+
+    return () => { active = false };
+  }, [ mediaIds, progress, view ] );
+
 
   return (
     <div className= 'space-y-8'>
@@ -247,14 +269,20 @@ export function MediaBrowser ( {
               { roots.length > 0 && (
                 <section className= 'space-y-4'>
                   <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Roots</h2>
-                  <RootGrid roots= { roots } onOpenRoot= { onOpenRoot } />
+                  <RootGrid
+                    roots= { roots }
+                    onOpenRoot= { onOpenRoot }
+                  />
                 </section>
               ) }
 
               { directories.length > 0 && (
                 <section className= 'space-y-4'>
                   <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Folders</h2>
-                  <FolderGrid directories= { directories } onOpenDirectory= { onOpenDirectory } />
+                  <FolderGrid
+                    directories= { directories }
+                    onOpenDirectory= { onOpenDirectory }
+                  />
                 </section>
               ) }
 
@@ -263,7 +291,11 @@ export function MediaBrowser ( {
                   { directories.length > 0 && (
                     <h2 className= 'uppercase text-xs font-medium tracking-wider text-slate-400'>Media</h2>
                   ) }
-                  <MediaGrid media= { media } onOpenMedia= { onOpenMedia } />
+                  <MediaGrid
+                    media= { media }
+                    progress= { progressByMedia }
+                    onOpenMedia= { onOpenMedia }
+                  />
                 </section>
               ) }
             </>
@@ -272,6 +304,7 @@ export function MediaBrowser ( {
               roots= { roots }
               directories= { directories }
               media= { media }
+              progress= { progressByMedia }
               onOpenRoot= { onOpenRoot }
               onOpenDirectory= { onOpenDirectory }
               onOpenMedia= { onOpenMedia }
