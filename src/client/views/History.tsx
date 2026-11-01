@@ -3,6 +3,7 @@ import { Pagination } from '@/src/client/components/Pagination';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
+import { formatDateTime } from '@/src/client/utils/format';
 import { HistoryRecord } from '@/src/shared/types/plays';
 import { useState } from 'react';
 
@@ -56,8 +57,12 @@ export function History () {
               </thead>
 
               <tbody className= 'divide-y divide-slate-700/70'>
-                { data.map( ( { id } ) => (
-                  <tr key= { id }></tr>
+                { data.map( ( { id, startedAt } ) => (
+                  <tr key= { id }>
+                    <td className= 'px-5 py-4 whitespace-nowrap text-slate-400'>
+                      { formatDateTime( startedAt ) }
+                    </td>
+                  </tr>
                 ) ) }
               </tbody>
             </table>
