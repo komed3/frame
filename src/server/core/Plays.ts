@@ -84,10 +84,26 @@ export class Plays {
 
     if ( sessionId !== null ) assertId( sessionId, 'session' );
 
+    const existing = as< { id: string } | undefined >( conn().prepare( `
+      SELECT id FROM plays
+      WHERE user_id = ? AND media_id = ? AND completed = 0
+      ORDER BY started_at DESC, id DESC
+      LIMIT 1
+    ` ).get( userId, mediaId ) );
+
+    if ( existing ) {
+      conn().prepare( 'UPDATE plays SET ended_at = NULL, session_id = ? WHERE id = ?' ).run( sessionId, existing.id );
+      conn().prepare( 'DELETE FROM plays WHERE user_id = ? AND media_id = ? AND completed = 0 AND id != ?' ).run(
+        userId, mediaId, existing.id
+      );
+
+      return existing.id;
+    }
+
     return db.createWithId( id => {
-      conn().prepare(
-        'INSERT INTO plays ( id, user_id, media_id, session_id ) VALUES ( ?, ?, ?, ? )'
-      ).run( id, userId, mediaId, sessionId );
+      conn().prepare( 'INSERT INTO plays ( id, user_id, media_id, session_id ) VALUES ( ?, ?, ?, ? )' ).run(
+        id, userId, mediaId, sessionId
+      );
 
       return id;
     } );
