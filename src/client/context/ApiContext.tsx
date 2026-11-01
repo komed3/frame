@@ -11,6 +11,7 @@ import type { MarkerRecord } from '@/src/shared/types/markers';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord } from '@/src/shared/types/playlists';
+import type { HistoryRecord } from '@/src/shared/types/plays';
 import type { PrefValue } from '@/src/shared/types/pref';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import type { MediaSearchResult } from '@/src/shared/types/search';
@@ -297,6 +298,19 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       forMedia: ( mediaId, page ) => request< PlaylistRecord[] >( `/playlist/for-media/${ e( mediaId ) }`, { query: pageQuery( page ) } ),
       next: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/next` ),
       prev: ( id, mediaId ) => request< PlaylistItemRecord | null >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }/prev` )
+    },
+
+    plays: {
+      list: page => request< HistoryRecord[] >( '/plays', { query: pageQuery( page ) } ),
+      start: ( mediaId, sessionId = null ) => request< { id: string } >( '/plays', {
+        method: 'POST', body: s( { mediaId, sessionId } )
+      } ),
+      update: ( id, watchedMs, completed = false ) => request< void >( `/plays/${ e( id ) }`, {
+        method: 'PATCH', body: s( { watchedMs, completed } )
+      } ),
+      finish: ( id, watchedMs, completed = false ) => request< void >( `/plays/${ e( id ) }/finish`, {
+        method: 'PUT', body: s( { watchedMs, completed } )
+      } )
     },
 
     prefs: {
