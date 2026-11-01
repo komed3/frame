@@ -16,8 +16,8 @@ plays.get( '/', ( req, res ) => {
 
 
 plays.post( '/', ( req, res ) => {
-  const id = Plays.start( res.locals.user.id, req.body?.mediaId, req.body?.sessionId ?? null );
-  res.status( 201 ).json( { id } );
+  const userId = res.locals.user.id, id = Plays.start( userId, req.body?.mediaId, req.body?.sessionId ?? null );
+  res.status( 201 ).json( { id, watchedMs: Plays.get( userId, id )?.watchedMs ?? 0 } );
 } );
 
 plays.patch< { id: string } >( '/:id', ( req, res ) => {
