@@ -129,6 +129,7 @@ export interface ApiPlaylistContainsResult {
 
 export interface ApiPlayStartResult {
   id: string;
+  watchedMs: number;
 }
 
 export interface ApiJobListOptions extends JobListFilters, Partial< ApiPage > {

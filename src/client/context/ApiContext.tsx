@@ -1,8 +1,8 @@
 import type {
   Api, ApiAssetRecord, ApiContextValue, ApiDeleteResult, ApiDirectoryListResult, ApiDirectoryTreeResult,
   ApiEnqueueResult, ApiEnv, ApiFavorite, ApiFavoriteAddResult, ApiHealth, ApiLogin, ApiLoginResult,
-  ApiMarkerClearResult, ApiPage, ApiPlaylistClearResult, ApiPlaylistContainsResult, ApiPreference,
-  ApiPreferences, ApiRequestOptions, ApiRootScanAllResult, ApiRootScanResult, ApiSession
+  ApiMarkerClearResult, ApiPage, ApiPlaylistClearResult, ApiPlaylistContainsResult, ApiPlayStartResult,
+  ApiPreference, ApiPreferences, ApiRequestOptions, ApiRootScanAllResult, ApiRootScanResult, ApiSession
 } from '@/src/shared/types/api';
 import type { DatabaseStats } from '@/src/shared/types/database';
 import type { FavoriteRecord } from '@/src/shared/types/favorites';
@@ -303,7 +303,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     plays: {
       list: page => request< HistoryRecord[] >( '/plays', { query: pageQuery( page ) } ),
-      start: ( mediaId, sessionId = null ) => request< { id: string } >( '/plays', {
+      start: ( mediaId, sessionId = null ) => request< ApiPlayStartResult >( '/plays', {
         method: 'POST', body: s( { mediaId, sessionId } )
       } ),
       update: ( id, watchedMs, completed = false ) => request< void >( `/plays/${ e( id ) }`, {
