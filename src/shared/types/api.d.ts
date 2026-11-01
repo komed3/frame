@@ -9,6 +9,7 @@ import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 import type { HistoryRecord } from '@/src/shared/types/plays';
 import type { PrefName, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
+import type { ProgressRecord } from '@/src/shared/types/progress';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import type { MediaSearchOptions, MediaSearchResult } from '@/src/shared/types/search';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -233,6 +234,11 @@ export interface Api {
     start: ( mediaId: string, sessionId?: string | null ) => Promise< ApiPlayStartResult >;
     update: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
     finish: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
+  };
+  progress: {
+    get: ( mediaId: string ) => Promise< ProgressRecord | null >;
+    save: ( mediaId: string, positionMs: number, completed?: boolean ) => Promise< ProgressRecord >;
+    delete: ( mediaId: string ) => Promise< void >;
   };
   prefs: {
     all: () => Promise< ApiPreferences >;
