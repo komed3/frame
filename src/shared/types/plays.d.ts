@@ -19,3 +19,8 @@ export interface PlayRow extends Omit< PlayRecord, 'completed' > {
 export interface HistoryRecord extends PlayRecord {
   media: MediaRecord | null;
 }
+
+export interface PlayStatusRecord {
+  mediaId: string;
+  completed: boolean;
+}
