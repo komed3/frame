@@ -105,8 +105,8 @@ function MediaGrid ( { media, progress, onOpenMedia }: MediaProps ) {
           className= 'group flex flex-col gap-3'
         >
           <div className= 'relative w-full aspect-video'>
-            <MediaIcon type= { item.type } className= 'absolute top-4 right-4 opacity-50' />
             <MediaThumbnail media= { item } progress= { progress?.[ item.id ] } />
+            <MediaIcon type= { item.type } className= 'absolute top-4 right-4 z-1 opacity-50' />
           </div>
 
           <div className= 'flex justify-between items-start gap-6'>
