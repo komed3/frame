@@ -13,6 +13,7 @@ import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord } from '@/src/shared/types/playlists';
 import type { HistoryRecord } from '@/src/shared/types/plays';
 import type { PrefValue } from '@/src/shared/types/pref';
+import type { ProgressRecord } from '@/src/shared/types/progress';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import type { MediaSearchResult } from '@/src/shared/types/search';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -311,6 +312,14 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       finish: ( id, watchedMs, completed = false ) => request< void >( `/plays/${ e( id ) }/finish`, {
         method: 'PUT', body: s( { watchedMs, completed } )
       } )
+    },
+
+    progress: {
+      get: id => request< ProgressRecord | null >( `/progress/${ e( id ) }` ),
+      save: ( id, positionMs, completed = false ) => request< ProgressRecord >( `/progress/${ e( id ) }`, {
+        method: 'PUT', body: s( { positionMs, completed } )
+      } ),
+      delete: id => request< void >( `/progress/${ e( id ) }`, { method: 'DELETE' } )
     },
 
     prefs: {
