@@ -25,7 +25,7 @@ interface FolderProps {
 
 interface MediaProps {
   media: MediaRecord[];
-  progress: Record< string, ProgressRecord >;
+  progress?: Record< string, ProgressRecord >;
   onOpenMedia: ( media: MediaRecord ) => void;
 }
 
@@ -106,7 +106,7 @@ function MediaGrid ( { media, progress, onOpenMedia }: MediaProps ) {
         >
           <div className= 'relative w-full aspect-video'>
             <MediaIcon type= { item.type } className= 'absolute top-4 right-4 opacity-50' />
-            <MediaThumbnail media= { item } progress= { progress[ item.id ] } />
+            <MediaThumbnail media= { item } progress= { progress?.[ item.id ] } />
           </div>
 
           <div className= 'flex justify-between items-start gap-6'>
@@ -304,7 +304,6 @@ export function MediaBrowser ( {
               roots= { roots }
               directories= { directories }
               media= { media }
-              progress= { progressByMedia }
               onOpenRoot= { onOpenRoot }
               onOpenDirectory= { onOpenDirectory }
               onOpenMedia= { onOpenMedia }
