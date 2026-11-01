@@ -231,6 +231,11 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   useKeyControls( {
     'f11': toggleFullscreen, ' ': togglePlay, m: toggleMute,
+    '0': () => seek( duration * 0 ), '1': () => seek( duration * 0.1 ),
+    '2': () => seek( duration * 0.2 ), '3': () => seek( duration * 0.3 ),
+    '4': () => seek( duration * 0.4 ), '5': () => seek( duration * 0.5 ),
+    '6': () => seek( duration * 0.6 ), '7': () => seek( duration * 0.7 ),
+    '8': () => seek( duration * 0.8 ), '9': () => seek( duration * 0.9 ),
     arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
     arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
     arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
