@@ -1,3 +1,4 @@
+import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import type { MediaRecord } from '@/src/shared/types/media';
 
 
@@ -8,6 +9,8 @@ interface VideoPlayerProps {
 
 
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
+  usePlayHistory( media );
+
   return (
     <></>
   );
