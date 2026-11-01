@@ -7,6 +7,7 @@ import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaListOptions, MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
+import type { HistoryRecord } from '@/src/shared/types/plays';
 import type { PrefName, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
 import type { MediaRoot } from '@/src/shared/types/roots';
 import type { MediaSearchOptions, MediaSearchResult } from '@/src/shared/types/search';
@@ -125,6 +126,10 @@ export interface ApiPlaylistContainsResult {
   inPlaylist: boolean;
 }
 
+export interface ApiPlayStartResult {
+  id: string;
+}
+
 export interface ApiJobListOptions extends JobListFilters, Partial< ApiPage > {
   status?: JobStatus;
 }
@@ -222,6 +227,12 @@ export interface Api {
     forMedia: ( mediaId: string, page?: Partial< ApiPage > ) => Promise< PlaylistRecord[] >;
     next: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord | null >;
     prev: ( id: string, mediaId: string ) => Promise< PlaylistItemRecord | null >;
+  };
+  plays: {
+    list: ( page?: Partial< ApiPage > ) => Promise< HistoryRecord[] >;
+    start: ( mediaId: string, sessionId?: string | null ) => Promise< ApiPlayStartResult >;
+    update: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
+    finish: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
   };
   prefs: {
     all: () => Promise< ApiPreferences >;
