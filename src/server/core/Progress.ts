@@ -10,19 +10,21 @@ export class Progress {
     return { ...row, completed: row.completed === 1 };
   }
 
-  public static list ( userId: string, limit = 100, offset = 0 ) : ProgressRecord[] {
+  public static list ( userId: string, limit = 100, offset = 0, mediaIds?: string[] ) : ProgressRecord[] {
     User.assertUserIdSafe( userId );
     assertLimitOffset( limit, offset );
+
+    if ( mediaIds && ! mediaIds.length ) return [];
 
     const rows = as< ProgressRow[] >( conn().prepare( `
       SELECT
         user_id AS userId, media_id AS mediaId, position_ms AS positionMs,
         completed, updated_at AS updatedAt
       FROM progress
-      WHERE user_id = ?
+      WHERE user_id = ? ${ mediaIds === undefined ? '' : `AND media_id IN ( ${ mediaIds.map( () => '?' ).join( ', ' ) } )` }
       ORDER BY updated_at DESC, media_id
       LIMIT ? OFFSET ?
-    ` ).all( userId, limit, offset ) );
+    ` ).all( userId, ...( mediaIds ?? [] ), limit, offset ) );
 
     return rows.map( row => Progress.mapRow( row ) );
   }
