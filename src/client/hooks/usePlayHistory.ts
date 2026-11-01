@@ -53,7 +53,7 @@ export function usePlayHistory ( media: MediaRecord ) {
     let active = true;
 
     plays.start( media.id ).then( async res => {
-      if ( ! active ) { plays.finish( res.id, res.watchedMs, false ).catch( () => {} ); return }
+      if ( ! active ) { plays.finish( res.id, res.watchedMs, ! hasPlayback ).catch( () => {} ); return }
 
       playId.current = res.id, watchedMs.current = res.watchedMs;
       if ( ! hasPlayback ) return;
@@ -68,7 +68,7 @@ export function usePlayHistory ( media: MediaRecord ) {
       if ( saved?.completed ) progress.delete( media.id ).catch( () => {} );
     } ).catch( () => {} );
 
-    return () => { active = false, save( true ) };
+    return () => { active = false, save( true, ! hasPlayback ) };
   }, [ media.id, hasPlayback, plays, progress, save ] );
 
 
