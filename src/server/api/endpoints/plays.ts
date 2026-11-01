@@ -13,3 +13,19 @@ plays.get( '/', ( req, res ) => {
     media: Media.get( play.mediaId )
   } ) ) );
 } );
+
+
+plays.post( '/', ( req, res ) => {
+  const id = Plays.start( res.locals.user.id, req.body?.mediaId, req.body?.sessionId ?? null );
+  res.status( 201 ).json( { id } );
+} );
+
+plays.patch< { id: string } >( '/:id', ( req, res ) => {
+  Plays.update( res.locals.user.id, req.params.id, Number( req.body?.watchedMs ), !! req.body?.completed );
+  res.status( 204 ).end();
+} );
+
+plays.put< { id: string } >( '/:id/finish', ( req, res ) => {
+  Plays.finish( res.locals.user.id, req.params.id, Number( req.body?.watchedMs ), !! req.body?.completed );
+  res.status( 204 ).end();
+} );
