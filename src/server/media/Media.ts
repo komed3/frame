@@ -10,10 +10,16 @@ const SELECT_MEDIA = `
     id, root_id AS rootId, directory_id AS directoryId, path, file_name AS fileName, type,
     mime_type AS mimeType, size_bytes AS sizeBytes, modified_at AS modifiedAt, file_hash AS fileHash,
     fingerprint, available, title, description, creator, rating, released_at AS releasedAt,
-    recorded_at AS recordedAt, language, duration_ms AS durationMs, width, height, fps,
-    bitrate, container, video_codec AS videoCodec, audio_codec AS audioCodec,
-    sample_rate AS sampleRate, channels, encoding, data_json AS dataJson,
-    scanned_at AS scannedAt, created_at AS createdAt, updated_at AS updatedAt
+    recorded_at AS recordedAt, language, duration_ms AS durationMs, width, height, fps, bitrate,
+    container, video_codec AS videoCodec, audio_codec AS audioCodec, sample_rate AS sampleRate,
+    channels, encoding, data_json AS dataJson, scanned_at AS scannedAt, created_at AS createdAt,
+    updated_at AS updatedAt,
+    EXISTS (
+      SELECT 1 FROM assets
+      WHERE assets.media_id = media.id
+        AND assets.kind = 'thumb'
+        AND assets.variant = 'default'
+    ) AS hasThumbnail
   FROM media
 `;
 
@@ -33,7 +39,10 @@ export class Media {
     if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
       throw new Error( `Invalid media data JSON for media ${ row.id }` );
 
-    return { ...row, available: row.available === 1, data: data as Record< string, unknown > };
+    return {
+      ...row, available: row.available === 1, hasThumbnail: row.hasThumbnail === 1,
+      data: data as Record< string, unknown >
+    };
   }
 
   public static assertMediaIdSafe ( mediaId: string ) : void {

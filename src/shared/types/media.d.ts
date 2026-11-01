@@ -13,6 +13,7 @@ export interface MediaRecord {
   fileHash: string | null;
   fingerprint: string | null;
   available: boolean;
+  hasThumbnail: boolean;
   title: string | null;
   description: string | null;
   creator: string | null;
@@ -37,8 +38,9 @@ export interface MediaRecord {
   updatedAt: string;
 }
 
-export interface MediaRow extends Omit< MediaRecord, 'available' | 'data' > {
+export interface MediaRow extends Omit< MediaRecord, 'available' | 'hasThumbnail' | 'data' > {
   available: number;
+  hasThumbnail: number;
   dataJson: string;
 }
 

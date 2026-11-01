@@ -55,7 +55,10 @@ export class MediaSearch {
     if ( ! data || typeof data !== 'object' || Array.isArray( data ) )
       throw new Error( `Invalid media data JSON for media ${ row.id }` );
 
-    return { ...row, available: Boolean( row.available ), data: data as Record< string, unknown > };
+    return {
+      ...row, available: Boolean( row.available ), hasThumbnail: row.hasThumbnail === 1,
+      data: data as Record< string, unknown >
+    };
   }
 
   private static normalizeIds ( ids: string[] ) : string[] {
@@ -399,7 +402,13 @@ export class MediaSearch {
         m.duration_ms AS durationMs, m.width, m.height, m.fps, m.bitrate, m.container,
         m.video_codec AS videoCodec, m.audio_codec AS audioCodec, m.sample_rate AS sampleRate,
         m.channels, m.encoding, m.data_json AS dataJson, m.scanned_at AS scannedAt,
-        m.created_at AS createdAt, m.updated_at AS updatedAt
+        m.created_at AS createdAt, m.updated_at AS updatedAt,
+        EXISTS (
+          SELECT 1 FROM assets a
+          WHERE a.media_id = m.id
+            AND a.kind = 'thumb'
+            AND a.variant = 'default'
+        ) AS hasThumbnail
       ${ from } ${ where }
       ORDER BY
         CASE WHEN ( ${ sortExpression } ) IS NULL THEN 1 ELSE 0 END,
