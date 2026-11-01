@@ -21,7 +21,12 @@ export function usePlayHistory ( media: MediaRecord ) {
       const diff = time - lastTime.current;
       if ( diff > 0 && diff < 3 ) watchedMs.current += diff * 1000;
     }
-  }
+  };
+
+  const set = ( play: boolean, last: number | null, pos?: number ) => {
+    playing.current = play, lastTime.current = last;
+    if ( pos !== undefined ) position.current = pos;
+  };
 
   const save = useCallback( ( finish = false, completed = false ) => {
     const id = playId.current;
@@ -66,28 +71,7 @@ export function usePlayHistory ( media: MediaRecord ) {
   }, [ media.id, hasPlayback, plays, progress, save ] );
 
 
-  const onPlay = useCallback( ( time: number ) => { playing.current = true, lastTime.current = time }, [] );
-
-  const onPause = useCallback( ( time: number ) => {
-    delta( time ), playing.current = false, position.current = time, lastTime.current = null, save();
-  }, [ save ] );
-
-  const onTimeUpdate = useCallback( ( time: number ) => {
-    playing.current && delta( time );
-    position.current = time, lastTime.current = playing.current ? time : null;
-    if ( Date.now() - lastSave.current >= 5000 ) save();
-  }, [ save ] );
-
-  const onSeeking = useCallback( () => { lastTime.current = null }, [] );
-
-  const onSeeked = useCallback( ( time: number ) => {
-    position.current = time, lastTime.current = playing.current ? time : null;
-    save();
-  }, [ save ] );
-
-  const onEnded = useCallback( ( time: number ) => {
-    delta( time ), playing.current = false, position.current = 0, lastTime.current = null, save( true, true );
-  }, [ save ] );
+  const onPlay = useCallback( ( time: number ) => set( true, time ), [] );
 
 
   return { positionMs, onPlay, onPause, onTimeUpdate, onSeeking, onSeeked, onEnded };
