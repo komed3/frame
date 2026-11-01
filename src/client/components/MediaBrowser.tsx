@@ -154,10 +154,10 @@ function MediaGrid ( { media, progress, played, onOpenMedia }: MediaProps ) {
 
 function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, onOpenMedia }: ListProps ) {
   return (
-    <div className= 'overflow-x-auto'>
-      <table className= 'w-full text-left text-sm whitespace-nowrap'>
-        <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
-          <tr className= '*:font-medium *:px-4 *:py-3'>
+    <div className= 'overflow-x-auto bg-slate-900/40 rounded shadow-lg'>
+      <table className= 'w-full text-sm text-left whitespace-nowrap'>
+        <thead className= 'text-xs text-slate-400 uppercase tracking-wider bg-slate-700/40'>
+          <tr className= '*:px-5 *:py-4 *:font-medium'>
             <th>Name</th>
             <th>Format</th>
             <th className= 'text-right'>Size</th>
@@ -172,7 +172,7 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
             <tr
               key= { `root-${ root.id }` }
               onClick= { () => onOpenRoot?.( root ) }
-              className= 'group cursor-pointer *:p-4 transition-colors hover:bg-slate-50/5'
+              className= 'group cursor-pointer *:px-5 *:py-4 transition-colors hover:bg-slate-50/5'
             >
               <td colSpan= { 6 }>
                 <div className= 'flex items-center gap-3 min-w-0'>
@@ -219,7 +219,11 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
                 </div>
               </td>
 
-              <td>{ formatFileFormat( item.fileName, item.container ) }</td>
+              <td>
+                <span className= 'px-2 py-1 font-mono text-xs bg-slate-50/10 rounded'>
+                  { formatFileFormat( item.fileName, item.container ) }
+                </span>
+              </td>
 
               <td className= 'text-right tabular-nums'>
                 { formatBytes( item.sizeBytes ) }
