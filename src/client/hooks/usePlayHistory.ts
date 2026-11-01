@@ -16,6 +16,13 @@ export function usePlayHistory ( media: MediaRecord ) {
   const playing = useRef( false );
 
 
+  const delta = ( time: number ) => {
+    if ( lastTime.current !== null ) {
+      const diff = time - lastTime.current;
+      if ( diff > 0 && diff < 3 ) watchedMs.current += diff * 1000;
+    }
+  }
+
   const save = useCallback( ( finish = false, completed = false ) => {
     const id = playId.current;
     if ( ! id ) return;
@@ -62,21 +69,11 @@ export function usePlayHistory ( media: MediaRecord ) {
   const onPlay = useCallback( ( time: number ) => { playing.current = true, lastTime.current = time }, [] );
 
   const onPause = useCallback( ( time: number ) => {
-    if ( lastTime.current !== null ) {
-      const delta = time - lastTime.current;
-      if ( delta > 0 && delta < 3 ) watchedMs.current += delta * 1000;
-    }
-
-    playing.current = false, position.current = time, lastTime.current = null;
-    save();
+    delta( time ), playing.current = false, position.current = time, lastTime.current = null, save();
   }, [ save ] );
 
   const onTimeUpdate = useCallback( ( time: number ) => {
-    if ( playing.current && lastTime.current !== null ) {
-      const delta = time - lastTime.current;
-      if ( delta > 0 && delta < 3 ) watchedMs.current += delta * 1000;
-    }
-
+    playing.current && delta( time );
     position.current = time, lastTime.current = playing.current ? time : null;
     if ( Date.now() - lastSave.current >= 5000 ) save();
   }, [ save ] );
@@ -89,13 +86,7 @@ export function usePlayHistory ( media: MediaRecord ) {
   }, [ save ] );
 
   const onEnded = useCallback( ( time: number ) => {
-    if ( lastTime.current !== null ) {
-      const delta = time - lastTime.current;
-      if ( delta > 0 && delta < 3 ) watchedMs.current += delta * 1000;
-    }
-
-    playing.current = false, position.current = 0, lastTime.current = null;
-    save( true, true );
+    delta( time ), playing.current = false, position.current = 0, lastTime.current = null, save( true, true );
   }, [ save ] );
 
 
