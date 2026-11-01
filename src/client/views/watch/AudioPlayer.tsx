@@ -11,7 +11,6 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import { formatDuration } from '@/src/client/utils/format';
-import { adjacentMedia } from '@/src/client/utils/media';
 import { parseWaveform, type WaveformData } from '@/src/client/utils/waveform';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -44,8 +43,7 @@ const BUTTON =
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
-  const api = useApi();
-  const { request, assets, media: mediaApi, directories, playlists } = api;
+  const { request, adjacentMedia, media: mediaApi, directories, assets } = useApi();
   const navigate = useNavigate();
 
   const audioRef = useRef< HTMLAudioElement >( null );
@@ -78,11 +76,11 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
-    const [ categories, tags, directory, prev, next ] = await Promise.all( [
+    const [ categories, tags, directory, [ prev, next ] ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      ...adjacentMedia( api, media, playlistId )
+      adjacentMedia( media, playlistId )
     ] );
 
     return { categories, tags, directory, prev, next };

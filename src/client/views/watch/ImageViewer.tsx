@@ -8,7 +8,6 @@ import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
-import { adjacentMedia } from '@/src/client/utils/media';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -50,8 +49,7 @@ const BUTTON = 'p-2 rounded hover:bg-white/20';
 
 
 export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
-  const api = useApi();
-  const { stream, media: mediaApi, directories, playlists } = api;
+  const { stream, adjacentMedia, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
 
 
@@ -74,12 +72,12 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< ImageViewerData >( key, async signal => {
-    const [ image, categories, tags, directory, prev, next ] = await Promise.all( [
+    const [ image, categories, tags, directory, [ prev, next ] ] = await Promise.all( [
       stream( media.id, { signal } ).then( res => res.blob() ),
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      ...adjacentMedia( api, media, playlistId )
+      adjacentMedia( media, playlistId )
     ] );
 
     return { image, categories, tags, directory, prev, next };
