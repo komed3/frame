@@ -14,4 +14,24 @@ export function usePlayHistory ( media: MediaRecord ) {
   const lastTime = useRef< number | null >( null );
   const lastSave = useRef( 0 );
   const playing = useRef( false );
+
+
+  const save = useCallback( ( finish = false, completed = false ) => {
+    const id = playId.current;
+    if ( ! id ) return;
+
+    if ( hasPlayback ) {
+      if ( completed ) progress.delete( media.id ).catch( () => {} );
+      else progress.save( media.id, Math.round( position.current * 1000 ) ).catch( () => {} );
+    }
+
+    const update = finish
+      ? plays.finish( id, Math.round( watchedMs.current ), completed )
+      : plays.update( id, Math.round( watchedMs.current ) );
+
+    update.catch( () => {} );
+    lastSave.current = Date.now();
+
+    if ( finish ) playId.current = null;
+  }, [ hasPlayback, media.id, plays, progress ] );
 }
