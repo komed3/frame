@@ -2,7 +2,7 @@ import { as, conn, db } from '@/src/server/core/Database';
 import { User } from '@/src/server/core/User';
 import { Media } from '@/src/server/media/Media';
 import { assertId, assertLimitOffset } from '@/src/server/utils';
-import type { PlayRecord, PlayRow } from '@/src/shared/types/plays';
+import type { PlayRecord, PlayRow, PlayStatusRecord } from '@/src/shared/types/plays';
 
 
 export class Plays {
@@ -60,6 +60,26 @@ export class Plays {
     Media.assertMediaIdSafe( mediaId );
 
     return Plays.list( 'user_id = ? AND media_id = ?', [ userId, mediaId ], limit, offset );
+  }
+
+  public static listStatusByUser ( userId: string, mediaIds: string[] ) : PlayStatusRecord[] {
+    User.assertUserIdSafe( userId );
+    mediaIds.forEach( id => Media.assertMediaIdSafe( id ) );
+
+    if ( ! mediaIds.length ) return [];
+
+    const rows = as< { mediaId: string; completed: number }[] >( conn().prepare( `
+      SELECT
+        p.media_id AS mediaId,
+        MAX( CASE WHEN m.type IN ( 'image', 'text' ) THEN 1 ELSE p.completed END ) AS completed
+      FROM plays p
+      JOIN media m ON m.id = p.media_id
+      WHERE p.user_id = ?
+        AND p.media_id IN ( ${ mediaIds.map( () => '?' ).join( ', ' ) } )
+      GROUP BY p.media_id
+    ` ).all( userId, ...mediaIds ) );
+
+    return rows.map( row => ( { ...row, completed: row.completed === 1 } ) );
   }
 
   public static get ( userId: string, playId: string ) : PlayRecord | null {
