@@ -74,6 +74,9 @@ export function usePlayHistory ( media: MediaRecord ) {
 
   const onPlay = useCallback( ( time: number ) => set( true, time ), [] );
   const onPause = useCallback( ( time: number ) => { delta( time ), set( false, null, time ), save() }, [ save ] );
+  const onSeeking = useCallback( () => set( undefined, null ), [] );
+  const onSeeked = useCallback( ( time: number ) => { set( undefined, playing.current ? time : null, time ), save() }, [ save ] );
+  const onEnded = useCallback( ( time: number ) => { delta( time ), set( false, null, 0 ), save( true, true ) }, [ save ] );
 
   const onTimeUpdate = useCallback( ( time: number ) => {
     playing.current && delta( time );
