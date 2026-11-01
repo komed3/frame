@@ -72,6 +72,7 @@ export function usePlayHistory ( media: MediaRecord ) {
 
 
   const onPlay = useCallback( ( time: number ) => set( true, time ), [] );
+  const onPause = useCallback( ( time: number ) => { delta( time ), set( false, null, time ), save() }, [ save ] );
 
 
   return { positionMs, onPlay, onPause, onTimeUpdate, onSeeking, onSeeked, onEnded };
