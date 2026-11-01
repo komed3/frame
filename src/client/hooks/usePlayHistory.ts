@@ -97,4 +97,7 @@ export function usePlayHistory ( media: MediaRecord ) {
     playing.current = false, position.current = 0, lastTime.current = null;
     save( true, true );
   }, [ save ] );
+
+
+  return { positionMs, onPlay, onPause, onTimeUpdate, onSeeking, onSeeked, onEnded };
 }
