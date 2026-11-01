@@ -336,7 +336,15 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
   const value = useMemo< ApiContextValue >( () => ( {
     ...api, env, user, token, loading, error, authenticated: user !== null,
-    canEdit: !! env && ( ! env.editorAdminOnly || user?.isAdmin === true )
+    canEdit: !! env && ( ! env.editorAdminOnly || user?.isAdmin === true ),
+
+    adjacentMedia: async ( media, playlistId ) => {
+      const adjacent = ( direction: 'prev' | 'next' ) => playlistId
+        ? api.playlists[ direction ]( playlistId, media.id ).then( item => item?.mediaId ?? null )
+        : api.media[ direction ]( media.id ).then( item => item?.id ?? null );
+
+      return Promise.all( [ adjacent( 'prev' ), adjacent( 'next' ) ] );
+    }
   } ), [ api, env, user, token, loading, error ] );
 
 
