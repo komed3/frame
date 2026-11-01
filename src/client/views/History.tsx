@@ -54,6 +54,12 @@ export function History () {
                   <th className= 'text-right'>Status</th>
                 </tr>
               </thead>
+
+              <tbody className= 'divide-y divide-slate-700/70'>
+                { data.map( ( { id } ) => (
+                  <tr key= { id }></tr>
+                ) ) }
+              </tbody>
             </table>
           </div>
 
