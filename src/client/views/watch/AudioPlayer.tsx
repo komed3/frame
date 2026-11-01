@@ -11,6 +11,7 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import { formatDuration } from '@/src/client/utils/format';
+import { adjacentMedia } from '@/src/client/utils/media';
 import { parseWaveform, type WaveformData } from '@/src/client/utils/waveform';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -74,17 +75,14 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   }
 
 
-  const adjacentMedia = ( direction: 'prev' | 'next' ) => playlistId
-    ? playlists[ direction ]( playlistId, media.id ).then( item => item?.mediaId ?? null )
-    : mediaApi[ direction ]( media.id ).then( item => item?.id ?? null );
-
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
     const [ categories, tags, directory, prev, next ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      adjacentMedia( 'prev' ), adjacentMedia( 'next' )
+      adjacentMedia( media, 'prev', playlistId ),
+      adjacentMedia( media, 'next', playlistId )
     ] );
 
     return { categories, tags, directory, prev, next };
