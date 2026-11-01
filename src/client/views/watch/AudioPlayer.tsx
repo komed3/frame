@@ -44,7 +44,8 @@ const BUTTON =
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
-  const { request, assets, media: mediaApi, directories, playlists } = useApi();
+  const api = useApi();
+  const { request, assets, media: mediaApi, directories, playlists } = api;
   const navigate = useNavigate();
 
   const audioRef = useRef< HTMLAudioElement >( null );
@@ -81,8 +82,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      adjacentMedia( media, 'prev', playlistId ),
-      adjacentMedia( media, 'next', playlistId )
+      ...adjacentMedia( api, media, playlistId )
     ] );
 
     return { categories, tags, directory, prev, next };

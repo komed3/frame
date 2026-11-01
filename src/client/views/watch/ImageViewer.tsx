@@ -50,7 +50,8 @@ const BUTTON = 'p-2 rounded hover:bg-white/20';
 
 
 export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
-  const { stream, media: mediaApi, directories, playlists } = useApi();
+  const api = useApi();
+  const { stream, media: mediaApi, directories, playlists } = api;
   const navigate = useNavigate();
 
 
@@ -78,8 +79,7 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      adjacentMedia( media, 'prev', playlistId ),
-      adjacentMedia( media, 'next', playlistId )
+      ...adjacentMedia( api, media, playlistId )
     ] );
 
     return { image, categories, tags, directory, prev, next };
