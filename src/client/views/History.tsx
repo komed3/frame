@@ -6,6 +6,7 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatDateTime, formatDuration } from '@/src/client/utils/format';
 import { HistoryRecord } from '@/src/shared/types/plays';
+import { CheckIcon, HourglassIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -59,17 +60,20 @@ export function History () {
               </thead>
 
               <tbody className= 'divide-y divide-slate-700/70'>
-                { data.map( ( { id, startedAt, media, watchedMs } ) => (
+                { data.map( ( { id, startedAt, media, watchedMs, completed } ) => (
                   <tr
                     key= { id }
                     onClick= { () => media && navigate( `/watch/${ media.id }` ) }
-                    className= { media ? 'group cursor-pointer transition-colors hover:bg-slate-50/5' : '' }
+                    className= {
+                      '*:px-5 *:py-4 ' +
+                      ( media ? 'group cursor-pointer transition-colors hover:bg-slate-50/5' : '' )
+                    }
                   >
-                    <td className= 'px-5 py-4 whitespace-nowrap text-slate-400'>
+                    <td className= 'whitespace-nowrap text-slate-400'>
                       { formatDateTime( startedAt ) }
                     </td>
 
-                    <td className= 'px-5 py-4 min-w-64'>
+                    <td className= 'min-w-64'>
                       { media ? (
                         <div className= 'group flex items-center gap-2'>
                           <MediaIcon type= { media.type } size= { 16 } />
@@ -85,8 +89,12 @@ export function History () {
                       ) }
                     </td>
 
-                    <td className= 'px-5 py-4 text-right tabular-nums text-slate-300'>
+                    <td className= 'text-right tabular-nums text-slate-300'>
                       { watchedMs ? formatDuration( watchedMs ) : '—' }
+                    </td>
+
+                    <td className= 'text-right *:inline'>
+                      { completed ? <CheckIcon size= { 15 } /> : <HourglassIcon size= { 15 } /> }
                     </td>
                   </tr>
                 ) ) }
