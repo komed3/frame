@@ -57,4 +57,44 @@ export function usePlayHistory ( media: MediaRecord ) {
 
     return () => { active = false, save( true ) };
   }, [ media.id, hasPlayback, plays, progress, save ] );
+
+
+  const onPlay = useCallback( ( time: number ) => { playing.current = true, lastTime.current = time }, [] );
+
+  const onPause = useCallback( ( time: number ) => {
+    if ( lastTime.current !== null ) {
+      const delta = time - lastTime.current;
+      if ( delta > 0 && delta < 3 ) watchedMs.current += delta * 1000;
+    }
+
+    playing.current = false, position.current = time, lastTime.current = null;
+    save();
+  }, [ save ] );
+
+  const onTimeUpdate = useCallback( ( time: number ) => {
+    if ( playing.current && lastTime.current !== null ) {
+      const delta = time - lastTime.current;
+      if ( delta > 0 && delta < 3 ) watchedMs.current += delta * 1000;
+    }
+
+    position.current = time, lastTime.current = playing.current ? time : null;
+    if ( Date.now() - lastSave.current >= 5000 ) save();
+  }, [ save ] );
+
+  const onSeeking = useCallback( () => { lastTime.current = null }, [] );
+
+  const onSeeked = useCallback( ( time: number ) => {
+    position.current = time, lastTime.current = playing.current ? time : null;
+    save();
+  }, [ save ] );
+
+  const onEnded = useCallback( ( time: number ) => {
+    if ( lastTime.current !== null ) {
+      const delta = time - lastTime.current;
+      if ( delta > 0 && delta < 3 ) watchedMs.current += delta * 1000;
+    }
+
+    playing.current = false, position.current = 0, lastTime.current = null;
+    save( true, true );
+  }, [ save ] );
 }
