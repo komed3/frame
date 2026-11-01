@@ -5,3 +5,11 @@ import { Router } from 'express';
 
 
 export const plays = Router();
+
+
+plays.get( '/', ( req, res ) => {
+  const { limit, offset } = parsePagination( req.query.limit, req.query.offset );
+  res.json( Plays.listByUser( res.locals.user.id, limit, offset ).map( play => ( { ...play,
+    media: Media.get( play.mediaId )
+  } ) ) );
+} );
