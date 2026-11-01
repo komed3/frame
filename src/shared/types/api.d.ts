@@ -165,6 +165,7 @@ export interface Api {
     categories: ( id: string ) => Promise< CategoryRecord[] >;
     setCategories: ( id: string, categoryIds: string[] ) => Promise< CategoryRecord[] >;
   };
+  adjacentMedia: ( media: MediaRecord, playlistId?: string ) => Promise< [ string | null, string | null ] >;
   search: ( options: MediaSearchOptions ) => Promise< MediaSearchResult >;
   roots: {
     list: () => Promise< MediaRoot[] >;
