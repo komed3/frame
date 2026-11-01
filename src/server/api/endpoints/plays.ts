@@ -14,6 +14,10 @@ plays.get( '/', ( req, res ) => {
   } ) ) );
 } );
 
+plays.get( '/status', ( req, res ) => {
+  const mediaIds = typeof req.query.mediaIds === 'string' ? req.query.mediaIds.split( ',' ) : [];
+  res.json( Plays.listStatusByUser( res.locals.user.id, mediaIds ) );
+} );
 
 plays.post( '/', ( req, res ) => {
   const userId = res.locals.user.id, id = Plays.start( userId, req.body?.mediaId, req.body?.sessionId ?? null );
