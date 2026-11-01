@@ -8,6 +8,7 @@ import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
+import { adjacentMedia } from '@/src/client/utils/media';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -77,12 +78,8 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      playlistId
-        ? playlists.prev( playlistId, media.id ).then( item => item?.mediaId ?? null )
-        : mediaApi.prev( media.id ).then( item => item?.id ?? null ),
-      playlistId
-        ? playlists.next( playlistId, media.id ).then( item => item?.mediaId ?? null )
-        : mediaApi.next( media.id ).then( item => item?.id ?? null )
+      adjacentMedia( media, 'prev', playlistId ),
+      adjacentMedia( media, 'next', playlistId )
     ] );
 
     return { image, categories, tags, directory, prev, next };
