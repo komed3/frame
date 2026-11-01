@@ -43,6 +43,20 @@ export function History () {
         </p>
       ) : (
         <>
+          <div className= 'overflow-x-auto bg-slate-800 rounded shadow-lg'>
+            <table className= 'w-full text-sm text-left'>
+              <thead className= 'text-xs text-slate-400 uppercase tracking-wider bg-slate-900/40'>
+                <tr className= '*:px-5 *:py-4 *:font-medium'>
+                  <th>Date</th>
+                  <th>Media</th>
+                  <th>Type</th>
+                  <th className= 'text-right'>Watched</th>
+                  <th className= 'text-right'>Status</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+
           <Pagination
             offset= { offset }
             limit= { PAGE_SIZE }
