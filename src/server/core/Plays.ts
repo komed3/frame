@@ -106,7 +106,7 @@ export class Plays {
 
     const existing = as< { id: string } | undefined >( conn().prepare( `
       SELECT id FROM plays
-      WHERE user_id = ? AND media_id = ? AND completed = 0
+      WHERE user_id = ? AND media_id = ? AND completed = 0 AND ended_at IS NULL
       ORDER BY started_at DESC, id DESC
       LIMIT 1
     ` ).get( userId, mediaId ) );
