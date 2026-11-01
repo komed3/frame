@@ -165,7 +165,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
 
   const logout = useCallback( async () => {
-    try { if ( token ) await request< void >( '/auth/logout', { method: 'POST' } ) }
+    try { if ( token ) await request( '/auth/logout', { method: 'POST' } ) }
     finally {
       localStorage.removeItem( TOKEN_KEY );
       setToken( null ), setUser( null );
@@ -187,12 +187,12 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       get: id => request< MediaRecord | null >( `/media/${ e( id ) }` ),
       prev: id => request< MediaRecord | null >( `/media/${ e( id ) }/prev` ),
       next: id => request< MediaRecord | null >( `/media/${ e( id ) }/next` ),
-      update: ( id, data ) => request< void >( `/media/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
+      update: ( id, data ) => request( `/media/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
       metadata: id => request< MediaMetadataRecord[] >( `/media/${ e( id ) }/metadata` ),
       setMetadata: ( id, key, value ) => request< MediaMetadataRecord | null >( `/media/${ e( id ) }/metadata/${ e( key ) }`, {
         method: 'PUT', body: s( { value } )
       } ),
-      deleteMetadata: ( id, key ) => request< void >( `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'DELETE' } ),
+      deleteMetadata: ( id, key ) => request( `/media/${ e( id ) }/metadata/${ e( key ) }`, { method: 'DELETE' } ),
       tags: id => request< TagRecord[] >( `/media/${ e( id ) }/tags` ),
       setTags: ( id, tagIds ) => request< TagRecord[] >( `/media/${ e( id ) }/tags`, { method: 'PUT', body: s( { tagIds } ) } ),
       categories: id => request< CategoryRecord[] >( `/media/${ e( id ) }/categories` ),
@@ -247,7 +247,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       get: id => request< TagRecord | null >( `/tag/${ e( id ) }` ),
       create: name => request< TagRecord | null >( '/tag', { method: 'POST', body: s( { name } ) } ),
       rename: ( id, name ) => request< TagRecord | null >( `/tag/${ e( id ) }`, { method: 'PATCH', body: s( { name } ) } ),
-      delete: id => request< void >( `/tag/${ e( id ) }`, { method: 'DELETE' } ),
+      delete: id => request( `/tag/${ e( id ) }`, { method: 'DELETE' } ),
       swap: id => request< CategoryRecord | null >( `/tag/${ e( id ) }/swap`, { method: 'POST' } )
     },
 
@@ -259,7 +259,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       setParent: ( id, parentId ) => request< CategoryRecord | null >( `/category/${ e( id ) }/parent`, {
         method: 'PUT', body: s( { parentId } )
       } ),
-      delete: id => request< void >( `/category/${ e( id ) }`, { method: 'DELETE' } ),
+      delete: id => request( `/category/${ e( id ) }`, { method: 'DELETE' } ),
       swap: id => request< TagRecord | null >( `/category/${ e( id ) }/swap`, { method: 'POST' } )
     },
 
@@ -267,14 +267,14 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       list: page => request< FavoriteRecord[] >( '/favorite', { query: pageQuery( page ) } ),
       has: mediaId => request< ApiFavorite >( `/favorite/${ e( mediaId ) }` ),
       add: mediaId => request< ApiFavoriteAddResult >( `/favorite/${ e( mediaId ) }`, { method: 'POST' } ),
-      remove: mediaId => request< void >( `/favorite/${ e( mediaId ) }`, { method: 'DELETE' } )
+      remove: mediaId => request( `/favorite/${ e( mediaId ) }`, { method: 'DELETE' } )
     },
 
     markers: {
       list: page => request< MarkerRecord[] >( '/marker', { query: pageQuery( page ) } ),
       get: id => request< MarkerRecord | null >( `/marker/${ e( id ) }` ),
       update: ( id, data ) => request< MarkerRecord | null >( `/marker/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
-      delete: id => request< void >( `/marker/${ e( id ) }`, { method: 'DELETE' } ),
+      delete: id => request( `/marker/${ e( id ) }`, { method: 'DELETE' } ),
       forMedia: ( id, page ) => request< MarkerRecord[] >( `/media/${ e( id ) }/markers`, { query: pageQuery( page ) } ),
       createForMedia: ( id, data ) => request< Pick< MarkerRecord, 'id' > >( `/media/${ e( id ) }/markers`, {
         method: 'POST', body: s( data )
@@ -287,10 +287,10 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       get: id => request< PlaylistRecord | null >( `/playlist/${ e( id ) }` ),
       create: ( name, description ) => request< PlaylistRecord | null >( '/playlist', { method: 'POST', body: s( { name, description } ) } ),
       update: ( id, data ) => request< PlaylistRecord | null >( `/playlist/${ e( id ) }`, { method: 'PATCH', body: s( data ) } ),
-      delete: id => request< void >( `/playlist/${ e( id ) }`, { method: 'DELETE' } ),
+      delete: id => request( `/playlist/${ e( id ) }`, { method: 'DELETE' } ),
       items: ( id, page ) => request< PlaylistItemRecord[] >( `/playlist/${ e( id ) }/items`, { query: pageQuery( page ) } ),
       add: ( id, mediaId ) => request< PlaylistItemRecord[] >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'POST' } ),
-      remove: ( id, mediaId ) => request< void >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' } ),
+      remove: ( id, mediaId ) => request( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, { method: 'DELETE' } ),
       clear: id => request< ApiPlaylistClearResult >( `/playlist/${ e( id ) }/items`, { method: 'DELETE' } ),
       move: ( id, mediaId, position ) => request< PlaylistItemRecord[] >( `/playlist/${ e( id ) }/items/${ e( mediaId ) }`, {
         method: 'PATCH', body: s( { position } )
@@ -306,20 +306,21 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       start: ( mediaId, sessionId = null ) => request< ApiPlayStartResult >( '/plays', {
         method: 'POST', body: s( { mediaId, sessionId } )
       } ),
-      update: ( id, watchedMs, completed = false ) => request< void >( `/plays/${ e( id ) }`, {
+      update: ( id, watchedMs, completed = false ) => request( `/plays/${ e( id ) }`, {
         method: 'PATCH', body: s( { watchedMs, completed } )
       } ),
-      finish: ( id, watchedMs, completed = false ) => request< void >( `/plays/${ e( id ) }/finish`, {
+      finish: ( id, watchedMs, completed = false ) => request( `/plays/${ e( id ) }/finish`, {
         method: 'PUT', body: s( { watchedMs, completed } )
       } )
     },
 
     progress: {
+      list: mediaIds => request< ProgressRecord[] >( '/progress', { query: { mediaIds: mediaIds.join( ',' ) } } ),
       get: id => request< ProgressRecord | null >( `/progress/${ e( id ) }` ),
       save: ( id, positionMs, completed = false ) => request< ProgressRecord >( `/progress/${ e( id ) }`, {
         method: 'PUT', body: s( { positionMs, completed } )
       } ),
-      delete: id => request< void >( `/progress/${ e( id ) }`, { method: 'DELETE' } )
+      delete: id => request( `/progress/${ e( id ) }`, { method: 'DELETE' } )
     },
 
     prefs: {
