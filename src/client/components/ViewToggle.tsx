@@ -25,7 +25,7 @@ export function ViewToggle ( { value, onChange }: ViewToggleProps ) {
           aria-pressed= { value === option }
           onClick= { () => onChange( option ) }
           className= {
-            'flex justify-center items-center gap-2 h-9 px-3 text-sm transition-colors ' +
+            'flex justify-center items-center gap-2 h-9 px-4 text-sm transition-colors ' +
             r + ' ' + ( value === option ? 'bg-slate-50/20' : 'hover:bg-slate-50/5' )
           }
         >
