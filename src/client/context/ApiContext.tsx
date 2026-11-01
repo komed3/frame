@@ -11,7 +11,7 @@ import type { MarkerRecord } from '@/src/shared/types/markers';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord } from '@/src/shared/types/playlists';
-import type { HistoryRecord } from '@/src/shared/types/plays';
+import type { HistoryRecord, PlayStatusRecord } from '@/src/shared/types/plays';
 import type { PrefValue } from '@/src/shared/types/pref';
 import type { ProgressRecord } from '@/src/shared/types/progress';
 import type { MediaRoot } from '@/src/shared/types/roots';
@@ -303,6 +303,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     plays: {
       list: page => request< HistoryRecord[] >( '/plays', { query: pageQuery( page ) } ),
+      status: mediaIds => request< PlayStatusRecord[] >( '/plays/status', { query: { mediaIds: mediaIds.join( ',' ) } } ),
       start: ( mediaId, sessionId = null ) => request< ApiPlayStartResult >( '/plays', {
         method: 'POST', body: s( { mediaId, sessionId } )
       } ),
