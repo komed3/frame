@@ -9,6 +9,7 @@ import { Waveform } from '@/src/client/components/Waveform';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
+import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import { formatDuration } from '@/src/client/utils/format';
 import { parseWaveform, type WaveformData } from '@/src/client/utils/waveform';
@@ -45,12 +46,14 @@ const BUTTON =
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const { request, adjacentMedia, media: mediaApi, directories, assets } = useApi();
   const navigate = useNavigate();
+  const history = usePlayHistory( media );
 
   const audioRef = useRef< HTMLAudioElement >( null );
   const playerRef = useRef< HTMLDivElement >( null );
   const volumeControlRef = useRef< HTMLDivElement >( null );
   const volumeInputRef = useRef< HTMLInputElement >( null );
   const volumeRef = useRef( 1 );
+  const restoredRef = useRef( false );
 
   const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
   const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
@@ -138,20 +141,28 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
       } ) ) );
     };
 
-    const onPlay = () => { setPlaying( true ), setEnded( false ) };
-    const onPause = () => setPlaying( false );
-    const onEnded = () => { setPlaying( false ), setEnded( true ) };
+    const onTimeUpdate = () => { update(), history.onTimeUpdate( audio.currentTime ) };
+    const onPlay = () => { setPlaying( true ), setEnded( false ), history.onPlay( audio.currentTime ) };
+    const onPause = () => { setPlaying( false ), history.onPause( audio.currentTime ) };
+    const onEnded = () => { setPlaying( false ), setEnded( true ), history.onEnded( audio.currentTime ) };
+    const onSeeking = () => history.onSeeking();
+    const onSeeked = () => history.onSeeked( audio.currentTime );
     const onReady = () => setReady( true );
     const onError = () => setStreamError( 'Could not play this audio file.' );
 
     const listeners: [ string, EventListener ][] = [
-      ...[ 'timeupdate', 'durationchange', 'progress' ].map( e => [ e, update ] as [ string, EventListener ] ),
-      [ 'play', onPlay ], [ 'pause', onPause ], [ 'ended', onEnded ], [ 'canplay', onReady ], [ 'error', onError ]
+      [ 'timeupdate', onTimeUpdate ], [ 'durationchange', update ], [ 'progress', update ],
+      [ 'play', onPlay ], [ 'pause', onPause ], [ 'ended', onEnded ],
+      [ 'seeking', onSeeking ], [ 'seeked', onSeeked ],
+      [ 'canplay', onReady ], [ 'error', onError ]
     ];
 
     listeners.forEach( ( [ e, listener ] ) => audio.addEventListener( e, listener ) );
     return () => listeners.forEach( ( [ e, listener ] ) => audio.removeEventListener( e, listener ) );
-  }, [] );
+  }, [
+    history.onPlay, history.onPause, history.onTimeUpdate,
+    history.onSeeking, history.onSeeked, history.onEnded
+  ] );
 
   useEffect( () => {
     const audio = audioRef.current;
@@ -160,11 +171,23 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     setReady( false ), setPlaying( false ), setEnded( false ), setStreamError( null );
     setCurrentTime( 0 ), setDuration( mediaDuration ), setBuffered( [] );
 
+    restoredRef.current = false;
     audio.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
     audio.load();
 
     return () => { audio.pause(), audio.removeAttribute( 'src' ), audio.load() };
   }, [ media.id, media.durationMs ] );
+
+  useEffect( () => {
+    const audio = audioRef.current;
+    if ( ! audio || ! ready || history.positionMs === null || restoredRef.current ) return;
+    if ( ! Number.isFinite( audio.duration ) ) return;
+
+    if ( history.positionMs > 0 && history.positionMs < audio.duration * 1000 )
+      audio.currentTime = history.positionMs / 1000;
+
+    restoredRef.current = true;
+  }, [ ready, history.positionMs ] );
 
   useEffect( () => {
     const change = () => setFullscreen( !! document.fullscreenElement );
