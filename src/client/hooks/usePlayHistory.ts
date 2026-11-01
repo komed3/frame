@@ -34,4 +34,27 @@ export function usePlayHistory ( media: MediaRecord ) {
 
     if ( finish ) playId.current = null;
   }, [ hasPlayback, media.id, plays, progress ] );
+
+
+  useEffect( () => {
+    let active = true;
+
+    plays.start( media.id ).then( async res => {
+      if ( ! active ) { plays.finish( res.id, 0, false ).catch( () => {} ); return }
+
+      playId.current = res.id, watchedMs.current = res.watchedMs;
+      if ( ! hasPlayback ) return;
+
+      const saved = await progress.get( media.id );
+      if ( ! active ) return;
+
+      const restored = saved && ! saved.completed ? saved.positionMs : 0;
+      position.current = restored / 1000;
+      setPositionMs( restored );
+
+      if ( saved?.completed ) progress.delete( media.id ).catch( () => {} );
+    } ).catch( () => {} );
+
+    return () => { active = false, save( true ) };
+  }, [ media.id, hasPlayback, plays, progress, save ] );
 }
