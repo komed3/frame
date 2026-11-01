@@ -1,4 +1,5 @@
 import { Loading } from '@/src/client/components/Loading';
+import { Pagination } from '@/src/client/components/Pagination';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
@@ -41,7 +42,14 @@ export function History () {
           No playback history found.
         </p>
       ) : (
-        <></>
+        <>
+          <Pagination
+            offset= { offset }
+            limit= { PAGE_SIZE }
+            itemCount= { data.length }
+            onChange= { v => { setOffset( v ), window.scrollTo( 0, 0 ) } }
+          />
+        </>
       ) }
     </div>
   );
