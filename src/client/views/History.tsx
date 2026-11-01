@@ -1,4 +1,5 @@
 import { Loading } from '@/src/client/components/Loading';
+import { MediaIcon } from '@/src/client/components/MediaIcon';
 import { Pagination } from '@/src/client/components/Pagination';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
@@ -6,6 +7,7 @@ import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatDateTime } from '@/src/client/utils/format';
 import { HistoryRecord } from '@/src/shared/types/plays';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 
 const PAGE_SIZE = 50;
@@ -13,6 +15,7 @@ const PAGE_SIZE = 50;
 
 export function History () {
   const { plays, user } = useApi();
+  const navigate = useNavigate();
 
   const [ offset, setOffset ] = useState( 0 );
   const key = JSON.stringify( [ user?.id ?? null, offset ] );
@@ -44,9 +47,9 @@ export function History () {
         </p>
       ) : (
         <>
-          <div className= 'overflow-x-auto bg-slate-800 rounded shadow-lg'>
+          <div className= 'overflow-x-auto bg-slate-900/40 rounded shadow-lg'>
             <table className= 'w-full text-sm text-left'>
-              <thead className= 'text-xs text-slate-400 uppercase tracking-wider bg-slate-900/40'>
+              <thead className= 'text-xs text-slate-400 uppercase tracking-wider bg-slate-700/40'>
                 <tr className= '*:px-5 *:py-4 *:font-medium'>
                   <th>Date</th>
                   <th>Media</th>
@@ -57,13 +60,37 @@ export function History () {
               </thead>
 
               <tbody className= 'divide-y divide-slate-700/70'>
-                { data.map( ( { id, startedAt } ) => (
-                  <tr key= { id }>
-                    <td className= 'px-5 py-4 whitespace-nowrap text-slate-400'>
-                      { formatDateTime( startedAt ) }
-                    </td>
-                  </tr>
-                ) ) }
+                { data.map( ( { id, startedAt, media } ) => {
+                  const hasMedia = !! media;
+
+                  return (
+                    <tr
+                      key= { id }
+                      onClick= { () => hasMedia && navigate( `/watch/${ media.id }` ) }
+                      className= { hasMedia ? 'group cursor-pointer transition-colors hover:bg-slate-50/5' : '' }
+                    >
+                      <td className= 'px-5 py-4 whitespace-nowrap text-slate-400'>
+                        { formatDateTime( startedAt ) }
+                      </td>
+
+                      <td className= 'px-5 py-4 min-w-64'>
+                        { hasMedia ? (
+                          <div className= 'group flex items-center gap-2'>
+                            <MediaIcon type= { media.type } size= { 16 } />
+
+                            <span className='font-medium transition-colors group-hover:text-sky-400'>
+                              { media.title || media.fileName }
+                            </span>
+                          </div>
+                        ) : (
+                          <span className= 'text-slate-500'>
+                            Unavailable media
+                          </span>
+                        ) }
+                      </td>
+                    </tr>
+                  );
+                } ) }
               </tbody>
             </table>
           </div>
