@@ -26,6 +26,7 @@ interface FolderProps {
 interface MediaProps {
   media: MediaRecord[];
   progress?: Record< string, ProgressRecord >;
+  played?: Record< string, boolean >;
   onOpenMedia: ( media: MediaRecord ) => void;
 }
 
@@ -95,7 +96,7 @@ function FolderGrid ( { directories, onOpenDirectory }: FolderProps ) {
   );
 }
 
-function MediaGrid ( { media, progress, onOpenMedia }: MediaProps ) {
+function MediaGrid ( { media, progress, played, onOpenMedia }: MediaProps ) {
   return media.length > 0 && (
     <div className= 'grid grid-cols-3 gap-x-5 gap-y-8'>
       { media.map( item => (
@@ -226,8 +227,9 @@ export function MediaBrowser ( {
   roots = [], directories = [], media, loading = false, offset, limit = MEDIA_PAGE_SIZE,
   total, hasNext, onPageChange, onOpenRoot, onOpenDirectory, onOpenMedia
 }: MediaBrowserProps ) {
-  const { progress } = useApi();
+  const { progress, plays } = useApi();
   const [ progressByMedia, setProgressByMedia ] = useState< Record< string, ProgressRecord > >( {} );
+  const [ playedByMedia, setPlayedByMedia ] = useState< Record< string, boolean > >( {} );
   const mediaIds = media.map( ( { id } ) => id ).join( ',' );
 
   const [ view, setView ] = useState< MediaViewMode >(
@@ -244,14 +246,21 @@ export function MediaBrowser ( {
     let active = true;
 
     setProgressByMedia( {} );
-    if ( view !== 'grid' || ! mediaIds ) return;
+    setPlayedByMedia( {} );
 
-    progress.list( mediaIds.split( ',' ) ).then( rec => {
-      if ( active ) setProgressByMedia( Object.fromEntries( rec.map( i => [ i.mediaId, i ] ) ) );
-    } ).catch( () => { if ( active ) setProgressByMedia( {} ) } );
+    if ( view !== 'grid' || ! mediaIds ) return;
+    const ids = mediaIds.split( ',' );
+
+    progress.list( ids ).then( rec => { if ( active ) setProgressByMedia(
+      Object.fromEntries( rec.map( i => [ i.mediaId, i ] ) )
+    ) } ).catch( () => { if ( active ) setProgressByMedia( {} ) } );
+
+    plays.status( ids ).then( rec => { if ( active ) setPlayedByMedia(
+      Object.fromEntries( rec.map( i => [ i.mediaId, i.completed ] ) )
+    ) } ).catch( () => { if ( active ) setPlayedByMedia( {} ) } );
 
     return () => { active = false };
-  }, [ mediaIds, progress, view ] );
+  }, [ mediaIds, plays, progress, view ] );
 
 
   return (
@@ -294,6 +303,7 @@ export function MediaBrowser ( {
                   <MediaGrid
                     media= { media }
                     progress= { progressByMedia }
+                    played= { playedByMedia }
                     onOpenMedia= { onOpenMedia }
                   />
                 </section>
