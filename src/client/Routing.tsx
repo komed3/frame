@@ -4,6 +4,7 @@ import { Categories } from '@/src/client/views/Categories';
 import { Category } from '@/src/client/views/Category';
 import { Editor } from '@/src/client/views/Editor';
 import { Favorites } from '@/src/client/views/Favorites';
+import { History } from '@/src/client/views/History';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
@@ -33,6 +34,7 @@ export function Routing () {
       <Route path= '/edit/:id' element= { <Editor /> } />
 
       <Route path= '/favorites' element= { <Favorites /> } />
+      <Route path= '/history' element= { <History /> } />
 
       <Route path= '/me' element= { <Account /> } />
       <Route path= '/server' element= { <Admin /> } />
