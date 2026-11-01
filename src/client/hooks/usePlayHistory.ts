@@ -23,8 +23,9 @@ export function usePlayHistory ( media: MediaRecord ) {
     }
   };
 
-  const set = ( play: boolean, last: number | null, pos?: number ) => {
-    playing.current = play, lastTime.current = last;
+  const set = ( play?: boolean, last?: number | null, pos?: number ) => {
+    if ( play !== undefined ) playing.current = play;
+    if ( last !== undefined ) lastTime.current = last;
     if ( pos !== undefined ) position.current = pos;
   };
 
@@ -73,6 +74,12 @@ export function usePlayHistory ( media: MediaRecord ) {
 
   const onPlay = useCallback( ( time: number ) => set( true, time ), [] );
   const onPause = useCallback( ( time: number ) => { delta( time ), set( false, null, time ), save() }, [ save ] );
+
+  const onTimeUpdate = useCallback( ( time: number ) => {
+    playing.current && delta( time );
+    set( undefined, playing.current ? time : null, time );
+    if ( Date.now() - lastSave.current >= 5000 ) save();
+  }, [ save ] );
 
 
   return { positionMs, onPlay, onPause, onTimeUpdate, onSeeking, onSeeked, onEnded };
