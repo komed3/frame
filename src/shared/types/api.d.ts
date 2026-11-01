@@ -165,7 +165,6 @@ export interface Api {
     categories: ( id: string ) => Promise< CategoryRecord[] >;
     setCategories: ( id: string, categoryIds: string[] ) => Promise< CategoryRecord[] >;
   };
-  adjacentMedia: ( media: MediaRecord, playlistId?: string ) => Promise< [ string | null, string | null ] >;
   search: ( options: MediaSearchOptions ) => Promise< MediaSearchResult >;
   roots: {
     list: () => Promise< MediaRoot[] >;
@@ -261,4 +260,6 @@ export interface ApiContextValue extends Api {
   error: string | null;
   authenticated: boolean;
   canEdit: boolean;
+
+  adjacentMedia: ( media: MediaRecord, playlistId?: string ) => Promise< [ string | null, string | null ] >;
 }
