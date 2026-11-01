@@ -7,7 +7,7 @@ import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaListOptions, MediaRecord } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
-import type { HistoryRecord } from '@/src/shared/types/plays';
+import type { HistoryRecord, PlayStatusRecord } from '@/src/shared/types/plays';
 import type { PrefName, PrefSchema, PrefTable, PrefValue } from '@/src/shared/types/pref';
 import type { ProgressRecord } from '@/src/shared/types/progress';
 import type { MediaRoot } from '@/src/shared/types/roots';
@@ -232,6 +232,7 @@ export interface Api {
   };
   plays: {
     list: ( page?: Partial< ApiPage > ) => Promise< HistoryRecord[] >;
+    status: ( mediaIds: string[] ) => Promise< PlayStatusRecord[] >;
     start: ( mediaId: string, sessionId?: string | null ) => Promise< ApiPlayStartResult >;
     update: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
     finish: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
