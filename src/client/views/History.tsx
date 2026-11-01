@@ -4,7 +4,7 @@ import { Pagination } from '@/src/client/components/Pagination';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
-import { formatDateTime } from '@/src/client/utils/format';
+import { formatDateTime, formatDuration } from '@/src/client/utils/format';
 import { HistoryRecord } from '@/src/shared/types/plays';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -53,14 +53,13 @@ export function History () {
                 <tr className= '*:px-5 *:py-4 *:font-medium'>
                   <th>Date</th>
                   <th>Media</th>
-                  <th>Type</th>
                   <th className= 'text-right'>Watched</th>
                   <th className= 'text-right'>Status</th>
                 </tr>
               </thead>
 
               <tbody className= 'divide-y divide-slate-700/70'>
-                { data.map( ( { id, startedAt, media } ) => (
+                { data.map( ( { id, startedAt, media, watchedMs } ) => (
                   <tr
                     key= { id }
                     onClick= { () => media && navigate( `/watch/${ media.id }` ) }
@@ -84,6 +83,10 @@ export function History () {
                           Unavailable media
                         </span>
                       ) }
+                    </td>
+
+                    <td className= 'px-5 py-4 text-right tabular-nums text-slate-300'>
+                      { watchedMs ? formatDuration( watchedMs ) : '—' }
                     </td>
                   </tr>
                 ) ) }
