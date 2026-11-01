@@ -1,3 +1,6 @@
+import type { MediaRecord } from '@/src/shared/types/media';
+
+
 export interface PlayRecord {
   id: string;
   userId: string;
@@ -11,4 +14,8 @@ export interface PlayRecord {
 
 export interface PlayRow extends Omit< PlayRecord, 'completed' > {
   completed: number;
+}
+
+export interface HistoryRecord extends PlayRecord {
+  media: MediaRecord | null;
 }
