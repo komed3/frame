@@ -158,12 +158,12 @@ function MediaList ( { roots, directories, media, onOpenRoot, onOpenDirectory, o
       <table className= 'w-full text-left text-sm whitespace-nowrap'>
         <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
           <tr className= '*:font-medium *:px-4 *:py-3'>
-            <th scope= 'col'>Name</th>
-            <th scope= 'col'>Format</th>
-            <th scope= 'col' className= 'text-right'>Size</th>
-            <th scope= 'col' className= 'text-right'>Duration</th>
-            <th scope= 'col' className= 'text-right'>Resolution</th>
-            <th scope= 'col'>Modified</th>
+            <th>Name</th>
+            <th>Format</th>
+            <th className= 'text-right'>Size</th>
+            <th className= 'text-right'>Duration</th>
+            <th className= 'text-right'>Resolution</th>
+            <th>Modified</th>
           </tr>
         </thead>
 
