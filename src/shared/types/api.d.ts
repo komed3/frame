@@ -237,6 +237,7 @@ export interface Api {
     finish: ( id: string, watchedMs: number, completed?: boolean ) => Promise< void >;
   };
   progress: {
+    list: ( mediaIds: string[] ) => Promise< ProgressRecord[] >;
     get: ( mediaId: string ) => Promise< ProgressRecord | null >;
     save: ( mediaId: string, positionMs: number, completed?: boolean ) => Promise< ProgressRecord >;
     delete: ( mediaId: string ) => Promise< void >;
