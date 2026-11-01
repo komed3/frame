@@ -43,6 +43,28 @@ export function formatDate ( value: string | null | undefined ) : string {
 }
 
 
+export function formatTime ( value: string | null | undefined ) : string {
+  if ( ! value ) return '—';
+
+  const date = new Date( value );
+  if ( Number.isNaN( date.getTime() ) ) return '—';
+
+  return new Intl.DateTimeFormat( 'en-us', { timeStyle: 'short' } ).format( date );
+}
+
+
+export function formatDateTime ( value: string | null | undefined ) : string {
+  if ( ! value ) return '—';
+
+  const date = new Date( value );
+  if ( Number.isNaN( date.getTime() ) ) return '—';
+
+  return new Intl.DateTimeFormat( 'en-us', {
+    dateStyle: 'medium', timeStyle: 'short'
+  } ).format( date );
+}
+
+
 export function formatFileFormat ( fileName: string, container?: string | null ) : string {
   const extension = fileName.match( /\.([^.\/\\]+)$/ )?.[ 1 ];
   return extension ? extension.toUpperCase() : container?.split( ',' )[ 0 ].toUpperCase() ?? '—';
