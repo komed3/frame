@@ -1,3 +1,4 @@
+import { Loading } from '@/src/client/components/Loading';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
@@ -28,6 +29,20 @@ export function History () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         History
       </h1>
+
+      { error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : loading ? (
+        <Loading className= 'min-h-64' />
+      ) : ! data?.length ? (
+        <p className= 'py-16 text-center text-slate-400'>
+          No playback history found.
+        </p>
+      ) : (
+        <></>
+      ) }
     </div>
   );
 }
