@@ -1,3 +1,6 @@
+import { useState } from 'react';
+
+
 interface VideoSeekbarProps {
   currentTime: number;
   duration: number;
