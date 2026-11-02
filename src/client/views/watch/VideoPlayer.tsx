@@ -313,6 +313,19 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 >
                   <SkipForwardIcon size= { 18 } />
                 </button>
+
+                <button
+                  onClick= { () => setRemaining( v => ! v ) }
+                  title= 'Switch elapsed / remaining time'
+                  className= { 
+                    'inline-flex items-center gap-2 ml-2 text-xs text-slate-300 tabular-nums ' +
+                    'whitespace-nowrap hover:text-white'
+                  }
+                >
+                  <span>{ timeLabel }</span>
+                  <span>/</span>
+                  <span>{ formatDuration( displayDuration * 1000 ) }</span>
+                </button>
               </div>
 
               <div className= 'flex justify-end items-center gap-4'></div>
