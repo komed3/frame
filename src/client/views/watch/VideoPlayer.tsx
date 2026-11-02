@@ -93,6 +93,21 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   }
 
 
+  useEffect( () => {
+    setVolume( volumePref ), volumeRef.current = volumePref;
+    if ( volumeInputRef.current ) volumeInputRef.current.value = String( volumePref );
+
+    updateVolumeUI( volumePref );
+  }, [ volumePref ] );
+
+  useEffect( () => {
+    const video = videoRef.current;
+    if ( ! video ) return;
+
+    video.volume = volume, video.muted = muted;
+  }, [ muted, volume ] );
+
+
   return (
     <>
       <div className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'>
