@@ -25,14 +25,30 @@ interface VideoPlayerProps {
 
 
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
+  const { request, adjacentMedia, media: mediaApi, directories, assets } = useApi();
   const navigate = useNavigate();
+  const history = usePlayHistory( media );
+
+  const title = media.title || media.fileName;
 
 
-  const directory = [];
-  const title = '';
+  const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
+  const { data, loading, error } = useApiData< VideoPlayerData >( key, async () => {
+    const [ categories, tags, directory, [ prev, next ] ] = await Promise.all( [
+      mediaApi.categories( media.id ).catch( () => [] ),
+      mediaApi.tags( media.id ).catch( () => [] ),
+      directories.list( media.rootId, media.directoryId ).catch( () => null ),
+      adjacentMedia( media, playlistId )
+    ] );
 
+    return { categories, tags, directory, prev, next };
+  } );
 
-  usePlayHistory( media );
+  const categories = data?.categories ?? [];
+  const tags = data?.tags ?? [];
+  const directory = data?.directory ?? null;
+  const prev = data?.prev ?? null;
+  const next = data?.next ?? null;
 
 
   return (
