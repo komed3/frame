@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 type KeyControls = Record< string, ( e: KeyboardEvent ) => void >;
 
 interface UseMediaPlayerOptions {
-  previous?: string | null;
+  prev?: string | null;
   next?: string | null;
   onNavigate?: ( id: string ) => void;
   extraControls?: KeyControls;
@@ -17,7 +17,7 @@ interface UseMediaPlayerOptions {
 
 
 export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaRecord, {
-  previous = null, next = null, onNavigate, extraControls = {}, errorMessage = 'Could not play this media file.'
+  prev: previous = null, next = null, onNavigate, extraControls = {}, errorMessage = 'Could not play this media file.'
 }: UseMediaPlayerOptions = {} ) {
   const mediaRef = useRef< T >( null );
   const playerRef = useRef< HTMLDivElement >( null );
