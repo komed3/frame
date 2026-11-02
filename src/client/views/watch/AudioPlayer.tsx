@@ -71,7 +71,6 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const directory = data?.directory ?? null;
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
-  const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
 
 
   const {
