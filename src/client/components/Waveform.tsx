@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 
 interface WaveformProps {
-  samples: Int16Array | null;
+  mediaId: string;
   duration: number;
   currentTime: number;
   buffered: { start: number, end: number }[];
