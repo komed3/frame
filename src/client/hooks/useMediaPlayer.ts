@@ -17,8 +17,7 @@ interface UseMediaPlayerOptions {
 
 
 export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaRecord, {
-  previous = null, next = null, onNavigate, extraControls = {},
-  errorMessage = 'Could not play this media file.'
+  previous = null, next = null, onNavigate, extraControls = {}, errorMessage = 'Could not play this media file.'
 }: UseMediaPlayerOptions = {} ) {
   const mediaRef = useRef< T >( null );
   const playerRef = useRef< HTMLDivElement >( null );
