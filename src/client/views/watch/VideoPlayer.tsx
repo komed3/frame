@@ -89,6 +89,12 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
             { title }
           </h1>
         </div>
+
+        { media.description && (
+          <p className= 'max-w-3xl text-lg leading-relaxed'>
+            { media.description }
+          </p>
+        ) }
       </div>
     </>
   );
