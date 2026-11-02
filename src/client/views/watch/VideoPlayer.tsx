@@ -168,6 +168,12 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     restoredRef.current = true;
   }, [ ready, history.positionMs ] );
 
+  useEffect( () => {
+    const change = () => setFullscreen( !! document.fullscreenElement );
+    document.addEventListener( 'fullscreenchange', change );
+    return () => document.removeEventListener( 'fullscreenchange', change );
+  }, [] );
+
 
   return (
     <>
