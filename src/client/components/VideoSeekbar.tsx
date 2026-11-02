@@ -17,6 +17,13 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
 
 
   return (
-    <></>
+    <div
+      className= 'relative flex items-center w-full h-1'
+      onMouseMove= { e => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setHovering( Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) ) );
+      } }
+      onMouseLeave= { () => setHovering( null ) }
+    ></div>
   );
 }
