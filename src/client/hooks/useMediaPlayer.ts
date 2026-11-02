@@ -118,4 +118,30 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     document.addEventListener( 'fullscreenchange', change );
     return () => document.removeEventListener( 'fullscreenchange', change );
   }, [] );
+
+
+  const seek = ( time: number ) => {
+    const element = mediaRef.current;
+    if ( ! element || ! Number.isFinite( element.duration ) ) return;
+    element.currentTime = Math.max( 0, Math.min( element.duration, time ) );
+  };
+
+  const togglePlay = () => {
+    const element = mediaRef.current;
+    if ( ! element || ! ready ) return;
+    if ( element.paused ) void element.play().catch( () => {} );
+    else element.pause();
+  };
+
+  const changeVolume = ( value: number ) => {
+    const next = Math.max( 0, Math.min( 1, value ) );
+
+    if ( mediaRef.current ) mediaRef.current.volume = next;
+    volumeRef.current = next;
+  };
+
+  const saveVolume = () => {
+    if ( volumeRef.current === volume ) return;
+    setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current );
+  };
 }
