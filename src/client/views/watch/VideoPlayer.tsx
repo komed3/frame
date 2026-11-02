@@ -28,7 +28,7 @@ interface VideoPlayerProps {
 
 
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
-  const { request, adjacentMedia, media: mediaApi, directories, assets } = useApi();
+  const { adjacentMedia, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
   const history = usePlayHistory( media );
 
