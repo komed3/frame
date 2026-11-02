@@ -20,4 +20,10 @@ export function VolumeControl ( {
   const inputRef = useRef< HTMLInputElement >( null );
 
   const update = ( value: number ) => controlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
+
+
+  useEffect( () => {
+    if ( inputRef.current ) inputRef.current.value = String( volume );
+    update( volume );
+  }, [ volume ] );
 }
