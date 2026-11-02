@@ -295,6 +295,24 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                     ? <RotateCcwIcon size= { 20 } />
                     : <PlayIcon size= { 20 } /> }
                 </button>
+
+                <button
+                  onClick= { () => seek( currentTime - 10 ) }
+                  title= 'Back 10 seconds'
+                  aria-label= 'Back 10 seconds'
+                  className= { BUTTON }
+                >
+                  <SkipBackIcon size= { 18 } />
+                </button>
+
+                <button
+                  onClick= { () => seek( currentTime + 10 ) }
+                  title= 'Forward 10 seconds'
+                  aria-label= 'Forward 10 seconds'
+                  className= { BUTTON }
+                >
+                  <SkipForwardIcon size= { 18 } />
+                </button>
               </div>
 
               <div className= 'flex justify-end items-center gap-4'></div>
