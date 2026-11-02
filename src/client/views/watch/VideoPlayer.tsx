@@ -102,15 +102,15 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
               playsInline
             />
 
-            { ! ready && ! error && (
+            { loading || ( ! ready && ! error ) && (
               <div className= 'absolute inset-0 flex justify-center items-center pointer-events-none'>
                 <Loading className= 'h-full' />
               </div>
             ) }
 
-            { error && (
+            { error || streamError && (
               <div className= 'absolute inset-0 flex justify-center items-center text-red-400'>
-                { error }
+                { error ?? streamError }
               </div>
             ) }
           </div>
