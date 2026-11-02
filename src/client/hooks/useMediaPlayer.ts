@@ -15,3 +15,9 @@ interface UseMediaPlayerOptions {
   extraControls?: KeyControls;
   errorMessage?: string;
 }
+
+
+export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaRecord, {
+  previous = null, next = null, onNavigate, extraControls = {},
+  errorMessage = 'Could not play this media file.'
+}: UseMediaPlayerOptions = {} ) {}
