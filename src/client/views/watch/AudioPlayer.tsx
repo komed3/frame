@@ -75,9 +75,9 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
 
   const {
-    mediaRef, playerRef, volume, muted, currentTime, duration, buffered, playing,
-    ended, ready, remaining, fullscreen, streamError, setRemaining, seek, togglePlay,
-    changeVolume, saveVolume, toggleMute, toggleFullscreen
+    mediaRef, playerRef, volume, muted, currentTime, displayDuration, timeLabel,
+    buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
+    togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLAudioElement >( media, {
     prev, next, onNavigate: navigateAdjacent,
     errorMessage: 'Could not play this audio file.'
@@ -102,12 +102,6 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
     return () => { active = false, controller.abort() };
   }, [ assets, media.id, request ] );
-
-
-  const displayDuration = duration || mediaDuration;
-  const timeLabel = remaining
-    ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) }`
-    : formatDuration( currentTime * 1000 );
 
 
   return (
