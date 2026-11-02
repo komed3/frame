@@ -36,6 +36,16 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
             } }
           />
         ) ) }
+
+        { hovering !== null && preview > progress && (
+          <div
+            className= 'absolute top-0 h-full bg-white/40'
+            style= { {
+              left: `${ progress * 100 }%`,
+              width: `${ ( preview - progress ) * 100 }%`
+            } }
+          />
+        ) }
       </div>
     </div>
   );
