@@ -175,6 +175,39 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   }, [] );
 
 
+  const seek = ( time: number ) => {
+    const video = videoRef.current;
+    if ( ! video || ! Number.isFinite( video.duration ) ) return;
+    video.currentTime = Math.max( 0, Math.min( video.duration, time ) );
+  };
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if ( ! video || ! ready ) return;
+    if ( video.paused ) void video.play().catch( () => {} );
+    else video.pause();
+  };
+
+  const changeVolume = ( value: number ) => {
+    const next = Math.max( 0, Math.min( 1, value ) );
+    volumeRef.current = next;
+    if ( volumeInputRef.current ) volumeInputRef.current.value = String( next );
+
+    updateVolumeUI( next );
+    if ( videoRef.current ) videoRef.current.volume = next;
+  };
+
+  const saveVolume = () => {
+    if ( volumeRef.current === volume ) return;
+    setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current );
+  };
+
+  const adjustVolume = ( value: number ) => { changeVolume( value ), saveVolume() };
+  const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
+  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : playerRef.current?.requestFullscreen();
+  const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
+
+
   return (
     <>
       <div className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'>
