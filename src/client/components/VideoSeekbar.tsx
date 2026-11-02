@@ -63,6 +63,18 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
           opacity: hovering !== null ? 1 : 0
         } }
       />
+
+      <input
+        type= 'range'
+        min= { 0 } max= { duration || 1 } step= { 0.01 }
+        value= { Math.min( currentTime, duration || 1 ) }
+        onInput= { e => onSeek( Number( e.currentTarget.value ) ) }
+        aria-label= 'Seek' title= 'Seek'
+        className= {
+          'absolute inset-0 z-10 w-full m-0 h-2 appearance-none ' +
+          'bg-transparent opacity-0 cursor-pointer'
+        }
+      />
     </div>
   );
 }
