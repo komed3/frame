@@ -10,3 +10,14 @@ interface VolumeControlProps {
   onToggleMute: () => void;
   sliderClassName?: string;
 }
+
+
+export function VolumeControl ( {
+  volume, muted, onVolumeChange, onVolumeCommit, onToggleMute,
+  sliderClassName = 'relative w-28 h-6 flex items-center'
+}: VolumeControlProps ) {
+  const controlRef = useRef< HTMLDivElement >( null );
+  const inputRef = useRef< HTMLInputElement >( null );
+
+  const update = ( value: number ) => controlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
+}
