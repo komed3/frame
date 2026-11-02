@@ -233,6 +233,12 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   } );
 
 
+  const displayDuration = duration || mediaDuration;
+  const timeLabel = remaining
+    ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) }`
+    : formatDuration( currentTime * 1000 );
+
+
   return (
     <>
       <div className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'>
