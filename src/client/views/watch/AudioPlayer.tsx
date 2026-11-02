@@ -72,10 +72,6 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const [ streamError, setStreamError ] = useState< string | null >( null );
   const [ fullscreen, setFullscreen ] = useState( false );
 
-  function updateVolumeUI ( value: number ) {
-    volumeControlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
-  }
-
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
@@ -94,6 +90,12 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const directory = data?.directory ?? null;
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
+
+
+  function updateVolumeUI ( value: number ) {
+    volumeControlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
+  }
+
 
   useEffect( () => {
     setVolume( volumePref ), volumeRef.current = volumePref;
