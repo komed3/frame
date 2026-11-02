@@ -20,4 +20,26 @@ interface UseMediaPlayerOptions {
 export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaRecord, {
   previous = null, next = null, onNavigate, extraControls = {},
   errorMessage = 'Could not play this media file.'
-}: UseMediaPlayerOptions = {} ) {}
+}: UseMediaPlayerOptions = {} ) {
+  const mediaRef = useRef< T >( null );
+  const playerRef = useRef< HTMLDivElement >( null );
+  const volumeRef = useRef( 1 );
+  const restoredRef = useRef( false );
+
+  const history = usePlayHistory( media );
+  const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
+  const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
+
+  const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
+
+  const [ volume, setVolume ] = useState( volumePref );
+  const [ currentTime, setCurrentTime ] = useState( 0 );
+  const [ duration, setDuration ] = useState( mediaDuration );
+  const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
+  const [ playing, setPlaying ] = useState( false );
+  const [ ended, setEnded ] = useState( false );
+  const [ ready, setReady ] = useState( false );
+  const [ remaining, setRemaining ] = useState( false );
+  const [ fullscreen, setFullscreen ] = useState( false );
+  const [ streamError, setStreamError ] = useState< string | null >( null );
+}
