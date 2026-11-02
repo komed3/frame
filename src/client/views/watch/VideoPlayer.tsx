@@ -181,6 +181,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     video.currentTime = Math.max( 0, Math.min( video.duration, time ) );
   };
 
+  const frame = ( dir: 'backward' | 'forward' ) => {
+    const video = videoRef.current;
+    if ( ! video || ! Number.isFinite( video.duration ) ) return;
+
+    const fps = media.fps ?? 30, frameTime = 1 / fps;
+    seek( dir === 'backward' ? video.currentTime - frameTime : video.currentTime + frameTime );
+  };
+
   const togglePlay = () => {
     const video = videoRef.current;
     if ( ! video || ! ready ) return;
@@ -215,6 +223,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     '4': () => seek( duration * 0.4 ), '5': () => seek( duration * 0.5 ),
     '6': () => seek( duration * 0.6 ), '7': () => seek( duration * 0.7 ),
     '8': () => seek( duration * 0.8 ), '9': () => seek( duration * 0.9 ),
+    ',': () => frame( 'backward' ), '.': () => frame( 'forward' ),
     arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
     arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
     arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
