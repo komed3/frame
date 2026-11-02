@@ -1,6 +1,7 @@
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
+import { formatDuration } from '@/src/client/utils/format';
 import type { MediaRecord } from '@/src/shared/types/media';
 import { useEffect, useRef, useState } from 'react';
 
@@ -168,9 +169,16 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   } );
 
 
+  const displayDuration = duration || mediaDuration;
+  const timeLabel = remaining
+      ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) }`
+      : formatDuration( currentTime * 1000 );
+
+
   return {
-    mediaRef, playerRef, history, volume, volumeRef, muted, currentTime, duration,
-    buffered, playing, ended, ready, remaining, fullscreen, streamError, setRemaining,
-    seek, togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
+    mediaRef, playerRef, history, volume, volumeRef, muted, currentTime,
+    duration, displayDuration, timeLabel, buffered, playing, ended, ready,
+    remaining, fullscreen, streamError, setRemaining, seek, togglePlay,
+    changeVolume, saveVolume, toggleMute, toggleFullscreen
   };
 }
