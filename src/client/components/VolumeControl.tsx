@@ -39,6 +39,24 @@ export function VolumeControl ( {
         { muted || volume === 0 ? <VolumeXIcon size= { 20 } /> :
           volume < 0.5 ? <Volume1Icon size= { 20 } /> : <Volume2Icon size= { 20 } /> }
       </button>
+
+      <div
+        ref= { controlRef }
+        className= { sliderClassName }
+        style= { { '--volume': `${ volume * 100 }%` } as React.CSSProperties }
+      >
+        <div className= 'relative w-full h-1.5 bg-slate-700 rounded-full'>
+          <div
+            className= 'h-full bg-slate-300 rounded-full'
+            style= { { width: 'var(--volume)' } }
+          />
+
+          <div
+            className= 'absolute top-1/2 -translate-1/2 size-4 bg-white rounded-full shadow-lg'
+            style= { { left: 'var(--volume)' } }
+          />
+        </div>
+      </div>
     </div>
   );
 }
