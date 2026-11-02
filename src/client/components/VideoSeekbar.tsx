@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 
 interface VideoSeekbarProps {
@@ -10,10 +10,41 @@ interface VideoSeekbarProps {
 
 
 export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: VideoSeekbarProps ) {
+  const inputRef = useRef< HTMLInputElement >( null );
+  const previewRef = useRef< HTMLDivElement >( null );
+  const thumbRef = useRef< HTMLDivElement >( null );
+  const draggingRef = useRef( false );
+  const pendingRef = useRef( currentTime );
   const [ hovering, setHovering ] = useState< number | null >( null );
 
   const progress = duration > 0 ? currentTime / duration : 0;
-  const preview = hovering === null ? progress : Math.max( progress, hovering );
+
+  const update = ( time: number ) => {
+    const pos = duration > 0 ? time / duration : 0;
+
+    if ( previewRef.current ) {
+      previewRef.current.style.left = `${ progress * 100 }%`;
+      previewRef.current.style.width = `${ Math.max( 0, pos - progress ) * 100 }%`;
+    }
+
+    if ( thumbRef.current ) thumbRef.current.style.left = `${ pos * 100 }%`;
+  };
+
+  const commit = () => {
+    if ( ! draggingRef.current && pendingRef.current === currentTime ) return;
+
+    draggingRef.current = false;
+    onSeek( pendingRef.current );
+  };
+
+
+  useEffect( () => {
+    if ( draggingRef.current ) return;
+
+    pendingRef.current = currentTime;
+    if ( inputRef.current ) inputRef.current.value = String( currentTime );
+    update( currentTime );
+  }, [ currentTime, duration ] );
 
 
   return (
@@ -37,15 +68,7 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
           />
         ) ) }
 
-        { hovering !== null && preview > progress && (
-          <div
-            className= 'absolute top-0 h-full bg-white/40'
-            style= { {
-              left: `${ progress * 100 }%`,
-              width: `${ ( preview - progress ) * 100 }%`
-            } }
-          />
-        ) }
+        <div ref= { previewRef } className= 'absolute top-0 h-full bg-white/40' />
 
         <div
           className= 'absolute top-0 left-0 h-full bg-sky-500'
@@ -54,25 +77,37 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
       </div>
 
       <div
+        ref= { thumbRef }
         className= {
           'absolute top-1/2 -translate-1/2 size-3 bg-white rounded-full ' +
           'shadow transition-opacity pointer-events-none'
         }
         style= { {
           left: `${ progress * 100 }%`,
-          opacity: hovering !== null ? 1 : 0
+          opacity: hovering !== null || draggingRef.current ? 1 : 0
         } }
       />
 
       <input
+        ref= { inputRef }
         type= 'range'
-        min= { 0 } max= { duration || 1 } step= { 0.01 }
-        value= { Math.min( currentTime, duration || 1 ) }
-        onInput= { e => onSeek( Number( e.currentTarget.value ) ) }
+        min= { 0 } max= { duration || 1 } step= { 0.01 } defaultValue= { currentTime }
+        onPointerDown= { () => { draggingRef.current = true } }
+        onInput= { e => {
+          pendingRef.current = Number( e.currentTarget.value );
+          update( pendingRef.current );
+        } }
+        onPointerUp= { commit }
+        onPointerCancel= { commit }
+        onKeyUp= { e => {
+          pendingRef.current = Number( e.currentTarget.value );
+          commit();
+        } }
+        onBlur= { commit }
         aria-label= 'Seek' title= 'Seek'
         className= {
-          'absolute inset-0 z-10 w-full m-0 h-2 appearance-none ' +
-          'bg-transparent opacity-0 cursor-pointer'
+          'appearance-none absolute inset-x-0 -inset-y-1 z-10 m-0 ' +
+          'w-full h-2 bg-transparent opacity-0 cursor-pointer'
         }
       />
     </div>
