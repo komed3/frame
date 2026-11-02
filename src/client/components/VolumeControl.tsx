@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import { Volume1Icon, Volume2Icon, VolumeXIcon } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 
 interface VolumeControlProps {
@@ -56,6 +56,19 @@ export function VolumeControl ( {
             style= { { left: 'var(--volume)' } }
           />
         </div>
+
+        <input
+          ref= { inputRef }
+          type= 'range'
+          min= { 0 } max= { 1 } step= { 0.01 } defaultValue= { volume }
+          onInput= { e => {
+            const value = Number( e.currentTarget.value );
+            update( value ), onVolumeChange( value );
+          } }
+          onPointerUp= { onVolumeCommit } onKeyUp= { onVolumeCommit } onBlur= { onVolumeCommit }
+          aria-label= 'Volume' title= 'Volume'
+          className= 'appearance-none absolute -inset-2 bg-transparent opacity-0 cursor-pointer'
+        />
       </div>
     </div>
   );
