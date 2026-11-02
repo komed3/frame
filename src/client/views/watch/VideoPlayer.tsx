@@ -1,3 +1,4 @@
+import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -23,6 +24,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
       <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
         <MediaActions media= { media } />
+
+        { playlistId && (
+          <ActivePlaylist
+            playlistId= { playlistId }
+            mediaId= { media.id }
+            orientation= 'horizontal'
+          />
+        ) }
       </div>
     </>
   );
