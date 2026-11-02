@@ -46,7 +46,27 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const navigate = useNavigate();
   const history = usePlayHistory( media );
 
+  const videoRef = useRef< HTMLVideoElement >( null );
+  const playerRef = useRef< HTMLDivElement >( null );
+  const volumeControlRef = useRef< HTMLDivElement >( null );
+  const volumeInputRef = useRef< HTMLInputElement >( null );
+  const volumeRef = useRef( 1 );
+  const restoredRef = useRef( false );
+
+  const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
+  const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
+  const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
   const title = media.title || media.fileName;
+
+  const [ volume, setVolume ] = useState( volumePref );
+  const [ currentTime, setCurrentTime ] = useState( 0 );
+  const [ duration, setDuration ] = useState( mediaDuration );
+  const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
+  const [ playing, setPlaying ] = useState( false );
+  const [ ended, setEnded ] = useState( false );
+  const [ ready, setReady ] = useState( false );
+  const [ remaining, setRemaining ] = useState( false );
+  const [ fullscreen, setFullscreen ] = useState( false );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
