@@ -26,4 +26,19 @@ export function VolumeControl ( {
     if ( inputRef.current ) inputRef.current.value = String( volume );
     update( volume );
   }, [ volume ] );
+
+
+  return (
+    <div className= 'flex items-center gap-4'>
+      <button
+        onClick= { onToggleMute }
+        title= 'Mute / Unmute [m]'
+        aria-label= { muted ? 'Unmute' : 'Mute' }
+        className= 'text-slate-300 transition-colors hover:text-white'
+      >
+        { muted || volume === 0 ? <VolumeXIcon size= { 20 } /> :
+          volume < 0.5 ? <Volume1Icon size= { 20 } /> : <Volume2Icon size= { 20 } /> }
+      </button>
+    </div>
+  );
 }
