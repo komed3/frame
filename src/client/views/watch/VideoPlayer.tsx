@@ -344,7 +344,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
                 <div
                   ref= { volumeControlRef }
-                  className= 'relative w-28 h-6 flex items-center'
+                  className= 'relative mr-6 w-28 h-6 flex items-center'
                   style= { { '--volume': `${ volume * 100 }%` } as CSSProperties }
                 >
                   <div className= 'relative w-full h-1.5 bg-slate-700 rounded-full'>
@@ -369,6 +369,38 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                     className= 'absolute -inset-2 appearance-none bg-transparent opacity-0 cursor-pointer'
                   />
                 </div>
+
+                <button
+                  onClick= { () => navigateAdjacent( prev ) }
+                  disabled= { ! prev }
+                  title= 'Previous [Ctrl + ←]'
+                  aria-label= 'Previous'
+                  className= { BUTTON }
+                >
+                  <ChevronLeftIcon size= { 20 } />
+                </button>
+
+                <button
+                  onClick= { () => navigateAdjacent( next ) }
+                  disabled= { ! next }
+                  title= 'Next [Ctrl + →]'
+                  aria-label= 'Next'
+                  className= { BUTTON }
+                >
+                  <ChevronRightIcon size= { 20 } />
+                </button>
+
+                <button
+                  onClick= { toggleFullscreen }
+                  aria-pressed= { fullscreen }
+                  title= 'Toggle fullscreen [F11]'
+                  aria-label= 'Fullscreen'
+                  className= { BUTTON }
+                >
+                  { fullscreen
+                    ? <Minimize2Icon size= { 20 } />
+                    : <Maximize2Icon size= { 20 } /> }
+                </button>
               </div>
             </div>
           </div>
