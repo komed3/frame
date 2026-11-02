@@ -242,7 +242,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
         ) }
       </div>
 
-      <audio ref= { audioRef } preload= 'auto' />
+      <audio ref= { mediaRef } preload= 'auto' />
 
       <MediaActions media= { media } />
 
