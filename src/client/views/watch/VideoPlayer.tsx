@@ -241,19 +241,34 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
   return (
     <>
-      <div className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'>
-        { loading ? (
-          <Loading className= 'h-full' />
-        ) : error ? (
-          <div className= 'flex justify-center items-center h-full font-semibold text-red-400'>
-            { error }
+      <div className= 'flex justify-center items-center h-[calc(100vh-64px)] bg-slate-950'>
+        <div
+          ref= { playerRef }
+          className= 'shrink-0 relative flex flex-col max-w-full h-full aspect-video'
+        >
+          <div className= 'flex-1 relative min-h-0 bg-black'>
+            <video
+              ref= { videoRef }
+              className= 'block w-full h-full object-contain'
+              preload= 'auto'
+              playsInline
+            />
+
+            { ! ready && ! error && (
+              <div className= 'absolute inset-0 flex justify-center items-center pointer-events-none'>
+                <Loading className= 'h-full' />
+              </div>
+            ) }
+
+            { error && (
+              <div className= 'absolute inset-0 flex justify-center items-center text-red-400'>
+                { error }
+              </div>
+            ) }
           </div>
-        ) : (
-          <div className= 'absolute left-1/2 -translate-x-1/2 flex flex-col h-full'>
-            <div className= 'flex-1 h-[calc(100%-48px)] aspect-video' />
-            <div className= 'shrink-0 h-12' />
-          </div>
-        ) }
+
+          <div className= 'shrink-0 h-16' />
+        </div>
       </div>
 
       <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
