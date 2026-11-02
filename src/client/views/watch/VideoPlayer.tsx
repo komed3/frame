@@ -1,7 +1,9 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
+import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import type { MediaRecord } from '@/src/shared/types/media';
+import { useNavigate } from 'react-router';
 
 
 interface VideoPlayerProps {
@@ -11,7 +13,15 @@ interface VideoPlayerProps {
 
 
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
+  const navigate = useNavigate();
+
+
+  const directory = [];
+  const title = '';
+
+
   usePlayHistory( media );
+
 
   return (
     <>
@@ -32,6 +42,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
             orientation= 'horizontal'
           />
         ) }
+
+        <hr className= 'border-dashed border-slate-700' />
+
+        <Breadcrumbs
+          items= { [ ...( directory?.breadcrumbs ?? [] ), { id: media.id, name: title, path: media.path } ] }
+          onHome= { () => navigate( '/all' ) }
+          onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
+        />
       </div>
     </>
   );
