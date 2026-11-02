@@ -52,6 +52,17 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
           style= { { width: `${ progress * 100 }%` } }
         />
       </div>
+
+      <div
+        className= {
+          'absolute top-1/2 -translate-1/2 size-3 bg-white rounded-full ' +
+          'shadow transition-opacity pointer-events-none'
+        }
+        style= { {
+          left: `${ progress * 100 }%`,
+          opacity: hovering !== null ? 1 : 0
+        } }
+      />
     </div>
   );
 }
