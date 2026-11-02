@@ -328,7 +328,20 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 </button>
               </div>
 
-              <div className= 'flex justify-end items-center gap-4'></div>
+              <div className= 'flex justify-end items-center gap-4'>
+                <button
+                  onClick= { toggleMute }
+                  title= 'Mute / Unmute [m]'
+                  aria-label= { muted ? 'Unmute' : 'Mute' }
+                  className= 'text-slate-300 transition-colors hover:text-white'
+                >
+                  { muted || volume === 0
+                    ? <VolumeXIcon size= { 20 } />
+                    : volume < 0.5
+                      ? <Volume1Icon size= { 20 } />
+                      : <Volume2Icon size= { 20 } /> }
+                </button>
+              </div>
             </div>
           </div>
         </div>
