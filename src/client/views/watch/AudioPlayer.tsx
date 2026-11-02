@@ -221,49 +221,13 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                   ) }
                 </div>
 
-                <div className= 'flex items-center gap-4'>
-                  <button
-                    onClick= { toggleMute }
-                    title= 'Mute / Unmute [m]'
-                    aria-label= { muted ? 'Unmute' : 'Mute' }
-                    className= 'text-slate-300 transition-colors hover:text-white'
-                  >
-                    { muted || volume === 0 ? (
-                      <VolumeXIcon size= { 20 } />
-                    ) : volume < 0.5 ? (
-                      <Volume1Icon size= { 20 } />
-                    ) : (
-                      <Volume2Icon size= { 20 } />
-                    ) }
-                  </button>
-
-                  <div
-                    ref= { volumeControlRef }
-                    className= 'relative w-28 h-6 flex items-center'
-                    style= { { '--volume': `${ volume * 100 }%` } as CSSProperties }
-                  >
-                    <div className= 'relative w-full h-1.5 rounded-full bg-slate-700'>
-                      <div
-                        className= 'h-full rounded-full bg-slate-300'
-                        style= { { width: 'var(--volume)' } }
-                      />
-
-                      <div
-                        className= 'absolute top-1/2 -translate-1/2 size-4 rounded-full bg-white shadow-lg'
-                        style= { { left: 'var(--volume)' } }
-                      />
-                    </div>
-
-                    <input
-                      ref= { volumeInputRef } type= 'range'
-                      min= { 0 } max= { 1 } step= { 0.01 } defaultValue= { volume }
-                      onInput= { e => changeVolume( Number( e.currentTarget.value ) ) }
-                      onPointerUp= { saveVolume } onKeyUp= { saveVolume } onBlur= { saveVolume }
-                      aria-label= 'Volume' title= 'Volume'
-                      className= 'absolute -inset-2 appearance-none bg-transparent opacity-0 cursor-pointer'
-                    />
-                  </div>
-                </div>
+                <VolumeControl
+                  volume= { volume }
+                  muted= { muted }
+                  onVolumeChange= { changeVolume }
+                  onVolumeCommit= { saveVolume }
+                  onToggleMute= { toggleMute }
+                />
               </div>
             </div>
 
