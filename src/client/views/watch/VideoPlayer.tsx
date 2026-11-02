@@ -157,6 +157,17 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     return () => { video.pause(), video.removeAttribute( 'src' ), video.load() };
   }, [ media.id, media.durationMs ] );
 
+  useEffect( () => {
+    const video = videoRef.current;
+    if ( ! video || ! ready || history.positionMs === null || restoredRef.current ) return;
+    if ( ! Number.isFinite( video.duration ) ) return;
+
+    if ( history.positionMs > 0 && history.positionMs < video.duration * 1000 )
+      video.currentTime = history.positionMs / 1000;
+
+    restoredRef.current = true;
+  }, [ ready, history.positionMs ] );
+
 
   return (
     <>
