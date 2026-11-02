@@ -5,20 +5,18 @@ import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { VideoSeekbar } from '@/src/client/components/VideoSeekbar';
+import { VolumeControl } from '@/src/client/components/VolumeControl';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
-import { useKeyControls } from '@/src/client/hooks/useKeyControls';
-import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
-import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
+import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
 import { formatDuration } from '@/src/client/utils/format';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
   ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
-  RotateCcwIcon, SkipBackIcon, SkipForwardIcon, Volume1Icon, Volume2Icon, VolumeXIcon
+  RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 
 
