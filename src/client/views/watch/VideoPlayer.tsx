@@ -277,8 +277,25 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
               />
             </div>
 
-            <div className= 'shrink-0 flex justify-between items-center h-15 px-2'>
-              <div className= 'flex items-center gap-2'></div>
+            <div
+              className= {
+                'shrink-0 flex justify-between items-center h-15 ' +
+                ( fullscreen && 'px-2' )
+              }
+            >
+              <div className= 'flex items-center gap-2'>
+                <button
+                  onClick= { togglePlay }
+                  disabled= { ! ready }
+                  title= 'Play / Pause [Space]'
+                  aria-label= { playing ? 'Pause' : ended ? 'Replay' : 'Play' }
+                  className= { BUTTON }
+                >
+                  { playing ? <PauseIcon size= { 20 } /> : ended
+                    ? <RotateCcwIcon size= { 20 } />
+                    : <PlayIcon size= { 20 } /> }
+                </button>
+              </div>
 
               <div className= 'flex justify-end items-center gap-4'></div>
             </div>
