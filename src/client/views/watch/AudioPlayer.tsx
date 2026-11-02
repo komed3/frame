@@ -11,7 +11,6 @@ import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
 import { formatDuration } from '@/src/client/utils/format';
-import { parseWaveform, type WaveformData } from '@/src/client/utils/waveform';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -19,7 +18,6 @@ import {
   ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
   RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -43,10 +41,8 @@ const BUTTON =
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
-  const { request, adjacentMedia, media: mediaApi, directories, assets } = useApi();
+  const { adjacentMedia, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
-
-  const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
 
   const navigateAdjacent = ( id: string | null ) => id && navigate(
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
@@ -78,26 +74,6 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
     togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLAudioElement >( media, { prev, next, onNavigate: navigateAdjacent } );
-
-
-  useEffect( () => {
-    const controller = new AbortController();
-    let active = true;
-
-    setWaveform( null );
-
-    assets.list( media.id ).then( a => {
-      const wave = a.find( i => i.kind === 'wave' && i.variant === 'default' );
-      if ( wave && active ) return request< Response >(
-        `/assets/${ encodeURIComponent( media.id ) }/wave/${ encodeURIComponent( wave.variant ) }`,
-        { signal: controller.signal }
-      ).then( response => response.arrayBuffer() );
-
-      return null;
-    } ).then( b => { if ( active && b ) setWaveform( parseWaveform( b ) ) } ).catch( () => {} );
-
-    return () => { active = false, controller.abort() };
-  }, [ assets, media.id, request ] );
 
 
   return (
@@ -164,7 +140,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
               </div>
 
               <Waveform
-                samples= { waveform?.samples ?? null }
+                mediaId= { media.id }
                 duration= { displayDuration }
                 currentTime= { currentTime }
                 buffered= { buffered }
