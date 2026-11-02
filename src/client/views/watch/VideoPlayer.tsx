@@ -36,6 +36,11 @@ interface VideoPlayerProps {
 }
 
 
+const BUTTON =
+  'flex justify-center items-center size-10 bg-slate-50/10 rounded-full transition-colors ' +
+  'hover:bg-slate-50/20 disabled:opacity-30 disabled:pointer-events-none';
+
+
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const { adjacentMedia, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
