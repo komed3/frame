@@ -55,6 +55,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     return { categories, tags, directory, prev, next };
   } );
 
+  const title = media.title || media.fileName;
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
@@ -62,98 +63,9 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const next = data?.next ?? null;
 
 
-  function updateVolumeUI ( value: number ) {
-    volumeControlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
-  }
-
-
-  useEffect( () => {
-    setVolume( volumePref ), volumeRef.current = volumePref;
-    if ( volumeInputRef.current ) volumeInputRef.current.value = String( volumePref );
-
-    updateVolumeUI( volumePref );
-  }, [ volumePref ] );
-
-  useEffect( () => {
-    const video = videoRef.current;
-    if ( ! video ) return;
-
-    video.volume = volume, video.muted = muted;
-  }, [ muted, volume ] );
-
-  useEffect( () => {
-    const video = videoRef.current;
-    if ( ! video ) return;
-
-    const update = () => {
-      setCurrentTime( video.currentTime || 0 );
-      if ( Number.isFinite( video.duration ) ) setDuration( video.duration );
-
-      setBuffered( Array.from( { length: video.buffered.length }, ( _, i ) => ( {
-        start: video.buffered.start( i ), end: video.buffered.end( i )
-      } ) ) );
-    };
-
-    const onTimeUpdate = () => { update(), history.onTimeUpdate( video.currentTime ) };
-    const onPlay = () => { setPlaying( true ), setEnded( false ), history.onPlay( video.currentTime ) };
-    const onPause = () => { setPlaying( false ), history.onPause( video.currentTime ) };
-    const onEnded = () => { setPlaying( false ), setEnded( true ), history.onEnded( video.currentTime ) };
-    const onSeeking = () => history.onSeeking();
-    const onSeeked = () => history.onSeeked( video.currentTime );
-    const onReady = () => { setReady( true ), update() };
-
-    const listeners: [ string, EventListener ][] = [
-      [ 'timeupdate', onTimeUpdate ], [ 'durationchange', update ], [ 'progress', update ],
-      [ 'play', onPlay ], [ 'pause', onPause ], [ 'ended', onEnded ],
-      [ 'seeking', onSeeking ], [ 'seeked', onSeeked ],
-      [ 'loadedmetadata', update ], [ 'canplay', onReady ]
-    ];
-
-    listeners.forEach( ( [ e, listener ] ) => video.addEventListener( e, listener ) );
-    return () => listeners.forEach( ( [ e, listener ] ) => video.removeEventListener( e, listener ) );
-  }, [
-    history.onPlay, history.onPause, history.onTimeUpdate,
-    history.onSeeking, history.onSeeked, history.onEnded
-  ] );
-
-  useEffect( () => {
-    const video = videoRef.current;
-    if ( ! video ) return;
-
-    setReady( false ), setPlaying( false ), setEnded( false );
-    setCurrentTime( 0 ), setDuration( mediaDuration ), setBuffered( [] );
-    setRemaining( false );
-
-    restoredRef.current = false;
-    video.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
-    video.load();
-
-    return () => { video.pause(), video.removeAttribute( 'src' ), video.load() };
-  }, [ media.id, media.durationMs ] );
-
-  useEffect( () => {
-    const video = videoRef.current;
-    if ( ! video || ! ready || history.positionMs === null || restoredRef.current ) return;
-    if ( ! Number.isFinite( video.duration ) ) return;
-
-    if ( history.positionMs > 0 && history.positionMs < video.duration * 1000 )
-      video.currentTime = history.positionMs / 1000;
-
-    restoredRef.current = true;
-  }, [ ready, history.positionMs ] );
-
-  useEffect( () => {
-    const change = () => setFullscreen( !! document.fullscreenElement );
-    document.addEventListener( 'fullscreenchange', change );
-    return () => document.removeEventListener( 'fullscreenchange', change );
-  }, [] );
-
-
-  const seek = ( time: number ) => {
-    const video = videoRef.current;
-    if ( ! video || ! Number.isFinite( video.duration ) ) return;
-    video.currentTime = Math.max( 0, Math.min( video.duration, time ) );
-  };
+  const navigateAdjacent = ( id: string | null ) => id && navigate(
+    `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
+  );
 
   const frame = ( dir: 'backward' | 'forward' ) => {
     const video = videoRef.current;
