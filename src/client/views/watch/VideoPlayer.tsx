@@ -1,3 +1,4 @@
+import { MediaActions } from '@/src/client/components/MediaActions';
 import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
 import type { MediaRecord } from '@/src/shared/types/media';
 
@@ -18,6 +19,10 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
           <div className= 'flex-1 h-[calc(100%-48px)] aspect-video' />
           <div className= 'shrink-0 h-12' />
         </div>
+      </div>
+
+      <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
+        <MediaActions media= { media } />
       </div>
     </>
   );
