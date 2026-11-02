@@ -1,6 +1,7 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
 import { MediaActions } from '@/src/client/components/MediaActions';
+import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
@@ -78,6 +79,16 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
           onHome= { () => navigate( '/all' ) }
           onNavigate= { id => navigate( id ? `/all/${ media.rootId }/${ id }` : `/all/${ media.rootId }` ) }
         />
+
+        <div className= 'space-y-3'>
+          { categories.length > 0 && (
+            <MediaTaxonomy type= 'category' items= { categories } />
+          ) }
+
+          <h1 className= 'text-2xl font-medium tracking-wide'>
+            { title }
+          </h1>
+        </div>
       </div>
     </>
   );
