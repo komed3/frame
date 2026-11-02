@@ -52,4 +52,40 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
     element.volume = volume, element.muted = muted;
   }, [ muted, volume ] );
+
+  useEffect( () => {
+    const element = mediaRef.current;
+    if ( ! element ) return;
+
+    const update = () => {
+      setCurrentTime( element.currentTime || 0 );
+      if ( Number.isFinite( element.duration ) ) setDuration( element.duration );
+
+      setBuffered( Array.from( { length: element.buffered.length }, ( _, i ) => ( {
+        start: element.buffered.start( i ), end: element.buffered.end( i )
+      } ) ) );
+    };
+
+    const onTimeUpdate = () => { update(), history.onTimeUpdate( element.currentTime ) };
+    const onPlay = () => { setPlaying( true ), setEnded( false ), history.onPlay( element.currentTime ) };
+    const onPause = () => { setPlaying( false ), history.onPause( element.currentTime ) };
+    const onEnded = () => { setPlaying( false ), setEnded( true ), history.onEnded( element.currentTime ) };
+    const onSeeking = () => history.onSeeking();
+    const onSeeked = () => history.onSeeked( element.currentTime );
+    const onReady = () => { setReady( true ), update() };
+    const onError = () => setStreamError( errorMessage );
+
+    const listeners: [ string, EventListener ][] = [
+      [ 'timeupdate', onTimeUpdate ], [ 'durationchange', update ], [ 'progress', update ],
+      [ 'play', onPlay ], [ 'pause', onPause ], [ 'ended', onEnded ], [ 'seeking', onSeeking ],
+      [ 'seeked', onSeeked ], [ 'loadedmetadata', update ], [ 'canplay', onReady ],
+      [ 'error', onError ]
+    ];
+
+    listeners.forEach( ( [ e, listener ] ) => element.addEventListener( e, listener ) );
+    return () => listeners.forEach( ( [ e, listener ] ) => element.removeEventListener( e, listener ) );
+  }, [
+    errorMessage, history.onPlay, history.onPause, history.onTimeUpdate,
+    history.onSeeking, history.onSeeked, history.onEnded
+  ] );
 }
