@@ -177,46 +177,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
               </div>
 
               <div className= 'flex justify-end items-center gap-4'>
-                <button
-                  onClick= { toggleMute }
-                  title= 'Mute / Unmute [m]'
-                  aria-label= { muted ? 'Unmute' : 'Mute' }
-                  className= 'text-slate-300 transition-colors hover:text-white'
-                >
-                  { muted || volume === 0
-                    ? <VolumeXIcon size= { 20 } />
-                    : volume < 0.5
-                      ? <Volume1Icon size= { 20 } />
-                      : <Volume2Icon size= { 20 } /> }
-                </button>
-
-                <div
-                  ref= { volumeControlRef }
-                  className= 'relative mr-6 w-28 h-6 flex items-center'
-                  style= { { '--volume': `${ volume * 100 }%` } as CSSProperties }
-                >
-                  <div className= 'relative w-full h-1.5 bg-slate-700 rounded-full'>
-                    <div
-                      className= 'h-full bg-slate-300 rounded-full'
-                      style= { { width: 'var(--volume)' } }
-                    />
-
-                    <div
-                      className= 'absolute top-1/2 -translate-1/2 size-4 bg-white rounded-full shadow-lg'
-                      style= { { left: 'var(--volume)' } }
-                    />
-                  </div>
-
-                  <input
-                    ref= { volumeInputRef }
-                    type= 'range'
-                    min= { 0 } max= { 1 } step= { 0.01 } defaultValue= { volume }
-                    onInput= { e => changeVolume( Number( e.currentTarget.value ) ) }
-                    onPointerUp= { saveVolume } onKeyUp= { saveVolume } onBlur= { saveVolume }
-                    aria-label= 'Volume' title= 'Volume'
-                    className= 'absolute -inset-2 appearance-none bg-transparent opacity-0 cursor-pointer'
-                  />
-                </div>
+                <VolumeControl
+                  volume= { volume }
+                  muted= { muted }
+                  onVolumeChange= { changeVolume }
+                  onVolumeCommit= { saveVolume }
+                  onToggleMute= { toggleMute }
+                  sliderClassName= 'relative mr-6 w-28 h-6 flex items-center'
+                />
 
                 <button
                   onClick= { () => navigateAdjacent( prev ) }
