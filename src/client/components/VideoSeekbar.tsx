@@ -24,6 +24,19 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
         setHovering( Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) ) );
       } }
       onMouseLeave= { () => setHovering( null ) }
-    ></div>
+    >
+      <div className= 'absolute top-1/2 inset-x-0 -translate-y-1/2 h-full bg-slate-700'>
+        { buffered.map( ( range, i ) => (
+          <div
+            key= { i }
+            className= 'absolute top-0 h-full bg-slate-500'
+            style= { {
+              left: `${ range.start / duration * 100 }%`,
+              width: `${ ( range.end - range.start ) / duration * 100 }%`
+            } }
+          />
+        ) ) }
+      </div>
+    </div>
   );
 }
