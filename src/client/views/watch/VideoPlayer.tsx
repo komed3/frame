@@ -10,6 +10,14 @@ import { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import { useNavigate } from 'react-router';
 
 
+interface VideoPlayerData {
+  categories: CategoryRecord[];
+  tags: TagRecord[];
+  directory: ApiDirectoryListResult | null;
+  prev: string | null;
+  next: string | null;
+}
+
 interface VideoPlayerProps {
   media: MediaRecord;
   playlistId?: string;
