@@ -66,6 +66,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     return { categories, tags, directory, prev, next };
   } );
 
+  const title = media.title || media.fileName;
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
