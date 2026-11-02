@@ -1,3 +1,5 @@
+import { useApi } from '@/src/client/context/ApiContext';
+import { parseWaveform, type WaveformData } from '@/src/client/utils/waveform';
 import { useEffect, useRef, useState } from 'react';
 
 
