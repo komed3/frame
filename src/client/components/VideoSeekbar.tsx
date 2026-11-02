@@ -46,6 +46,11 @@ export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: Vide
             } }
           />
         ) }
+
+        <div
+          className= 'absolute top-0 left-0 h-full bg-sky-500'
+          style= { { width: `${ progress * 100 }%` } }
+        />
       </div>
     </div>
   );
