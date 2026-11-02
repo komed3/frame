@@ -10,8 +10,11 @@ interface WaveformProps {
 }
 
 
-export function Waveform ( { samples, duration, currentTime, buffered, onSeek }: WaveformProps ) {
+export function Waveform ( { mediaId, duration, currentTime, buffered, onSeek }: WaveformProps ) {
+  const { request, assets } = useApi();
+
   const canvasRef = useRef< HTMLCanvasElement >( null );
+  const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
   const [ hover, setHover ] = useState< number | null >( null );
 
 
