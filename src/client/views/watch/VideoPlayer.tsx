@@ -1,5 +1,6 @@
 import { ActivePlaylist } from '@/src/client/components/ActivePlaylist';
 import { Breadcrumbs } from '@/src/client/components/Breadcrumbs';
+import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
@@ -56,10 +57,18 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   return (
     <>
       <div className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'>
-        <div className= 'absolute left-1/2 -translate-x-1/2 flex flex-col h-full'>
-          <div className= 'flex-1 h-[calc(100%-48px)] aspect-video' />
-          <div className= 'shrink-0 h-12' />
-        </div>
+        { loading ? (
+          <Loading className= 'h-full' />
+        ) : error ? (
+          <div className= 'flex justify-center items-center h-full font-semibold text-red-400'>
+            { error }
+          </div>
+        ) : (
+          <div className= 'absolute left-1/2 -translate-x-1/2 flex flex-col h-full'>
+            <div className= 'flex-1 h-[calc(100%-48px)] aspect-video' />
+            <div className= 'shrink-0 h-12' />
+          </div>
+        ) }
       </div>
 
       <div className= 'mx-auto my-8 max-w-7xl px-6 space-y-10'>
