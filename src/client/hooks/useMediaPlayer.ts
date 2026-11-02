@@ -88,4 +88,34 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     errorMessage, history.onPlay, history.onPause, history.onTimeUpdate,
     history.onSeeking, history.onSeeked, history.onEnded
   ] );
+
+  useEffect( () => {
+    const element = mediaRef.current;
+    if ( ! element ) return;
+
+    setReady( false ), setPlaying( false ), setEnded( false ), setStreamError( null );
+    setCurrentTime( 0 ), setDuration( mediaDuration ), setBuffered( [] );
+    setRemaining( false );
+
+    restoredRef.current = false;
+    element.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
+    element.load();
+
+    return () => { element.pause(), element.removeAttribute( 'src' ), element.load() };
+  }, [ media.id, media.durationMs ] );
+
+  useEffect( () => {
+    const el = mediaRef.current;
+    if ( ! el || ! ready || history.positionMs === null || restoredRef.current ) return;
+    if ( ! Number.isFinite( el.duration ) ) return;
+
+    if ( history.positionMs > 0 && history.positionMs < el.duration * 1000 ) el.currentTime = history.positionMs / 1000;
+    restoredRef.current = true;
+  }, [ ready, history.positionMs ] );
+
+  useEffect( () => {
+    const change = () => setFullscreen( !! document.fullscreenElement );
+    document.addEventListener( 'fullscreenchange', change );
+    return () => document.removeEventListener( 'fullscreenchange', change );
+  }, [] );
 }
