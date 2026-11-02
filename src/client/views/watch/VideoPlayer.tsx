@@ -276,6 +276,12 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 onSeek= { seek }
               />
             </div>
+
+            <div className= 'shrink-0 flex justify-between items-center h-15 px-2'>
+              <div className= 'flex items-center gap-2'></div>
+
+              <div className= 'flex justify-end items-center gap-4'></div>
+            </div>
           </div>
         </div>
       </div>
