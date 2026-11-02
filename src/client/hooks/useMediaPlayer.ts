@@ -109,7 +109,9 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     if ( ! el || ! ready || history.positionMs === null || restoredRef.current ) return;
     if ( ! Number.isFinite( el.duration ) ) return;
 
-    if ( history.positionMs > 0 && history.positionMs < el.duration * 1000 ) el.currentTime = history.positionMs / 1000;
+    if ( history.positionMs > 0 && history.positionMs < el.duration * 1000 )
+      el.currentTime = history.positionMs / 1000;
+
     restoredRef.current = true;
   }, [ ready, history.positionMs ] );
 
