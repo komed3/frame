@@ -42,4 +42,14 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const [ remaining, setRemaining ] = useState( false );
   const [ fullscreen, setFullscreen ] = useState( false );
   const [ streamError, setStreamError ] = useState< string | null >( null );
+
+
+  useEffect( () => { volumeRef.current = volumePref, setVolume( volumePref ) }, [ volumePref ] );
+
+  useEffect( () => {
+    const element = mediaRef.current;
+    if ( ! element ) return;
+
+    element.volume = volume, element.muted = muted;
+  }, [ muted, volume ] );
 }
