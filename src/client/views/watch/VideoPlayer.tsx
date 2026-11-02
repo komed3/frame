@@ -88,6 +88,11 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const next = data?.next ?? null;
 
 
+  function updateVolumeUI ( value: number ) {
+    volumeControlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
+  }
+
+
   return (
     <>
       <div className= 'relative h-[calc(100vh-64px)] bg-slate-950 overflow-hidden'>
