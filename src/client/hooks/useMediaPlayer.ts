@@ -144,4 +144,9 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     if ( volumeRef.current === volume ) return;
     setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current );
   };
+
+  const adjustVolume = ( v: number ) => { changeVolume( v ), saveVolume() };
+  const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
+  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() :
+    playerRef.current?.requestFullscreen();
 }
