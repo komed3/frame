@@ -46,31 +46,12 @@ const BUTTON =
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const { request, adjacentMedia, media: mediaApi, directories, assets } = useApi();
   const navigate = useNavigate();
-  const history = usePlayHistory( media );
 
-  const audioRef = useRef< HTMLAudioElement >( null );
-  const playerRef = useRef< HTMLDivElement >( null );
-  const volumeControlRef = useRef< HTMLDivElement >( null );
-  const volumeInputRef = useRef< HTMLInputElement >( null );
-  const volumeRef = useRef( 1 );
-  const restoredRef = useRef( false );
-
-  const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
-  const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
-  const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
-  const title = media.title || media.fileName;
-
-  const [ volume, setVolume ] = useState( volumePref );
   const [ waveform, setWaveform ] = useState< WaveformData | null >( null );
-  const [ currentTime, setCurrentTime ] = useState( 0 );
-  const [ duration, setDuration ] = useState( mediaDuration );
-  const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
-  const [ playing, setPlaying ] = useState( false );
-  const [ ended, setEnded ] = useState( false );
-  const [ ready, setReady ] = useState( false );
-  const [ remaining, setRemaining ] = useState( false );
-  const [ streamError, setStreamError ] = useState< string | null >( null );
-  const [ fullscreen, setFullscreen ] = useState( false );
+
+  const navigateAdjacent = ( id: string | null ) => id && navigate(
+    `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
+  );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
@@ -90,26 +71,18 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
   const directory = data?.directory ?? null;
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
+  const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
 
 
-  function updateVolumeUI ( value: number ) {
-    volumeControlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
-  }
+  const {
+    mediaRef, playerRef, volume, muted, currentTime, duration, buffered, playing,
+    ended, ready, remaining, fullscreen, streamError, setRemaining, seek, togglePlay,
+    changeVolume, saveVolume, toggleMute, toggleFullscreen
+  } = useMediaPlayer< HTMLAudioElement >( media, {
+    prev, next, onNavigate: navigateAdjacent,
+    errorMessage: 'Could not play this audio file.'
+  } );
 
-
-  useEffect( () => {
-    setVolume( volumePref ), volumeRef.current = volumePref;
-    if ( volumeInputRef.current ) volumeInputRef.current.value = String( volumePref );
-
-    updateVolumeUI( volumePref );
-  }, [ volumePref ] );
-
-  useEffect( () => {
-    const audio = audioRef.current;
-    if ( ! audio ) return;
-
-    audio.volume = volume, audio.muted = muted
-  }, [ muted ] );
 
   useEffect( () => {
     const controller = new AbortController();
