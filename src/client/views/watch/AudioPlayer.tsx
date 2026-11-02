@@ -77,10 +77,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
     mediaRef, playerRef, volume, muted, currentTime, displayDuration, timeLabel,
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
     togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
-  } = useMediaPlayer< HTMLAudioElement >( media, {
-    prev, next, onNavigate: navigateAdjacent,
-    errorMessage: 'Could not play this audio file.'
-  } );
+  } = useMediaPlayer< HTMLAudioElement >( media, { prev, next, onNavigate: navigateAdjacent } );
 
 
   useEffect( () => {
