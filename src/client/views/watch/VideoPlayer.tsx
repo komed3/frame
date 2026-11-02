@@ -67,24 +67,12 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
   );
 
-  const frame = ( dir: 'backward' | 'forward' ) => {
-    const video = videoRef.current;
-    if ( ! video || ! Number.isFinite( video.duration ) ) return;
-
-    const fps = media.fps ?? 30, frameTime = 1 / fps;
-    seek( dir === 'backward' ? video.currentTime - frameTime : video.currentTime + frameTime );
-  };
-
 
   const {
-    mediaRef: videoRef, playerRef, volume, muted, currentTime, displayDuration,
-    timeLabel, buffered, playing, ended, ready, fullscreen, streamError, setRemaining,
-    seek, togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
-  } = useMediaPlayer< HTMLVideoElement >( media, {
-    prev, next, onNavigate: navigateAdjacent, extraControls: {
-      ',': () => frame( 'backward' ), '.': () => frame( 'forward' )
-    }
-  } );
+    mediaRef, playerRef, volume, muted, currentTime, displayDuration, timeLabel,
+    buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
+    togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
+  } = useMediaPlayer< HTMLVideoElement >( media, { prev, next, onNavigate: navigateAdjacent } );
 
 
   return (
@@ -96,7 +84,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
         >
           <div className= 'flex-1 relative min-h-0 bg-black'>
             <video
-              ref= { videoRef }
+              ref= { mediaRef }
               className= 'block w-full h-full object-contain'
               preload= 'auto'
               playsInline
