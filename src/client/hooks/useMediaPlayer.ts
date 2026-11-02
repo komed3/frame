@@ -166,4 +166,11 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     'ctrl+arrowright': () => next && onNavigate?.( next ),
     ...extraControls
   } );
+
+
+  return {
+    mediaRef, playerRef, history, volume, volumeRef, muted, currentTime, duration,
+    buffered, playing, ended, ready, remaining, fullscreen, streamError, setRemaining,
+    seek, togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
+  };
 }
