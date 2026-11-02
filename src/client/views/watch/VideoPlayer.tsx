@@ -142,6 +142,21 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     history.onSeeking, history.onSeeked, history.onEnded
   ] );
 
+  useEffect( () => {
+    const video = videoRef.current;
+    if ( ! video ) return;
+
+    setReady( false ), setPlaying( false ), setEnded( false );
+    setCurrentTime( 0 ), setDuration( mediaDuration ), setBuffered( [] );
+    setRemaining( false );
+
+    restoredRef.current = false;
+    video.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
+    video.load();
+
+    return () => { video.pause(), video.removeAttribute( 'src' ), video.load() };
+  }, [ media.id, media.durationMs ] );
+
 
   return (
     <>
