@@ -16,6 +16,26 @@ export function Waveform ( { samples, duration, currentTime, buffered, onSeek }:
 
 
   useEffect( () => {
+    const controller = new AbortController();
+    let active = true;
+
+    setWaveform( null );
+
+    assets.list( mediaId ).then( list => {
+      const wave = list.find( i => i.kind === 'wave' && i.variant === 'default' );
+      if ( ! wave || ! active ) return null;
+
+      return request< Response >(
+        `/assets/${ encodeURIComponent( mediaId ) }/wave/${ encodeURIComponent( wave.variant ) }`,
+        { signal: controller.signal }
+      ).then( res => res.arrayBuffer() );
+    } ).then( buf => { if ( active && buf ) setWaveform( parseWaveform( buf ) ) } ).catch( () => {} );
+
+    return () => { active = false, controller.abort() };
+  }, [ assets, mediaId, request ] );
+
+
+  useEffect( () => {
     const canvas = canvasRef.current;
     if ( ! canvas ) return;
 
