@@ -107,6 +107,41 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     video.volume = volume, video.muted = muted;
   }, [ muted, volume ] );
 
+  useEffect( () => {
+    const video = videoRef.current;
+    if ( ! video ) return;
+
+    const update = () => {
+      setCurrentTime( video.currentTime || 0 );
+      if ( Number.isFinite( video.duration ) ) setDuration( video.duration );
+
+      setBuffered( Array.from( { length: video.buffered.length }, ( _, i ) => ( {
+        start: video.buffered.start( i ), end: video.buffered.end( i )
+      } ) ) );
+    };
+
+    const onTimeUpdate = () => { update(), history.onTimeUpdate( video.currentTime ) };
+    const onPlay = () => { setPlaying( true ), setEnded( false ), history.onPlay( video.currentTime ) };
+    const onPause = () => { setPlaying( false ), history.onPause( video.currentTime ) };
+    const onEnded = () => { setPlaying( false ), setEnded( true ), history.onEnded( video.currentTime ) };
+    const onSeeking = () => history.onSeeking();
+    const onSeeked = () => history.onSeeked( video.currentTime );
+    const onReady = () => { setReady( true ), update() };
+
+    const listeners: [ string, EventListener ][] = [
+      [ 'timeupdate', onTimeUpdate ], [ 'durationchange', update ], [ 'progress', update ],
+      [ 'play', onPlay ], [ 'pause', onPause ], [ 'ended', onEnded ],
+      [ 'seeking', onSeeking ], [ 'seeked', onSeeked ],
+      [ 'loadedmetadata', update ], [ 'canplay', onReady ]
+    ];
+
+    listeners.forEach( ( [ e, listener ] ) => video.addEventListener( e, listener ) );
+    return () => listeners.forEach( ( [ e, listener ] ) => video.removeEventListener( e, listener ) );
+  }, [
+    history.onPlay, history.onPause, history.onTimeUpdate,
+    history.onSeeking, history.onSeeked, history.onEnded
+  ] );
+
 
   return (
     <>
