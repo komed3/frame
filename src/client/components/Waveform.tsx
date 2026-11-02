@@ -55,9 +55,9 @@ export function Waveform ( { mediaId, duration, currentTime, buffered, onSeek }:
       if ( ! ctx ) return;
 
       ctx.clearRect( 0, 0, width, height );
-      if ( ! samples?.length || ! duration ) return;
+      if ( ! waveform?.samples.length || ! duration ) return;
 
-      const count = samples.length / 2, points = Math.min( width, 3600 );
+      const count = waveform.samples.length / 2, points = Math.min( width, 3600 );
       const center = height / 2, played = currentTime / duration;
       const preview = hover === null ? played : Math.max( played, hover );
 
@@ -67,7 +67,7 @@ export function Waveform ( { mediaId, duration, currentTime, buffered, onSeek }:
         let peak = 0;
 
         for ( let i = from; i < to; i++ ) peak = Math.max(
-          peak, Math.abs( samples[ i * 2 ] ), Math.abs( samples[ i * 2 + 1 ] )
+          peak, Math.abs( waveform.samples[ i * 2 ] ), Math.abs( waveform.samples[ i * 2 + 1 ] )
         );
 
         const position = x / points, time = position * duration;
@@ -88,7 +88,7 @@ export function Waveform ( { mediaId, duration, currentTime, buffered, onSeek }:
     draw();
 
     return () => observer.disconnect();
-  }, [ samples, duration, currentTime, buffered, hover ] );
+  }, [ waveform, duration, currentTime, buffered, hover ] );
 
 
   return (
