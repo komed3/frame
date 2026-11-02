@@ -75,54 +75,16 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     seek( dir === 'backward' ? video.currentTime - frameTime : video.currentTime + frameTime );
   };
 
-  const togglePlay = () => {
-    const video = videoRef.current;
-    if ( ! video || ! ready ) return;
-    if ( video.paused ) void video.play().catch( () => {} );
-    else video.pause();
-  };
 
-  const changeVolume = ( value: number ) => {
-    const next = Math.max( 0, Math.min( 1, value ) );
-    volumeRef.current = next;
-    if ( volumeInputRef.current ) volumeInputRef.current.value = String( next );
-
-    updateVolumeUI( next );
-    if ( videoRef.current ) videoRef.current.volume = next;
-  };
-
-  const saveVolume = () => {
-    if ( volumeRef.current === volume ) return;
-    setVolume( volumeRef.current ), setPref( 'PLAYER_VOLUME', volumeRef.current );
-  };
-
-  const adjustVolume = ( value: number ) => { changeVolume( value ), saveVolume() };
-  const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
-  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : playerRef.current?.requestFullscreen();
-  const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
-
-
-  useKeyControls( {
-    'f11': toggleFullscreen, ' ': togglePlay, m: toggleMute,
-    '0': () => seek( duration * 0 ), '1': () => seek( duration * 0.1 ),
-    '2': () => seek( duration * 0.2 ), '3': () => seek( duration * 0.3 ),
-    '4': () => seek( duration * 0.4 ), '5': () => seek( duration * 0.5 ),
-    '6': () => seek( duration * 0.6 ), '7': () => seek( duration * 0.7 ),
-    '8': () => seek( duration * 0.8 ), '9': () => seek( duration * 0.9 ),
-    ',': () => frame( 'backward' ), '.': () => frame( 'forward' ),
-    arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
-    arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
-    arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
-    arrowdown: () => adjustVolume( volumeRef.current - 0.05 ),
-    'ctrl+arrowleft': () => navigateAdjacent( prev ),
-    'ctrl+arrowright': () => navigateAdjacent( next )
+  const {
+    mediaRef: videoRef, playerRef, volume, muted, currentTime, displayDuration,
+    timeLabel, buffered, playing, ended, ready, fullscreen, streamError, setRemaining,
+    seek, togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
+  } = useMediaPlayer< HTMLVideoElement >( media, {
+    prev, next, onNavigate: navigateAdjacent, extraControls: {
+      ',': () => frame( 'backward' ), '.': () => frame( 'forward' )
+    }
   } );
-
-
-  const displayDuration = duration || mediaDuration;
-  const timeLabel = remaining
-    ? `-${ formatDuration( Math.max( 0, displayDuration - currentTime ) * 1000 ) }`
-    : formatDuration( currentTime * 1000 );
 
 
   return (
