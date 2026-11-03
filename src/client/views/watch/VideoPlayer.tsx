@@ -133,23 +133,19 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                     : <PlayIcon size= { 20 } /> }
                 </button>
 
-                <button
-                  onClick= { () => seek( currentTime - 10 ) }
-                  title= 'Back 10 seconds'
-                  aria-label= 'Back 10 seconds'
-                  className= { BUTTON }
-                >
-                  <SkipBackIcon size= { 18 } />
-                </button>
-
-                <button
-                  onClick= { () => seek( currentTime + 10 ) }
-                  title= 'Forward 10 seconds'
-                  aria-label= 'Forward 10 seconds'
-                  className= { BUTTON }
-                >
-                  <SkipForwardIcon size= { 18 } />
-                </button>
+                { ( [ [ -10, SkipBackIcon, 'Back', '←' ], [ 10, SkipForwardIcon, 'Forward', '→' ] ] as const ).map(
+                  ( [ offset, Icon, direction, key ] ) => (
+                    <button
+                      key= { direction }
+                      onClick= { () => seek( currentTime + offset ) }
+                      title= { `${ direction } 10 seconds [${key}]` }
+                      aria-label= { `${ direction } 10 seconds` }
+                      className= { BUTTON }
+                    >
+                      <Icon size= { 18 } />
+                    </button>
+                  )
+                ) }
 
                 <button
                   onClick= { () => setRemaining( v => ! v ) }
