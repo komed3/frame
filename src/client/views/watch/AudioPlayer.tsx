@@ -188,7 +188,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                   ) }
                 </div>
 
-                <div className= 'flex items-center gap-10'>
+                <div className= 'flex items-center gap-2'>
                   <VolumeControl
                     volume= { volume }
                     muted= { muted }
