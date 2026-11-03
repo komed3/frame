@@ -14,6 +14,15 @@ interface VideoMarkerControlProps {
 }
 
 
+const BUTTON =
+  'flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors ' +
+  'hover:bg-slate-50/10 disabled:opacity-50 disabled:pointer-events-none';
+
+const INPUT =
+  'w-full px-3 py-2 text-sm bg-slate-900 border border-slate-600 rounded ' +
+  'outline-none focus:border-slate-500';
+
+
 export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, onUpdate, onDelete }: VideoMarkerControlProps ) {
   const [ open, setOpen ] = useState( false );
   const [ selected, setSelected ] = useState< string | null >( null );
