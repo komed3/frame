@@ -28,6 +28,7 @@ interface VideoPlayerData {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
+  markers: MarkerRecord[];
   prev: string | null;
   next: string | null;
 }
@@ -49,7 +50,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< VideoPlayerData >( key, async () => {
-    const [ categories, tags, directory, markerData, [ prev, next ] ] = await Promise.all( [
+    const [ categories, tags, directory, markers, [ prev, next ] ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
@@ -57,13 +58,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
       adjacentMedia( media, playlistId )
     ] );
 
-    return { categories, tags, directory, prev, next };
+    return { categories, tags, directory, markers, prev, next };
   } );
 
   const title = media.title || media.fileName;
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
+  const markers = data?.markers ?? [];
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
 
