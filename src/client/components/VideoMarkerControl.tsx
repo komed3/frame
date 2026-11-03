@@ -166,6 +166,20 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
             <h3 className= 'text-sm font-medium'>
               { selected ? 'Edit marker' : 'New marker' }
             </h3>
+
+            <div className= 'space-y-1'>
+              <label className= 'block text-xs text-slate-400'>
+                Position (seconds)
+              </label>
+
+              <input
+                type= 'number'
+                min= { 0 } step= { 0.001 } value= { position }
+                onChange= { e => setPosition( e.target.value ) }
+                required
+                className= { INPUT }
+              />
+            </div>
           </form>
         </div>
       ) }
