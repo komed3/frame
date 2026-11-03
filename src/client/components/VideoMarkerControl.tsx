@@ -42,12 +42,19 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
   const save = async ( e: SubmitEvent< HTMLFormElement > ) => {
     e.preventDefault();
 
-    const positionMs = Math.round( Number( position ) * 1000 );
-    if ( ! Number.isFinite( positionMs ) || positionMs < 0 ) {
-      setError( 'Invalid marker position.' );
-      return;
-    }
+    const posMs = Math.round( Number( position ) * 1000 );
+    if ( ! Number.isFinite( posMs ) || posMs < 0 ) { setError( 'Invalid marker position.' ); return }
 
     setSaving( true ), setError( null );
+
+    try {
+      if ( selected ) await onUpdate( selected, { positionMs: posMs, title, description } );
+      else await onCreate( posMs, title, description );
+
+      reset();
+    }
+
+    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not save marker.' ) }
+    finally { setSaving( false ) }
   };
 }
