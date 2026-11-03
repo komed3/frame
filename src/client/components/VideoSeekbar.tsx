@@ -190,14 +190,14 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
           }
           style= { { left: `${ positionMs / ( duration * 1000 ) * 100 }%` } }
         >
-          <span className= 'block w-1 h-3 bg-amber-400 rounded-sm shadow' />
+          <span className= 'block w-1 h-1.5 bg-amber-400 shadow' />
         </button>
       ) ) }
 
       <div
         ref= { thumbRef }
         className= {
-          'absolute top-1/2 -translate-1/2 size-3 bg-white rounded-full ' +
+          'absolute top-1/2 -translate-1/2 z-30 size-3 bg-white rounded-full ' +
           'shadow transition-opacity pointer-events-none'
         }
         style= { {
