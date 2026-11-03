@@ -3,6 +3,7 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { formatDuration } from '@/src/client/utils/format';
 import type { MediaFrame, MediaFramesManifest } from '@/src/shared/types/assets';
 import { useEffect, useRef, useState } from 'react';
+import type { MarkerRecord } from '@/src/shared/types/markers';
 
 
 interface VideoSeekbarProps {
@@ -10,11 +11,12 @@ interface VideoSeekbarProps {
   currentTime: number;
   duration: number;
   buffered: { start: number, end: number }[];
+  markers: MarkerRecord[];
   onSeek: ( time: number ) => void;
 }
 
 
-export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSeek }: VideoSeekbarProps ) {
+export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, markers, onSeek }: VideoSeekbarProps ) {
   const { assets } = useApi();
 
   const rootRef = useRef< HTMLDivElement >( null );
