@@ -134,6 +134,28 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSee
       } }
       onMouseLeave= { () => setHovering( null ) }
     >
+      { hovering !== null && (
+        <div
+          ref= { previewRef }
+          className= 'absolute z-20 pointer-events-none'
+          style= { {
+            left: previewPosition.left, top: previewPosition.top,
+            width: 'min(160px, calc(100vw - 16px))'
+          } }
+        >
+          { previewSrc && (
+            <img
+              src= { previewSrc }
+              className= 'block w-full h-auto aspect-video object-contain bg-black rounded'
+              alt= ''
+            />
+          ) }
+          <div className= 'mt-1 text-center text-xs tabular-nums text-white'>
+            { formatDuration( hoverTime ?? 0 ) }
+          </div>
+        </div>
+      ) }
+
       <div className= 'absolute top-1/2 inset-x-0 -translate-y-1/2 h-full bg-slate-700'>
         { buffered.map( ( range, i ) => (
           <div
