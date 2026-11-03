@@ -26,7 +26,7 @@ export function VolumeControl ( { volume, muted, onVolumeChange, onVolumeCommit,
 
 
   return (
-    <div className= 'flex items-center gap-5 h-10 pl-5 pr-6 bg-slate-50/10 rounded-full'>
+    <div className= 'flex items-center gap-4 h-10 pl-5 pr-6 bg-slate-50/10 rounded-full'>
       <button
         onClick= { onToggleMute }
         title= 'Mute / Unmute [m]'
