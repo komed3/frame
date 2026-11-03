@@ -218,6 +218,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     assets: {
       list: id => request< ApiAssetRecord[] >( `/assets/${ e( id ) }` ),
+      load: url => request( url.replace( API, '' ) ),
       url: ( id, kind, variant = 'default' ) => `${ API }/assets/${ e( id ) }/${ kind }/${ e( variant ) }`
     },
 
