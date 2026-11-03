@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 
 interface VideoSeekbarProps {
+  mediaId: string;
   currentTime: number;
   duration: number;
   buffered: { start: number, end: number }[];
