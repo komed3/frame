@@ -19,13 +19,14 @@ export function VolumeControl ( {
   const controlRef = useRef< HTMLDivElement >( null );
   const inputRef = useRef< HTMLInputElement >( null );
 
-  const update = ( value: number ) => controlRef.current?.style.setProperty( '--volume', `${ value * 100 }%` );
+  const displayVolume = muted ? 0 : volume;
+  const update = ( v: number ) => controlRef.current?.style.setProperty( '--volume', `${ v * 100 }%` );
 
 
   useEffect( () => {
-    if ( inputRef.current ) inputRef.current.value = String( volume );
-    update( volume );
-  }, [ volume ] );
+    if ( inputRef.current ) inputRef.current.value = String( displayVolume );
+    update( displayVolume );
+  }, [ displayVolume ] );
 
 
   return (
@@ -43,7 +44,7 @@ export function VolumeControl ( {
       <div
         ref= { controlRef }
         className= { sliderClassName }
-        style= { { '--volume': `${ volume * 100 }%` } as React.CSSProperties }
+        style= { { '--volume': `${ displayVolume * 100 }%` } as React.CSSProperties }
       >
         <div className= 'relative w-full h-1.5 bg-slate-700 rounded-full'>
           <div
