@@ -28,4 +28,6 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
     setSelected( null ), setPosition( String( currentTime ) );
     setTitle( '' ), setDescription( '' ), setError( null );
   };
+
+  const create = () => { reset(), setOpen( true ) };
 }
