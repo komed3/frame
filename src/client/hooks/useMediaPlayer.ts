@@ -145,6 +145,11 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const changeVolume = ( value: number ) => {
     const next = Math.max( 0, Math.min( 1, value ) );
 
+    if ( muted ) {
+      if ( mediaRef.current ) mediaRef.current.muted = false;
+      setPref( 'PLAYER_MUTED', false );
+    }
+
     if ( mediaRef.current ) mediaRef.current.volume = next;
     volumeRef.current = next;
   };
