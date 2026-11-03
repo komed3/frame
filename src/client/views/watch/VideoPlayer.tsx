@@ -85,7 +85,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLVideoElement >( media, { prev, next, onNavigate: navigateAdjacent } );
 
-  useEffect( () => { if ( markerData ) setMarkers( markerData ) }, [ markerData ] );
+  useEffect( () => { setMarkers( markerData ?? [] ) }, [ markerData ] );
 
 
   const createMarker = async ( positionMs: number, title: string, description: string ) => {
