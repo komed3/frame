@@ -22,3 +22,18 @@ type MediaAssetRow = Omit< MediaAssetRecord, 'data' > & {
 export type MediaAssetInput = Pick< MediaAssetRecord, 'kind' | 'path' > & Partial< Pick< MediaAssetRecord,
   'variant' | 'fingerprint' | 'mimeType' | 'sizeBytes' | 'width' | 'height' | 'data'
 > >;
+
+export interface MediaFrame {
+  index: number;
+  timeMs: number;
+  path: string;
+}
+
+export interface MediaFramesManifest {
+  version: number;
+  durationMs: number;
+  intervalMs: number;
+  width: number;
+  height: number;
+  frames: MediaFrame[];
+}
