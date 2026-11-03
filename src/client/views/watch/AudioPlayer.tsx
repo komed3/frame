@@ -5,6 +5,7 @@ import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
+import { PlaybackRateControl } from '@/src/client/components/PlaybackRateControl';
 import { VolumeControl } from '@/src/client/components/VolumeControl';
 import { Waveform } from '@/src/client/components/Waveform';
 import { useApi } from '@/src/client/context/ApiContext';
@@ -15,8 +16,8 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
-  RotateCcwIcon, SkipBackIcon, SkipForwardIcon
+  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon,
+  PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
@@ -70,9 +71,9 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
 
 
   const {
-    mediaRef, playerRef, volume, muted, currentTime, displayDuration, timeLabel,
+    mediaRef, playerRef, volume, muted, rate, currentTime, displayDuration, timeLabel,
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
-    togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
+    togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLAudioElement >( media, { prev, next, onNavigate: navigateAdjacent } );
 
 
@@ -187,13 +188,20 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                   ) }
                 </div>
 
-                <VolumeControl
-                  volume= { volume }
-                  muted= { muted }
-                  onVolumeChange= { changeVolume }
-                  onVolumeCommit= { saveVolume }
-                  onToggleMute= { toggleMute }
-                />
+                <div className= 'flex items-center gap-10'>
+                  <VolumeControl
+                    volume= { volume }
+                    muted= { muted }
+                    onVolumeChange= { changeVolume }
+                    onVolumeCommit= { saveVolume }
+                    onToggleMute= { toggleMute }
+                  />
+
+                  <PlaybackRateControl
+                    rate= { rate }
+                    onChange= { setPlaybackRate }
+                  />
+                </div>
               </div>
             </div>
 
