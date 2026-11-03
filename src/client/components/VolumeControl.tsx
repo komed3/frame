@@ -63,7 +63,7 @@ export function VolumeControl ( { volume, muted, onVolumeChange, onVolumeCommit,
             update( value ), onVolumeChange( value );
           } }
           onPointerUp= { onVolumeCommit } onKeyUp= { onVolumeCommit } onBlur= { onVolumeCommit }
-          aria-label= 'Volume' title= 'Volume'
+          title= 'Volume [↑ / ↓]' aria-label= 'Volume'
           className= 'appearance-none absolute -inset-2 bg-transparent opacity-0 cursor-pointer'
         />
       </div>
