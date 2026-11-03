@@ -47,7 +47,7 @@ export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlPro
       </button>
 
       { open && (
-        <div className= 'absolute left-1/2 bottom-full -translate-x-1/2 mb-2 shadow-lg'>
+        <div className= 'absolute left-1/2 bottom-full -translate-x-1/2 z-20 mb-8 shadow-lg'>
           <div className= 'absolute left-1/2 -bottom-1.5 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
 
           <div className= 'relative z-1 w-24 py-2 bg-slate-700 rounded'>
