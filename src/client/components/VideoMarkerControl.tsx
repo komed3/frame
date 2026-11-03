@@ -206,6 +206,12 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
                 className= { INPUT + ' resize-y' }
               />
             </div>
+
+            { error && (
+              <p role= 'alert' className= 'text-sm text-red-400'>
+                { error }
+              </p>
+            ) }
           </form>
         </div>
       ) }
