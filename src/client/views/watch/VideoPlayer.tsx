@@ -49,10 +49,11 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< VideoPlayerData >( key, async () => {
-    const [ categories, tags, directory, [ prev, next ] ] = await Promise.all( [
+    const [ categories, tags, directory, markerData, [ prev, next ] ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
+      markersApi.forMedia( media.id ),
       adjacentMedia( media, playlistId )
     ] );
 
