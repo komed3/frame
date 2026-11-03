@@ -66,4 +66,22 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
     catch ( err ) { setError( err instanceof Error ? err.message : 'Could not save marker.' ) }
     finally { setSaving( false ) }
   };
+
+
+  return (
+    <div className= 'relative'>
+      <button
+        onClick= { () => open ? setOpen( false ) : create() }
+        aria-expanded= { open }
+        title= 'Markers'
+        aria-label= 'Markers'
+        className= {
+          'flex justify-center items-center size-10 bg-slate-50/10 rounded-full ' +
+          'transition-colors hover:bg-slate-50/20'
+        }
+      >
+        <FlagIcon size= { 20 } />
+      </button>
+    </div>
+  );
 }
