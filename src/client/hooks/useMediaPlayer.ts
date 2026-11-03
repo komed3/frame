@@ -122,24 +122,24 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
 
   const seek = ( time: number ) => {
-    const element = mediaRef.current;
-    if ( ! element || ! Number.isFinite( element.duration ) ) return;
-    element.currentTime = Math.max( 0, Math.min( element.duration, time ) );
+    const el = mediaRef.current;
+    if ( ! el || ! Number.isFinite( el.duration ) ) return;
+    el.currentTime = Math.max( 0, Math.min( el.duration, time ) );
   };
 
   const frame = ( dir: 'backward' | 'forward' ) => {
-    const video = mediaRef.current;
-    if ( ! video || ! Number.isFinite( video.duration ) ) return;
+    const el = mediaRef.current;
+    if ( ! el || ! Number.isFinite( el.duration ) ) return;
 
     const fps = media.fps ?? 30, frameTime = 1 / fps;
-    seek( dir === 'backward' ? video.currentTime - frameTime : video.currentTime + frameTime );
+    seek( dir === 'backward' ? el.currentTime - frameTime : el.currentTime + frameTime );
   };
 
   const togglePlay = () => {
-    const element = mediaRef.current;
-    if ( ! element || ! ready ) return;
-    if ( element.paused ) void element.play().catch( () => {} );
-    else element.pause();
+    const el = mediaRef.current;
+    if ( ! el || ! ready ) return;
+    if ( el.paused ) void el.play().catch( () => {} );
+    else el.pause();
   };
 
   const changeVolume = ( value: number ) => {
