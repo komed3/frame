@@ -37,6 +37,12 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSee
   );
 
   const progress = duration > 0 ? currentTime / duration : 0;
+  const hoverTime = hovering === null ? null : hovering * duration * 1000;
+  const frame = hoverTime === null ? null : frames?.reduce< MediaFrame | null >(
+    ( p, c ) => c.timeMs <= hoverTime && ( ! p || c.timeMs > p.timeMs ) ? c : p, null
+  ) ?? frames?.[ 0 ] ?? null;
+  const frameSrc = frame ? `/api/assets/${ encodeURIComponent( mediaId ) }/frame/${ frame.index }` : null;
+
 
   const update = ( time: number ) => {
     const pos = duration > 0 ? time / duration : 0;
