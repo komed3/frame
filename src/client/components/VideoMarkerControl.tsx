@@ -161,6 +161,12 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
               ) ) }
             </div>
           ) }
+
+          <form onSubmit= { save } className= 'space-y-3 border-t border-slate-600 pt-3'>
+            <h3 className= 'text-sm font-medium'>
+              { selected ? 'Edit marker' : 'New marker' }
+            </h3>
+          </form>
         </div>
       ) }
     </div>
