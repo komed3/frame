@@ -45,6 +45,28 @@ export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlPro
         <CircleGaugeIcon size= { 16 } />
         <span>{ rate.toFixed( 2 ) }</span>
       </button>
+
+      { open && (
+        <div className= 'absolute left-1/2 bottom-full -translate-x-1/2 mb-2 shadow-lg'>
+          <div className= 'absolute left-1/2 -bottom-1.5 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
+
+          <div className= 'relative z-1 w-24 py-2 bg-slate-700 rounded'>
+            { PBR_VALUES.map( value => (
+              <button
+                key= { value }
+                onClick= { () => { onChange( value ); setOpen( false ) } }
+                aria-pressed= { rate === value }
+                className= {
+                  'block w-full px-3 py-2 text-sm text-center tabular-nums transition-colors ' +
+                  ( rate === value ? 'bg-slate-50/20' : 'hover:bg-slate-50/10' )
+                }
+              >
+                { value.toFixed( 2 ) }
+              </button>
+            ) ) }
+          </div>
+        </div>
+      ) }
     </div>
   );
 }
