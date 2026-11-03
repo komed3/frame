@@ -172,6 +172,7 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
   const adjustVolume = ( v: number ) => { changeVolume( v ), saveVolume() };
   const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
+  const adjustPlaybackRate = ( v: number ) => setPlaybackRate( rate + v );
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() :
     playerRef.current?.requestFullscreen();
 
