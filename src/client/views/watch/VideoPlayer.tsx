@@ -163,15 +163,13 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
               </div>
 
               <div className= 'flex justify-end items-center gap-2'>
-                <div className= 'mr-8'>
-                  <VolumeControl
-                    volume= { volume }
-                    muted= { muted }
-                    onVolumeChange= { changeVolume }
-                    onVolumeCommit= { saveVolume }
-                    onToggleMute= { toggleMute }
-                  />
-                </div>
+                <VolumeControl
+                  volume= { volume }
+                  muted= { muted }
+                  onVolumeChange= { changeVolume }
+                  onVolumeCommit= { saveVolume }
+                  onToggleMute= { toggleMute }
+                />
 
                 <PlaybackRateControl
                   rate= { rate }
