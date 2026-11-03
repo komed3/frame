@@ -139,6 +139,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 currentTime= { currentTime }
                 duration= { displayDuration }
                 buffered= { buffered }
+                markers= { markers }
                 onSeek= { seek }
               />
             </div>
