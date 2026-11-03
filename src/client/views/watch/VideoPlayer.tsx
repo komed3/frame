@@ -14,8 +14,8 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon, FlagIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
-  RotateCcwIcon, SkipBackIcon, SkipForwardIcon
+  ChevronLeftIcon, ChevronRightIcon, CircleGaugeIcon, FlagIcon, Maximize2Icon, Minimize2Icon,
+  PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
@@ -165,8 +165,8 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 </button>
               </div>
 
-              <div className= 'flex justify-end items-center gap-4'>
-                <div className= 'mr-6'>
+              <div className= 'flex justify-end items-center gap-2'>
+                <div className= 'mr-8'>
                   <VolumeControl
                     volume= { volume }
                     muted= { muted }
@@ -175,6 +175,16 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                     onToggleMute= { toggleMute }
                   />
                 </div>
+
+                <button
+                  onClick= { undefined }
+                  title= 'Playback rate [↑ / ↓]'
+                  aria-label= 'Playback rate'
+                  className= { BUTTON + ' gap-2 w-24 text-sm' }
+                >
+                  <CircleGaugeIcon size= { 16 } />
+                  <span>1.0x</span>
+                </button>
 
                 <button
                   onClick= { undefined }
