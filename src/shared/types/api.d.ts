@@ -179,6 +179,7 @@ export interface Api {
   };
   assets: {
     list: ( mediaId: string ) => Promise< ApiAssetRecord[] >;
+    load: < T > ( url: string ) => Promise< T >;
     url: ( mediaId: string, kind: MediaAssetKind, variant?: string ) => string;
   };
   stream: ( id: string, options?: ApiStreamOptions ) => Promise< Response >;
