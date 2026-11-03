@@ -30,4 +30,12 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
   };
 
   const create = () => { reset(), setOpen( true ) };
+
+  const select = ( marker: MarkerRecord ) => {
+    setSelected( marker.id );
+    setPosition( String( marker.positionMs / 1000 ) );
+    setTitle( marker.title ?? '' );
+    setDescription( marker.description ?? '' );
+    setError( null );
+  };
 }
