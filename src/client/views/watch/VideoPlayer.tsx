@@ -44,7 +44,7 @@ const BUTTON =
 
 
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
-  const { adjacentMedia, media: mediaApi, directories } = useApi();
+  const { adjacentMedia, media: mediaApi, markers: markersApi, directories } = useApi();
   const navigate = useNavigate();
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
