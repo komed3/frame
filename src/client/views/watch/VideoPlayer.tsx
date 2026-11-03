@@ -5,6 +5,7 @@ import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
 import { PlaybackRateControl } from '@/src/client/components/PlaybackRateControl';
+import { VideoMarkerControl } from '@/src/client/components/VideoMarkerControl';
 import { VideoSeekbar } from '@/src/client/components/VideoSeekbar';
 import { VolumeControl } from '@/src/client/components/VolumeControl';
 import { useApi } from '@/src/client/context/ApiContext';
@@ -12,16 +13,16 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
 import { formatDuration } from '@/src/client/utils/format';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
+import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon, FlagIcon, Maximize2Icon, Minimize2Icon,
+  ChevronLeftIcon, ChevronRightIcon,
+  Maximize2Icon, Minimize2Icon,
   PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { VideoMarkerControl } from '@/src/client/components/VideoMarkerControl';
-import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 
 interface VideoPlayerData {
