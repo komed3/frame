@@ -12,3 +12,6 @@ interface VideoMarkerControlProps {
   onUpdate: ( id: string, data: MarkerUpdate ) => Promise< void >;
   onDelete: ( id: string ) => Promise< void >;
 }
+
+
+export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, onUpdate, onDelete }: VideoMarkerControlProps ) {}
