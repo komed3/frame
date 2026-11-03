@@ -68,8 +68,60 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSee
 
     pendingRef.current = currentTime;
     if ( inputRef.current ) inputRef.current.value = String( currentTime );
+
     update( currentTime );
   }, [ currentTime, duration ] );
+
+  useEffect( () => { imagesRef.current.clear(), setPreviewSrc( null ) }, [ mediaId ] );
+
+  useEffect( () => {
+    if ( ! frameSrc ) return;
+
+    const cached = imagesRef.current.get( frameSrc );
+    if ( cached ) { if ( cached.complete && cached.naturalWidth ) setPreviewSrc( frameSrc ); return }
+
+    const image = new Image();
+    imagesRef.current.set( frameSrc, image );
+    image.onload = () => setPreviewSrc( frameSrc );
+    image.onerror = () => imagesRef.current.delete( frameSrc );
+    image.src = frameSrc;
+  }, [ frameSrc ] );
+
+  useEffect( () => {
+    if ( hovering === null || ! rootRef.current || ! previewRef.current ) return;
+
+    const updatePosition = () => {
+      if ( previewFrameRef.current ) cancelAnimationFrame( previewFrameRef.current );
+
+      previewFrameRef.current = requestAnimationFrame( () => {
+        const root = rootRef.current, preview = previewRef.current;
+        if ( ! root || ! preview ) return;
+
+        const rect = root.getBoundingClientRect();
+        const width = preview.offsetWidth, height = preview.offsetHeight, x = rect.left + hovering * rect.width;
+        const left = Math.max( 8, Math.min( document.documentElement.clientWidth - width - 8, x - width / 2 ) );
+        const top = rect.top - height - 16 >= 8 ? rect.top - height - 16 : Math.min(
+          document.documentElement.clientHeight - height - 8, rect.bottom + 16
+        );
+
+        setPreviewPosition( { left: left - rect.left, top: top - rect.top } );
+      } );
+    };
+
+    const observer = new ResizeObserver( updatePosition );
+    observer.observe( rootRef.current );
+    observer.observe( previewRef.current );
+    window.addEventListener( 'resize', updatePosition );
+    window.addEventListener( 'scroll', updatePosition, true );
+    updatePosition();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener( 'resize', updatePosition );
+      window.removeEventListener( 'scroll', updatePosition, true );
+      if ( previewFrameRef.current ) cancelAnimationFrame( previewFrameRef.current );
+    };
+  }, [ hovering, frame ] );
 
 
   return (
