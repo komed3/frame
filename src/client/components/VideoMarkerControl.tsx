@@ -180,6 +180,32 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
                 className= { INPUT }
               />
             </div>
+
+            <div className= 'space-y-1'>
+              <label className= 'block text-xs text-slate-400'>
+                Title
+              </label>
+
+              <input
+                value= { title }
+                onChange= { e => setTitle( e.target.value ) }
+                maxLength= { 200 }
+                className= { INPUT }
+              />
+            </div>
+
+            <div className= 'space-y-1'>
+              <label className= 'block text-xs text-slate-400'>
+                Description
+              </label>
+
+              <textarea
+                value= { description }
+                onChange= { e => setDescription( e.target.value ) }
+                rows= { 3 }
+                className= { INPUT + ' resize-y' }
+              />
+            </div>
           </form>
         </div>
       ) }
