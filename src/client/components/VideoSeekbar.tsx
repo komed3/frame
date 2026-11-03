@@ -168,8 +168,8 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSee
           />
         ) ) }
 
-        <div ref= { previewRef } className= 'absolute top-0 h-full bg-white/40' />
-
+        <div ref= { trackRef } className= 'absolute top-0 h-full bg-white/40' />
+      
         <div
           className= 'absolute top-0 left-0 h-full bg-sky-500'
           style= { { width: `${ progress * 100 }%` } }
