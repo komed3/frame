@@ -106,6 +106,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
           <div className= 'shrink-0 flex flex-col h-16'>
             <div className= 'shrink-0 h-1'>
               <VideoSeekbar
+                mediaId= { media.id }
                 currentTime= { currentTime }
                 duration= { displayDuration }
                 buffered= { buffered }
