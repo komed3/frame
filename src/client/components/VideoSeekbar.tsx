@@ -26,7 +26,15 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSee
   const thumbRef = useRef< HTMLDivElement >( null );
   const draggingRef = useRef( false );
   const pendingRef = useRef( currentTime );
+
   const [ hovering, setHovering ] = useState< number | null >( null );
+  const [ previewPosition, setPreviewPosition ] = useState( { left: 0, top: 0 } );
+  const [ previewSrc, setPreviewSrc ] = useState< string | null >( null );
+
+
+  const { data: frames = [] } = useApiData< MediaFrame[] >( mediaId, async () =>
+    ( await assets.load< MediaFramesManifest >( assets.url( mediaId, 'frames' ) ) )?.frames
+  );
 
   const progress = duration > 0 ? currentTime / duration : 0;
 
