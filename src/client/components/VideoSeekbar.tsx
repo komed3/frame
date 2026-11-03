@@ -2,8 +2,8 @@ import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { formatDuration } from '@/src/client/utils/format';
 import type { MediaFrame, MediaFramesManifest } from '@/src/shared/types/assets';
-import { useEffect, useRef, useState } from 'react';
 import type { MarkerRecord } from '@/src/shared/types/markers';
+import { useEffect, useRef, useState } from 'react';
 
 
 interface VideoSeekbarProps {
@@ -177,6 +177,22 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
           style= { { width: `${ progress * 100 }%` } }
         />
       </div>
+
+      { duration > 0 && markers.map( ( { id, positionMs, title, description } ) => (
+        <button
+          key= { id }
+          onClick= { e => { e.stopPropagation(), onSeek( positionMs / 1000 ) } }
+          title= { `${ formatDuration( positionMs ) }${ title ? ` – ${ title }` : '' }` }
+          aria-label= { `Seek to marker ${ title || formatDuration( positionMs ) }` }
+          className= {
+            'absolute top-1/2 -translate-1/2 z-20 flex justify-center items-center ' +
+            'size-4 pointer-events-auto'
+          }
+          style= { { left: `${ positionMs / ( duration * 1000 ) * 100 }%` } }
+        >
+          <span className= 'block w-1 h-3 bg-amber-400 rounded-sm shadow' />
+        </button>
+      ) ) }
 
       <div
         ref= { thumbRef }
