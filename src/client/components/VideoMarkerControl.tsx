@@ -108,6 +108,45 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
             <PlusIcon size= { 16 } />
             <span>New marker at current position</span>
           </button>
+
+          { markers.length > 0 && (
+            <div className= 'mb-4 space-y-1'>
+              { markers.map( marker => (
+                <div
+                  key= { marker.id }
+                  className= {
+                    'flex items-center gap-2 rounded ' +
+                    ( selected === marker.id ? 'bg-slate-50/10' : 'hover:bg-slate-50/5' )
+                  }
+                >
+                  <button
+                    onClick= { () => { select( marker ), onSeek( marker.positionMs / 1000 ) } }
+                    className= 'flex-1 min-w-0 flex items-center gap-3 px-3 py-2 text-left'
+                  >
+                    <span className= 'shrink-0 text-xs text-slate-400 tabular-nums'>
+                      { formatDuration( marker.positionMs ) }
+                    </span>
+                    <span className= 'truncate text-sm'>
+                      { marker.title || 'Untitled marker' }
+                    </span>
+                  </button>
+
+                  <button
+                    onClick= { () => remove( marker.id ) }
+                    disabled= { saving }
+                    aria-label= 'Delete marker'
+                    title= 'Delete marker'
+                    className= {
+                      'p-2 text-slate-400 transition-colors ' +
+                      'hover:text-red-400 disabled:opacity-50'
+                    }
+                  >
+                    <Trash2Icon size= { 16 } />
+                  </button>
+                </div>
+              ) ) }
+            </div>
+          ) }
         </div>
       ) }
     </div>
