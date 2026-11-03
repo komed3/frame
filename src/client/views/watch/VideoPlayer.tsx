@@ -166,14 +166,15 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
               </div>
 
               <div className= 'flex justify-end items-center gap-4'>
-                <VolumeControl
-                  volume= { volume }
-                  muted= { muted }
-                  onVolumeChange= { changeVolume }
-                  onVolumeCommit= { saveVolume }
-                  onToggleMute= { toggleMute }
-                  sliderClassName= 'relative mr-6 w-28 h-6 flex items-center'
-                />
+                <div className= 'mx-6'>
+                  <VolumeControl
+                    volume= { volume }
+                    muted= { muted }
+                    onVolumeChange= { changeVolume }
+                    onVolumeCommit= { saveVolume }
+                    onToggleMute= { toggleMute }
+                  />
+                </div>
 
                 <button
                   onClick= { () => navigateAdjacent( prev ) }
