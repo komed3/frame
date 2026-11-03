@@ -131,7 +131,9 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     const el = mediaRef.current;
     if ( ! el || ! Number.isFinite( el.duration ) ) return;
 
-    const fps = media.fps ?? 30, frameTime = 1 / fps;
+    el.pause();
+
+    const frameTime = 1 / ( media.fps ?? 30 );
     seek( dir === 'backward' ? el.currentTime - frameTime : el.currentTime + frameTime );
   };
 
