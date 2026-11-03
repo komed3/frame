@@ -19,6 +19,9 @@ import {
   PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { VideoMarkerControl } from '@/src/client/components/VideoMarkerControl';
+import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
+import { useEffect, useState } from 'react';
 
 
 interface VideoPlayerData {
