@@ -203,14 +203,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                   onChange= { setPlaybackRate }
                 />
 
-                <button
-                  onClick= { undefined }
-                  title= 'Marker at current position [*]'
-                  aria-label= 'Marker at current position'
-                  className= { BUTTON }
-                >
-                  <FlagIcon size= { 20 } />
-                </button>
+                <VideoMarkerControl
+                  markers= { markers }
+                  currentTime= { currentTime }
+                  onSeek= { seek }
+                  onCreate= { createMarker }
+                  onUpdate= { updateMarker }
+                  onDelete= { deleteMarker }
+                />
 
                 <button
                   onClick= { () => navigateAdjacent( prev ) }
