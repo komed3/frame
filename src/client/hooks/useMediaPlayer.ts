@@ -156,6 +156,11 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     pbrRef.current = next, setRate( next ), setPref( 'PLAYER_PLAYBACK_RATE', next );
   };
 
+  const adjustPlaybackRate = ( dir: -1 | 1 ) => {
+    const next = dir > 0 ? PBR_VALUES.find( v => v > rate ) : PBR_VALUES.toReversed().find( v => v < rate );
+    if ( next !== undefined ) setPlaybackRate( next );
+  };
+
   const changeVolume = ( value: number ) => {
     const next = Math.max( 0, Math.min( 1, value ) );
 
@@ -175,7 +180,6 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
   const adjustVolume = ( v: number ) => { changeVolume( v ), saveVolume() };
   const toggleMute = () => setPref( 'PLAYER_MUTED', ! muted );
-  const adjustPlaybackRate = ( v: number ) => setPlaybackRate( rate + v );
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() :
     playerRef.current?.requestFullscreen();
 
@@ -188,8 +192,7 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     '6': () => seek( duration * 0.6 ), '7': () => seek( duration * 0.7 ),
     '8': () => seek( duration * 0.8 ), '9': () => seek( duration * 0.9 ),
     ',': () => frame( 'backward' ), '.': () => frame( 'forward' ),
-    '+': () => adjustPlaybackRate( PBR_VALUES.find( v => v > rate ) ?? 5 ),
-    '-': () => adjustPlaybackRate( PBR_VALUES.toReversed().find( v => v < rate ) ?? 0.1 ),
+    '+': () => adjustPlaybackRate( 1 ), '-': () => adjustPlaybackRate( -1 ),
     arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
     arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
     arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
