@@ -23,15 +23,17 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const mediaRef = useRef< T >( null );
   const playerRef = useRef< HTMLDivElement >( null );
   const volumeRef = useRef( 1 );
+  const pbrRef = useRef( 1 );
   const restoredRef = useRef( false );
 
   const history = usePlayHistory( media );
-  const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED' ] );
-  const volumePref = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ];
+  const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED', 'PLAYER_PLAYBACK_RATE' ] );
+  const vol = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ], pbr = prefs[ 2 ] as number;
 
   const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
 
-  const [ volume, setVolume ] = useState( volumePref );
+  const [ volume, setVolume ] = useState( vol );
+  const [ rate, setRate ] = useState( pbr );
   const [ currentTime, setCurrentTime ] = useState( 0 );
   const [ duration, setDuration ] = useState( mediaDuration );
   const [ buffered, setBuffered ] = useState< { start: number, end: number }[] >( [] );
@@ -43,7 +45,8 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const [ streamError, setStreamError ] = useState< string | null >( null );
 
 
-  useEffect( () => { volumeRef.current = volumePref, setVolume( volumePref ) }, [ volumePref ] );
+  useEffect( () => { volumeRef.current = vol, setVolume( vol ) }, [ vol ] );
+  useEffect( () => { pbrRef.current = pbr, setRate( pbr ) }, [ pbr ] );
 
   useEffect( () => {
     const element = mediaRef.current;
