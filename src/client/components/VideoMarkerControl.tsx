@@ -212,6 +212,26 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
                 { error }
               </p>
             ) }
+
+            <div className= 'flex justify-between items-center'>
+              { selected ? (
+                <button
+                  onClick= { reset }
+                  className= { BUTTON }
+                >
+                  Cancel
+                </button>
+              ) : <span /> }
+
+              <button
+                type= 'submit'
+                disabled= { saving }
+                className= { BUTTON + ' bg-slate-50/10' }
+              >
+                <SaveIcon size= { 16 } />
+                <span>{ saving ? 'Saving …' : 'Save marker' }</span>
+              </button>
+            </div>
           </form>
         </div>
       ) }
