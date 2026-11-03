@@ -172,12 +172,12 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
                       <PlayIcon size= { 22 } /> }
                   </button>
 
-                  { ( [ [ -10, SkipBackIcon, 'Back' ], [ 10, SkipForwardIcon, 'Forward' ] ] as const ).map(
-                    ( [ offset, Icon, direction ] ) => (
+                  { ( [ [ -10, SkipBackIcon, 'Back', '←' ], [ 10, SkipForwardIcon, 'Forward', '→' ] ] as const ).map(
+                    ( [ offset, Icon, direction, key ] ) => (
                       <button
                         key= { direction }
                         onClick= { () => seek( currentTime + offset ) }
-                        title= { `${ direction } 10 seconds` }
+                        title= { `${ direction } 10 seconds [${key}]` }
                         aria-label= { `${ direction } 10 seconds` }
                         className= { BUTTON }
                       >
