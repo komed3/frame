@@ -188,6 +188,8 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     '6': () => seek( duration * 0.6 ), '7': () => seek( duration * 0.7 ),
     '8': () => seek( duration * 0.8 ), '9': () => seek( duration * 0.9 ),
     ',': () => frame( 'backward' ), '.': () => frame( 'forward' ),
+    '+': () => adjustPlaybackRate( PBR_VALUES.find( v => v > rate ) ?? 5 ),
+    '-': () => adjustPlaybackRate( PBR_VALUES.toReversed().find( v => v < rate ) ?? 0.1 ),
     arrowleft: e => seek( currentTime - ( e.shiftKey ? 10 : 5 ) ),
     arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
     arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
