@@ -38,8 +38,8 @@ export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlPro
         title= 'Playback rate [+ / -]'
         aria-label= 'Playback rate'
         className= {
-          'flex justify-center items-center gap-2 w-24 h-10 text-sm tabular-nums ' +
-          'bg-slate-50/10 rounded-full transition-colors hover:bg-slate-50/20'
+          'flex justify-center items-center gap-2 w-24 h-10 text-sm tabular-nums bg-slate-50/10 ' +
+          'rounded-full transition-colors ' + ( open ? 'bg-slate-50/30' : 'hover:bg-slate-50/20' )
         }
       >
         <CircleGaugeIcon size= { 16 } />
@@ -47,7 +47,7 @@ export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlPro
       </button>
 
       { open && (
-        <div className= 'absolute left-1/2 bottom-full -translate-x-1/2 z-20 mb-8 shadow-lg'>
+        <div className= 'absolute left-1/2 bottom-full -translate-x-1/2 z-20 mb-4 shadow-lg'>
           <div className= 'absolute left-1/2 -bottom-1.5 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
 
           <div className= 'relative z-1 w-24 py-2 bg-slate-700 rounded'>
