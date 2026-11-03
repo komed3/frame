@@ -48,6 +48,9 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const { adjacentMedia, media: mediaApi, markers: markersApi, directories } = useApi();
   const navigate = useNavigate();
 
+  const [ markers, setMarkers ] = useState< MarkerRecord[] >( [] );
+
+
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< VideoPlayerData >( key, async () => {
     const [ categories, tags, directory, markers, [ prev, next ] ] = await Promise.all( [
@@ -65,7 +68,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
-  const markers = data?.markers ?? [];
+  const markerData = data?.markers ?? [];
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
 
@@ -80,6 +83,24 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
     togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLVideoElement >( media, { prev, next, onNavigate: navigateAdjacent } );
+
+  useEffect( () => { if ( markerData ) setMarkers( markerData ) }, [ markerData ] );
+
+
+  const createMarker = async ( positionMs: number, title: string, description: string ) => {
+    await markersApi.createForMedia( media.id, { positionMs, title, description } );
+    setMarkers( await markersApi.forMedia( media.id ) );
+  };
+
+  const updateMarker = async ( id: string, data: MarkerUpdate ) => {
+    const marker = await markersApi.update( id, data );
+    if ( marker ) setMarkers( c => c.map( item => item.id === id ? marker : item ) );
+  };
+
+  const deleteMarker = async ( id: string ) => {
+    await markersApi.delete( id );
+    setMarkers( c => c.filter( marker => marker.id !== id ) );
+  };
 
 
   return (
