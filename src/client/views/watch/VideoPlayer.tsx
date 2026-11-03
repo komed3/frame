@@ -4,17 +4,18 @@ import { Loading } from '@/src/client/components/Loading';
 import { MediaActions } from '@/src/client/components/MediaActions';
 import { MediaInfo } from '@/src/client/components/MediaInfo';
 import { MediaTaxonomy } from '@/src/client/components/MediaTaxonomy';
+import { PlaybackRateControl } from '@/src/client/components/PlaybackRateControl';
 import { VideoSeekbar } from '@/src/client/components/VideoSeekbar';
 import { VolumeControl } from '@/src/client/components/VolumeControl';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
-import { useMediaPlayer, PBR_VALUES } from '@/src/client/hooks/useMediaPlayer';
+import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
 import { formatDuration } from '@/src/client/utils/format';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon, CircleGaugeIcon, FlagIcon, Maximize2Icon, Minimize2Icon,
+  ChevronLeftIcon, ChevronRightIcon, FlagIcon, Maximize2Icon, Minimize2Icon,
   PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -172,19 +173,10 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                   />
                 </div>
 
-                <div className= 'relative'>
-                  <button
-                    onClick= { undefined }
-                    title= 'Playback rate [+ / -]'
-                    aria-label= 'Playback rate'
-                    className= { BUTTON + ' gap-2 w-24 text-sm tabular-nums' }
-                  >
-                    <CircleGaugeIcon size= { 16 } />
-                    <span>{ rate.toFixed( 2 ) }</span>
-                  </button>
-
-                  <div className= 'absolute'></div>
-                </div>
+                <PlaybackRateControl
+                  rate= { rate }
+                  onChange= { setPlaybackRate }
+                />
 
                 <button
                   onClick= { undefined }
