@@ -22,4 +22,10 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
   const [ description, setDescription ] = useState( '' );
   const [ saving, setSaving ] = useState( false );
   const [ error, setError ] = useState< string | null >( null );
+
+
+  const reset = () => {
+    setSelected( null ), setPosition( String( currentTime ) );
+    setTitle( '' ), setDescription( '' ), setError( null );
+  };
 }
