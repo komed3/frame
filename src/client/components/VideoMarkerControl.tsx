@@ -92,6 +92,13 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
         >
           <div className= 'flex justify-between items-center mb-3'>
             <h2 className= 'font-medium'>Markers</h2>
+
+            <button
+              onClick= { () => setOpen( false ) }
+              aria-label= 'Close markers'
+            >
+              <XIcon size= { 18 } />
+            </button>
           </div>
         </div>
       ) }
