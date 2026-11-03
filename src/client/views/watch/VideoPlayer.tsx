@@ -8,7 +8,7 @@ import { VideoSeekbar } from '@/src/client/components/VideoSeekbar';
 import { VolumeControl } from '@/src/client/components/VolumeControl';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
-import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
+import { useMediaPlayer, PBR_VALUES } from '@/src/client/hooks/useMediaPlayer';
 import { formatDuration } from '@/src/client/utils/format';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -69,7 +69,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
 
   const {
-    mediaRef, playerRef, volume, muted, currentTime, displayDuration, timeLabel,
+    mediaRef, playerRef, volume, muted, rate, currentTime, displayDuration, timeLabel,
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
     togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLVideoElement >( media, { prev, next, onNavigate: navigateAdjacent } );
@@ -172,15 +172,19 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                   />
                 </div>
 
-                <button
-                  onClick= { undefined }
-                  title= 'Playback rate [+ / -]'
-                  aria-label= 'Playback rate'
-                  className= { BUTTON + ' gap-2 w-24 text-sm' }
-                >
-                  <CircleGaugeIcon size= { 16 } />
-                  <span>1.0x</span>
-                </button>
+                <div className= 'relative'>
+                  <button
+                    onClick= { undefined }
+                    title= 'Playback rate [+ / -]'
+                    aria-label= 'Playback rate'
+                    className= { BUTTON + ' gap-2 w-24 text-sm tabular-nums' }
+                  >
+                    <CircleGaugeIcon size= { 16 } />
+                    <span>{ rate.toFixed( 2 ) }</span>
+                  </button>
+
+                  <div className= 'absolute'></div>
+                </div>
 
                 <button
                   onClick= { undefined }
