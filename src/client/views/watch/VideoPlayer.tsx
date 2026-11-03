@@ -174,7 +174,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
                 <button
                   onClick= { undefined }
-                  title= 'Playback rate [↑ / ↓]'
+                  title= 'Playback rate [+ / -]'
                   aria-label= 'Playback rate'
                   className= { BUTTON + ' gap-2 w-24 text-sm' }
                 >
@@ -184,7 +184,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
                 <button
                   onClick= { undefined }
-                  title= 'Marker at current position [+]'
+                  title= 'Marker at current position [*]'
                   aria-label= 'Marker at current position'
                   className= { BUTTON }
                 >
