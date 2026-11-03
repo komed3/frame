@@ -28,7 +28,7 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
   const history = usePlayHistory( media );
   const [ prefs, setPref ] = useUserPrefs( [ 'PLAYER_VOLUME', 'PLAYER_MUTED', 'PLAYER_PLAYBACK_RATE' ] );
-  const vol = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ], pbr = prefs[ 2 ] as number;
+  const vol = prefs[ 0 ] as number ?? 1, muted = !! prefs[ 1 ], pbr = prefs[ 2 ] as number ?? 1;
 
   const mediaDuration = media.durationMs ? media.durationMs / 1000 : 0;
 
@@ -52,8 +52,8 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     const el = mediaRef.current;
     if ( ! el ) return;
 
-    el.volume = volume, el.muted = muted;
-  }, [ muted, volume ] );
+    el.volume = volume, el.muted = muted, el.playbackRate = rate;
+  }, [ muted, volume, rate ] );
 
   useEffect( () => {
     const el = mediaRef.current;
