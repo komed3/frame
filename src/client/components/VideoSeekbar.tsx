@@ -14,9 +14,15 @@ interface VideoSeekbarProps {
 }
 
 
-export function VideoSeekbar ( { currentTime, duration, buffered, onSeek }: VideoSeekbarProps ) {
+export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSeek }: VideoSeekbarProps ) {
+  const { assets } = useApi();
+
+  const rootRef = useRef< HTMLDivElement >( null );
   const inputRef = useRef< HTMLInputElement >( null );
   const previewRef = useRef< HTMLDivElement >( null );
+  const previewFrameRef = useRef< number | null >( null );
+  const imagesRef = useRef( new Map< string, HTMLImageElement >() );
+  const trackRef = useRef< HTMLDivElement >( null );
   const thumbRef = useRef< HTMLDivElement >( null );
   const draggingRef = useRef( false );
   const pendingRef = useRef( currentTime );
