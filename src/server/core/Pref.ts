@@ -8,7 +8,7 @@ export class Pref {
   public static readonly schema = {
     PLAYER_VOLUME: { type: 'number', desc: 'Default player volume', default: 1, min: 0, max: 1 },
     PLAYER_MUTED: { type: 'boolean', desc: 'Start playback muted', default: false },
-    PLAYER_PLAYBACK_RATE: { type: 'number', desc: 'Default playback speed', default: 1, min: 0.25, max: 4 },
+    PLAYER_PLAYBACK_RATE: { type: 'number', desc: 'Default playback speed', default: 1, min: 0.25, max: 5 },
     PLAYER_AUTOPLAY_NEXT: { type: 'boolean', desc: 'Automatically play the next item', default: false },
     PLAYER_SHUFFLE: { type: 'boolean', desc: 'Shuffle playlist playback', default: false },
     PLAYER_REPEAT: { type: 'boolean', desc: 'Repeat playlist playback', default: false },
