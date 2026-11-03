@@ -7,3 +7,9 @@ interface PlaybackRateControlProps {
   rate: number;
   onChange: ( value: number ) => void;
 }
+
+
+export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlProps ) {
+  const ref = useRef< HTMLDivElement >( null );
+  const [ open, setOpen ] = useState( false );
+}
