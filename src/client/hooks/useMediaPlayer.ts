@@ -49,31 +49,31 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   useEffect( () => { pbrRef.current = pbr, setRate( pbr ) }, [ pbr ] );
 
   useEffect( () => {
-    const element = mediaRef.current;
-    if ( ! element ) return;
+    const el = mediaRef.current;
+    if ( ! el ) return;
 
-    element.volume = volume, element.muted = muted;
+    el.volume = volume, el.muted = muted;
   }, [ muted, volume ] );
 
   useEffect( () => {
-    const element = mediaRef.current;
-    if ( ! element ) return;
+    const el = mediaRef.current;
+    if ( ! el ) return;
 
     const update = () => {
-      setCurrentTime( element.currentTime || 0 );
-      if ( Number.isFinite( element.duration ) ) setDuration( element.duration );
+      setCurrentTime( el.currentTime || 0 );
+      if ( Number.isFinite( el.duration ) ) setDuration( el.duration );
 
-      setBuffered( Array.from( { length: element.buffered.length }, ( _, i ) => ( {
-        start: element.buffered.start( i ), end: element.buffered.end( i )
+      setBuffered( Array.from( { length: el.buffered.length }, ( _, i ) => ( {
+        start: el.buffered.start( i ), end: el.buffered.end( i )
       } ) ) );
     };
 
-    const onTimeUpdate = () => { update(), history.onTimeUpdate( element.currentTime ) };
-    const onPlay = () => { setPlaying( true ), setEnded( false ), history.onPlay( element.currentTime ) };
-    const onPause = () => { setPlaying( false ), history.onPause( element.currentTime ) };
-    const onEnded = () => { setPlaying( false ), setEnded( true ), history.onEnded( element.currentTime ) };
+    const onTimeUpdate = () => { update(), history.onTimeUpdate( el.currentTime ) };
+    const onPlay = () => { setPlaying( true ), setEnded( false ), history.onPlay( el.currentTime ) };
+    const onPause = () => { setPlaying( false ), history.onPause( el.currentTime ) };
+    const onEnded = () => { setPlaying( false ), setEnded( true ), history.onEnded( el.currentTime ) };
     const onSeeking = () => history.onSeeking();
-    const onSeeked = () => history.onSeeked( element.currentTime );
+    const onSeeked = () => history.onSeeked( el.currentTime );
     const onReady = () => { setReady( true ), update() };
     const onError = () => setStreamError( errorMessage );
 
@@ -84,26 +84,26 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
       [ 'error', onError ]
     ];
 
-    listeners.forEach( ( [ e, listener ] ) => element.addEventListener( e, listener ) );
-    return () => listeners.forEach( ( [ e, listener ] ) => element.removeEventListener( e, listener ) );
+    listeners.forEach( ( [ e, listener ] ) => el.addEventListener( e, listener ) );
+    return () => listeners.forEach( ( [ e, listener ] ) => el.removeEventListener( e, listener ) );
   }, [
     errorMessage, history.onPlay, history.onPause, history.onTimeUpdate,
     history.onSeeking, history.onSeeked, history.onEnded
   ] );
 
   useEffect( () => {
-    const element = mediaRef.current;
-    if ( ! element ) return;
+    const el = mediaRef.current;
+    if ( ! el ) return;
 
     setReady( false ), setPlaying( false ), setEnded( false ), setStreamError( null );
     setCurrentTime( 0 ), setDuration( mediaDuration ), setBuffered( [] );
     setRemaining( false );
 
     restoredRef.current = false;
-    element.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
-    element.load();
+    el.src = `/api/stream/${ encodeURIComponent( media.id ) }`;
+    el.load();
 
-    return () => { element.pause(), element.removeAttribute( 'src' ), element.load() };
+    return () => { el.pause(), el.removeAttribute( 'src' ), el.load() };
   }, [ media.id, media.durationMs ] );
 
   useEffect( () => {
