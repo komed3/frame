@@ -71,7 +71,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const {
     mediaRef, playerRef, volume, muted, rate, currentTime, displayDuration, timeLabel,
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
-    togglePlay, changeVolume, saveVolume, toggleMute, toggleFullscreen
+    togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen
   } = useMediaPlayer< HTMLVideoElement >( media, { prev, next, onNavigate: navigateAdjacent } );
 
 
