@@ -14,7 +14,7 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
+  ChevronLeftIcon, ChevronRightIcon, FlagIcon, Maximize2Icon, Minimize2Icon, PauseIcon, PlayIcon,
   RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -166,7 +166,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
               </div>
 
               <div className= 'flex justify-end items-center gap-4'>
-                <div className= 'mx-6'>
+                <div className= 'mr-6'>
                   <VolumeControl
                     volume= { volume }
                     muted= { muted }
@@ -175,6 +175,15 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                     onToggleMute= { toggleMute }
                   />
                 </div>
+
+                <button
+                  onClick= { undefined }
+                  title= 'Marker at current position [+]'
+                  aria-label= 'Marker at current position'
+                  className= { BUTTON }
+                >
+                  <FlagIcon size= { 20 } />
+                </button>
 
                 <button
                   onClick= { () => navigateAdjacent( prev ) }
