@@ -67,6 +67,20 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
     finally { setSaving( false ) }
   };
 
+  const remove = async ( id: string ) => {
+    if ( saving ) return;
+
+    setSaving( true ), setError( null );
+
+    try {
+      await onDelete( id );
+      if ( selected === id ) reset();
+    }
+
+    catch ( err ) { setError( err instanceof Error ? err.message : 'Could not delete marker.' ) }
+    finally { setSaving( false ) }
+  };
+
 
   return (
     <div className= 'relative'>
