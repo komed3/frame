@@ -22,12 +22,12 @@ assets.get< { id: string } >( '/:id', ( req, res ) => res.json( MediaAssets.list
   }` } )
 ) ) );
 
-assets.get( '/:id/:kind', sendAsset );
-assets.get( '/:id/:kind/:variant', sendAsset );
-
 assets.get( '/:id/frame/:number', ( req, res, next ) => {
   const frame = `frames/${ req.params.id }/${ req.params.number.padStart( 6, '0' ) }.webp`;
 
   res.setHeader( 'Cache-Control', 'private, max-age=3600' );
   res.sendFile( MediaAssets.resolvePath( frame ), err => { if ( err ) next( err ) } );
 } );
+
+assets.get( '/:id/:kind', sendAsset );
+assets.get( '/:id/:kind/:variant', sendAsset );
