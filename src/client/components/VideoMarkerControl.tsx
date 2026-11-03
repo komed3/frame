@@ -82,6 +82,19 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
       >
         <FlagIcon size= { 20 } />
       </button>
+
+      { open && (
+        <div
+          className= {
+            'absolute right-0 bottom-full z-30 mb-2 w-80 max-h-[70vh] p-4 bg-slate-700 ' +
+            'rounded shadow-lg overflow-y-auto'
+          }
+        >
+          <div className= 'flex justify-between items-center mb-3'>
+            <h2 className= 'font-medium'>Markers</h2>
+          </div>
+        </div>
+      ) }
     </div>
   );
 }
