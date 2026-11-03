@@ -47,9 +47,9 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, onSee
   const update = ( time: number ) => {
     const pos = duration > 0 ? time / duration : 0;
 
-    if ( previewRef.current ) {
-      previewRef.current.style.left = `${ progress * 100 }%`;
-      previewRef.current.style.width = `${ Math.max( 0, pos - progress ) * 100 }%`;
+    if ( trackRef.current ) {
+      trackRef.current.style.left = `${ progress * 100 }%`;
+      trackRef.current.style.width = `${ Math.max( 0, pos - progress ) * 100 }%`;
     }
 
     if ( thumbRef.current ) thumbRef.current.style.left = `${ pos * 100 }%`;
