@@ -147,6 +147,12 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     else el.pause();
   };
 
+  const setPlaybackRate = ( value: number ) => {
+    const next = Math.max( 0.1, Math.min( 5, value ) );
+    if ( mediaRef.current ) mediaRef.current.playbackRate = next;
+    pbrRef.current = next, setRate( next ), setPref( 'PLAYER_PLAYBACK_RATE', next );
+  };
+
   const changeVolume = ( value: number ) => {
     const next = Math.max( 0, Math.min( 1, value ) );
 
