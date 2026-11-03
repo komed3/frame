@@ -38,4 +38,16 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
     setDescription( marker.description ?? '' );
     setError( null );
   };
+
+  const save = async ( e: SubmitEvent< HTMLFormElement > ) => {
+    e.preventDefault();
+
+    const positionMs = Math.round( Number( position ) * 1000 );
+    if ( ! Number.isFinite( positionMs ) || positionMs < 0 ) {
+      setError( 'Invalid marker position.' );
+      return;
+    }
+
+    setSaving( true ), setError( null );
+  };
 }
