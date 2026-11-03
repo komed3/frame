@@ -8,14 +8,10 @@ interface VolumeControlProps {
   onVolumeChange: ( value: number ) => void;
   onVolumeCommit: () => void;
   onToggleMute: () => void;
-  sliderClassName?: string;
 }
 
 
-export function VolumeControl ( {
-  volume, muted, onVolumeChange, onVolumeCommit, onToggleMute,
-  sliderClassName = 'relative w-28 h-6 flex items-center'
-}: VolumeControlProps ) {
+export function VolumeControl ( { volume, muted, onVolumeChange, onVolumeCommit, onToggleMute }: VolumeControlProps ) {
   const controlRef = useRef< HTMLDivElement >( null );
   const inputRef = useRef< HTMLInputElement >( null );
 
@@ -43,7 +39,7 @@ export function VolumeControl ( {
 
       <div
         ref= { controlRef }
-        className= { sliderClassName }
+        className= 'relative w-28 h-6 flex items-center'
         style= { { '--volume': `${ displayVolume * 100 }%` } as React.CSSProperties }
       >
         <div className= 'relative w-full h-1.5 bg-slate-700 rounded-full'>
