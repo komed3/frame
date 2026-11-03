@@ -100,6 +100,14 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
               <XIcon size= { 18 } />
             </button>
           </div>
+
+          <button
+            onClick= { create }
+            className= { BUTTON + ' w-full mb-3' }
+          >
+            <PlusIcon size= { 16 } />
+            <span>New marker at current position</span>
+          </button>
         </div>
       ) }
     </div>
