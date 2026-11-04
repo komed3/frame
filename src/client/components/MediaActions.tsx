@@ -226,13 +226,13 @@ export function MediaActions ( { media }: MediaActionsProps ) {
               <div className= 'relative z-1 py-2 bg-slate-700 rounded'>
                 <button onClick= { showMetadata } className= { CTX_BUTTON }>
                   <DatabaseIcon size= { 16 } />
-                  <span>View metadata</span>
+                  <span>Metadata</span>
                 </button>
 
                 { canEdit && (
                   <button onClick= { rescanMetadata } className= { CTX_BUTTON }>
                     <RefreshCwIcon size= { 16 } />
-                    <span>Rescan metadata</span>
+                    <span>Rescan</span>
                   </button>
                 ) }
 
@@ -242,7 +242,7 @@ export function MediaActions ( { media }: MediaActionsProps ) {
                   className= { CTX_BUTTON }
                 >
                   <DownloadIcon size= { 16 } />
-                  <span>{ downloading ? 'Downloading …' : 'Download media' }</span>
+                  <span>{ downloading ? 'Downloading …' : 'Download' }</span>
                 </button>
               </div>
             </div>
