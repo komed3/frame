@@ -59,6 +59,12 @@ export function Settings () {
             onChange= { v => setPref( 'APP_THEME', v as PrefValue< 'APP_THEME' > ) }
           />
         </div>
+
+        { error && (
+          <p role= 'alert' className= 'text-sm text-red-400'>
+            { error }
+          </p>
+        ) }
       </div>
     </div>
   );
