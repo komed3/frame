@@ -11,6 +11,15 @@ const THEME_OPTIONS: SelectOption[] = [ { value: 'dark', label: 'Dark' } ];
 
 
 export function Settings () {
+  const { prefs } = useApi();
+
+  const [ resetting, setResetting ] = useState( false );
+  const [ error, setError ] = useState< string | null >( null );
+
+  const [ [ language = 'en', theme = 'dark' ], setPref ] = useUserPrefs( [ 'APP_LANGUAGE', 'APP_THEME' ] );
+  usePageTitle( 'Settings' );
+
+
   return (
     <></>
   );
