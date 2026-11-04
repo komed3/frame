@@ -84,6 +84,11 @@ export function useTooltips () {
       else setTooltip( null );
     };
 
+
+    observer.observe( document.documentElement, {
+      subtree: true, childList: true, attributes: true, attributeFilter: [ 'title' ]
+    } );
+
     document.addEventListener( 'pointerover', onPointerOver );
     document.addEventListener( 'pointerout', hide );
     document.addEventListener( 'focusin', onFocusIn );
