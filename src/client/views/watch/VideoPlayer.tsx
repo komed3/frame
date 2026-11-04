@@ -72,7 +72,12 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     buffered, playing, ended, ready, fullscreen, markers, streamError, setRemaining, seek,
     togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen,
     createMarker, updateMarker, deleteMarker
-  } = useMediaPlayer< HTMLVideoElement >( media );
+  } = useMediaPlayer< HTMLVideoElement >( media, { extraControls: {
+    h: () => fullscreen && setHideControls( ! hideControls )
+  } } );
+
+
+  useEffect( () => { ! fullscreen && setHideControls( false ) }, [ fullscreen ] );
 
 
   return (
