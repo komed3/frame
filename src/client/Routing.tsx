@@ -9,6 +9,7 @@ import { History } from '@/src/client/views/History';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
+import { Settings } from '@/src/client/views/Settings';
 import { Tag } from '@/src/client/views/Tag';
 import { Tags } from '@/src/client/views/Tags';
 import { Tree } from '@/src/client/views/Tree';
@@ -40,6 +41,7 @@ export function Routing () {
       <Route path= '/help' element= { <Help /> } />
 
       <Route path= '/me' element= { <Account /> } />
+      <Route path= '/settings' element= { <Settings /> } />
       <Route path= '/server' element= { <Admin /> } />
 
       <Route path= '/' element= { <></> } />
