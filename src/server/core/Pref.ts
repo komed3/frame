@@ -12,7 +12,9 @@ export class Pref {
     PLAYER_AUTOPLAY_NEXT: { type: 'boolean', desc: 'Automatically play the next item', default: false },
     PLAYER_SHUFFLE: { type: 'boolean', desc: 'Shuffle playlist playback', default: false },
     PLAYER_REPEAT: { type: 'boolean', desc: 'Repeat playlist playback', default: false },
-    PLAYER_SUBTITLE_MODE: { type: 'enum', desc: 'Default subtitle behavior', default: 'auto', values: [ 'auto', 'on', 'off' ] }
+    PLAYER_SUBTITLE_MODE: { type: 'enum', desc: 'Default subtitle behavior', default: 'auto', values: [ 'auto', 'on', 'off' ] },
+    APP_LANGUAGE: { type: 'enum', desc: 'Application language', default: 'en', values: [ 'en' ] },
+    APP_THEME: { type: 'enum', desc: 'Application theme', default: 'dark', values: [ 'dark' ] }
   } satisfies PrefTable;
 
   private static isName ( name: string ) : name is PrefName {
