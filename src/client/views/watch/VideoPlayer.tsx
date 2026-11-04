@@ -13,7 +13,6 @@ import { useApiData } from '@/src/client/hooks/useApiData';
 import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
 import { formatDuration } from '@/src/client/utils/format';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
-import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
@@ -21,7 +20,6 @@ import {
   Maximize2Icon, Minimize2Icon,
   PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -29,7 +27,6 @@ interface VideoPlayerData {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
-  markers: MarkerRecord[];
   prev: string | null;
   next: string | null;
 }
@@ -46,30 +43,26 @@ const BUTTON =
 
 
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
-  const { adjacentMedia, media: mediaApi, markers: markersApi, directories } = useApi();
+  const { adjacentMedia, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
-
-  const [ markers, setMarkers ] = useState< MarkerRecord[] >( [] );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< VideoPlayerData >( key, async () => {
-    const [ categories, tags, directory, markers, [ prev, next ] ] = await Promise.all( [
+    const [ categories, tags, directory, [ prev, next ] ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
       directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      markersApi.forMedia( media.id ),
       adjacentMedia( media, playlistId )
     ] );
 
-    return { categories, tags, directory, markers, prev, next };
+    return { categories, tags, directory, prev, next };
   } );
 
   const title = media.title || media.fileName;
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
-  const markerData = data?.markers ?? [];
   const prev = data?.prev ?? null;
   const next = data?.next ?? null;
 
@@ -81,27 +74,10 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
   const {
     mediaRef, playerRef, volume, muted, rate, currentTime, displayDuration, timeLabel,
-    buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
-    togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen
+    buffered, playing, ended, ready, fullscreen, markers, streamError, setRemaining, seek,
+    togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen,
+    createMarker, updateMarker, deleteMarker
   } = useMediaPlayer< HTMLVideoElement >( media, { prev, next, onNavigate: navigateAdjacent } );
-
-  useEffect( () => { setMarkers( markerData ?? [] ) }, [ markerData ] );
-
-
-  const createMarker = async ( positionMs: number, title?: string, description?: string ) => {
-    await markersApi.createForMedia( media.id, { positionMs, title, description } );
-    setMarkers( await markersApi.forMedia( media.id ) );
-  };
-
-  const updateMarker = async ( id: string, data: MarkerUpdate ) => {
-    const marker = await markersApi.update( id, data );
-    if ( marker ) setMarkers( c => c.map( item => item.id === id ? marker : item ) );
-  };
-
-  const deleteMarker = async ( id: string ) => {
-    await markersApi.delete( id );
-    setMarkers( c => c.filter( marker => marker.id !== id ) );
-  };
 
 
   return (
@@ -139,7 +115,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 currentTime= { currentTime }
                 duration= { displayDuration }
                 buffered= { buffered }
-                markers= { markers }
+                markers= { markers ?? [] }
                 onSeek= { seek }
               />
             </div>
@@ -180,7 +156,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 <button
                   onClick= { () => setRemaining( v => ! v ) }
                   title= 'Switch elapsed / remaining time'
-                  className= { 
+                  className= {
                     'inline-flex items-center gap-2 ml-2 text-xs text-slate-300 tabular-nums ' +
                     'whitespace-nowrap hover:text-white'
                   }
@@ -206,7 +182,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 />
 
                 <VideoMarkerControl
-                  markers= { markers }
+                  markers= { markers ?? [] }
                   currentTime= { currentTime }
                   onSeek= { seek }
                   onCreate= { createMarker }
