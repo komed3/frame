@@ -1,7 +1,7 @@
 import { useOutsideClose } from '@/src/client/hooks/useOutsideClose';
 import { formatDuration } from '@/src/client/utils/format';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
-import { FlagIcon, PlusIcon, SaveIcon, Trash2Icon, XIcon } from 'lucide-react';
+import { ArrowLeftIcon, FlagIcon, PlusIcon, SaveIcon, Trash2Icon, XIcon } from 'lucide-react';
 import { type SubmitEvent, useRef, useState } from 'react';
 
 
