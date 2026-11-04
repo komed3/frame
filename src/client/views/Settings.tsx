@@ -44,7 +44,21 @@ export function Settings () {
           Application
         </h2>
 
-        <div className= 'grid grid-cols-1 sm:grid-cols-2 gap-6'></div>
+        <div className= 'grid grid-cols-1 sm:grid-cols-2 gap-6'>
+          <Select
+            label= 'Language'
+            value= { language }
+            options= { LANGUAGE_OPTIONS }
+            onChange= { v => setPref( 'APP_LANGUAGE', v as PrefValue< 'APP_LANGUAGE' > ) }
+          />
+
+          <Select
+            label= 'Theme'
+            value= { theme }
+            options= { THEME_OPTIONS }
+            onChange= { v => setPref( 'APP_THEME', v as PrefValue< 'APP_THEME' > ) }
+          />
+        </div>
       </div>
     </div>
   );
