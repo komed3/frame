@@ -18,4 +18,10 @@ export function useWatchNavigation ( media: MediaRecord, playlistId?: string ) {
   const navigateAdjacent = ( id: string | null ) => {
     if ( id ) navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
   };
+
+
+  useKeyControls( {
+    'ctrl+arrowleft': () => navigateAdjacent( prev ),
+    'ctrl+arrowright': () => navigateAdjacent( next )
+  } );
 }
