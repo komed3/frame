@@ -20,7 +20,7 @@ import {
   ArrowDownToLineIcon, ArrowUpToLineIcon, ChevronLeftIcon, ChevronRightIcon, Maximize2Icon,
   Minimize2Icon, PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
