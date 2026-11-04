@@ -22,7 +22,7 @@ const PLAYER_SHORTCUTS: Shortcut[] = [
   { keys: [ ',', '.' ], label: 'Step backward or forward one frame' },
   { keys: [ '+', '-' ], label: 'Increase or decrease playback speed' },
   { keys: [ 'F11' ], label: 'Toggle fullscreen mode' },
-  { keys: [ 'h' ], label: 'Toggle controls in fullscreen mode' }
+  { keys: [ 'h' ], label: 'Toggle controls in fullscreen mode (video only)' }
 ];
 
 const NAVIGATION_SHORTCUTS: Shortcut[] = [
@@ -91,9 +91,9 @@ export function Help () {
       </h1>
 
       <ShortcutGroup
-          title= 'Video Playback Controls'
-          shortcuts= { PLAYER_SHORTCUTS }
-        />
+        title= 'Player Controls'
+        shortcuts= { PLAYER_SHORTCUTS }
+      />
 
       <p className= 'text-xs text-slate-500'>
         Keyboard shortcuts are disabled while typing in input fields.
