@@ -208,7 +208,7 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
 
   useKeyControls( {
-    'f11': toggleFullscreen, ' ': togglePlay, m: toggleMute,
+    f11: toggleFullscreen, ' ': togglePlay, m: toggleMute,
     '0': () => seek( duration * 0 ), '1': () => seek( duration * 0.1 ),
     '2': () => seek( duration * 0.2 ), '3': () => seek( duration * 0.3 ),
     '4': () => seek( duration * 0.4 ), '5': () => seek( duration * 0.5 ),
