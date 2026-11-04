@@ -71,6 +71,13 @@ export function useTooltips () {
       const el = e.target.closest< HTMLElement >( `[${ ATTR }]` );
       if ( el ) show( el, 0 );
     };
+
+    const update = () => {
+      const el = activeRef.current, text = el?.getAttribute( ATTR );
+
+      if ( el?.isConnected && text ) position( el, text );
+      else setTooltip( null );
+    };
   }, [] );
 
 
