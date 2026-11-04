@@ -111,6 +111,27 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
     };
   }, [ fullscreen, hideControls ] );
 
+  useEffect( () => {
+    const player = playerRef.current;
+    if ( ! fullscreen || ! player ) return setCursorHidden( false );
+
+    const hide = () => setCursorHidden( true );
+
+    const show = () => {
+      setCursorHidden( false );
+      if ( cursorTimerRef.current ) clearTimeout( cursorTimerRef.current );
+      cursorTimerRef.current = setTimeout( hide, 2500 );
+    };
+
+    player.addEventListener( 'mousemove', show );
+    show();
+
+    return () => {
+      player.removeEventListener( 'mousemove', show );
+      if ( cursorTimerRef.current ) clearTimeout( cursorTimerRef.current );
+    };
+  }, [ fullscreen ] );
+
 
   return (
     <>
