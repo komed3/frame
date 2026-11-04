@@ -116,6 +116,16 @@ export function useTooltips () {
     };
   }, [] );
 
+  useLayoutEffect( () => {
+    if ( ! tooltip || ! activeRef.current || ! tooltipRef.current ) return;
+
+    const rect = activeRef.current.getBoundingClientRect();
+    const half = tooltipRef.current.offsetWidth / 2;
+    const x = Math.max( 8 + half, Math.min( window.innerWidth - 8 - half, rect.left + rect.width / 2 ) );
+
+    setTooltip( c => c && c.x !== x ? { ...c, x } : c );
+  }, [ tooltip ] );
+
 
   return tooltip && portalTarget && createPortal( (
     <div
