@@ -14,9 +14,11 @@ const ATTR = 'data-frame-tooltip';
 
 
 export function useTooltips () {
-  const [ tooltip, setTooltip ] = useState< TooltipState | null >( null );
   const activeRef = useRef< HTMLElement | null >( null );
-  const timerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
+  const timerRef = useRef< NodeJS.Timeout | null >( null );
+
+  const [ tooltip, setTooltip ] = useState< TooltipState | null >( null );
+  const [ portalTarget, setPortalTarget ] = useState< Element | null >( null );
 
 
   useEffect( () => {
