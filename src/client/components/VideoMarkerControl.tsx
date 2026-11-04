@@ -1,7 +1,8 @@
+import { useOutsideClose } from '@/src/client/hooks/useOutsideClose';
 import { formatDuration } from '@/src/client/utils/format';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 import { FlagIcon, PlusIcon, SaveIcon, Trash2Icon, XIcon } from 'lucide-react';
-import { type SubmitEvent, useEffect, useRef, useState } from 'react';
+import { type SubmitEvent, useRef, useState } from 'react';
 
 
 interface VideoMarkerControlProps {
@@ -37,13 +38,7 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
   const sortedMarkers = [ ...markers ].sort( ( a, b ) => a.positionMs - b.positionMs );
 
 
-  useEffect( () => {
-    if ( ! open ) return;
-
-    const close = ( e: PointerEvent ) => { if ( ! ref.current?.contains( e.target as Node ) ) setOpen( false ) };
-    document.addEventListener( 'pointerdown', close );
-    return () => document.removeEventListener( 'pointerdown', close );
-  }, [ open ] );
+  useOutsideClose( { ref, open, setOpen } );
 
 
   const reset = () => {

@@ -1,6 +1,7 @@
 import { PBR_VALUES } from '@/src/client/hooks/useMediaPlayer';
+import { useOutsideClose } from '@/src/client/hooks/useOutsideClose';
 import { CircleGaugeIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 
 interface PlaybackRateControlProps {
@@ -14,13 +15,7 @@ export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlPro
   const [ open, setOpen ] = useState( false );
 
 
-  useEffect( () => {
-    if ( ! open ) return;
-
-    const close = ( e: PointerEvent ) => { if ( ! ref.current?.contains( e.target as Node ) ) setOpen( false ) };
-    document.addEventListener( 'pointerdown', close );
-    return () => document.removeEventListener( 'pointerdown', close );
-  }, [ open ] );
+  useOutsideClose( { ref, open, setOpen } );
 
 
   return (
