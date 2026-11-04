@@ -38,6 +38,14 @@ export function Settings () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Settings
       </h1>
+
+      <div className= 'p-6 space-y-6 bg-slate-800 rounded shadow-lg'>
+        <h2 className= 'text-lg font-medium'>
+          Application
+        </h2>
+
+        <div className= 'grid grid-cols-1 sm:grid-cols-2 gap-6'></div>
+      </div>
     </div>
   );
 }
