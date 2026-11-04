@@ -138,7 +138,10 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
       <div className= 'flex justify-center items-center h-[calc(100vh-64px)] bg-slate-950'>
         <div
           ref= { playerRef }
-          className= 'shrink-0 relative flex flex-col max-w-full h-full aspect-video'
+          className= {
+            'shrink-0 relative flex flex-col max-w-full h-full aspect-video ' +
+            ( cursorHidden ? 'cursor-none' : '' )
+          }
         >
           <div className= 'flex-1 relative min-h-0 bg-black'>
             <video
