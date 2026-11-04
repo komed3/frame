@@ -270,8 +270,14 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
             </div>
           ) }
 
-          { ( fullscreen && hideControls ) && (
-            <div className= 'absolute right-2 bottom-2 z-20 flex items-center gap-2'>
+          { fullscreen && hideControls && (
+            <div
+              ref= { overlayRef }
+              className= {
+                'absolute right-2 bottom-2 z-20 flex items-center gap-2 transition-opacity duration-200 ' +
+                ( overlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none' )
+              }
+            >
               <button
                 onClick= { togglePlay }
                 disabled= { ! ready }
