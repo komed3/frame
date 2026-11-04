@@ -54,11 +54,27 @@ const IMAGE_SHORTCUTS: Shortcut[] = [
 
 function ShortcutGroup ( { title, shortcuts }: ShortcutGroupProps ) {
   return (
-    <div className= 'p-5 bg-slate-50/5 rounded-lg'>
-      <div className= 'mb-5 space-y-1'>
-        <h2 className= 'font-medium tracking-wide'>
-          { title }
-        </h2>
+    <div className= 'p-5 space-y-5 bg-slate-50/5 rounded-lg'>
+      <h2 className= 'font-medium tracking-wide'>
+        { title }
+      </h2>
+
+      <div className= 'grid grid-cols-2 gap-x-8 gap-y-4'>
+        { shortcuts.map( ( { keys, label }, i ) => (
+          <div key= { i } className= 'flex items-center justify-between gap-4 min-w-0'>
+            <span className= 'min-w-0 text-sm text-slate-300'>
+              { label }
+            </span>
+
+            <div className= 'shrink-0 flex items-center gap-1 font-medium text-slate-200'>
+              { keys.map( key => (
+                <kbd key= { key } className= 'px-2 py-1 text-xs bg-slate-50/10 rounded'>
+                  { key }
+                </kbd>
+              ) ) }
+            </div>
+          </div>
+        ) ) }
       </div>
     </div>
   );
