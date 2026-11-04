@@ -16,6 +16,9 @@ interface VideoSeekbarProps {
 }
 
 
+const SNAP_DISTANCE = 14;
+
+
 export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, markers, onSeek }: VideoSeekbarProps ) {
   const { assets } = useApi();
 
