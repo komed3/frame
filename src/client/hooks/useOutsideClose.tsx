@@ -2,7 +2,7 @@ import { type RefObject, useEffect } from 'react';
 
 
 interface OutsideCloseProps {
-  ref: RefObject< HTMLElement >;
+  ref: RefObject< any >;
   open: boolean;
   setOpen: ( open: boolean ) => void;
 }
