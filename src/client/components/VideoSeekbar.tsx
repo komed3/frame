@@ -176,8 +176,15 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
               alt= ''
             />
           ) }
-          <div className= 'mt-1 text-center text-xs tabular-nums text-white'>
-            { formatDuration( hoverTime ?? 0 ) }
+
+          { hoverMarker && (
+            <div className= 'mt-1 text-center text-xs font-medium truncate'>
+              { hoverMarker.title || 'Marker' }
+            </div>
+          ) }
+
+          <div className= 'mt-1 text-center text-xs tabular-nums'>
+            { formatDuration( hoverMarker?.positionMs ?? hoverTime ?? 0 ) }
           </div>
         </div>
       ) }
