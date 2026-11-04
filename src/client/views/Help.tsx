@@ -25,6 +25,19 @@ const PLAYER_SHORTCUTS: Shortcut[] = [
   { keys: [ 'F11' ], label: 'Toggle fullscreen mode' }
 ];
 
+const NAVIGATION_SHORTCUTS: Shortcut[] = [
+  { keys: [ 'Ctrl + ←' ], label: 'Open previous media' },
+  { keys: [ 'Ctrl + →' ], label: 'Open next media' }
+];
+
+const PLAYLIST_SHORTCUTS: Shortcut[] = [
+  { keys: [ 'P' ], label: 'Play previous playlist item' },
+  { keys: [ 'N' ], label: 'Play next playlist item' },
+  { keys: [ 'A' ], label: 'Toggle autoplay' },
+  { keys: [ 'S' ], label: 'Toggle shuffle' },
+  { keys: [ 'R' ], label: 'Toggle repeat' }
+];
+
 
 export function Help () {
   usePageTitle( 'Help' );
