@@ -62,6 +62,28 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
     if ( thumbRef.current ) thumbRef.current.style.left = `${ pos * 100 }%`;
   };
 
+  const clearHover = () => { hoverMarkerRef.current = null, setHoverMarker( null ), setHovering( null ) };
+
+  const updateHover = ( clientX: number ) => {
+    const rect = rootRef.current?.getBoundingClientRect();
+    if ( ! rect ) return;
+
+    const x = Math.max( 0, Math.min( rect.width, clientX - rect.left ) );
+    const pos = rect.width > 0 ? x / rect.width : 0;
+
+    const nearest = duration > 0 ? markers.reduce< { marker: MarkerRecord, distance: number } | null >(
+      ( closest, marker ) => {
+        const m = marker.positionMs / ( duration * 1000 ) * rect.width, d = Math.abs( x - m );
+        return d <= SNAP_DISTANCE && ( ! closest || d < closest.distance ) ? { marker, distance: d } : closest;
+      }, null
+    ) : null;
+
+    const marker = nearest?.marker ?? null;
+    hoverMarkerRef.current = marker;
+    setHoverMarker( marker );
+    setHovering( marker ? marker.positionMs / ( duration * 1000 ) : pos );
+  };
+
   const commit = () => {
     if ( ! draggingRef.current && pendingRef.current === currentTime ) return;
 
