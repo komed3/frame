@@ -17,12 +17,12 @@ interface VideoMarkerControlProps {
 
 
 const BUTTON =
-  'flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors ' +
-  'hover:bg-slate-50/10 disabled:opacity-50 disabled:pointer-events-none';
+  'flex items-center justify-center gap-2 px-3 py-2 text-xs rounded transition-colors ' +
+  'hover:bg-slate-50/20 disabled:opacity-50 disabled:pointer-events-none';
 
 const INPUT =
-  'w-full px-3 py-2 text-sm bg-slate-900 border border-slate-600 rounded ' +
-  'outline-none focus:border-slate-500';
+  'w-full px-3 py-2 text-xs text-white bg-slate-900 border border-slate-600 rounded ' +
+  'outline-none focus:border-slate-400 placeholder:text-slate-500';
 
 
 export function VideoMarkerControl ( {
