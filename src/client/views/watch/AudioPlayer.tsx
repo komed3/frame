@@ -11,6 +11,7 @@ import { Waveform } from '@/src/client/components/Waveform';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useMediaPlayer } from '@/src/client/hooks/useMediaPlayer';
+import { useWatchNavigation } from '@/src/client/hooks/useWatchNavigation';
 import { formatDuration } from '@/src/client/utils/format';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
@@ -31,8 +32,6 @@ interface AudioPlayerData {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
-  prev: string | null;
-  next: string | null;
 }
 
 
@@ -42,39 +41,34 @@ const BUTTON =
 
 
 export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
-  const { adjacentMedia, media: mediaApi, directories } = useApi();
+  const { media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
-
-  const navigateAdjacent = ( id: string | null ) => id && navigate(
-    `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }`
-  );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< AudioPlayerData >( key, async () => {
-    const [ categories, tags, directory, [ prev, next ] ] = await Promise.all( [
+    const [ categories, tags, directory ] = await Promise.all( [
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
-      directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      adjacentMedia( media, playlistId )
+      directories.list( media.rootId, media.directoryId ).catch( () => null )
     ] );
 
-    return { categories, tags, directory, prev, next };
+    return { categories, tags, directory };
   } );
 
   const title = media.title || media.fileName;
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
-  const prev = data?.prev ?? null;
-  const next = data?.next ?? null;
 
+
+  const { prev, next, navigateAdjacent } = useWatchNavigation( media, playlistId );
 
   const {
     mediaRef, playerRef, volume, muted, rate, currentTime, displayDuration, timeLabel,
     buffered, playing, ended, ready, fullscreen, streamError, setRemaining, seek,
     togglePlay, changeVolume, saveVolume, setPlaybackRate, toggleMute, toggleFullscreen
-  } = useMediaPlayer< HTMLAudioElement >( media, { prev, next, onNavigate: navigateAdjacent } );
+  } = useMediaPlayer< HTMLAudioElement >( media );
 
 
   return (
