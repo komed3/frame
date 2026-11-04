@@ -64,14 +64,14 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
 
   const clearHover = () => { hoverMarkerRef.current = null, setHoverMarker( null ), setHovering( null ) };
 
-  const updateHover = ( clientX: number ) => {
+  const updateHover = ( clientX: number, ctrlKey: boolean ) => {
     const rect = rootRef.current?.getBoundingClientRect();
     if ( ! rect ) return;
 
     const x = Math.max( 0, Math.min( rect.width, clientX - rect.left ) );
     const pos = rect.width > 0 ? x / rect.width : 0;
 
-    const nearest = duration > 0 ? markers.reduce< { marker: MarkerRecord, distance: number } | null >(
+    const nearest = duration > 0 && ctrlKey ? markers.reduce< { marker: MarkerRecord, distance: number } | null >(
       ( closest, marker ) => {
         const m = marker.positionMs / ( duration * 1000 ) * rect.width, d = Math.abs( x - m );
         return d <= SNAP_DISTANCE && ( ! closest || d < closest.distance ) ? { marker, distance: d } : closest;
@@ -156,7 +156,7 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
   return (
     <div
       ref= { rootRef }
-      onPointerMove= { e => updateHover( e.clientX ) }
+      onPointerMove= { e => updateHover( e.clientX, e.ctrlKey ) }
       onPointerLeave= { clearHover }
       className= 'relative flex items-center w-full h-1'
     >
