@@ -230,7 +230,7 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
     f11: toggleFullscreen, escape: () => { if ( magnifier ) setMagnifier( 0 ), setPointer( null ) },
     '0': () => setView( 'fit' ), f: () => setView( 'fill' ),
     '1': () => { zoomRef.current = 1, setZoom( 1 ), setView( 'zoom' ) },
-    z: toggleZoom, '+': () => changeZoom( 1.25 ), '=': () => changeZoom( 1.25 ), '-': () => changeZoom( 0.8 ),
+    z: toggleZoom, '+': () => changeZoom( 1.25 ), '-': () => changeZoom( 0.8 ),
     m: () => { setMagnifier( c => c ? 0 : 2 ), setPointer( null ) },
     '[': () => setMagnifier( c => Math.max( c - 2, 2 ) as MagnifierLevel ),
     ']': () => setMagnifier( c => Math.min( c + 2, 8 ) as MagnifierLevel ),
