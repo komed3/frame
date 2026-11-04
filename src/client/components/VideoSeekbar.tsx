@@ -34,6 +34,7 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
   const pendingRef = useRef( currentTime );
 
   const [ hovering, setHovering ] = useState< number | null >( null );
+  const [ hoverMarker, setHoverMarker ] = useState< MarkerRecord | null >( null );
   const [ previewPosition, setPreviewPosition ] = useState( { left: 0, top: 0 } );
   const [ previewSrc, setPreviewSrc ] = useState< string | null >( null );
 
