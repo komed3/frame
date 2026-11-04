@@ -52,6 +52,13 @@ const IMAGE_SHORTCUTS: Shortcut[] = [
 ];
 
 
+function ShortcutGroup ( { title, description, shortcuts }: ShortcutGroupProps ) {
+  return (
+    <div></div>
+  );
+}
+
+
 export function Help () {
   usePageTitle( 'Help' );
 
