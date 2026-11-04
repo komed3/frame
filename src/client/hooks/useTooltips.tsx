@@ -96,6 +96,8 @@ export function useTooltips () {
     window.addEventListener( 'scroll', update, true );
     window.addEventListener( 'resize', update );
 
+    scan( document.documentElement );
+
     return () => {
       observer.disconnect();
       document.removeEventListener( 'pointerover', onPointerOver );
