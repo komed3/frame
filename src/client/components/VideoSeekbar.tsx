@@ -209,19 +209,19 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
         />
       </div>
 
-      { duration > 0 && markers.map( ( { id, positionMs, title, description } ) => (
+      { duration > 0 && markers.map( marker => (
         <button
-          key= { id }
-          onClick= { e => { e.stopPropagation(), onSeek( positionMs / 1000 ) } }
-          title= { `${ formatDuration( positionMs ) }${ title ? ` – ${ title }` : '' }` }
-          aria-label= { `Seek to marker ${ title || formatDuration( positionMs ) }` }
-          className= {
-            'absolute top-1/2 -translate-1/2 z-20 flex justify-center items-center ' +
-            'size-4 pointer-events-auto'
-          }
-          style= { { left: `${ positionMs / ( duration * 1000 ) * 100 }%` } }
+          key= { marker.id }
+          onClick= { e => { e.stopPropagation(), onSeek( marker.positionMs / 1000 ) } }
+          title= { `${ formatDuration( marker.positionMs ) }${ marker.title ? ` – ${ marker.title }` : '' }` }
+          aria-label= { `Seek to marker ${ marker.title || formatDuration( marker.positionMs ) }` }
+          className= 'absolute top-1/2 -translate-1/2 z-20 flex justify-center items-center size-7'
+          style= { { left: `${ marker.positionMs / ( duration * 1000 ) * 100 }%` } }
         >
-          <span className= 'block w-1 h-1.5 bg-amber-400 shadow' />
+          <span className= {
+            'block w-1 h-1.5 shadow transition-colors ' +
+            ( hoverMarker?.id === marker.id ? 'bg-white' : 'bg-amber-400' )
+          } />
         </button>
       ) ) }
 
