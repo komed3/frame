@@ -111,7 +111,7 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
         aria-label= 'Markers'
         className= {
           'flex justify-center items-center size-10 bg-slate-50/10 rounded-full ' +
-          'transition-colors hover:bg-slate-50/20'
+          'transition-colors ' + ( open ? 'bg-slate-50/30' : 'hover:bg-slate-50/20' )
         }
       >
         <FlagIcon size= { 20 } />
