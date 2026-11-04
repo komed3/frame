@@ -6,6 +6,8 @@ export interface PrefSchema {
   PLAYER_SHUFFLE: boolean;
   PLAYER_REPEAT: boolean;
   PLAYER_SUBTITLE_MODE: 'auto' | 'on' | 'off';
+  APP_LANGUAGE: 'en';
+  APP_THEME: 'dark';
 }
 
 export type PrefName = keyof PrefSchema;
