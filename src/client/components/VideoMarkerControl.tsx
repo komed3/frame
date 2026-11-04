@@ -46,18 +46,16 @@ export function VideoMarkerControl ( {
 
 
   const reset = () => {
-    setSelected( null ), setPosition( String( currentTime ) );
-    setTitle( '' ), setDescription( '' ), setError( null );
+    setSelected( null ), setPosition( String( currentTime ) ), setTitle( '' ),
+    setDescription( '' ), setError( null ), setEditing( false );
   };
 
-  const create = () => { reset(), setOpen( true ) };
+  const create = () => { reset(), setEditing( true ), setOpen( true ) };
 
   const select = ( marker: MarkerRecord ) => {
-    setSelected( marker.id );
-    setPosition( String( marker.positionMs / 1000 ) );
-    setTitle( marker.title ?? '' );
-    setDescription( marker.description ?? '' );
-    setError( null );
+    setSelected( marker.id ), setPosition( String( marker.positionMs / 1000 ) ),
+    setTitle( marker.title ?? '' ), setDescription( marker.description ?? '' ),
+    setError( null ), setEditing( true );
   };
 
   const save = async ( e: SubmitEvent< HTMLFormElement > ) => {
