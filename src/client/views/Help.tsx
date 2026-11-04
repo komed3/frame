@@ -38,6 +38,19 @@ const PLAYLIST_SHORTCUTS: Shortcut[] = [
   { keys: [ 'R' ], label: 'Toggle repeat' }
 ];
 
+const IMAGE_SHORTCUTS: Shortcut[] = [
+  { keys: [ '0' ], label: 'Fit image to screen' },
+  { keys: [ 'F' ], label: 'Fill screen with image' },
+  { keys: [ '1' ], label: 'Display image at original size (100%)' },
+  { keys: [ 'Z' ], label: 'Toggle zoom mode' },
+  { keys: [ '+', '=' ], label: 'Zoom in' },
+  { keys: [ '-' ], label: 'Zoom out' },
+  { keys: [ 'M' ], label: 'Toggle magnifier' },
+  { keys: [ '[', ']' ], label: 'Change magnification level' },
+  { keys: [ '↑', '↓', '←', '→' ], label: 'Pan image in zoom mode' },
+  { keys: [ 'Shift + Arrow' ], label: 'Pan image faster' }
+];
+
 
 export function Help () {
   usePageTitle( 'Help' );
