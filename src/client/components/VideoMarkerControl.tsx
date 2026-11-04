@@ -82,7 +82,7 @@ export function VideoMarkerControl ( {
 
     setSaving( true ), setError( null );
 
-    try { await onDelete( id ); if ( selected === id ) reset() }
+    try { await onDelete( id ) }
     catch ( err ) { setError( err instanceof Error ? err.message : 'Could not delete marker.' ) }
     finally { setSaving( false ) }
   };
@@ -91,7 +91,7 @@ export function VideoMarkerControl ( {
   return (
     <div ref= { ref } className= 'relative'>
       <button
-        onClick= { () => open ? setOpen( false ) : create() }
+        onClick= { () => setOpen( ! open ) }
         aria-expanded= { open }
         title= 'Markers'
         aria-label= 'Markers'
