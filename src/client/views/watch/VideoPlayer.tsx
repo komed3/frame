@@ -17,9 +17,11 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
+  ArrowDownToLineIcon,
   ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon,
   PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 
@@ -43,6 +45,8 @@ const BUTTON =
 export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const { media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
+
+  const [ hideControls, setHideControls ] = useState( false );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
@@ -100,124 +104,137 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
             ) }
           </div>
 
-          <div className= 'shrink-0 flex flex-col h-16'>
-            <div className= 'shrink-0 h-1'>
-              <VideoSeekbar
-                mediaId= { media.id }
-                currentTime= { currentTime }
-                duration= { displayDuration }
-                buffered= { buffered }
-                markers= { markers ?? [] }
-                onSeek= { seek }
-              />
-            </div>
+          { ( ! fullscreen || ! hideControls ) && (
+            <div className= 'shrink-0 flex flex-col h-16'>
+              <div className= 'shrink-0 h-1'>
+                <VideoSeekbar
+                  mediaId= { media.id }
+                  currentTime= { currentTime }
+                  duration= { displayDuration }
+                  buffered= { buffered }
+                  markers= { markers ?? [] }
+                  onSeek= { seek }
+                />
+              </div>
 
-            <div
-              className= {
-                'shrink-0 flex justify-between items-center h-15 ' +
-                ( fullscreen && 'px-2' )
-              }
-            >
-              <div className= 'flex items-center gap-2'>
-                <button
-                  onClick= { togglePlay }
-                  disabled= { ! ready }
-                  title= 'Play / Pause [Space]'
-                  aria-label= { playing ? 'Pause' : ended ? 'Replay' : 'Play' }
-                  className= { BUTTON }
-                >
-                  { playing ? <PauseIcon size= { 20 } /> : ended
-                    ? <RotateCcwIcon size= { 20 } />
-                    : <PlayIcon size= { 20 } /> }
-                </button>
+              <div
+                className= {
+                  'shrink-0 flex justify-between items-center h-15 ' +
+                  ( fullscreen && 'px-2' )
+                }
+              >
+                <div className= 'flex items-center gap-2'>
+                  <button
+                    onClick= { togglePlay }
+                    disabled= { ! ready }
+                    title= 'Play / Pause [Space]'
+                    aria-label= { playing ? 'Pause' : ended ? 'Replay' : 'Play' }
+                    className= { BUTTON }
+                  >
+                    { playing ? <PauseIcon size= { 20 } /> : ended
+                      ? <RotateCcwIcon size= { 20 } />
+                      : <PlayIcon size= { 20 } /> }
+                  </button>
 
-                { ( [ [ -10, SkipBackIcon, 'Back', '←' ], [ 10, SkipForwardIcon, 'Forward', '→' ] ] as const ).map(
-                  ( [ offset, Icon, direction, key ] ) => (
+                  { ( [ [ -10, SkipBackIcon, 'Back', '←' ], [ 10, SkipForwardIcon, 'Forward', '→' ] ] as const ).map(
+                    ( [ offset, Icon, direction, key ] ) => (
+                      <button
+                        key= { direction }
+                        onClick= { () => seek( currentTime + offset ) }
+                        title= { `${ direction } 10 seconds [${key}]` }
+                        aria-label= { `${ direction } 10 seconds` }
+                        className= { BUTTON }
+                      >
+                        <Icon size= { 18 } />
+                      </button>
+                    )
+                  ) }
+
+                  <button
+                    onClick= { () => setRemaining( v => ! v ) }
+                    title= 'Switch elapsed / remaining time'
+                    className= {
+                      'inline-flex items-center gap-2 ml-2 text-xs text-slate-300 tabular-nums ' +
+                      'whitespace-nowrap hover:text-white'
+                    }
+                  >
+                    <span>{ timeLabel }</span>
+                    <span>/</span>
+                    <span>{ formatDuration( displayDuration * 1000 ) }</span>
+                  </button>
+                </div>
+
+                <div className= 'flex justify-end items-center gap-2'>
+                  <VolumeControl
+                    volume= { volume }
+                    muted= { muted }
+                    onVolumeChange= { changeVolume }
+                    onVolumeCommit= { saveVolume }
+                    onToggleMute= { toggleMute }
+                  />
+
+                  <PlaybackRateControl
+                    rate= { rate }
+                    onChange= { setPlaybackRate }
+                    margin= 'mb-8'
+                  />
+
+                  <VideoMarkerControl
+                    markers= { markers ?? [] }
+                    currentTime= { currentTime }
+                    onSeek= { seek }
+                    onCreate= { createMarker }
+                    onUpdate= { updateMarker }
+                    onDelete= { deleteMarker }
+                    margin= 'mb-8'
+                  />
+
+                  <button
+                    onClick= { () => navigateAdjacent( prev ) }
+                    disabled= { ! prev }
+                    title= 'Previous [Ctrl + ←]'
+                    aria-label= 'Previous'
+                    className= { BUTTON }
+                  >
+                    <ChevronLeftIcon size= { 20 } />
+                  </button>
+
+                  <button
+                    onClick= { () => navigateAdjacent( next ) }
+                    disabled= { ! next }
+                    title= 'Next [Ctrl + →]'
+                    aria-label= 'Next'
+                    className= { BUTTON }
+                  >
+                    <ChevronRightIcon size= { 20 } />
+                  </button>
+
+                  <button
+                    onClick= { toggleFullscreen }
+                    aria-pressed= { fullscreen }
+                    title= 'Toggle fullscreen [F11]'
+                    aria-label= 'Fullscreen'
+                    className= { BUTTON }
+                  >
+                    { fullscreen
+                      ? <Minimize2Icon size= { 20 } />
+                      : <Maximize2Icon size= { 20 } /> }
+                  </button>
+
+                  { fullscreen && (
                     <button
-                      key= { direction }
-                      onClick= { () => seek( currentTime + offset ) }
-                      title= { `${ direction } 10 seconds [${key}]` }
-                      aria-label= { `${ direction } 10 seconds` }
+                      onClick= { () => setHideControls( true ) }
+                      title= 'Hide controls'
+                      aria-label= 'Hide controls'
                       className= { BUTTON }
                     >
-                      <Icon size= { 18 } />
+                      <ArrowDownToLineIcon size= { 20 } />
                     </button>
-                  )
-                ) }
-
-                <button
-                  onClick= { () => setRemaining( v => ! v ) }
-                  title= 'Switch elapsed / remaining time'
-                  className= {
-                    'inline-flex items-center gap-2 ml-2 text-xs text-slate-300 tabular-nums ' +
-                    'whitespace-nowrap hover:text-white'
-                  }
-                >
-                  <span>{ timeLabel }</span>
-                  <span>/</span>
-                  <span>{ formatDuration( displayDuration * 1000 ) }</span>
-                </button>
-              </div>
-
-              <div className= 'flex justify-end items-center gap-2'>
-                <VolumeControl
-                  volume= { volume }
-                  muted= { muted }
-                  onVolumeChange= { changeVolume }
-                  onVolumeCommit= { saveVolume }
-                  onToggleMute= { toggleMute }
-                />
-
-                <PlaybackRateControl
-                  rate= { rate }
-                  onChange= { setPlaybackRate }
-                  margin= 'mb-8'
-                />
-
-                <VideoMarkerControl
-                  markers= { markers ?? [] }
-                  currentTime= { currentTime }
-                  onSeek= { seek }
-                  onCreate= { createMarker }
-                  onUpdate= { updateMarker }
-                  onDelete= { deleteMarker }
-                  margin= 'mb-8'
-                />
-
-                <button
-                  onClick= { () => navigateAdjacent( prev ) }
-                  disabled= { ! prev }
-                  title= 'Previous [Ctrl + ←]'
-                  aria-label= 'Previous'
-                  className= { BUTTON }
-                >
-                  <ChevronLeftIcon size= { 20 } />
-                </button>
-
-                <button
-                  onClick= { () => navigateAdjacent( next ) }
-                  disabled= { ! next }
-                  title= 'Next [Ctrl + →]'
-                  aria-label= 'Next'
-                  className= { BUTTON }
-                >
-                  <ChevronRightIcon size= { 20 } />
-                </button>
-
-                <button
-                  onClick= { toggleFullscreen }
-                  aria-pressed= { fullscreen }
-                  title= 'Toggle fullscreen [F11]'
-                  aria-label= 'Fullscreen'
-                  className= { BUTTON }
-                >
-                  { fullscreen
-                    ? <Minimize2Icon size= { 20 } />
-                    : <Maximize2Icon size= { 20 } /> }
-                </button>
+                  ) }
+                </div>
               </div>
             </div>
-          </div>
+          ) }
         </div>
       </div>
 
