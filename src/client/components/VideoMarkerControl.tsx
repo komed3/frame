@@ -31,6 +31,7 @@ export function VideoMarkerControl ( {
   const ref = useRef< HTMLDivElement >( null );
 
   const [ open, setOpen ] = useState( false );
+  const [ editing, setEditing ] = useState( false );
   const [ selected, setSelected ] = useState< string | null >( null );
   const [ position, setPosition ] = useState( '0' );
   const [ title, setTitle ] = useState( '' );
