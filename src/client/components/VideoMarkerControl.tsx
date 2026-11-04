@@ -12,6 +12,7 @@ interface VideoMarkerControlProps {
   onCreate: ( positionMs: number, title?: string, description?: string ) => Promise< void >;
   onUpdate: ( id: string, data: MarkerUpdate ) => Promise< void >;
   onDelete: ( id: string ) => Promise< void >;
+  margin?: string;
 }
 
 
@@ -24,7 +25,9 @@ const INPUT =
   'outline-none focus:border-slate-500';
 
 
-export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, onUpdate, onDelete }: VideoMarkerControlProps ) {
+export function VideoMarkerControl ( {
+  markers, currentTime, onSeek, onCreate, onUpdate, onDelete, margin= 'mb-4'
+}: VideoMarkerControlProps ) {
   const ref = useRef< HTMLDivElement >( null );
 
   const [ open, setOpen ] = useState( false );
@@ -104,8 +107,9 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
       { open && (
         <div
           className= {
-            'absolute right-0 bottom-full z-30 mb-4 w-80 max-w-[calc(100vw-2rem)] ' +
-            'max-h-[min(34rem,calc(100vh-6rem))] bg-slate-700 rounded shadow-lg'
+            'absolute right-0 bottom-full z-30 w-80 max-w-[calc(100vw-2rem)] ' +
+            'max-h-[min(34rem,calc(100vh-6rem))] bg-slate-700 rounded shadow-lg ' +
+            margin
           }
         >
           <div className= 'absolute right-3 -bottom-1.5 rotate-45 size-3 bg-slate-700' />

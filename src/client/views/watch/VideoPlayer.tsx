@@ -178,6 +178,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                 <PlaybackRateControl
                   rate= { rate }
                   onChange= { setPlaybackRate }
+                  margin= 'mb-8'
                 />
 
                 <VideoMarkerControl
@@ -187,6 +188,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                   onCreate= { createMarker }
                   onUpdate= { updateMarker }
                   onDelete= { deleteMarker }
+                  margin= 'mb-8'
                 />
 
                 <button

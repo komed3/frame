@@ -7,10 +7,11 @@ import { useRef, useState } from 'react';
 interface PlaybackRateControlProps {
   rate: number;
   onChange: ( value: number ) => void;
+  margin?: string;
 }
 
 
-export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlProps ) {
+export function PlaybackRateControl ( { rate, onChange, margin = 'mb-4' }: PlaybackRateControlProps ) {
   const ref = useRef< HTMLDivElement >( null );
   const [ open, setOpen ] = useState( false );
 
@@ -35,7 +36,7 @@ export function PlaybackRateControl ( { rate, onChange }: PlaybackRateControlPro
       </button>
 
       { open && (
-        <div className= 'absolute left-1/2 bottom-full -translate-x-1/2 z-20 mb-4 shadow-lg'>
+        <div className= { `absolute left-1/2 bottom-full -translate-x-1/2 z-20 ${ margin } shadow-lg` }>
           <div className= 'absolute left-1/2 -bottom-1.5 -translate-x-1/2 rotate-45 size-3 bg-slate-700' />
 
           <div className= 'relative z-1 w-24 py-2 bg-slate-700 rounded'>
