@@ -10,27 +10,29 @@ interface ViewToggleProps {
 
 
 const BTN = [
-  [ 'grid', 'Grid View', LayoutGridIcon, 'rounded-l-full' ],
-  [ 'list', 'List View', Rows3Icon, 'rounded-r-full' ]
+  [ 'grid', 'Grid', LayoutGridIcon ],
+  [ 'list', 'List', Rows3Icon ]
 ] as const;
 
 
 export function ViewToggle ( { value, onChange }: ViewToggleProps ) {
   return (
-    <div className= 'inline-flex items-center gap-1 p-1 bg-slate-800 rounded-full'>
-      { BTN.map( ( [ option, label, Icon, r ] ) => (
+    <div className= 'inline-flex items-center gap-2'>
+      { BTN.map( ( [ option, label, Icon ] ) => (
         <button
-          key= { option }
-          aria-label= { label }
-          aria-pressed= { value === option }
           onClick= { () => onChange( option ) }
+          aria-pressed= { value === option }
+          title= { `${ label } View` } aria-label= { `${ label } View` }
           className= {
-            'flex justify-center items-center gap-2 h-9 px-4 text-sm transition-colors ' +
-            r + ' ' + ( value === option ? 'bg-slate-50/20' : 'hover:bg-slate-50/5' )
+            'flex justify-center items-center gap-2 h-10 min-w-10 rounded shadow-lg transition-colors ' +
+            ( value === option ? 'bg-slate-50/20 px-4' : 'bg-slate-50/5 hover:bg-slate-50/10' )
           }
         >
           <Icon size= { 18 } />
-          { label }
+
+          { value === option && (
+            <span className= 'text-sm'>{ label }</span>
+          ) }
         </button>
       ) ) }
     </div>
