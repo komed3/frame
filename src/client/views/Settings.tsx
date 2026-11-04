@@ -20,6 +20,19 @@ export function Settings () {
   usePageTitle( 'Settings' );
 
 
+  const reset = async () => {
+    setResetting( true ), setError( null );
+
+    try {
+      await prefs.resetAll();
+      window.location.reload();
+    } catch ( err ) {
+      setError( err instanceof Error ? err.message : 'Could not reset settings.' );
+      setResetting( false );
+    }
+  };
+
+
   return (
     <></>
   );
