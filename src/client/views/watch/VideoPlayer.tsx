@@ -88,7 +88,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   useEffect( () => { setMarkers( markerData ?? [] ) }, [ markerData ] );
 
 
-  const createMarker = async ( positionMs: number, title: string, description: string ) => {
+  const createMarker = async ( positionMs: number, title?: string, description?: string ) => {
     await markersApi.createForMedia( media.id, { positionMs, title, description } );
     setMarkers( await markersApi.forMedia( media.id ) );
   };
