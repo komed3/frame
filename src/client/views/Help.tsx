@@ -56,6 +56,10 @@ export function Help () {
   usePageTitle( 'Help' );
 
   return (
-    <></>
+    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-4'>
+      <h1 className= 'text-2xl font-light tracking-wide'>
+        Keyboard Shortcuts
+      </h1>
+    </div>
   );
 }
