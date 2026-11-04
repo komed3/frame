@@ -37,6 +37,17 @@ export function useTooltips () {
 
       setTooltip( { text, x, y: above ? rect.top - 8 : rect.bottom + 8, above } );
     };
+
+    const show = ( el: HTMLElement, delay: number ) => {
+      const text = el.getAttribute( ATTR );
+      if ( ! text ) return;
+
+      if ( activeRef.current === el ) return;
+      activeRef.current = el;
+
+      if ( timerRef.current ) clearTimeout( timerRef.current );
+      timerRef.current = setTimeout( () => { if ( el.isConnected ) position( el, text ) }, delay );
+    };
   }, [] );
 
 
