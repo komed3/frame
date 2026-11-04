@@ -115,145 +115,164 @@ export function VideoMarkerControl ( {
 
           <div className= 'relative flex flex-col max-h-[min(32rem,calc(100vh-6rem))] p-3'>
             <div className= 'shrink-0 flex justify-between items-center mb-3'>
-              <h2 className= 'font-medium'>Markers</h2>
+              <div className= 'flex items-center gap-2'>
+                { editing && (
+                  <button
+                    onClick= { reset }
+                    aria-label= 'Back to markers'
+                    className= 'p-1'
+                  >
+                    <ArrowLeftIcon size= { 16 } />
+                  </button>
+                ) }
+
+                <h2 className= 'text-sm font-medium'>
+                  { editing ? selected ? 'Edit marker' : 'New marker' : 'Markers' }
+                </h2>
+
+                { ! editing && (
+                  <span className= 'px-2 py-0.5 text-[10px] bg-slate-50/10 rounded tabular-nums'>
+                    { markers.length }
+                  </span>
+                ) }
+              </div>
 
               <button
                 onClick= { () => setOpen( false ) }
                 aria-label= 'Close markers'
-                className= 'text-slate-400 transition-colors hover:text-white'
+                className= 'p-1'
               >
-                <XIcon size= { 18 } />
+                <XIcon size= { 16 } />
               </button>
             </div>
 
-            <button
-              onClick= { create }
-              className= { BUTTON + ' shrink-0 w-full mb-3 bg-slate-50/5' }
-            >
-              <PlusIcon size= { 16 } />
-              <span>New marker at current position</span>
-            </button>
+            { ! editing ? (
+              <>
+                <button
+                  onClick= { create }
+                  className= { BUTTON + ' shrink-0 w-full mb-3 bg-slate-50/10' }
+                >
+                  <PlusIcon size= { 15 } />
+                  <span>New marker</span>
+                </button>
 
-            <div className= 'shrink min-h-0 max-h-40 mb-3 overflow-y-auto'>
-              { sortedMarkers.length ? (
-                <div className= 'space-y-0.5'>
-                  { sortedMarkers.map( marker => (
-                    <div
-                      key= { marker.id }
-                      className= {
-                        'flex items-center gap-1 rounded transition-colors ' +
-                        ( selected === marker.id ? 'bg-slate-50/10' : 'hover:bg-slate-50/5' )
-                      }
-                    >
-                      <button
-                        onClick= { () => { select( marker ), onSeek( marker.positionMs / 1000 ) } }
-                        aria-pressed= { selected === marker.id }
-                        className= 'flex-1 min-w-0 flex items-center gap-3 px-2 py-2 text-left'
-                      >
-                        <span className= 'shrink-0 text-xs text-slate-400 tabular-nums'>
-                          { formatDuration( marker.positionMs ) }
-                        </span>
+                <div className= 'min-h-0 overflow-y-auto'>
+                  { sortedMarkers.length ? (
+                    <div className= 'space-y-1'>
+                      { sortedMarkers.map( marker => (
+                        <div
+                          key= { marker.id }
+                          className= 'flex items-center gap-1 rounded transition-colors hover:bg-slate-50/5'
+                        >
+                          <button
+                            onClick= { () => { select( marker ), onSeek( marker.positionMs / 1000 ) } }
+                            className= 'flex-1 min-w-0 flex items-center gap-3 px-2 py-2 text-left'
+                          >
+                            <span className= 'shrink-0 text-xs text-slate-400 tabular-nums'>
+                              { formatDuration( marker.positionMs ) }
+                            </span>
 
-                        <span className= 'min-w-0'>
-                          <span className= 'block truncate text-sm'>
-                            { marker.title || 'Untitled marker' }
-                          </span>
-                        </span>
-                      </button>
+                            <span className= 'min-w-0 truncate text-xs'>
+                              { marker.title || 'Untitled marker' }
+                            </span>
+                          </button>
 
-                      <button
-                        onClick= { () => remove( marker.id ) }
-                        disabled= { saving }
-                        aria-label= 'Delete marker'
-                        title= 'Delete marker'
-                        className= {
-                          'shrink-0 p-2 text-slate-400 transition-colors ' +
-                          'hover:text-red-400 disabled:opacity-50'
-                        }
-                      >
-                        <Trash2Icon size= { 16 } />
-                      </button>
+                          <button
+                            onClick= { () => remove( marker.id ) }
+                            disabled= { saving }
+                            aria-label= 'Delete marker'
+                            title= 'Delete marker'
+                            className= {
+                              'shrink-0 p-2 text-slate-400 transition-colors ' +
+                              'hover:text-red-400 disabled:opacity-50'
+                            }
+                          >
+                            <Trash2Icon size= { 15 } />
+                          </button>
+                        </div>
+                      ) ) }
                     </div>
-                  ) ) }
+                  ) : (
+                    <p className= 'py-8 text-center text-xs text-slate-400'>
+                      No markers yet.
+                    </p>
+                  ) }
                 </div>
-              ) : (
-                <p className= 'py-4 text-center text-xs text-slate-400'>
-                  No markers yet.
-                </p>
-              ) }
-            </div>
 
-            <form onSubmit= { save } className= 'shrink-0 space-y-3 border-t border-slate-600 pt-3'>
-              <h3 className= 'text-sm font-medium'>
-                { selected ? 'Edit marker' : 'New marker' }
-              </h3>
+                { error && (
+                  <p role= 'alert' className= 'mt-2 text-xs text-red-400'>
+                    { error }
+                  </p>
+                ) }
+              </>
+            ) : (
+              <form onSubmit= { save } className= 'min-h-0 flex flex-col gap-3'>
+                <div className= 'space-y-1'>
+                  <label className= 'block text-xs text-slate-400'>
+                    Position (seconds)
+                  </label>
 
-              <div className= 'space-y-1'>
-                <label className= 'block text-xs text-slate-400'>
-                  Position (seconds)
-                </label>
+                  <input
+                    type= 'number'
+                    min= { 0 } step= 'any' value= { position } required
+                    onChange= { e => setPosition( e.target.value ) }
+                    className= { INPUT + ' tabular-nums' }
+                  />
+                </div>
 
-                <input
-                  type= 'number'
-                  min= { 0 } step= 'any' value= { position } required
-                  onChange= { e => setPosition( e.target.value ) }
-                  className= { INPUT }
-                />
-              </div>
+                <div className= 'space-y-1'>
+                  <label className= 'block text-xs text-slate-400'>
+                    Title <span className= 'text-slate-500'>(optional)</span>
+                  </label>
 
-              <div className= 'space-y-1'>
-                <label className= 'block text-xs text-slate-400'>
-                  Title <span className= 'text-slate-500'>(optional)</span>
-                </label>
+                  <input
+                    value= { title }
+                    onChange= { e => setTitle( e.target.value ) }
+                    maxLength= { 200 }
+                    placeholder= 'Marker title'
+                    className= { INPUT }
+                  />
+                </div>
 
-                <input
-                  value= { title }
-                  onChange= { e => setTitle( e.target.value ) }
-                  maxLength= { 200 }
-                  className= { INPUT }
-                />
-              </div>
+                <div className= 'space-y-1'>
+                  <label className= 'block text-xs text-slate-400'>
+                    Description <span className= 'text-slate-500'>(optional)</span>
+                  </label>
 
-              <div className= 'space-y-1'>
-                <label className= 'block text-xs text-slate-400'>
-                  Description <span className= 'text-slate-500'>(optional)</span>
-                </label>
+                  <textarea
+                    value= { description }
+                    onChange= { e => setDescription( e.target.value ) }
+                    rows= { 4 }
+                    placeholder= 'Add a description'
+                    className= { INPUT + ' resize-y' }
+                  />
+                </div>
 
-                <textarea
-                  value= { description }
-                  onChange= { e => setDescription( e.target.value ) }
-                  rows= { 2 }
-                  className= { INPUT + ' resize-y' }
-                />
-              </div>
+                { error && (
+                  <p role= 'alert' className= 'text-xs text-red-400'>
+                    { error }
+                  </p>
+                ) }
 
-              { error && (
-                <p role= 'alert' className= 'text-sm text-red-400'>
-                  { error }
-                </p>
-              ) }
-
-              <div className= 'flex justify-between items-center'>
-                { selected ? (
+                <div className= 'flex justify-end items-center gap-2 pt-2 border-t border-slate-600'>
                   <button
-                    type= 'button'
                     onClick= { reset }
-                    className= { BUTTON }
+                    className= { BUTTON + ' text-slate-300' }
                   >
                     Cancel
                   </button>
-                ) : <span /> }
 
-                <button
-                  type= 'submit'
-                  disabled= { saving }
-                  className= { BUTTON + ' bg-slate-50/10' }
-                >
-                  <SaveIcon size= { 16 } />
-                  <span>{ saving ? 'Saving …' : 'Save marker' }</span>
-                </button>
-              </div>
-            </form>
+                  <button
+                    type= 'submit'
+                    disabled= { saving }
+                    className= { BUTTON + ' bg-slate-50/10' }
+                  >
+                    <SaveIcon size= { 14 } />
+                    <span>{ saving ? 'Saving …' : 'Save marker' }</span>
+                  </button>
+                </div>
+              </form>
+            ) }
           </div>
         </div>
       ) }
