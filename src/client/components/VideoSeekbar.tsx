@@ -247,7 +247,7 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
         ) }
         onKeyUp= { e => { pendingRef.current = Number( e.currentTarget.value ), commit() } }
         onPointerUp= { commit } onPointerCancel= { commit } onBlur= { commit }
-        aria-label= 'Seek' title= 'Seek'
+        aria-label= 'Seek'
         className= {
           'appearance-none absolute inset-x-0 -inset-y-1 z-10 m-0 ' +
           'w-full h-2 bg-transparent opacity-0 cursor-pointer'
