@@ -62,7 +62,7 @@ export function VideoMarkerControl ( {
     e.preventDefault();
 
     const posMs = Math.round( Number( position ) * 1000 );
-    if ( ! Number.isFinite( posMs ) || posMs < 0 ) { setError( 'Invalid marker position.' ); return }
+    if ( ! Number.isFinite( posMs ) || posMs < 0 ) return setError( 'Invalid marker position.' );
 
     setSaving( true ), setError( null );
 
