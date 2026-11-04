@@ -78,6 +78,24 @@ export function useTooltips () {
       if ( el?.isConnected && text ) position( el, text );
       else setTooltip( null );
     };
+
+    document.addEventListener( 'pointerover', onPointerOver );
+    document.addEventListener( 'pointerout', hide );
+    document.addEventListener( 'focusin', onFocusIn );
+    document.addEventListener( 'focusout', hide );
+    window.addEventListener( 'scroll', update, true );
+    window.addEventListener( 'resize', update );
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener( 'pointerover', onPointerOver );
+      document.removeEventListener( 'pointerout', hide );
+      document.removeEventListener( 'focusin', onFocusIn );
+      document.removeEventListener( 'focusout', hide );
+      window.removeEventListener( 'scroll', update, true );
+      window.removeEventListener( 'resize', update );
+      if ( timerRef.current ) clearTimeout( timerRef.current );
+    };
   }, [] );
 
 
