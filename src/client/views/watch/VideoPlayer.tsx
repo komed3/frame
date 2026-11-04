@@ -16,9 +16,8 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ChevronLeftIcon, ChevronRightIcon,
-  Maximize2Icon, Minimize2Icon,
-  PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
+  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon,
+  PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
