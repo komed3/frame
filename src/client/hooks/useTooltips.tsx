@@ -24,7 +24,7 @@ export function useTooltips () {
       el.removeAttribute( 'title' );
     };
 
-    const scan = ( el: Element ) => { migrate( el ), el.querySelectorAll( '[title]' ).forEach( migrate ) };
+    const scan = ( el: Element ) => el.querySelectorAll( '[title]' ).forEach( migrate );
   }, [] );
 
 
