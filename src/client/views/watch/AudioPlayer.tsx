@@ -113,7 +113,7 @@ export function AudioPlayer ( { media, playlistId }: AudioPlayerProps ) {
               <button
                 onClick= { toggleFullscreen }
                 aria-pressed= { fullscreen }
-                title= 'Toggle fullscreen [f]'
+                title= 'Toggle fullscreen [F11]'
                 aria-label= 'Fullscreen'
                 className= { BUTTON }
               >
