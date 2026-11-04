@@ -48,6 +48,15 @@ export function useTooltips () {
       if ( timerRef.current ) clearTimeout( timerRef.current );
       timerRef.current = setTimeout( () => { if ( el.isConnected ) position( el, text ) }, delay );
     };
+
+    const hide = ( e: PointerEvent | FocusEvent ) => {
+      const from = e.target instanceof Element ? e.target.closest< HTMLElement >( `[${ ATTR }]` ) : null;
+      const to = e.relatedTarget instanceof Element ? e.relatedTarget.closest( `[${ ATTR }]` ) : null;
+      if ( ( from && from === to ) || from !== activeRef.current ) return;
+
+      if ( timerRef.current ) clearTimeout( timerRef.current );
+      activeRef.current = null, setTooltip( null );
+    };
   }, [] );
 
 
