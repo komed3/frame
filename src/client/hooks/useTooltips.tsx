@@ -85,10 +85,6 @@ export function useTooltips () {
     };
 
 
-    observer.observe( document.documentElement, {
-      subtree: true, childList: true, attributes: true, attributeFilter: [ 'title' ]
-    } );
-
     document.addEventListener( 'pointerover', onPointerOver );
     document.addEventListener( 'pointerout', hide );
     document.addEventListener( 'focusin', onFocusIn );
@@ -97,6 +93,9 @@ export function useTooltips () {
     window.addEventListener( 'resize', update );
 
     scan( document.documentElement );
+    observer.observe( document.documentElement, {
+      subtree: true, childList: true, attributes: true, attributeFilter: [ 'title' ]
+    } );
 
     return () => {
       observer.disconnect();
