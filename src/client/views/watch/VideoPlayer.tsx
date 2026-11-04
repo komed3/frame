@@ -47,9 +47,11 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
   const overlayRef = useRef< HTMLDivElement >( null );
   const overlayTimerRef = useRef< NodeJS.Timeout | null >( null );
+  const cursorTimerRef = useRef< NodeJS.Timeout | null >( null );
 
   const [ hideControls, setHideControls ] = useState( false );
   const [ overlayVisible, setOverlayVisible ] = useState( true );
+  const [ cursorHidden, setCursorHidden ] = useState( false );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
