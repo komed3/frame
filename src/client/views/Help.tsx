@@ -101,6 +101,11 @@ export function Help () {
       />
 
       <ShortcutGroup
+        title= 'Images'
+        shortcuts= { IMAGE_SHORTCUTS }
+      />
+
+      <ShortcutGroup
         title= 'Playlist'
         shortcuts= { PLAYLIST_SHORTCUTS }
       />
