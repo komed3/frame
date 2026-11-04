@@ -16,6 +16,9 @@ export function useTooltips () {
   const timerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
 
 
+  useEffect( () => {}, [] );
+
+
   return tooltip && createPortal(
     <div
       role= 'tooltip'
