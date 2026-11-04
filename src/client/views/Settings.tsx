@@ -1,7 +1,7 @@
 import { Select, type SelectOption } from '@/src/client/components/Select';
 import { useApi } from '@/src/client/context/ApiContext';
-import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
+import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import type { PrefValue } from '@/src/shared/types/pref';
 import { useState } from 'react';
 
@@ -65,6 +65,23 @@ export function Settings () {
             { error }
           </p>
         ) }
+
+        <div className= 'flex justify-between items-center gap-4 pt-2'>
+          <p className= 'text-xs text-slate-400'>
+            Changes are saved automatically.
+          </p>
+
+          <button
+            onClick= { reset }
+            disabled= { resetting }
+            className= {
+              'px-3.5 py-2 text-sm font-medium text-red-400 bg-slate-50/10 rounded ' +
+              'transition-colors hover:bg-slate-50/20 disabled:opacity-50'
+            }
+          >
+            { resetting ? 'Resetting …' : 'Reset all settings' }
+          </button>
+        </div>
       </div>
     </div>
   );
