@@ -159,11 +159,6 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
       onPointerMove= { e => updateHover( e.clientX ) }
       onPointerLeave= { clearHover }
       className= 'relative flex items-center w-full h-1'
-      onMouseMove= { e => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setHovering( Math.max( 0, Math.min( 1, ( e.clientX - rect.left ) / rect.width ) ) );
-      } }
-      onMouseLeave= { () => setHovering( null ) }
     >
       { hovering !== null && (
         <div
