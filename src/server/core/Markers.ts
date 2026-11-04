@@ -6,6 +6,11 @@ import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
 
 
 export class Markers {
+  private static normalize ( value: unknown, label: string ) : string | null {
+  if ( value === null || value === undefined || typeof value === 'string' && ! value.trim() ) return null;
+  return normalizeOptionalString( value, label );
+}
+
   public static get ( userId: string, markerId: string ) : MarkerRecord | null {
     User.assertUserIdSafe( userId );
     assertId( markerId, 'marker' );
@@ -68,8 +73,8 @@ export class Markers {
         VALUES ( ?, ?, ?, ?, ?, ? )
       ` ).run(
         id, userId, mediaId, positionMs,
-        normalizeOptionalString( title, 'Marker title' ),
-        normalizeOptionalString( description, 'Marker description' )
+        Markers.normalize( title, 'Marker title' ),
+        Markers.normalize( description, 'Marker description' )
       );
 
       return id;
@@ -92,12 +97,12 @@ export class Markers {
 
     if ( patch.title !== undefined ) {
       assignments.push( 'title = ?' );
-      values.push( normalizeOptionalString( patch.title, 'Marker title' ) );
+      values.push( Markers.normalize( patch.title, 'Marker title' ) );
     }
 
     if ( patch.description !== undefined ) {
       assignments.push( 'description = ?' );
-      values.push( normalizeOptionalString( patch.description, 'Marker description' ) );
+      values.push( Markers.normalize( patch.description, 'Marker description' ) );
     }
 
     if ( ! assignments.length ) return;
