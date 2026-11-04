@@ -51,6 +51,12 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const [ remaining, setRemaining ] = useState( false );
   const [ fullscreen, setFullscreen ] = useState( false );
   const [ streamError, setStreamError ] = useState< string | null >( null );
+  const [ markerVersion, setMarkerVersion ] = useState( 0 );
+
+
+  const { data: markers = [] } = useApiData< MarkerRecord[] >(
+    `${ media.id }:${ markerVersion }`, () => markersApi.forMedia( media.id )
+  );
 
 
   useEffect( () => { volumeRef.current = vol, setVolume( vol ) }, [ vol ] );
