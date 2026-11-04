@@ -196,9 +196,8 @@ export function VideoMarkerControl ( {
 
                 <input
                   type= 'number'
-                  min= { 0 } step= { 0.001 } value= { position }
+                  min= { 0 } step= 'any' value= { position } required
                   onChange= { e => setPosition( e.target.value ) }
-                  required
                   className= { INPUT }
                 />
               </div>
