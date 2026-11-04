@@ -60,6 +60,10 @@ export function Help () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Keyboard Shortcuts
       </h1>
+
+      <p className= 'text-xs text-slate-500'>
+        Keyboard shortcuts are disabled while typing in input fields.
+      </p>
     </div>
   );
 }
