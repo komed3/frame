@@ -57,6 +57,20 @@ export function useTooltips () {
       if ( timerRef.current ) clearTimeout( timerRef.current );
       activeRef.current = null, setTooltip( null );
     };
+
+    const onPointerOver = ( e: PointerEvent ) => {
+      if ( e.pointerType === 'touch' || ! ( e.target instanceof Element ) ) return;
+
+      const el = e.target.closest< HTMLElement >( `[${ ATTR }]` );
+      if ( el ) show( el, 350 );
+    };
+
+    const onFocusIn = ( e: FocusEvent ) => {
+      if ( ! ( e.target instanceof Element ) ) return;
+
+      const el = e.target.closest< HTMLElement >( `[${ ATTR }]` );
+      if ( el ) show( el, 0 );
+    };
   }, [] );
 
 
