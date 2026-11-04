@@ -13,4 +13,9 @@ export function useWatchNavigation ( media: MediaRecord, playlistId?: string ) {
   const key = `${ media.id }:${ playlistId ?? '' }`;
   const { data } = useApiData< [ string | null, string | null ] >( key, () => adjacentMedia( media, playlistId ) );
   const [ prev, next ] = data ?? [ null, null ];
+
+
+  const navigateAdjacent = ( id: string | null ) => {
+    if ( id ) navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
+  };
 }
