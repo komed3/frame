@@ -92,11 +92,7 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
 
     setSaving( true ), setError( null );
 
-    try {
-      await onDelete( id );
-      if ( selected === id ) reset();
-    }
-
+    try { await onDelete( id ); if ( selected === id ) reset() }
     catch ( err ) { setError( err instanceof Error ? err.message : 'Could not delete marker.' ) }
     finally { setSaving( false ) }
   };
