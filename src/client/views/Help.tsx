@@ -8,7 +8,6 @@ interface Shortcut {
 
 interface ShortcutGroupProps {
   title: string;
-  description?: string;
   shortcuts: Shortcut[];
 }
 
@@ -53,7 +52,7 @@ const IMAGE_SHORTCUTS: Shortcut[] = [
 ];
 
 
-function ShortcutGroup ( { title, description, shortcuts }: ShortcutGroupProps ) {
+function ShortcutGroup ( { title, shortcuts }: ShortcutGroupProps ) {
   return (
     <div className= 'p-5 bg-slate-50/5 rounded-lg'>
       <div className= 'mb-5 space-y-1'>
