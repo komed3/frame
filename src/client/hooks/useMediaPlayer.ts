@@ -194,7 +194,7 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() :
     playerRef.current?.requestFullscreen();
 
-  const createMarker = async ( positionMs: number, title: string, description: string ) => {
+  const createMarker = async ( positionMs: number, title?: string, description?: string ) => {
     await markersApi.createForMedia( media.id, { positionMs, title, description } );
     setMarkerVersion( c => c + 1 );
   };
