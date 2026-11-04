@@ -132,8 +132,8 @@ export function useTooltips () {
       ref= { tooltipRef }
       role= 'tooltip'
       className= {
-        'fixed z-100 max-w-[min(15rem,calc(100vw-1rem))] px-2 py-1 text-center whitespace-nowrap ' +
-        'text-[11px] leading-4 font-medium text-slate-200 bg-slate-800/95 rounded shadow-lg ' +
+        'fixed z-100 w-fit px-2 py-1 text-center whitespace-nowrap text-[11px] ' +
+        'leading-4 font-medium text-slate-200 bg-slate-800/95 rounded shadow-lg ' +
         'backdrop-blur-sm pointer-events-none'
       }
       style= { {
