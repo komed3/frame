@@ -53,7 +53,7 @@ export function Select ( { label, value, options, onChange, placeholder = 'Selec
         onClick= { () => setOpen( ! open ) }
         className= {
           'flex justify-between items-center gap-3 w-full h-10 px-3 text-left text-sm bg-slate-800 ' +
-          'border border-transparent rounded outline-none transition focus:border-slate-500'
+          'border border-slate-600 rounded outline-none transition focus:border-slate-500'
         }
       >
         <span className= 'truncate'>
