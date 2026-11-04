@@ -16,7 +16,16 @@ export function useTooltips () {
   const timerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
 
 
-  useEffect( () => {}, [] );
+  useEffect( () => {
+    const migrate = ( el: Element ) => {
+      if ( ! el.hasAttribute( 'title' ) ) return;
+
+      el.setAttribute( 'data-frame-tooltip', el.getAttribute( 'title' ) ?? '' );
+      el.removeAttribute( 'title' );
+    };
+
+    const scan = ( el: Element ) => { migrate( el ), el.querySelectorAll( '[title]' ).forEach( migrate ) };
+  }, [] );
 
 
   return tooltip && createPortal(
