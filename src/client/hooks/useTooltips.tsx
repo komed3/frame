@@ -10,6 +10,9 @@ interface TooltipState {
 }
 
 
+const ATTR = 'data-frame-tooltip';
+
+
 export function useTooltips () {
   const [ tooltip, setTooltip ] = useState< TooltipState | null >( null );
   const activeRef = useRef< HTMLElement | null >( null );
@@ -20,7 +23,7 @@ export function useTooltips () {
     const migrate = ( el: Element ) => {
       if ( ! el.hasAttribute( 'title' ) ) return;
 
-      el.setAttribute( 'data-frame-tooltip', el.getAttribute( 'title' ) ?? '' );
+      el.setAttribute( ATTR, el.getAttribute( 'title' ) ?? '' );
       el.removeAttribute( 'title' );
     };
 
