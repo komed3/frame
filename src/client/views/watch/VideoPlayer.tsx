@@ -49,6 +49,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const overlayTimerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
 
   const [ hideControls, setHideControls ] = useState( false );
+  const [ overlayVisible, setOverlayVisible ] = useState( true );
 
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
