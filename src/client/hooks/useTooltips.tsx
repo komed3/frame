@@ -46,11 +46,7 @@ export function useTooltips () {
     } ) );
 
     const position = ( el: HTMLElement, text: string ) => {
-      const rect = el.getBoundingClientRect();
-      const half = Math.min( 128, Math.max( 0, ( window.innerWidth - 16 ) / 2 ) );
-      const x = Math.max( 8 + half, Math.min( window.innerWidth - 8 - half, rect.left + rect.width / 2 ) );
-      const above = rect.top >= 48;
-
+      const rect = el.getBoundingClientRect(), x = rect.left + rect.width / 2, above = rect.top >= 48;
       setTooltip( { text, x, y: above ? rect.top - 8 : rect.bottom + 8, above } );
     };
 
