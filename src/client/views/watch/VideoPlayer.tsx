@@ -45,6 +45,9 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const { media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
 
+  const overlayRef = useRef< HTMLDivElement >( null );
+  const overlayTimerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
+
   const [ hideControls, setHideControls ] = useState( false );
 
 
