@@ -242,17 +242,12 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
         type= 'range'
         min= { 0 } max= { duration || 1 } step= { 0.01 } defaultValue= { currentTime }
         onPointerDown= { () => { draggingRef.current = true } }
-        onInput= { e => {
-          pendingRef.current = Number( e.currentTarget.value );
-          update( pendingRef.current );
-        } }
-        onPointerUp= { commit }
-        onPointerCancel= { commit }
-        onKeyUp= { e => {
-          pendingRef.current = Number( e.currentTarget.value );
-          commit();
-        } }
-        onBlur= { commit }
+        onInput= { e => update(
+          pendingRef.current = draggingRef.current && hoverMarkerRef.current ?
+            hoverMarkerRef.current.positionMs / 1000 : Number( e.currentTarget.value )
+        ) }
+        onKeyUp= { e => { pendingRef.current = Number( e.currentTarget.value ), commit() } }
+        onPointerUp= { commit } onPointerCancel= { commit } onBlur= { commit }
         aria-label= 'Seek' title= 'Seek'
         className= {
           'appearance-none absolute inset-x-0 -inset-y-1 z-10 m-0 ' +
