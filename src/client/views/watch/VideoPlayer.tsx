@@ -83,6 +83,32 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
   useEffect( () => { ! fullscreen && setHideControls( false ) }, [ fullscreen ] );
 
+  useEffect( () => {
+    const clear = () => overlayTimerRef.current && clearTimeout( overlayTimerRef.current );
+    if ( ! fullscreen || ! hideControls ) { setOverlayVisible( true ), clear(); return }
+
+    const hide = () => {
+      if ( ! overlayRef.current?.matches( ':hover' ) ) setOverlayVisible( false );
+      else overlayTimerRef.current = setTimeout( hide, 1000 );
+    };
+
+    const show = () => {
+      setOverlayVisible( true ), clear();
+      overlayTimerRef.current = setTimeout( hide, 2500 );
+    };
+
+    const player = playerRef.current;
+    player?.addEventListener( 'mousemove', show );
+    player?.addEventListener( 'pointerdown', show );
+    show();
+
+    return () => {
+      player?.removeEventListener( 'mousemove', show );
+      player?.removeEventListener( 'pointerdown', show );
+      clear();
+    };
+  }, [ fullscreen, hideControls ] );
+
 
   return (
     <>
