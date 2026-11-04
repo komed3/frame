@@ -76,7 +76,7 @@ export function Help () {
       </h1>
 
       <ShortcutGroup
-          title= 'Video playback controls'
+          title= 'Video Playback Controls'
           shortcuts= { PLAYER_SHORTCUTS }
         />
 
