@@ -27,6 +27,7 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
   const previewRef = useRef< HTMLDivElement >( null );
   const previewFrameRef = useRef< number | null >( null );
   const imagesRef = useRef( new Map< string, HTMLImageElement >() );
+  const hoverMarkerRef = useRef< MarkerRecord | null >( null );
   const trackRef = useRef< HTMLDivElement >( null );
   const thumbRef = useRef< HTMLDivElement >( null );
   const draggingRef = useRef( false );
