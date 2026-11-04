@@ -194,6 +194,21 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
   const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() :
     playerRef.current?.requestFullscreen();
 
+  const createMarker = async ( positionMs: number, title: string, description: string ) => {
+    await markersApi.createForMedia( media.id, { positionMs, title, description } );
+    setMarkerVersion( c => c + 1 );
+  };
+
+  const updateMarker = async ( id: string, data: MarkerUpdate ) => {
+    await markersApi.update( id, data );
+    setMarkerVersion( c => c + 1 );
+  };
+
+  const deleteMarker = async ( id: string ) => {
+    await markersApi.delete( id );
+    setMarkerVersion( c => c + 1 );
+  };
+
 
   useKeyControls( {
     'f11': toggleFullscreen, ' ': togglePlay, m: toggleMute,
