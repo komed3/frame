@@ -236,9 +236,9 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
 
   return {
-    mediaRef, playerRef, history, volume, volumeRef, muted, rate, pbrRef, currentTime,
-    duration, displayDuration, timeLabel, buffered, playing, ended, ready, remaining,
-    fullscreen, streamError, setRemaining, seek, frame, togglePlay, setPlaybackRate,
-    changeVolume, saveVolume, toggleMute, toggleFullscreen
+    mediaRef, playerRef, history, volume, volumeRef, muted, rate, pbrRef, currentTime, duration,
+    displayDuration, timeLabel, buffered, playing, ended, ready, remaining, fullscreen,  markers,
+    streamError, setRemaining, seek, frame, togglePlay, setPlaybackRate, changeVolume,
+    saveVolume, toggleMute, toggleFullscreen, createMarker, updateMarker, deleteMarker
   };
 }
