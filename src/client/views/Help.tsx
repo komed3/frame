@@ -95,6 +95,16 @@ export function Help () {
         shortcuts= { PLAYER_SHORTCUTS }
       />
 
+      <ShortcutGroup
+        title= 'Media Navigation'
+        shortcuts= { NAVIGATION_SHORTCUTS }
+      />
+
+      <ShortcutGroup
+        title= 'Playlist'
+        shortcuts= { PLAYLIST_SHORTCUTS }
+      />
+
       <p className= 'text-xs text-slate-500'>
         Keyboard shortcuts are disabled while typing in input fields.
       </p>
