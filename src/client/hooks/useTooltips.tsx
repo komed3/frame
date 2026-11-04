@@ -27,7 +27,12 @@ export function useTooltips () {
       el.removeAttribute( 'title' );
     };
 
-    const scan = ( el: Element ) => el.querySelectorAll( '[title]' ).forEach( migrate );
+    const scan = ( el: Element ) => { migrate( el ), el.querySelectorAll( '[title]' ).forEach( migrate ) };
+
+    const observer = new MutationObserver( records => records.forEach( record => {
+      if ( record.type === 'attributes' ) migrate( record.target as Element );
+      else record.addedNodes.forEach( node => node instanceof Element && scan( node ) );
+    } ) );
 
     const position = ( el: HTMLElement, text: string ) => {
       const rect = el.getBoundingClientRect();
