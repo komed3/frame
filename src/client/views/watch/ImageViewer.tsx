@@ -8,6 +8,7 @@ import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { useKeyControls } from '@/src/client/hooks/useKeyControls';
 import { usePlayHistory } from '@/src/client/hooks/usePlayHistory';
+import { useWatchNavigation } from '@/src/client/hooks/useWatchNavigation';
 import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
@@ -31,8 +32,6 @@ interface ImageViewerData {
   categories: CategoryRecord[];
   tags: TagRecord[];
   directory: ApiDirectoryListResult | null;
-  prev: string | null;
-  next: string | null;
 }
 
 interface MagnifierPosition {
@@ -49,7 +48,7 @@ const BUTTON = 'p-2 rounded hover:bg-white/20';
 
 
 export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
-  const { stream, adjacentMedia, media: mediaApi, directories } = useApi();
+  const { stream, media: mediaApi, directories } = useApi();
   const navigate = useNavigate();
 
 
@@ -72,29 +71,25 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
 
   const key = JSON.stringify( [ media.id, media.rootId, media.directoryId ] );
   const { data, loading, error } = useApiData< ImageViewerData >( key, async signal => {
-    const [ image, categories, tags, directory, [ prev, next ] ] = await Promise.all( [
+    const [ image, categories, tags, directory ] = await Promise.all( [
       stream( media.id, { signal } ).then( res => res.blob() ),
       mediaApi.categories( media.id ).catch( () => [] ),
       mediaApi.tags( media.id ).catch( () => [] ),
-      directories.list( media.rootId, media.directoryId ).catch( () => null ),
-      adjacentMedia( media, playlistId )
+      directories.list( media.rootId, media.directoryId ).catch( () => null )
     ] );
 
-    return { image, categories, tags, directory, prev, next };
+    return { image, categories, tags, directory };
   } );
 
   const categories = data?.categories ?? [];
   const tags = data?.tags ?? [];
   const directory = data?.directory ?? null;
-  const prev = data?.prev ?? null;
-  const next = data?.next ?? null;
 
   useEffect( () => {
     if ( ! data?.image ) return;
 
     const url = URL.createObjectURL( data.image );
     setImageUrl( url );
-
     return () => URL.revokeObjectURL( url );
   }, [ data?.image ] );
 
@@ -133,6 +128,7 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
   }, [ mode, zoom, imageSize ] );
 
 
+  const { prev, next, navigateAdjacent } = useWatchNavigation( media, playlistId );
   usePlayHistory( media );
 
 
@@ -195,10 +191,7 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
       const dx = e.clientX - dragRef.current.x, dy = e.clientY - dragRef.current.y;
 
       if ( Math.abs( dx ) + Math.abs( dy ) > 3 ) dragRef.current.moved = true;
-      if ( mode === 'zoom' ) {
-        vp.scrollLeft = dragRef.current.left - dx;
-        vp.scrollTop = dragRef.current.top - dy;
-      }
+      if ( mode === 'zoom' ) vp.scrollLeft = dragRef.current.left - dx, vp.scrollTop = dragRef.current.top - dy;
     }
 
     if ( ! magnifier ) return;
@@ -218,24 +211,19 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
 
   const handlePointerUp = () => {
     const { active, moved } = dragRef.current;
-
-    dragRef.current.active = false;
-    dragRef.current.moved = false;
+    dragRef.current.active = false, dragRef.current.moved = false;
     setDragging( false );
 
-    if ( active && ! moved && magnifier ) setMagnifier(
-      c => c === 2 ? 4 : c === 4 ? 6 : c === 6 ? 8 : 2
-    );
+    if ( active && ! moved && magnifier ) setMagnifier( c => c === 2 ? 4 : c === 4 ? 6 : c === 6 ? 8 : 2 );
   };
 
   const handlePointerCancel = () => {
-    dragRef.current.active = false;
-    dragRef.current.moved = false;
+    dragRef.current.active = false, dragRef.current.moved = false;
     setDragging( false );
   };
 
-  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() : viewerRef.current?.requestFullscreen();
-  const navigateAdjacent = ( id: string | null ) => id && navigate( `/watch/${ id }${ playlistId ? `/${ playlistId }` : '' }` );
+  const toggleFullscreen = () => document.fullscreenElement ? document.exitFullscreen() :
+    viewerRef.current?.requestFullscreen();
 
 
   useKeyControls( {
@@ -249,8 +237,7 @@ export function ImageViewer ( { media, playlistId }: ImageViewerProps ) {
     arrowup: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollTop -= e.shiftKey ? 160 : 40 ) },
     arrowdown: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollTop += e.shiftKey ? 160 : 40 ) },
     arrowleft: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft -= e.shiftKey ? 160 : 40 ) },
-    arrowright: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft += e.shiftKey ? 160 : 40 ) },
-    'ctrl+arrowleft': () => navigateAdjacent( prev ), 'ctrl+arrowright': () => navigateAdjacent( next )
+    arrowright: e => { mode === 'zoom' && vpRef.current && ( vpRef.current.scrollLeft += e.shiftKey ? 160 : 40 ) }
   } );
 
 
