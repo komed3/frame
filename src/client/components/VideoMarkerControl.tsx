@@ -41,15 +41,8 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
     if ( ! open ) return;
 
     const close = ( e: PointerEvent ) => { if ( ! ref.current?.contains( e.target as Node ) ) setOpen( false ) };
-    const keydown = ( e: KeyboardEvent ) => { if ( e.key === 'Escape' ) setOpen( false ) };
-
     document.addEventListener( 'pointerdown', close );
-    document.addEventListener( 'keydown', keydown );
-
-    return () => {
-      document.removeEventListener( 'pointerdown', close );
-      document.removeEventListener( 'keydown', keydown );
-    };
+    return () => document.removeEventListener( 'pointerdown', close );
   }, [ open ] );
 
 
@@ -122,7 +115,7 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
         >
           <div className= 'absolute right-3 -bottom-1.5 rotate-45 size-3 bg-slate-700' />
 
-          <div className= 'relative flex flex-col max-h-[min(34rem,calc(100vh-6rem))] p-4'>
+          <div className= 'relative flex flex-col max-h-[min(34rem,calc(100vh-6rem))] p-4 overflow-y-auto'>
             <div className= 'shrink-0 flex justify-between items-center mb-3'>
               <h2 className= 'font-medium'>Markers</h2>
 
@@ -167,12 +160,6 @@ export function VideoMarkerControl ( { markers, currentTime, onSeek, onCreate, o
                           <span className= 'block truncate text-sm'>
                             { marker.title || 'Untitled marker' }
                           </span>
-
-                          { marker.description && (
-                            <span className= 'block truncate text-xs text-slate-400'>
-                              { marker.description }
-                            </span>
-                          ) }
                         </span>
                       </button>
 
