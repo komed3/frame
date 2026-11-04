@@ -172,18 +172,18 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
           { previewSrc && (
             <img
               src= { previewSrc }
-              className= 'block w-full h-auto aspect-video object-contain bg-black rounded'
+              className= 'block mb-1 w-full h-auto aspect-video object-contain bg-black rounded'
               alt= ''
             />
           ) }
 
           { hoverMarker && (
-            <div className= 'mt-1 text-center text-xs font-medium truncate'>
+            <div className= 'text-center text-xs font-medium truncate'>
               { hoverMarker.title || 'Marker' }
             </div>
           ) }
 
-          <div className= 'mt-1 text-center text-xs tabular-nums'>
+          <div className= 'text-center text-xs tabular-nums'>
             { formatDuration( hoverMarker?.positionMs ?? hoverTime ?? 0 ) }
           </div>
         </div>
@@ -213,7 +213,6 @@ export function VideoSeekbar ( { mediaId, currentTime, duration, buffered, marke
         <button
           key= { marker.id }
           onClick= { e => { e.stopPropagation(), onSeek( marker.positionMs / 1000 ) } }
-          title= { `${ formatDuration( marker.positionMs ) }${ marker.title ? ` – ${ marker.title }` : '' }` }
           aria-label= { `Seek to marker ${ marker.title || formatDuration( marker.positionMs ) }` }
           className= 'absolute top-1/2 -translate-1/2 z-20 flex justify-center items-center size-7'
           style= { { left: `${ marker.positionMs / ( duration * 1000 ) * 100 }%` } }
