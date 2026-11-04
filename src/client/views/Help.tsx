@@ -54,7 +54,19 @@ const IMAGE_SHORTCUTS: Shortcut[] = [
 
 function ShortcutGroup ( { title, description, shortcuts }: ShortcutGroupProps ) {
   return (
-    <div></div>
+    <div className= 'p-5 bg-slate-50/5 rounded-lg'>
+      <div className= 'mb-5 space-y-1'>
+        <h2 className= 'font-medium tracking-wide'>
+          { title }
+        </h2>
+
+        { description && (
+          <p className= 'text-sm text-slate-400'>
+            { description }
+          </p>
+        ) }
+      </div>
+    </div>
   );
 }
 
