@@ -46,7 +46,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
   const navigate = useNavigate();
 
   const overlayRef = useRef< HTMLDivElement >( null );
-  const overlayTimerRef = useRef< ReturnType< typeof setTimeout > | null >( null );
+  const overlayTimerRef = useRef< NodeJS.Timeout | null >( null );
 
   const [ hideControls, setHideControls ] = useState( false );
   const [ overlayVisible, setOverlayVisible ] = useState( true );
