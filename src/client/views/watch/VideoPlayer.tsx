@@ -223,7 +223,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                   { fullscreen && (
                     <button
                       onClick= { () => setHideControls( true ) }
-                      title= 'Hide controls'
+                      title= 'Hide controls [h]'
                       aria-label= 'Hide controls'
                       className= { BUTTON }
                     >
@@ -251,7 +251,7 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
 
               <button
                 onClick= { () => setHideControls( false ) }
-                title= 'Show controls'
+                title= 'Show controls [h]'
                 aria-label= 'Show controls'
                 className= { BUTTON }
               >
