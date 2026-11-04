@@ -129,11 +129,12 @@ export function useTooltips () {
 
   return tooltip && portalTarget && createPortal( (
     <div
+      ref= { tooltipRef }
       role= 'tooltip'
       className= {
-        'fixed z-100 max-w-[min(15rem,calc(100vw-1rem))] px-2 py-1 text-center ' +
-        'text-[11px] leading-4 font-medium text-slate-200 bg-slate-800/95 ' +
-        'rounded shadow-lg backdrop-blur-sm pointer-events-none'
+        'fixed z-100 max-w-[min(15rem,calc(100vw-1rem))] px-2 py-1 text-center whitespace-nowrap ' +
+        'text-[11px] leading-4 font-medium text-slate-200 bg-slate-800/95 rounded shadow-lg ' +
+        'backdrop-blur-sm pointer-events-none'
       }
       style= { {
         transform: tooltip.above ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',
