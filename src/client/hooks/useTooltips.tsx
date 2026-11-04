@@ -120,7 +120,7 @@ export function useTooltips () {
   }, [] );
 
 
-  return tooltip && createPortal(
+  return tooltip && portalTarget && createPortal( (
     <div
       role= 'tooltip'
       className= {
@@ -134,7 +134,6 @@ export function useTooltips () {
       } }
     >
       { tooltip.text }
-    </div>,
-    document.body
-  );
+    </div>
+  ), portalTarget );
 }
