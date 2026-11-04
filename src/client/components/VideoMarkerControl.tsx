@@ -107,13 +107,13 @@ export function VideoMarkerControl ( {
         <div
           className= {
             'absolute right-0 bottom-full z-30 w-80 max-w-[calc(100vw-2rem)] ' +
-            'max-h-[min(34rem,calc(100vh-6rem))] bg-slate-700 rounded shadow-lg ' +
+            'max-h-[min(32rem,calc(100vh-6rem))] bg-slate-700 rounded shadow-xl ' +
             margin
           }
         >
           <div className= 'absolute right-3 -bottom-1.5 rotate-45 size-3 bg-slate-700' />
 
-          <div className= 'relative flex flex-col max-h-[min(34rem,calc(100vh-6rem))] p-4 overflow-y-auto'>
+          <div className= 'relative flex flex-col max-h-[min(32rem,calc(100vh-6rem))] p-3'>
             <div className= 'shrink-0 flex justify-between items-center mb-3'>
               <h2 className= 'font-medium'>Markers</h2>
 
