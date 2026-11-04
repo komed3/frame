@@ -12,9 +12,6 @@ import { useEffect, useRef, useState } from 'react';
 type KeyControls = Record< string, ( e: KeyboardEvent ) => void >;
 
 interface UseMediaPlayerOptions {
-  prev?: string | null;
-  next?: string | null;
-  onNavigate?: ( id: string ) => void;
   extraControls?: KeyControls;
   errorMessage?: string;
 }
@@ -24,7 +21,7 @@ export const PBR_VALUES = [ 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5
 
 
 export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaRecord, {
-  prev: previous = null, next = null, onNavigate, extraControls = {}, errorMessage = 'Could not play this media file.'
+  extraControls = {}, errorMessage = 'Could not play this media file.'
 }: UseMediaPlayerOptions = {} ) {
   const { markers: markersApi } = useApi();
 
@@ -223,8 +220,6 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
     arrowright: e => seek( currentTime + ( e.shiftKey ? 10 : 5 ) ),
     arrowup: () => adjustVolume( volumeRef.current + 0.05 ),
     arrowdown: () => adjustVolume( volumeRef.current - 0.05 ),
-    'ctrl+arrowleft': () => previous && onNavigate?.( previous ),
-    'ctrl+arrowright': () => next && onNavigate?.( next ),
     ...extraControls
   } );
 
