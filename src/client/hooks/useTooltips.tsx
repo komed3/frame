@@ -22,6 +22,14 @@ export function useTooltips () {
 
 
   useEffect( () => {
+    const update = () => setPortalTarget( document.fullscreenElement ?? document.body );
+    update();
+
+    document.addEventListener( 'fullscreenchange', update );
+    return () => document.removeEventListener( 'fullscreenchange', update );
+  }, [] );
+
+  useEffect( () => {
     const migrate = ( el: Element ) => {
       if ( ! el.hasAttribute( 'title' ) ) return;
 
