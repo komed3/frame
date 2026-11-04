@@ -17,9 +17,8 @@ import type { ApiDirectoryListResult } from '@/src/shared/types/api';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { CategoryRecord, TagRecord } from '@/src/shared/types/taxonomy';
 import {
-  ArrowDownToLineIcon,
-  ChevronLeftIcon, ChevronRightIcon, Maximize2Icon, Minimize2Icon, PauseIcon,
-  PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
+  ArrowDownToLineIcon, ArrowUpToLineIcon, ChevronLeftIcon, ChevronRightIcon, Maximize2Icon,
+  Minimize2Icon, PauseIcon, PlayIcon, RotateCcwIcon, SkipBackIcon, SkipForwardIcon
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -233,6 +232,31 @@ export function VideoPlayer ( { media, playlistId }: VideoPlayerProps ) {
                   ) }
                 </div>
               </div>
+            </div>
+          ) }
+
+          { ( fullscreen && hideControls ) && (
+            <div className= 'absolute right-2 bottom-2 z-20 flex items-center gap-2'>
+              <button
+                onClick= { togglePlay }
+                disabled= { ! ready }
+                title= 'Play / Pause [Space]'
+                aria-label= { playing ? 'Pause' : ended ? 'Replay' : 'Play' }
+                className= { BUTTON }
+              >
+                { playing ? <PauseIcon size= { 20 } /> : ended
+                  ? <RotateCcwIcon size= { 20 } />
+                  : <PlayIcon size= { 20 } /> }
+              </button>
+
+              <button
+                onClick= { () => setHideControls( false ) }
+                title= 'Show controls'
+                aria-label= 'Show controls'
+                className= { BUTTON }
+              >
+                <ArrowUpToLineIcon size= { 20 } />
+              </button>
             </div>
           ) }
         </div>
