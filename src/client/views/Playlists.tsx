@@ -18,6 +18,10 @@ export function Playlists () {
     playlists.list( { limit: MEDIA_PAGE_SIZE, offset } )
   );
 
+
+  usePageTitle( 'Playlists' );
+
+
   return (
     <></>
   );
