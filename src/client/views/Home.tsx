@@ -178,6 +178,26 @@ export function Home () {
           ) ) }
         </div>
       </div>
+
+      <MediaShelf
+        title= 'Continue Watching'
+        to= '/history'
+        items= { data.continuing }
+      />
+
+      <MediaShelf
+        title= 'Recently Played'
+        to= '/history'
+        items= { data.history }
+      />
+
+      <MediaShelf
+        title= 'Favorites'
+        to= '/favorites'
+        items= { data.favorites }
+      />
+
+      <PlaylistShelf items= { data.playlists } />
     </div>
   );
 }
