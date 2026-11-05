@@ -21,6 +21,11 @@ interface MarkerPageData {
 export function Markers () {
   const { markers, media } = useApi();
 
+  const [ refresh, setRefresh ] = useState( 0 );
+  const [ offset, setOffset ] = useState( 0 );
+  const [ actionError, setActionError ] = useState< string | null >( null );
+  const [ deleting, setDeleting ] = useState< string | null >( null );
+
 
   return (
     <></>
