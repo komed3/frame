@@ -6,6 +6,7 @@ import { Editor } from '@/src/client/views/Editor';
 import { Favorites } from '@/src/client/views/Favorites';
 import { Help } from '@/src/client/views/Help';
 import { History } from '@/src/client/views/History';
+import { Markers } from '@/src/client/views/Markers';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
 import { Search } from '@/src/client/views/Search';
@@ -36,6 +37,7 @@ export function Routing () {
       <Route path= '/edit/:id' element= { <Editor /> } />
 
       <Route path= '/favorites' element= { <Favorites /> } />
+      <Route path= '/markers' element= { <Markers /> } />
       <Route path= '/history' element= { <History /> } />
 
       <Route path= '/help' element= { <Help /> } />
