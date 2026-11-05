@@ -70,7 +70,20 @@ export function Markers () {
           No markers found.
         </p>
       ) : (
-        <></>
+        <>
+          <div className= 'overflow-x-auto bg-slate-900/40 rounded shadow-lg'>
+            <table className= 'w-full text-sm text-left'>
+              <thead className= 'text-xs text-slate-400 uppercase tracking-wider bg-slate-700/40'>
+                <tr className= '*:px-5 *:py-4 *:font-medium'>
+                  <th>Marker</th>
+                  <th>Media</th>
+                  <th className= 'text-right'>Position</th>
+                  <th className= 'w-px' />
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </>
       ) }
     </div>
   );
