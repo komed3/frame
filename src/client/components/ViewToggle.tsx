@@ -20,6 +20,7 @@ export function ViewToggle ( { value, onChange }: ViewToggleProps ) {
     <div className= 'inline-flex items-center gap-2'>
       { BTN.map( ( [ option, label, Icon ] ) => (
         <button
+          key= { option }
           onClick= { () => onChange( option ) }
           aria-pressed= { value === option }
           title= { `${ label } View` } aria-label= { `${ label } View` }
