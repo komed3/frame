@@ -100,7 +100,7 @@ FFmpeg and FFprobe are used for metadata extraction, preview generation, frame e
 
 Run the built-in system check to verify the installation:
 
-```sh
+```bash
 npm run frame -- check
 ```
 
@@ -108,20 +108,20 @@ npm run frame -- check
 
 ### Clone the repository
 
-```sh
+```bash
 git clone https://github.com/komed3/frame.git
 cd frame
 ```
 
 ### Install dependencies
 
-```sh
+```bash
 npm ci
 ```
 
 ### Build Frame
 
-```sh
+```bash
 npm run build
 ```
 
@@ -131,7 +131,7 @@ This builds the server, maintenance CLI and frontend.
 
 Run the interactive initialization wizard:
 
-```sh
+```bash
 npm run frame -- init
 ```
 
@@ -147,14 +147,49 @@ The initialization command creates the `.env` configuration file. It can only be
 
 ### Start the server
 
-```sh
+```bash
 npm run start
 ```
 
 By default, Frame listens on:
 
-```sh
+```bash
 http://localhost:3000
 ```
 
 The default bind address is `0.0.0.0`, so the server can also be accessed from other devices on the network.
+
+
+## Configuration
+
+Frame stores its configuration in a `.env` file in the project directory.
+
+The initialization wizard creates this file and provides defaults for all configuration options.
+
+Configuration can also be inspected and changed using the CLI:
+
+```bash
+npm run frame -- config list
+npm run frame -- config get PORT
+npm run frame -- config set PORT 3000
+npm run frame -- config unset PORT
+```
+
+Changes made to the configuration require a server restart.
+
+### Important configuration options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `NODE_ENV` | `dev` | Runtime environment |
+| `HOST` | `0.0.0.0` | HTTP bind address |
+| `PORT` | `3000` | HTTP port |
+| `DB_PATH` | `data/frame.sqlite` | SQLite database location |
+| `ASSETS_PATH` | `data/assets` | Generated media assets |
+| `WORKER_CONCURRENCY` | `1` | Maximum concurrent background jobs |
+| `EDITOR_ADMIN_ONLY` | `true` | Restrict media editing to administrators |
+| `PASSWORD_STRICT` | `true` | Enforce strong passwords |
+
+Additional options are available for database timeouts, worker polling and retries, FFmpeg processing timeouts and video scrubber generation.
+
+Use npm `npm run frame -- config list` to see the complete configuration schema and current values.
