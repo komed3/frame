@@ -326,6 +326,27 @@ export function Playlist () {
             className= 'fixed inset-0 z-40 bg-slate-900 opacity-50'
             onClick= { () => ! saving && setEditing( false ) }
           />
+
+          <div
+            className= {
+              'fixed top-1/2 left-1/2 -translate-1/2 z-50 w-[90%] max-w-lg p-5 ' +
+              'space-y-5 bg-slate-700 rounded shadow-lg'
+            }
+          >
+            <div className= 'flex justify-between items-center'>
+              <h2 className= 'font-medium'>
+                Edit Playlist
+              </h2>
+
+              <button
+                aria-label= 'Close'
+                onClick= { () => setEditing( false ) }
+                disabled= { saving }
+              >
+                <XIcon size= { 20 } />
+              </button>
+            </div>
+          </div>
         </>
       ) }
     </div>
