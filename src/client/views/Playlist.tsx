@@ -13,6 +13,12 @@ import { type SubmitEvent, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 
+interface PlaylistPageData {
+  playlist: PlaylistRecord;
+  items: ( PlaylistItemRecord & { media: MediaRecord | null } )[];
+}
+
+
 export function Playlist () {
   const { playlistId } = useParams();
 
