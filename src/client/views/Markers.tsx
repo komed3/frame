@@ -52,6 +52,12 @@ export function Markers () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Markers
       </h1>
+
+      { actionError && (
+        <p role= 'alert' className= 'text-sm text-red-400'>
+          { actionError }
+        </p>
+      ) }
     </div>
   );
 }
