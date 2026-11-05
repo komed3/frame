@@ -86,15 +86,21 @@ export function Markers () {
                 { data.markers.map( ( { id, title, mediaId, positionMs } ) => {
                   const item = data.media[ mediaId ];
 
-                  return item && (
+                  return (
                     <tr key= { id } className= '*:px-5 *:py-4'>
                       <td className= 'min-w-56 p-0!'>
-                        <Link
-                          to= { `/watch/${ item.id }#pos:${ positionMs }` }
-                          className= 'block px-5 py-4 font-medium transition-colors hover:text-sky-400'
-                        >
-                          { title || 'Untitled marker' }
-                        </Link>
+                        { item ? (
+                          <Link
+                            to= { `/watch/${ item.id }#pos:${ positionMs }` }
+                            className= 'block px-5 py-4 font-medium transition-colors hover:text-sky-400'
+                          >
+                            { title || 'Untitled marker' }
+                          </Link>
+                        ) : (
+                          <span className= 'px-5 py-4 text-slate-400'>
+                            { title || 'Untitled marker' }
+                          </span>
+                        ) }
                       </td>
                     </tr>
                   );
