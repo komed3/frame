@@ -135,6 +135,25 @@ export function Home () {
         <h1 className= 'text-2xl font-light tracking-wide'>
           Overview
         </h1>
+
+        <div className= 'grid grid-cols-4 gap-4'>
+          { [
+            { label: 'Media', value: formatNumber( stats.total ) },
+            { label: 'Storage', value: formatBytes( stats.sizeBytes ) },
+            { label: 'Duration', value: formatDuration( stats.durationMs ) },
+            { label: 'Available', value: formatNumber( stats.available ) }
+          ].map( ( { label, value } ) => (
+            <div key= { label } className= 'p-4 space-y-0.5 bg-slate-800 rounded shadow-lg'>
+              <p className= 'text-xs uppercase tracking-wider text-slate-500'>
+                { label }
+              </p>
+
+              <p className= 'text-xl font-medium tabular-nums'>
+                { value }
+              </p>
+            </div>
+          ) ) }
+        </div>
       </div>
     </div>
   );
