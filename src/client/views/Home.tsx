@@ -115,6 +115,20 @@ export function Home () {
   usePageTitle( '' );
 
 
+  if ( loading ) return <Loading className= 'min-h-[50vh]' />;
+
+  if ( error || ! data ) return (
+    <div className= 'mx-auto my-12 max-w-7xl px-6'>
+      <p role= 'alert' className= 'py-16 text-center text-red-400'>
+        { error ?? 'Unable to load dashboard.' }
+      </p>
+    </div>
+  );
+
+
+  const { stats } = data;
+
+
   return (
     <></>
   );
