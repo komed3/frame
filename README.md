@@ -74,12 +74,12 @@ Frame includes a dedicated CLI for initialization, configuration and maintenance
 
 Frame identifies media files by their file extensions during scanning. The following extensions are currently recognized.
 
-- **Video:** mp4, m4v, mkv, mov, avi, webm, mpg, mpeg, mts, m2ts, ts, wmv, flv, ogv
-- **Audio:** mp3, m4a, aac, flac, ogg, opus, wav, wma, aiff, aif, ape, mid, midi
-- **Images:** jpg, jpeg, png, gif, webp, avif, bmp, tif, tiff, svg, heic, heif
-- **Text:** txt
+- **Video:** `mp4`, `m4v`, `mkv`, `mov`, `avi`, `webm`, `mpg`, `mpeg`, `mts`, `m2ts`, `ts`, `wmv`, `flv`, `ogv`
+- **Audio:** `mp3`, `m4a`, `aac`, `flac`, `ogg`, `opus`, `wav`, `wma`, `aiff`, `aif`, `ape`, `mid`, `midi`
+- **Images:** `jpg`, `jpeg`, `png`, `gif`, `webp`, `avif`, `bmp`, `tif`, `tiff`, `svg`, `heic`, `heif`
+- **Text:** `txt`
 
-Text files are processed with support for UTF-8, UTF-8 BOM, UTF-16 LE, UTF-16 BE and Windows-1252 encoding detection.
+Text files are processed with support for `UTF-8`, `UTF-8 BOM`, `UTF-16 LE`, `UTF-16 BE` and `Windows-1252` encoding detection.
 
 Playback compatibility: Frame streams original media files without transcoding. Actual playback support therefore depends on the browser and its available codecs. Recognizing a file extension does not guarantee that every browser can play or display that format.
 
@@ -90,7 +90,7 @@ Playback compatibility: Frame streams original media files without transcoding. 
 - SQLite
 - Node.js 22.12.0 or newer
 - npm
-- FFmpeg and FFprobe available in PATH
+- FFmpeg and FFprobe available in `PATH`
 - At least 2 GB RAM; 4 GB or more recommended
 - At least 2 logical CPU cores recommended
 
@@ -103,3 +103,58 @@ Run the built-in system check to verify the installation:
 ```sh
 npm run frame -- check
 ```
+
+## Installation
+
+1. Clone the repository
+
+```sh
+git clone https://github.com/komed3/frame.git
+cd frame
+```
+
+2. Install dependencies
+
+```sh
+npm ci
+```
+
+3. Build Frame
+
+```sh
+npm run build
+```
+
+This builds the server, maintenance CLI and frontend.
+
+4. Initialize Frame
+
+Run the interactive initialization wizard:
+
+```sh
+npm run frame -- init
+```
+
+The wizard guides you through:
+
+1. Initial configuration.
+2. Creation of the first administrator account.
+3. Registration of media roots.
+
+Registered media roots are scanned automatically by queued background jobs.
+
+The initialization command creates the `.env` configuration file. It can only be run once unless the existing configuration file is removed.
+
+5. Start the server
+
+```sh
+npm run start
+```
+
+By default, Frame listens on:
+
+```sh
+http://localhost:3000
+```
+
+The default bind address is `0.0.0.0`, so the server can also be accessed from other devices on the network.
