@@ -128,6 +128,11 @@ export function Playlist () {
   if ( ! data ) return <NotFound />;
 
 
+  const { playlist, items } = data;
+  const firstMedia = items.find( i => i.media )?.media ?? null;
+  const duration = items.reduce( ( total, i ) => total + ( i.media?.durationMs ?? 0 ), 0 );
+
+
   return (
     <></>
   );
