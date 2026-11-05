@@ -165,7 +165,7 @@ export function Playlist () {
         </p>
       ) }
 
-      <div className= 'flex items-start gap-12'>
+      <div className= 'flex items-start gap-10'>
         <div className= 'w-100 p-6 pt-5 space-y-6 bg-slate-800 rounded shadow-lg'>
           { firstMedia && firstMedia.hasThumbnail && (
             <MediaThumbnail media= { firstMedia } />
@@ -230,17 +230,13 @@ export function Playlist () {
           </div>
         </div>
 
-        <div className= 'flex-1 space-y-6'>
-          <h2 className= 'text-lg font-medium'>
-            Media
-          </h2>
-
+        <div className= 'flex-1'>
           { ! items.length ? (
-            <p className= 'py-16 text-center text-slate-400 bg-slate-900/40 rounded'>
+            <p className= 'py-16 text-center text-slate-400 bg-slate-800 rounded'>
               This playlist is empty.
             </p>
           ) : (
-            <div className= 'overflow-hidden bg-slate-900/40 divide-y divide-slate-700/70 rounded shadow-lg'>
+            <div className= 'overflow-hidden bg-slate-800 divide-y divide-slate-700/70 rounded shadow-lg'>
               { items.map( ( { mediaId, media }, i ) => (
                 <div
                   key= { mediaId }
