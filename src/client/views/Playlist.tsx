@@ -223,6 +223,14 @@ export function Playlist () {
           <h2 className= 'text-lg font-medium'>
             Media
           </h2>
+
+          { ! items.length ? (
+            <p className= 'py-16 text-center text-slate-400 bg-slate-900/40 rounded'>
+              This playlist is empty.
+            </p>
+          ) : (
+            <></>
+          ) }
         </div>
       </div>
     </div>
