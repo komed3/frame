@@ -229,7 +229,11 @@ export function Playlist () {
               This playlist is empty.
             </p>
           ) : (
-            <></>
+            <div className= 'overflow-hidden bg-slate-900/40 divide-y divide-slate-700/70 rounded shadow-lg'>
+              { items.map( ( { mediaId, media }, i ) => (
+                <></>
+              ) ) }
+            </div>
           ) }
         </div>
       </div>
