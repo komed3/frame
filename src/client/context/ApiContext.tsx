@@ -8,7 +8,7 @@ import type { DatabaseStats } from '@/src/shared/types/database';
 import type { FavoriteRecord } from '@/src/shared/types/favorites';
 import type { JobRecord, JobStats } from '@/src/shared/types/job';
 import type { MarkerRecord } from '@/src/shared/types/markers';
-import type { MediaRecord } from '@/src/shared/types/media';
+import type { MediaRecord, MediaStats } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord } from '@/src/shared/types/playlists';
 import type { HistoryRecord, PlayStatusRecord } from '@/src/shared/types/plays';
@@ -184,6 +184,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
 
     media: {
       list: o => request< MediaRecord[] >( '/media', { query: o } ),
+      stats: () => request< MediaStats >( '/media/stats' ),
       get: id => request< MediaRecord | null >( `/media/${ e( id ) }` ),
       prev: id => request< MediaRecord | null >( `/media/${ e( id ) }/prev` ),
       next: id => request< MediaRecord | null >( `/media/${ e( id ) }/next` ),
