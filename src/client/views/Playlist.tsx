@@ -134,6 +134,10 @@ export function Playlist () {
 
 
   return (
-    <></>
+    <div className= 'flex items-start gap-6 mx-auto my-12 max-w-7xl px-6'>
+      <div className= 'w-100 p-6 space-y-5 bg-slate-800 rounded shadow-lg'></div>
+
+      <div className= 'flex-1'></div>
+    </div>
   );
 }
