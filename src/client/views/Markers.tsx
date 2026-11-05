@@ -94,7 +94,7 @@ export function Markers () {
                             to= { `/watch/${ item.id }#pos:${ positionMs }` }
                             className= 'group flex items-center gap-2 px-5 py-4 font-medium'
                           >
-                            <MediaIcon type= { item.type } size= { 16 } />
+                            <FlagIcon size= { 16 } />
 
                             <span className= 'transition-colors group-hover:text-sky-400'>
                               { title || 'Untitled marker' }
