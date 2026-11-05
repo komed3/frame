@@ -19,6 +19,9 @@ interface MarkerPageData {
 
 
 export function Markers () {
+  const { markers, media } = useApi();
+
+
   return (
     <></>
   );
