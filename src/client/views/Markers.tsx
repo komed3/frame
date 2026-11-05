@@ -108,7 +108,12 @@ export function Markers () {
                       </td>
 
                       <td className= 'min-w-64'>
-                        { item ? item.title || item.fileName : (
+                        { item ? (
+                          <div className= 'flex items-center gap-2'>
+                            <MediaIcon type= { item.type } size= { 16 } />
+                            <span>{ item.title || item.fileName }</span>
+                          </div>
+                        ) : (
                           <span className= 'text-slate-500'>
                             Unavailable media
                           </span>
