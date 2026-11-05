@@ -486,3 +486,18 @@ Generated assets include posters, thumbnails, waveform data and video frame prev
 Original media files are never copied into the Frame data directory. They remain in the registered media roots.
 
 Make sure the database and asset directories are included in your backup strategy. The original media files must be backed up separately.
+
+
+## Current scope and limitations
+
+Frame 2.0.0 provides a complete and usable foundation for managing and playing personal media libraries.
+
+The following areas are intentionally not included in the current release:
+
+- **Mobile layout:** The interface is currently designed for desktop use. A dedicated responsive/mobile experience remains a future enhancement.
+- **Internationalization:** The interface currently uses English only.
+- **Light theme:** The current interface uses a dark theme.
+- **Additional text formats:** The text viewer currently supports plain-text files (`.txt`). Formats such as PDF are not yet supported.
+- **Media transcoding:** Frame streams original files and does not provide server-side transcoding. Playback compatibility depends on browser support.
+
+These limitations do not affect the core functionality of the current release.
