@@ -8,7 +8,7 @@ import { formatBytes, formatDuration, formatFileFormat, formatMediaType } from '
 import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { PlaylistItemRecord, PlaylistRecord } from '@/src/shared/types/playlists';
-import { ArrowDownIcon, ArrowUpIcon, CheckIcon, PencilIcon, PlayIcon, Trash2Icon, XIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowLeftIcon, ArrowUpIcon, CheckIcon, ChevronLeftIcon, PencilIcon, PlayIcon, Trash2Icon, XIcon } from 'lucide-react';
 import { type SubmitEvent, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -140,6 +140,14 @@ export function Playlist () {
 
   return (
     <div className= 'mx-auto my-12 max-w-7xl space-y-10 px-6'>
+      <Link
+        to= '/playlists'
+        className= 'inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white'
+      >
+        <ArrowLeftIcon size= { 16 } />
+        <span>Back to playlists</span>
+      </Link>
+
       { actionError && (
         <p role= 'alert' className= 'text-sm text-red-400'>
           { actionError }
