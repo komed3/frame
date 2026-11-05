@@ -10,6 +10,14 @@ import { Link } from 'react-router';
 
 
 export function Playlists () {
+  const { playlists } = useApi();
+  const [ offset, setOffset ] = useState( 0 );
+
+
+  const { data, loading, error } = useApiData( String( offset ), () =>
+    playlists.list( { limit: MEDIA_PAGE_SIZE, offset } )
+  );
+
   return (
     <></>
   );
