@@ -193,3 +193,73 @@ Changes made to the configuration require a server restart.
 Additional options are available for database timeouts, worker polling and retries, FFmpeg processing timeouts and video scrubber generation.
 
 Use npm `npm run frame -- config list` to see the complete configuration schema and current values.
+
+
+## Command-line interface
+
+The Frame CLI is available through npm:
+
+```bash
+npm run frame -- <command>
+```
+
+To display the available commands and options:
+
+```bash
+npm run frame -- --help
+npm run frame -- <command> --help
+```
+
+### Available command groups
+
+| Command | Description |
+| --- | --- |
+| `init` | Initialize Frame and create the first administrator |
+| `check` | Check system requirements |
+| `config` | Inspect and modify configuration |
+| `db` | Inspect migrations and database statistics |
+| `user` | Manage user accounts |
+| `auth` | Inspect and revoke authentication sessions |
+| `pref` | Manage user preferences |
+| `search` | Search indexed media |
+| `root` | Register, list, enable and disable media roots |
+| `directory` | Inspect media directories |
+| `media` | Inspect and manage media records |
+| `metadata` | Inspect and manage media metadata |
+| `track` | Inspect extracted media tracks |
+| `asset` | Inspect and clean generated assets |
+| `category` | Manage media categories |
+| `tag` | Manage media tags |
+| `playlist` | Manage playlists and entries |
+| `favorite` | Manage favorites |
+| `marker` | Manage playback markers |
+| `play` | Inspect playback history |
+| `job` | Inspect, enqueue, cancel and retry background jobs |
+| `scan` | Queue scans for all enabled media roots |
+
+Examples:
+
+```bash
+# List registered media roots
+npm run frame -- root list
+
+# Register another media root
+npm run frame -- root add /mnt/media
+
+# Queue scans for all enabled roots
+npm run frame -- scan
+
+# Inspect background jobs
+npm run frame -- job list
+
+# Show database statistics
+npm run frame -- db stats
+
+# List users
+npm run frame -- user list
+
+# Inspect generated assets for a media record
+npm run frame -- asset list <media-id>
+```
+
+The CLI is intended for administrative and maintenance tasks. Most commands can be executed while the server is running. Database reset operations require the server to be stopped.
