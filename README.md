@@ -277,3 +277,19 @@ The following example assumes:
 - The project directory is owned by the `frame` user.
 
 Adjust paths and permissions to match your system.
+
+### Prepare the installation
+
+Clone the repository and build Frame as described in the installation section.
+
+Make sure the service user has:
+
+- Read access to all registered media roots.
+- Write access to the project directory.
+- Write access to the database and generated asset directories.
+
+Initialize Frame before enabling the service:
+
+```bash
+npm run frame -- init
+```
