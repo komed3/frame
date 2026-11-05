@@ -41,7 +41,7 @@ export function Playlists () {
       ) : (
         <>
           <div className= 'overflow-hidden bg-slate-900/40 divide-y divide-slate-700/70 rounded shadow-lg'>
-            { data.map( ( { id, name, updatedAt } ) => (
+            { data.map( ( { id, name, description, updatedAt } ) => (
               <Link
                 key= { id } to= { `/playlist/${ id }` }
                 className= 'group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-slate-50/5'
@@ -52,6 +52,12 @@ export function Playlists () {
                   <div className= 'truncate font-medium leading-5 transition-colors group-hover:text-sky-400'>
                     { name }
                   </div>
+
+                  { description && (
+                    <p className= 'mt-4 max-w-3xl text-sm leading-relaxed text-slate-400'>
+                      { description }
+                    </p>
+                  ) }
                 </div>
 
                 <span className= 'shrink-0 text-xs leading-5 text-slate-500'>
