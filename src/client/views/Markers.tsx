@@ -27,6 +27,14 @@ export function Markers () {
   const [ deleting, setDeleting ] = useState< string | null >( null );
 
 
+  const { data, loading, error } = useApiData< MarkerPageData >( `${ offset }:${ refresh }`, async () => {
+    const items = await markers.list( { limit: MEDIA_PAGE_SIZE, offset } );
+    return { markers: items, media: Object.fromEntries( await Promise.all(
+      [ ...new Set( items.map( m => m.mediaId ) ) ].map( async id => [ id, await media.get( id ) ] )
+    ) ) };
+  } );
+
+
   return (
     <></>
   );
