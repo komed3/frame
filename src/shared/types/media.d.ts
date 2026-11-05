@@ -32,7 +32,7 @@ export interface MediaRecord {
   sampleRate: number | null;
   channels: number | null;
   encoding: string | null;
-  data: Record<string, unknown>;
+  data: Record< string, unknown >;
   scannedAt: string | null;
   createdAt: string;
   updatedAt: string;
