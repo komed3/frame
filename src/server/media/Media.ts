@@ -1,6 +1,9 @@
 import { as, conn, db } from '@/src/server/core/Database';
 import { assertId, assertLimitOffset, assertRelativePath } from '@/src/server/utils';
-import type { MediaFileInput, MediaListOptions, MediaRecord, MediaRow, MediaType, MediaUpdate } from '@/src/shared/types/media';
+import type {
+  MediaFileInput, MediaListOptions, MediaRecord, MediaRow,
+  MediaStats, MediaType, MediaUpdate
+} from '@/src/shared/types/media';
 
 
 export const MEDIA_TYPES: MediaType[] = [ 'video', 'audio', 'image', 'text', 'other' ];
@@ -68,6 +71,23 @@ export class Media {
     ).get( rootId, path ) );
 
     return row ? Media.mapRow( row ) : null;
+  }
+
+  public static stats () : MediaStats {
+    return as< MediaStats >( conn().prepare( `
+      SELECT
+        COUNT(*) AS total,
+        SUM( available ) AS available,
+        SUM( available = 0 ) AS unavailable,
+        COALESCE( SUM( size_bytes ), 0 ) AS sizeBytes,
+        COALESCE( SUM( duration_ms ), 0 ) AS durationMs,
+        SUM( type = 'video' ) AS videoCount,
+        SUM( type = 'audio' ) AS audioCount,
+        SUM( type = 'image' ) AS imageCount,
+        SUM( type = 'text' ) AS textCount,
+        SUM( type = 'other' ) AS otherCount
+      FROM media
+    ` ).get() );
   }
 
   public static list ( options: MediaListOptions = {} ) : MediaRecord[] {
