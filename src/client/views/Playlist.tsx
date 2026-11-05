@@ -33,6 +33,34 @@ export function Playlist () {
   const [ actionError, setActionError ] = useState< string | null >( null );
 
 
+  const key = `${ playlistId ?? '' }:${ refresh }`;
+  const { data, loading, error } = useApiData< PlaylistPageData | null >( key, async () => {
+    if ( ! playlistId ) return null;
+
+    const playlist = await playlists.get( playlistId );
+    if ( ! playlist ) return null;
+
+    const items: PlaylistItemRecord[] = [];
+    let offset = 0;
+
+    while ( true ) {
+      const page = await playlists.items( playlistId, { limit: 500, offset } );
+      items.push( ...page ), offset += page.length;
+
+      if ( page.length < 500 ) break;
+    }
+
+    const results = await Promise.all( Array.from( { length: Math.ceil( items.length / 500 ) }, ( _, i ) => search( {
+      ids: items.slice( i * 500, ( i + 1 ) * 500 ).map( item => item.mediaId ), limit: 500
+    } ) ) );
+
+    const mediaById = new Map< string, MediaRecord >();
+    results.forEach( res => res.items.forEach( i => mediaById.set( i.id, i ) ) );
+
+    return { playlist, items: items.map( i => ( { ...i, media: mediaById.get( i.mediaId ) ?? null } ) ) };
+  } );
+
+
   return (
     <></>
   );
