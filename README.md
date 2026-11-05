@@ -293,3 +293,95 @@ Initialize Frame before enabling the service:
 ```bash
 npm run frame -- init
 ```
+
+### Create the update script
+
+The service checks the upstream repository every time it starts. If the local installation is behind the remote `master` branch, it updates the working tree using a fast-forward merge and rebuilds the application.
+
+Create `/usr/local/lib/frame-update.sh`:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR="/opt/frame"
+BRANCH="master"
+
+cd "$APP_DIR"
+
+echo "[Frame] Checking repository status..."
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "[Frame] Working tree is not clean. Refusing automatic update."
+  exit 1
+fi
+
+git fetch --prune origin "$BRANCH"
+
+LOCAL_COMMIT="$(git rev-parse HEAD)"
+REMOTE_COMMIT="$(git rev-parse "origin/$BRANCH")"
+
+if git merge-base --is-ancestor "$LOCAL_COMMIT" "$REMOTE_COMMIT"; then
+  if [[ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]]; then
+    echo "[Frame] New version available. Updating..."
+    git merge --ff-only "$REMOTE_COMMIT"
+  fi
+elif ! git merge-base --is-ancestor "$REMOTE_COMMIT" "$LOCAL_COMMIT"; then
+  echo "[Frame] Local and remote branches have diverged."
+  echo "[Frame] Manual intervention is required."
+  exit 1
+fi
+
+CURRENT_COMMIT="$(git rev-parse HEAD)"
+BUILD_MARKER="$(git rev-parse --git-path frame-built)"
+BUILT_COMMIT=""
+
+if [[ -f "$BUILD_MARKER" ]]; then
+  BUILT_COMMIT="$(cat "$BUILD_MARKER")"
+fi
+
+if [[ "$BUILT_COMMIT" == "$CURRENT_COMMIT" ]]; then
+  echo "[Frame] Installation is up to date."
+  exit 0
+fi
+
+echo "[Frame] Build required."
+
+INSTALL_DEPS=false
+
+if [[ -z "$BUILT_COMMIT" ]] || ! git cat-file -e "$BUILT_COMMIT^{commit}" 2>/dev/null; then
+  INSTALL_DEPS=true
+elif ! git diff --quiet "$BUILT_COMMIT" "$CURRENT_COMMIT" -- package.json package-lock.json; then
+  INSTALL_DEPS=true
+fi
+
+if [[ "$INSTALL_DEPS" == true ]]; then
+  echo "[Frame] Installing dependencies..."
+  npm ci --include=dev
+fi
+
+echo "[Frame] Building application..."
+npm run build
+
+printf '%s\n' "$CURRENT_COMMIT" > "$BUILD_MARKER"
+
+echo "[Frame] Update completed successfully."
+```
+
+Make the script executable:
+
+```bash
+sudo chmod 755 /usr/local/lib/frame-update.sh
+```
+
+The update procedure deliberately has a few safeguards:
+
+- Local modifications or untracked files prevent automatic updates.
+- Updates are only applied when they can be fast-forwarded safely.
+- Diverged branches require manual intervention.
+- Dependencies are reinstalled only when the dependency manifests change or no successful build has been recorded.
+- The successful build marker is written only after the complete build finishes.
+
+This also means that a failed build is retried on the next service start instead of being mistaken for an already completed update.
+
+The script uses the `master` branch. Change `BRANCH` if your installation tracks a different branch.
