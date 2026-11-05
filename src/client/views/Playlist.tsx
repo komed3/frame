@@ -85,6 +85,16 @@ export function Playlist () {
     finally { setSaving( false ) }
   };
 
+  const removePlaylist = async () => {
+    if ( ! playlistId || busy || ! window.confirm( `Delete playlist "${ data?.playlist.name }"?` ) ) return;
+
+    setBusy( 'playlist' ), setActionError( null );
+
+    try { await playlists.delete( playlistId ); navigate( '/playlists' ) }
+    catch ( err ) { setActionError( err instanceof Error ? err.message : 'Could not delete playlist.' ) }
+    finally { setBusy( null ) }
+  };
+
 
   return (
     <></>
