@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 export function ScrollTopButton () {
   const [ visible, setVisible ] = useState( false );
 
-
   useEffect( () => {
     const update = () => setVisible( window.scrollY > 400 );
     window.addEventListener( 'scroll', update, { passive: true } );
