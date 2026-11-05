@@ -12,6 +12,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 
+interface MarkerPageData {
+  markers: MarkerRecord[];
+  media: Record< string, MediaRecord | null >;
+}
+
+
 export function Markers () {
   return (
     <></>
