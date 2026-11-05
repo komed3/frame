@@ -187,6 +187,14 @@ export function Playlist () {
               <PencilIcon size= { 16 } />
               <span>Edit</span>
             </button>
+
+            <button
+              onClick= { removePlaylist } disabled= { busy !== null }
+              className= { ACTION_BUTTON + ' text-red-400 hover:text-red-300' }
+            >
+              <Trash2Icon size= { 16 } />
+              <span>Delete playlist</span>
+            </button>
           </div>
         </div>
 
