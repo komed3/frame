@@ -416,3 +416,33 @@ WantedBy=multi-user.target
 ```
 
 Make sure the configured Node.js executable and npm are available at the paths used by the service. If Node.js is installed through a version manager, configure the service environment accordingly rather than relying on an interactive shell.
+
+### Enable and start the service
+
+Reload systemd and enable Frame:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now frame
+```
+
+Check the service status:
+
+```bash
+sudo systemctl status frame
+```
+
+Follow the logs:
+
+```bash
+sudo journalctl -u frame -f
+```
+
+Stop or restart Frame:
+
+```bash
+sudo systemctl stop frame
+sudo systemctl restart frame
+```
+
+With this setup, Frame starts automatically at boot. Every service start checks for updates, and a successful update is compiled before the server process starts.
