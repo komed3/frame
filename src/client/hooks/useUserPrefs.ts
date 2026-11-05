@@ -9,23 +9,28 @@ export function useUserPrefs < K extends PrefName > ( keys: readonly K[] ) {
   keysRef.current = keys;
 
   const [ values, setValues ] = useState< PrefValue< K >[] >( [] );
+  const [ error, setError ] = useState< Error | null >( null );
   const key = keys.join( '\0' );
 
 
+  const get = ( active: () => boolean ) => Promise.all( keysRef.current.map( k => prefs.get( k ) ) )
+    .then( r => { if ( active() ) setValues( r.map( ( { value } ) => value ) ) } ).catch( setError );
+
+
   useEffect( () => {
-    let active = true;
-
-    Promise.all( keysRef.current.map( key => prefs.get( key ) ) ).then( results => {
-      if ( active ) setValues( results.map( result => result.value ) );
-    } );
-
+    let active = true; get( () => active );
     return () => { active = false };
   }, [ key, prefs ] );
 
   const setPref = useCallback( < P extends K > ( key: P, value: PrefValue< P > ) => {
-    setValues( current => current.map( ( v, i ) => i === keysRef.current.indexOf( key ) ? value : v ) );
-    prefs.set( key, value );
+    setError( null ), setValues( c => c.map( ( v, i ) => i === keysRef.current.indexOf( key ) ? value : v ) );
+    return prefs.set( key, value ).catch( setError );
   }, [ prefs ] );
 
-  return [ values, setPref ] as const;
+  const reset = useCallback( async () => {
+    setError( null );
+    return prefs.resetAll().then( () => get( () => true ) );
+  }, [ prefs ] );
+
+  return [ values, setPref, reset, error ] as const;
 }
