@@ -263,3 +263,17 @@ npm run frame -- asset list <media-id>
 ```
 
 The CLI is intended for administrative and maintenance tasks. Most commands can be executed while the server is running. Database reset operations require the server to be stopped.
+
+
+## Running Frame as a Linux service
+
+For a permanent installation, Frame can be managed by systemd. This allows the server to start automatically during boot and restart after unexpected failures.
+
+The following example assumes:
+
+- A dedicated Linux user named `frame`.
+- The repository is installed in `/opt/frame`.
+- Node.js and npm are available in `/usr/bin`.
+- The project directory is owned by the `frame` user.
+
+Adjust paths and permissions to match your system.
