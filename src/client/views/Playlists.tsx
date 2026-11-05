@@ -45,7 +45,9 @@ export function Playlists () {
               <Link
                 key= { id } to= { `/playlist/${ id }` }
                 className= 'group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-slate-50/5'
-              ></Link>
+              >
+                <ListVideoIcon size= { 20 } className= 'shrink-0 text-slate-400' />
+              </Link>
             ) ) }
           </div>
         </>
