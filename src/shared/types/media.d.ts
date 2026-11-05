@@ -68,3 +68,16 @@ export interface MediaListOptions {
   limit?: number;
   offset?: number;
 }
+
+export interface MediaStats {
+  total: number;
+  available: number;
+  unavailable: number;
+  sizeBytes: number;
+  durationMs: number;
+  videoCount: number;
+  audioCount: number;
+  imageCount: number;
+  textCount: number;
+  otherCount: number;
+}
