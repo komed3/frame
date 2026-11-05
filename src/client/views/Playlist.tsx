@@ -143,7 +143,7 @@ export function Playlist () {
 
       <div className= 'flex items-start gap-6'>
         <div className= 'w-100 p-6 pt-5 space-y-6 bg-slate-800 rounded shadow-lg'>
-          <div className= 'space-y-3'>
+          <div className= 'space-y-2'>
             <h1 className= 'text-xl font-medium'>
               { playlist.name }
             </h1>
@@ -153,6 +153,28 @@ export function Playlist () {
                 { playlist.description }
               </p>
             ) }
+          </div>
+
+          <div className= 'grid grid-cols-2 gap-4'>
+            <div className= 'flex flex-col'>
+              <span className= 'text-[11px] uppercase tracking-wider text-slate-500'>
+                Media
+              </span>
+
+              <b className= 'font-medium tabular-nums'>
+                { items.length }
+              </b>
+            </div>
+
+            <div className= 'flex flex-col'>
+              <span className= 'text-[11px] uppercase tracking-wider text-slate-500'>
+                Duration
+              </span>
+
+              <b className= 'font-medium tabular-nums'>
+                { formatDuration( duration ) }
+              </b>
+            </div>
           </div>
         </div>
 
