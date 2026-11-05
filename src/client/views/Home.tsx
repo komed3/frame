@@ -44,7 +44,7 @@ interface PlaylistShelfProps {
 
 
 const MORE_BUTTON =
-  'flex items-center gap-2 px-6 py-3 text-sm bg-slate-50/10 rounded-full ' +
+  'flex items-center gap-2.5 px-5 py-2.5 text-normal bg-slate-50/10 rounded-full ' +
   'transition-colors hover:bg-slate-50/20';
 
 
@@ -56,7 +56,7 @@ function MediaShelf ( { title, to, items }: MediaShelfProps ) {
 
 function PlaylistShelf ( { items }: PlaylistShelfProps ) {
   return items.length > 0 && (
-    <div className= 'space-y-4'>
+    <div className= 'space-y-8'>
       <div className= 'flex justify-between items-center'>
         <h2 className= 'text-lg font-medium tracking-wide'>
           Playlists
@@ -64,8 +64,30 @@ function PlaylistShelf ( { items }: PlaylistShelfProps ) {
 
         <Link to= '/playlists' className= { MORE_BUTTON }>
           <span>View all</span>
-          <ArrowRightIcon size= { 16 } />
+          <ArrowRightIcon size= { 18 } />
         </Link>
+      </div>
+
+      <div className= 'grid grid-cols-3 gap-4'>
+        { items.map( ( { playlist, media } ) => (
+          <Link
+            key= { playlist.id }
+            to= { `/playlist/${ playlist.id }` }
+            className= 'group min-w-0 space-y-2'
+          >
+            { media ? (
+              <MediaThumbnail media= { media } />
+            ) : (
+              <div className= 'flex justify-center items-center aspect-video bg-slate-50/5 rounded'>
+                <ListVideoIcon size= { 36 } strokeWidth= { 0.8 } className= 'opacity-25' />
+              </div>
+            ) }
+
+            <p className= 'truncate text-sm font-medium transition-colors group-hover:text-sky-400'>
+              { playlist.name }
+            </p>
+          </Link>
+        ) ) }
       </div>
     </div>
   );
@@ -147,7 +169,7 @@ export function Home () {
 
 
   return (
-    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-12'>
+    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-20'>
       <div className= 'space-y-4'>
         <h1 className= 'text-2xl font-light tracking-wide'>
           Overview
