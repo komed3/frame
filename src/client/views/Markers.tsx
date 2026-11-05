@@ -38,6 +38,15 @@ export function Markers () {
   usePageTitle( 'Markers' );
 
 
+  const remove = async ( id: string ) => {
+    setDeleting( id ), setActionError( null );
+
+    try { await markers.delete( id ); setRefresh( v => v + 1 ) }
+    catch ( err ) { setActionError( err instanceof Error ? err.message : 'Could not delete marker.' ) }
+    finally { setDeleting( null ) }
+  };
+
+
   return (
     <></>
   );
