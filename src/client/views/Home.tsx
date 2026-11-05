@@ -12,6 +12,26 @@ import { ArrowRightIcon, ListVideoIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 
+interface HomeMedia {
+  media: MediaRecord;
+  subtitle?: string;
+  progress?: number;
+}
+
+interface HomePlaylist {
+  playlist: PlaylistRecord;
+  media: MediaRecord | null;
+}
+
+interface HomeData {
+  stats: MediaStats;
+  continuing: HomeMedia[];
+  history: HomeMedia[];
+  favorites: HomeMedia[];
+  playlists: HomePlaylist[];
+}
+
+
 export function Home () {
   return (
     <></>
