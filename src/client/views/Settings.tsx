@@ -1,9 +1,7 @@
 import { Select, type SelectOption } from '@/src/client/components/Select';
-import { useApi } from '@/src/client/context/ApiContext';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { useUserPrefs } from '@/src/client/hooks/useUserPrefs';
 import type { PrefValue } from '@/src/shared/types/pref';
-import { useState } from 'react';
 
 
 const LANGUAGE_OPTIONS: SelectOption[] = [ { value: 'en', label: 'English' } ];
@@ -11,26 +9,12 @@ const THEME_OPTIONS: SelectOption[] = [ { value: 'dark', label: 'Dark' } ];
 
 
 export function Settings () {
-  const { prefs } = useApi();
+  const [ [ language = 'en', theme = 'dark' ], setPref, reset, error ] = useUserPrefs( [
+    'APP_LANGUAGE', 'APP_THEME'
+  ] );
 
-  const [ resetting, setResetting ] = useState( false );
-  const [ error, setError ] = useState< string | null >( null );
 
-  const [ [ language = 'en', theme = 'dark' ], setPref ] = useUserPrefs( [ 'APP_LANGUAGE', 'APP_THEME' ] );
   usePageTitle( 'Settings' );
-
-
-  const reset = async () => {
-    setResetting( true ), setError( null );
-
-    try {
-      await prefs.resetAll();
-      window.location.reload();
-    } catch ( err ) {
-      setError( err instanceof Error ? err.message : 'Could not reset settings.' );
-      setResetting( false );
-    }
-  };
 
 
   return (
@@ -73,13 +57,12 @@ export function Settings () {
 
           <button
             onClick= { reset }
-            disabled= { resetting }
             className= {
               'px-3.5 py-2 text-sm font-medium text-red-400 bg-slate-50/10 rounded ' +
               'transition-colors hover:bg-slate-50/20 disabled:opacity-50'
             }
           >
-            { resetting ? 'Resetting …' : 'Reset all settings' }
+            Reset all settings
           </button>
         </div>
       </div>
