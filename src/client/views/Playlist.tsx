@@ -183,10 +183,7 @@ export function Playlist () {
           </div>
 
           <div className= 'grid grid-cols-2 gap-2'>
-            <button
-              onClick= { edit }
-              className= { ACTION_BUTTON }
-            >
+            <button onClick= { edit } className= { ACTION_BUTTON }>
               <PencilIcon size= { 16 } />
               <span>Edit</span>
             </button>
