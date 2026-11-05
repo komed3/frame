@@ -31,6 +31,19 @@ interface HomeData {
   playlists: HomePlaylist[];
 }
 
+interface MediaShelfProps {
+  title: string;
+  to: string;
+  items: HomeMedia[];
+}
+
+
+function MediaShelf ( { title, to, items }: MediaShelfProps ) {
+  return items.length > 0 && (
+    <></>
+  );
+}
+
 
 export function Home () {
   return (
