@@ -142,7 +142,19 @@ export function Playlist () {
       ) }
 
       <div className= 'flex items-start gap-6'>
-        <div className= 'w-100 p-6 space-y-5 bg-slate-800 rounded shadow-lg'></div>
+        <div className= 'w-100 p-6 pt-5 space-y-6 bg-slate-800 rounded shadow-lg'>
+          <div className= 'space-y-3'>
+            <h1 className= 'text-xl font-medium'>
+              { playlist.name }
+            </h1>
+
+            { playlist.description && (
+              <p className= 'text-sm leading-relaxed text-slate-400'>
+                { playlist.description }
+              </p>
+            ) }
+          </div>
+        </div>
 
         <div className= 'flex-1'></div>
       </div>
