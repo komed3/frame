@@ -68,3 +68,17 @@ Jobs are prioritized and retried automatically when processing fails. Interrupte
 ### Command-line interface
 
 Frame includes a dedicated CLI for initialization, configuration and maintenance. It can be used independently of the web interface to manage media roots, users, jobs, metadata, database information and other resources.
+
+
+## Supported media formats
+
+Frame identifies media files by their file extensions during scanning. The following extensions are currently recognized.
+
+- **Video:** mp4, m4v, mkv, mov, avi, webm, mpg, mpeg, mts, m2ts, ts, wmv, flv, ogv
+- **Audio:** mp3, m4a, aac, flac, ogg, opus, wav, wma, aiff, aif, ape, mid, midi
+- **Images:** jpg, jpeg, png, gif, webp, avif, bmp, tif, tiff, svg, heic, heif
+- **Text:** txt
+
+Text files are processed with support for UTF-8, UTF-8 BOM, UTF-16 LE, UTF-16 BE and Windows-1252 encoding detection.
+
+Playback compatibility: Frame streams original media files without transcoding. Actual playback support therefore depends on the browser and its available codecs. Recognizing a file extension does not guarantee that every browser can play or display that format.
