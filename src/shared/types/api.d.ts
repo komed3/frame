@@ -4,7 +4,7 @@ import type { MediaDirectory, MediaDirectoryEntry, MediaDirectoryTree } from '@/
 import type { FavoriteRecord } from '@/src/shared/types/favorites';
 import type { EnqueueJob, JobListFilters, JobRecord, JobStats, JobStatus } from '@/src/shared/types/job';
 import type { MarkerRecord, MarkerUpdate } from '@/src/shared/types/markers';
-import type { MediaListOptions, MediaRecord } from '@/src/shared/types/media';
+import type { MediaListOptions, MediaRecord, MediaStats } from '@/src/shared/types/media';
 import type { MediaMetadataRecord } from '@/src/shared/types/metadata';
 import type { PlaylistItemRecord, PlaylistRecord, PlaylistUpdate } from '@/src/shared/types/playlists';
 import type { HistoryRecord, PlayStatusRecord } from '@/src/shared/types/plays';
@@ -155,6 +155,7 @@ export interface Api {
   health: () => Promise< ApiHealth >;
   media: {
     list: ( options?: MediaListOptions ) => Promise< MediaRecord[] >;
+    stats: () => Promise< MediaStats >;
     get: ( id: string ) => Promise< MediaRecord | null >;
     prev: ( id: string ) => Promise< MediaRecord | null >;
     next: ( id: string ) => Promise< MediaRecord | null >;
