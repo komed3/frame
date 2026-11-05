@@ -112,6 +112,9 @@ export function Home () {
   } );
 
 
+  usePageTitle( '' );
+
+
   return (
     <></>
   );
