@@ -43,8 +43,8 @@ export function Routing () {
       <Route path= '/markers' element= { <Markers /> } />
       <Route path= '/history' element= { <History /> } />
 
-      <Route path= '/playlist/:playlistId' element= { <Playlists /> } />
-      <Route path= '/playlists' element= { <Playlist /> } />
+      <Route path= '/playlist/:playlistId' element= { <Playlist /> } />
+      <Route path= '/playlists' element= { <Playlists /> } />
 
       <Route path= '/help' element= { <Help /> } />
 
