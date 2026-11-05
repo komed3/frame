@@ -5,3 +5,66 @@
 Frame is a self-hosted platform for organizing, managing and playing personal media libraries. It combines a web-based interface with a local SQLite database, background processing and a command-line maintenance tool.
 
 Frame is designed for private media collections and runs on your own hardware. It does not depend on external metadata services, scraping services or cloud infrastructure. Your media files remain in their original locations; Frame indexes and manages them without importing or duplicating the original files.
+
+
+## Features
+
+### Media library
+
+- Manage multiple media roots and automatically scan their directory structures.
+- Organize media by type, directory and metadata.
+- Search and filter large media collections.
+- Track file availability and detect changes to existing files.
+- Store media metadata, technical information and user-defined properties.
+- Generate thumbnails, posters and additional media assets in the background.
+- Keep original media files in their existing locations.
+
+### Playback and viewing
+
+- Video player with seeking, playback speed controls and frame previews.
+- Audio player with waveform visualization, seeking and playback speed controls.
+- Image viewer.
+- Plain-text viewer.
+- Playback progress tracking and continue-watching functionality.
+- Play history, favorites and playlists.
+- Custom playback markers for videos.
+- Keyboard shortcuts and player controls.
+
+Media is streamed directly from its original location using HTTP range requests. Frame does not transcode media during playback.
+
+### Metadata and organization
+
+- Automatically extract technical metadata using FFprobe.
+- Extract audio, video and subtitle track information.
+- Store manually maintained metadata separately from scanned metadata.
+- Organize media using categories and tags.
+- Manage playlists and their entries.
+- Generate and maintain preview assets asynchronously.
+
+### Background processing
+
+Frame includes a persistent job queue and background worker.
+
+Depending on the media type, jobs can perform:
+
+- Directory scanning and file fingerprinting.
+- Technical metadata extraction.
+- Track extraction.
+- Poster and thumbnail generation.
+- Video frame extraction for seek previews.
+- Audio waveform generation.
+- Text excerpt extraction.
+
+Jobs are prioritized and retried automatically when processing fails. Interrupted jobs are recovered when the worker starts again.
+
+### User management
+
+- Multiple user accounts.
+- Administrator and editor permissions.
+- Session management.
+- User-specific preferences, favorites, playback history and progress.
+- Optional restriction of media editing to administrators.
+
+### Command-line interface
+
+Frame includes a dedicated CLI for initialization, configuration and maintenance. It can be used independently of the web interface to manage media roots, users, jobs, metadata, database information and other resources.
