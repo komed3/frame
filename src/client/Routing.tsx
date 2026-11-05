@@ -9,6 +9,8 @@ import { History } from '@/src/client/views/History';
 import { Markers } from '@/src/client/views/Markers';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
+import { Playlist } from '@/src/client/views/Playlist';
+import { Playlists } from '@/src/client/views/Playlists';
 import { Search } from '@/src/client/views/Search';
 import { Settings } from '@/src/client/views/Settings';
 import { Tag } from '@/src/client/views/Tag';
@@ -39,6 +41,9 @@ export function Routing () {
       <Route path= '/favorites' element= { <Favorites /> } />
       <Route path= '/markers' element= { <Markers /> } />
       <Route path= '/history' element= { <History /> } />
+
+      <Route path= '/playlist/:playlistId' element= { <Playlists /> } />
+      <Route path= '/playlists' element= { <Playlist /> } />
 
       <Route path= '/help' element= { <Help /> } />
 
