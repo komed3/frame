@@ -37,8 +37,18 @@ interface MediaShelfProps {
   items: HomeMedia[];
 }
 
+interface PlaylistShelfProps {
+  items: HomePlaylist[];
+}
+
 
 function MediaShelf ( { title, to, items }: MediaShelfProps ) {
+  return items.length > 0 && (
+    <></>
+  );
+}
+
+function PlaylistShelf ( { items }: PlaylistShelfProps ) {
   return items.length > 0 && (
     <></>
   );
