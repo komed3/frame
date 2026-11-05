@@ -64,6 +64,13 @@ export function Playlist () {
   usePageTitle( data?.playlist.name ?? 'Playlist' );
 
 
+  const edit = () => {
+    if ( ! data ) return;
+    setName( data.playlist.name ), setDescription( data.playlist.description ?? '' );
+    setEditing( true ), setActionError( null );
+  };
+
+
   return (
     <></>
   );
