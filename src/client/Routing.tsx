@@ -6,6 +6,7 @@ import { Editor } from '@/src/client/views/Editor';
 import { Favorites } from '@/src/client/views/Favorites';
 import { Help } from '@/src/client/views/Help';
 import { History } from '@/src/client/views/History';
+import { Home } from '@/src/client/views/Home';
 import { Markers } from '@/src/client/views/Markers';
 import { Media } from '@/src/client/views/Media';
 import { NotFound } from '@/src/client/views/NotFound';
@@ -51,7 +52,7 @@ export function Routing () {
       <Route path= '/settings' element= { <Settings /> } />
       <Route path= '/server' element= { <Admin /> } />
 
-      <Route path= '/' element= { <></> } />
+      <Route path= '/' element= { <Home /> } />
       <Route path= '*' element= { <NotFound /> } />
     </Routes>
   );
