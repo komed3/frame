@@ -81,6 +81,16 @@ export function Markers () {
                   <th className= 'w-px' />
                 </tr>
               </thead>
+
+              <tbody className= 'divide-y divide-slate-700/70'>
+                { data.markers.map( ( { mediaId } ) => {
+                  const item = data.media[ mediaId ];
+
+                  return (
+                    <></>
+                  );
+                } ) }
+              </tbody>
             </table>
           </div>
         </>
