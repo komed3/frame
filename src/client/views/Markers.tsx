@@ -114,6 +114,10 @@ export function Markers () {
                           </span>
                         ) }
                       </td>
+
+                      <td className= 'text-right whitespace-nowrap tabular-nums'>
+                        { formatDuration( positionMs ) }
+                      </td>
                     </tr>
                   );
                 } ) }
