@@ -93,6 +93,13 @@ export function Markers () {
               </tbody>
             </table>
           </div>
+
+          <Pagination
+            offset= { offset }
+            limit= { MEDIA_PAGE_SIZE }
+            itemCount= { data.markers.length }
+            onChange= { v => { setOffset( v ), window.scrollTo( 0, 0 ) } }
+          />
         </>
       ) }
     </div>
