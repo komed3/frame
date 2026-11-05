@@ -123,6 +123,21 @@ export function Markers () {
                       <td className= 'text-right whitespace-nowrap tabular-nums'>
                         { formatDuration( positionMs ) }
                       </td>
+
+                      <td className= 'w-px px-3! py-2!'>
+                        <button
+                          onClick= { () => remove( id ) }
+                          disabled= { deleting !== null }
+                          aria-label= 'Delete marker'
+                          title= 'Delete marker'
+                          className= {
+                            'p-2 text-slate-400 rounded transition-colors hover:bg-slate-50/10 ' +
+                            'hover:text-red-400 disabled:opacity-40'
+                          }
+                        >
+                          <Trash2Icon size= { 16 } />
+                        </button>
+                      </td>
                     </tr>
                   );
                 } ) }
