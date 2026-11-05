@@ -148,6 +148,10 @@ export function Playlist () {
 
       <div className= 'flex items-start gap-6'>
         <div className= 'w-100 p-6 pt-5 space-y-6 bg-slate-800 rounded shadow-lg'>
+          { firstMedia && firstMedia.hasThumbnail && (
+            <MediaThumbnail media= { firstMedia } />
+          ) }
+
           <div className= 'space-y-2'>
             <h1 className= 'text-xl font-medium'>
               { playlist.name }
