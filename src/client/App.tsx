@@ -1,4 +1,5 @@
 import { Loading } from '@/src/client/components/Loading';
+import { ScrollTopButton } from '@/src/client/components/ScrollTopButton';
 import { useApi } from '@/src/client/context/ApiContext';
 import { Footer } from '@/src/client/layout/Footer';
 import { Header } from '@/src/client/layout/Header';
@@ -28,6 +29,7 @@ export function App () {
       </main>
 
       <Footer />
+      <ScrollTopButton />
     </>
   );
 }
