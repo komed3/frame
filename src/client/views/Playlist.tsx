@@ -21,6 +21,17 @@ interface PlaylistPageData {
 
 export function Playlist () {
   const { playlistId } = useParams();
+  const { playlists, search } = useApi();
+  const navigate = useNavigate();
+
+  const [ refresh, setRefresh ] = useState( 0 );
+  const [ editing, setEditing ] = useState( false );
+  const [ name, setName ] = useState( '' );
+  const [ description, setDescription ] = useState( '' );
+  const [ saving, setSaving ] = useState( false );
+  const [ busy, setBusy ] = useState< string | null >( null );
+  const [ actionError, setActionError ] = useState< string | null >( null );
+
 
   return (
     <></>
