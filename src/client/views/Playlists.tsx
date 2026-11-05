@@ -27,6 +27,20 @@ export function Playlists () {
       <h1 className= 'text-2xl font-light tracking-wide'>
         Playlists
       </h1>
+
+      { loading ? (
+        <Loading className= 'min-h-64' />
+      ) : error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : ! data?.length ? (
+        <p className= 'py-16 text-center text-slate-400'>
+          No playlists found.
+        </p>
+      ) : (
+        <></>
+      ) }
     </div>
   );
 }
