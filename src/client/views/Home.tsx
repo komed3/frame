@@ -50,7 +50,18 @@ const MORE_BUTTON =
 
 function MediaShelf ( { title, to, items }: MediaShelfProps ) {
   return items.length > 0 && (
-    <></>
+    <div className= 'space-y-8'>
+      <div className= 'flex justify-between items-center'>
+        <h2 className= 'text-lg font-medium tracking-wide'>
+          { title }
+        </h2>
+
+        <Link to= { to } className= { MORE_BUTTON }>
+          <span>View all</span>
+          <ArrowRightIcon size= { 18 } />
+        </Link>
+      </div>
+    </div>
   );
 }
 
