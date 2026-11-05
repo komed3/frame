@@ -236,7 +236,39 @@ export function Playlist () {
                   className= 'flex items-center gap-4 px-4 py-3 transition-colors hover:bg-slate-50/5'
                 >
                   { media ? (
-                    <></>
+                    <Link
+                      to= { `/watch/${ media.id }/${ playlistId }` }
+                      className= 'group flex-1 flex items-center gap-4 min-w-0'
+                    >
+                      <div className= 'shrink-0 w-28'>
+                        <MediaThumbnail media= { media } />
+                      </div>
+
+                      <div className= 'flex-1 min-w-0 space-y-1'>
+                        <p className= 'truncate text-sm font-medium transition-colors group-hover:text-sky-400'>
+                          { media.title || media.fileName }
+                        </p>
+
+                        <div className= 'flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400'>
+                          <span className= 'flex items-center gap-1.5'>
+                            <MediaIcon type= { media.type } size= { 14 } />
+                            { formatMediaType( media.type ) }
+                          </span>
+
+                          <span>{ formatFileFormat( media.fileName, media.container ) }</span>
+
+                          { ( media.type === 'video' || media.type === 'audio' ) && (
+                            <span className= 'tabular-nums'>
+                              { formatDuration( media.durationMs ) }
+                            </span>
+                          ) }
+
+                          <span className= 'tabular-nums'>
+                            { formatBytes( media.sizeBytes ) }
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
                   ) : (
                     <div className= 'flex flex-1 items-center gap-4 min-w-0'>
                       <div className= 'shrink-0 flex justify-center items-center w-28 aspect-video bg-slate-50/5 rounded'>
