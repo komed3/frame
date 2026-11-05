@@ -501,3 +501,13 @@ The following areas are intentionally not included in the current release:
 - **Media transcoding:** Frame streams original files and does not provide server-side transcoding. Playback compatibility depends on browser support.
 
 These limitations do not affect the core functionality of the current release.
+
+
+## License
+
+Frame is licensed under the MIT License. See [LICENSE](LICENSE) for details.  
+Copyright (c) 2026 komed3 (Paul Köhler).
+
+---
+
+**Frame — your media, your server, your control.**
