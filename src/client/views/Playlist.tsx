@@ -8,7 +8,7 @@ import { formatBytes, formatDuration, formatFileFormat, formatMediaType } from '
 import { NotFound } from '@/src/client/views/NotFound';
 import type { MediaRecord } from '@/src/shared/types/media';
 import type { PlaylistItemRecord, PlaylistRecord } from '@/src/shared/types/playlists';
-import { ArrowDownIcon, ArrowLeftIcon, ArrowUpIcon, CheckIcon, ChevronLeftIcon, PencilIcon, PlayIcon, Trash2Icon, XIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowLeftIcon, ArrowUpIcon, CheckIcon, ChevronLeftIcon, FileIcon, PencilIcon, PlayIcon, Trash2Icon, XIcon } from 'lucide-react';
 import { type SubmitEvent, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -231,7 +231,24 @@ export function Playlist () {
           ) : (
             <div className= 'overflow-hidden bg-slate-900/40 divide-y divide-slate-700/70 rounded shadow-lg'>
               { items.map( ( { mediaId, media }, i ) => (
-                <></>
+                <div
+                  key= { mediaId }
+                  className= 'flex items-center gap-4 px-4 py-3 transition-colors hover:bg-slate-50/5'
+                >
+                  { media ? (
+                    <></>
+                  ) : (
+                    <div className= 'flex flex-1 items-center gap-4 min-w-0'>
+                      <div className= 'shrink-0 flex justify-center items-center w-28 aspect-video bg-slate-50/5 rounded'>
+                        <FileIcon size= { 26 } className= 'opacity-25' />
+                      </div>
+
+                      <span className= 'text-sm text-slate-500'>
+                        Unavailable media
+                      </span>
+                    </div>
+                  ) }
+                </div>
               ) ) }
             </div>
           ) }
