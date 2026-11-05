@@ -15,6 +15,7 @@ media.get( '/', ( req, res ) => {
   res.json( Media.list( pagination ) );
 } );
 
+media.get( '/stats', ( _, res ) => res.json( Media.stats() ) );
 media.get< { id: string } >( '/:id', ( req, res ) => res.json( Media.get( req.params.id ) ) );
 media.get< { id: string } >( '/:id/metadata', ( req, res ) => res.json( MediaMetadata.list( req.params.id ) ) );
 media.get< { id: string } >( '/:id/tags', ( req, res ) => res.json( MediaTaxonomy.getMediaTags( req.params.id ) ) );
