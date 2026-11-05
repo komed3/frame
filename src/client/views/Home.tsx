@@ -4,12 +4,13 @@ import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
 import { formatBytes, formatDateTime, formatDuration, formatNumber } from '@/src/client/utils/format';
-import type { MediaRecord, MediaStats } from '@/src/shared/types/media';
+import type { MediaRecord, MediaStats, MediaType } from '@/src/shared/types/media';
 import type { HistoryRecord } from '@/src/shared/types/plays';
 import type { PlaylistRecord } from '@/src/shared/types/playlists';
 import type { ProgressRecord } from '@/src/shared/types/progress';
 import { ArrowRightIcon, ListVideoIcon } from 'lucide-react';
 import { Link } from 'react-router';
+import { MediaIcon } from '../components/MediaIcon';
 
 
 interface HomeMedia {
@@ -131,18 +132,18 @@ export function Home () {
 
   return (
     <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-12'>
-      <div className= 'space-y-5'>
+      <div className= 'space-y-4'>
         <h1 className= 'text-2xl font-light tracking-wide'>
           Overview
         </h1>
 
         <div className= 'grid grid-cols-4 gap-4'>
           { [
-            { label: 'Media', value: formatNumber( stats.total ) },
-            { label: 'Storage', value: formatBytes( stats.sizeBytes ) },
-            { label: 'Duration', value: formatDuration( stats.durationMs ) },
-            { label: 'Available', value: formatNumber( stats.available ) }
-          ].map( ( { label, value } ) => (
+            [ 'Media', formatNumber( stats.total ) ],
+            [ 'Storage', formatBytes( stats.sizeBytes ) ],
+            [ 'Duration', formatDuration( stats.durationMs ) ],
+            [ 'Available', formatNumber( stats.available ) ]
+          ].map( ( [ label, value ] ) => (
             <div key= { label } className= 'p-4 space-y-0.5 bg-slate-800 rounded shadow-lg'>
               <p className= 'text-xs uppercase tracking-wider text-slate-500'>
                 { label }
@@ -151,6 +152,28 @@ export function Home () {
               <p className= 'text-xl font-medium tabular-nums'>
                 { value }
               </p>
+            </div>
+          ) ) }
+        </div>
+
+        <div className= 'grid grid-cols-5 gap-4'>
+          { [
+            [ 'video', 'Videos', formatNumber( stats.videoCount ) ],
+            [ 'audio', 'Audio', formatNumber( stats.audioCount ) ],
+            [ 'image', 'Images', formatNumber( stats.imageCount ) ],
+            [ 'text', 'Text', formatNumber( stats.textCount ) ],
+            [ 'other', 'Other', formatNumber( stats.otherCount ) ]
+          ].map( ( [ type, label, value ] ) => (
+            <div key= { label } className= 'flex items-center gap-2 px-4 py-3 bg-slate-800 rounded shadow-lg'>
+              <MediaIcon type= { type as MediaType } size= { 16 } />
+
+              <span className= 'min-w-0 truncate'>
+                { label }
+              </span>
+
+              <b className= 'flex-1 text-right font-medium tabular-nums'>
+                { value }
+              </b>
             </div>
           ) ) }
         </div>
