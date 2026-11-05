@@ -70,6 +70,21 @@ export function Playlist () {
     setEditing( true ), setActionError( null );
   };
 
+  const save = async ( e: SubmitEvent ) => {
+    e.preventDefault();
+    if ( ! playlistId || ! name.trim() || saving ) return;
+
+    setSaving( true ), setActionError( null );
+
+    try {
+      await playlists.update( playlistId, { name: name.trim(), description: description.trim() || null } );
+      setEditing( false ), setRefresh( v => v + 1 );
+    }
+
+    catch ( err ) { setActionError( err instanceof Error ? err.message : 'Could not update playlist.' ) }
+    finally { setSaving( false ) }
+  };
+
 
   return (
     <></>
