@@ -19,6 +19,11 @@ interface PlaylistPageData {
 }
 
 
+const ACTION_BUTTON =
+  'flex justify-center items-center gap-2 px-3.5 py-2.5 text-sm bg-slate-50/10 rounded ' +
+  'transition-colors hover:bg-slate-50/20 disabled:opacity-40 disabled:pointer-events-none';
+
+
 export function Playlist () {
   const { playlistId } = useParams();
   const { playlists, search } = useApi();
@@ -175,6 +180,16 @@ export function Playlist () {
                 { formatDuration( duration ) }
               </b>
             </div>
+          </div>
+
+          <div className= 'grid grid-cols-2 gap-2'>
+            <button
+              onClick= { edit }
+              className= { ACTION_BUTTON }
+            >
+              <PencilIcon size= { 16 } />
+              <span>Edit</span>
+            </button>
           </div>
         </div>
 
