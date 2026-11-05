@@ -61,6 +61,9 @@ export function Playlist () {
   } );
 
 
+  usePageTitle( data?.playlist.name ?? 'Playlist' );
+
+
   return (
     <></>
   );
