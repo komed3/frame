@@ -465,3 +465,24 @@ npm run build
 ```
 
 The build process compiles the server and maintenance CLI, then builds the frontend into `dist/client`.
+
+
+## Data and storage
+
+Frame keeps its database and generated assets separate from the original media files.
+
+By default:
+
+```text
+data/
+├── frame.sqlite
+└── assets/
+```
+
+The database stores media records, metadata, user accounts, playback information, playlists, markers and background jobs.
+
+Generated assets include posters, thumbnails, waveform data and video frame previews.
+
+Original media files are never copied into the Frame data directory. They remain in the registered media roots.
+
+Make sure the database and asset directories are included in your backup strategy. The original media files must be backed up separately.
