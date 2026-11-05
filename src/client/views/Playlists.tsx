@@ -66,6 +66,13 @@ export function Playlists () {
               </Link>
             ) ) }
           </div>
+
+          <Pagination
+            offset= { offset }
+            limit= { MEDIA_PAGE_SIZE }
+            itemCount= { data.length }
+            onChange= { v => { setOffset( v ), window.scrollTo( 0, 0 ) } }
+          />
         </>
       ) }
     </div>
