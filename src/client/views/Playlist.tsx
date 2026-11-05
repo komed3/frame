@@ -319,6 +319,15 @@ export function Playlist () {
           ) }
         </div>
       </div>
+
+      { editing && (
+        <>
+          <div
+            className= 'fixed inset-0 z-40 bg-slate-900 opacity-50'
+            onClick= { () => ! saving && setEditing( false ) }
+          />
+        </>
+      ) }
     </div>
   );
 }
