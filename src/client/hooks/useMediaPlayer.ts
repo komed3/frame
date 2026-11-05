@@ -127,6 +127,15 @@ export function useMediaPlayer < T extends HTMLMediaElement > ( media: MediaReco
 
     restoredRef.current = true;
   }, [ ready, history.positionMs ] );
+  
+  useEffect( () => {
+    const match = window.location.hash.match( /^#pos:(\d+)$/ );
+    if ( ! ready || ! match ) return;
+
+    window.history.replaceState( window.history.state, '', window.location.pathname + window.location.search );
+    restoredRef.current = true;
+    seek( Number( match[ 1 ] ) / 1000 );
+  }, [ ready ] );
 
   useEffect( () => {
     const change = () => setFullscreen( !! document.fullscreenElement );
