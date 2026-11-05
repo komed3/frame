@@ -41,12 +41,16 @@ export function Playlists () {
       ) : (
         <>
           <div className= 'overflow-hidden bg-slate-900/40 divide-y divide-slate-700/70 rounded shadow-lg'>
-            { data.map( ( { id } ) => (
+            { data.map( ( { id, updatedAt } ) => (
               <Link
                 key= { id } to= { `/playlist/${ id }` }
                 className= 'group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-slate-50/5'
               >
                 <ListVideoIcon size= { 20 } className= 'shrink-0 text-slate-400' />
+
+                <span className= 'shrink-0 leading-5 text-xs text-slate-500'>
+                  { formatDateTime( updatedAt ) }
+                </span>
               </Link>
             ) ) }
           </div>
