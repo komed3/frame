@@ -27,6 +27,10 @@ const ITEM_BUTTON =
   'p-2 text-slate-400 rounded transition-colors hover:bg-slate-50/10 ' +
   'disabled:opacity-30 disabled:pointer-events-none';
 
+const INPUT_FIELD =
+  'w-full px-3 py-2 text-sm bg-slate-900 border border-slate-600 rounded ' +
+  'focus:border-slate-500 focus:outline-none';
+
 
 export function Playlist () {
   const { playlistId } = useParams();
@@ -346,6 +350,53 @@ export function Playlist () {
                 <XIcon size= { 20 } />
               </button>
             </div>
+
+            <form onSubmit= { save } className= 'space-y-4'>
+              <div className= 'space-y-1'>
+                <label className= 'block text-sm text-slate-400'>
+                  Name
+                </label>
+
+                <input
+                  value= { name } autoFocus
+                  onChange= { e => setName( e.target.value ) }
+                  maxLength= { 200 }
+                  className= { INPUT_FIELD }
+                />
+              </div>
+
+              <div className= 'space-y-1'>
+                <label className= 'block text-sm text-slate-400'>
+                  Description
+                </label>
+
+                <textarea
+                  value= { description }
+                  onChange= { e => setDescription( e.target.value ) }
+                  rows= { 4 }
+                  className= { INPUT_FIELD + ' resize-y' }
+                />
+              </div>
+
+              <div className= 'flex justify-end gap-2'>
+                <button
+                  onClick= { () => setEditing( false ) }
+                  disabled= { saving }
+                  className= { ACTION_BUTTON }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type= 'submit'
+                  disabled= { ! name.trim() || saving }
+                  className= { ACTION_BUTTON + ' bg-slate-50/20 hover:bg-slate-50/30' }
+                >
+                  <CheckIcon size= { 16 } />
+                  <span>{ saving ? 'Saving …' : 'Save' }</span>
+                </button>
+              </div>
+            </form>
           </div>
         </>
       ) }
