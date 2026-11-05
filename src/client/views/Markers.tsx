@@ -35,6 +35,9 @@ export function Markers () {
   } );
 
 
+  usePageTitle( 'Markers' );
+
+
   return (
     <></>
   );
