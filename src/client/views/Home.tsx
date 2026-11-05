@@ -56,6 +56,8 @@ function PlaylistShelf ( { items }: PlaylistShelfProps ) {
 
 
 export function Home () {
+  const { media, progress, plays, search, playlists, user } = useApi();
+
   return (
     <></>
   );
