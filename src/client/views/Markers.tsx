@@ -92,13 +92,25 @@ export function Markers () {
                         { item ? (
                           <Link
                             to= { `/watch/${ item.id }#pos:${ positionMs }` }
-                            className= 'block px-5 py-4 font-medium transition-colors hover:text-sky-400'
+                            className= 'group flex items-center gap-2 px-5 py-4 font-medium'
                           >
-                            { title || 'Untitled marker' }
+                            <MediaIcon type= { item.type } size= { 16 } />
+
+                            <span className= 'transition-colors group-hover:text-sky-400'>
+                              { title || 'Untitled marker' }
+                            </span>
                           </Link>
                         ) : (
-                          <span className= 'px-5 py-4 text-slate-400'>
+                          <span className= 'px-5 py-4 text-slate-500'>
                             { title || 'Untitled marker' }
+                          </span>
+                        ) }
+                      </td>
+
+                      <td className= 'min-w-64'>
+                        { item ? item.title || item.fileName : (
+                          <span className= 'text-slate-500'>
+                            Unavailable media
                           </span>
                         ) }
                       </td>
