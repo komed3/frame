@@ -43,6 +43,11 @@ interface PlaylistShelfProps {
 }
 
 
+const MORE_BUTTON =
+  'flex items-center gap-2 px-6 py-3 text-sm bg-slate-50/10 rounded-full ' +
+  'transition-colors hover:bg-slate-50/20';
+
+
 function MediaShelf ( { title, to, items }: MediaShelfProps ) {
   return items.length > 0 && (
     <></>
@@ -51,7 +56,18 @@ function MediaShelf ( { title, to, items }: MediaShelfProps ) {
 
 function PlaylistShelf ( { items }: PlaylistShelfProps ) {
   return items.length > 0 && (
-    <></>
+    <div className= 'space-y-4'>
+      <div className= 'flex justify-between items-center'>
+        <h2 className= 'text-lg font-medium tracking-wide'>
+          Playlists
+        </h2>
+
+        <Link to= '/playlists' className= { MORE_BUTTON }>
+          <span>View all</span>
+          <ArrowRightIcon size= { 16 } />
+        </Link>
+      </div>
+    </div>
   );
 }
 
