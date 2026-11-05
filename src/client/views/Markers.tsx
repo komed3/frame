@@ -83,11 +83,20 @@ export function Markers () {
               </thead>
 
               <tbody className= 'divide-y divide-slate-700/70'>
-                { data.markers.map( ( { mediaId } ) => {
+                { data.markers.map( ( { id, title, mediaId, positionMs } ) => {
                   const item = data.media[ mediaId ];
 
-                  return (
-                    <></>
+                  return item && (
+                    <tr key= { id } className= '*:px-5 *:py-4'>
+                      <td className= 'min-w-56 p-0!'>
+                        <Link
+                          to= { `/watch/${ item.id }#pos:${ positionMs }` }
+                          className= 'block px-5 py-4 font-medium transition-colors hover:text-sky-400'
+                        >
+                          { title || 'Untitled marker' }
+                        </Link>
+                      </td>
+                    </tr>
                   );
                 } ) }
               </tbody>
