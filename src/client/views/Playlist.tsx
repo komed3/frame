@@ -95,6 +95,26 @@ export function Playlist () {
     finally { setBusy( null ) }
   };
 
+  const removeItem = async ( mediaId: string ) => {
+    if ( ! playlistId || busy ) return;
+
+    setBusy( mediaId ), setActionError( null );
+
+    try { await playlists.remove( playlistId, mediaId ); setRefresh( v => v + 1 ) }
+    catch ( err ) { setActionError( err instanceof Error ? err.message : 'Could not remove media.' ) }
+    finally { setBusy( null ) }
+  };
+
+  const moveItem = async ( mediaId: string, position: number ) => {
+    if ( ! playlistId || busy ) return;
+
+    setBusy( mediaId ), setActionError( null );
+
+    try { await playlists.move( playlistId, mediaId, position ); setRefresh( v => v + 1 ) }
+    catch ( err ) { setActionError( err instanceof Error ? err.message : 'Could not move media.' ) }
+    finally { setBusy( null ) }
+  };
+
 
   return (
     <></>
