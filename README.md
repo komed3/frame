@@ -385,3 +385,34 @@ The update procedure deliberately has a few safeguards:
 This also means that a failed build is retried on the next service start instead of being mistaken for an already completed update.
 
 The script uses the `master` branch. Change `BRANCH` if your installation tracks a different branch.
+
+### Create the systemd unit
+
+Create `/etc/systemd/system/frame.service`:
+
+```ini
+[Unit]
+Description=Frame Media Server
+After=network.target
+
+[Service]
+Type=simple
+User=frame
+Group=frame
+WorkingDirectory=/opt/frame
+
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+ExecStartPre=/usr/local/lib/frame-update.sh
+ExecStart=/usr/bin/node dist/server/run.js
+
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Make sure the configured Node.js executable and npm are available at the paths used by the service. If Node.js is installed through a version manager, configure the service environment accordingly rather than relying on an interactive shell.
