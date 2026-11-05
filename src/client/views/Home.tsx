@@ -67,20 +67,35 @@ function MediaShelf ( { title, to, items }: MediaShelfProps ) {
             to= { `/watch/${ media.id }` }
             className= 'group min-w-0 space-y-2'
           >
-            <MediaThumbnail media= { media } />
+            <div className= 'relative'>
+              <MediaThumbnail media= { media } />
 
-            { progress !== undefined && (
-              <div className= 'h-1 overflow-hidden bg-slate-700 rounded-full'>
-                <div
-                  className= 'h-full bg-sky-500'
-                  style= { { width: `${ progress }%` } }
-                />
-              </div>
-            ) }
+              { progress !== undefined && (
+                <div className= 'absolute inset-x-0 bottom-0 h-1 bg-slate-950/60'>
+                  <div
+                    className= 'h-full bg-sky-500'
+                    style= { { width: `${ progress }%` } }
+                  />
+                </div>
+              ) }
+            </div>
 
-            <p className= 'truncate text-sm font-medium transition-colors group-hover:text-sky-400'>
-              { media.title || media.fileName }
-            </p>
+            <div className= 'flex justify-between items-start gap-3 text-sm'>
+              <span
+                className= {
+                  'flex-1 min-w-0 font-medium line-clamp-2 wrap-break-words ' +
+                  'transition-colors group-hover:text-sky-400'
+                }
+              >
+                { media.title || media.fileName }
+              </span>
+
+              { media.durationMs !== null && (
+                <span className= 'shrink-0 text-slate-400 tabular-nums'>
+                  { formatDuration( media.durationMs ) }
+                </span>
+              ) }
+            </div>
           </Link>
         ) ) }
       </div>
