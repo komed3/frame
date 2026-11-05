@@ -106,20 +106,20 @@ npm run frame -- check
 
 ## Installation
 
-1. Clone the repository
+### Clone the repository
 
 ```sh
 git clone https://github.com/komed3/frame.git
 cd frame
 ```
 
-2. Install dependencies
+### Install dependencies
 
 ```sh
 npm ci
 ```
 
-3. Build Frame
+### Build Frame
 
 ```sh
 npm run build
@@ -127,7 +127,7 @@ npm run build
 
 This builds the server, maintenance CLI and frontend.
 
-4. Initialize Frame
+### Initialize Frame
 
 Run the interactive initialization wizard:
 
@@ -145,7 +145,7 @@ Registered media roots are scanned automatically by queued background jobs.
 
 The initialization command creates the `.env` configuration file. It can only be run once unless the existing configuration file is removed.
 
-5. Start the server
+### Start the server
 
 ```sh
 npm run start
