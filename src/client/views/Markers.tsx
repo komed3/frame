@@ -58,6 +58,20 @@ export function Markers () {
           { actionError }
         </p>
       ) }
+
+      { loading ? (
+        <Loading className= 'min-h-64' />
+      ) : error ? (
+        <p role= 'alert' className= 'py-16 text-center text-red-400'>
+          { error }
+        </p>
+      ) : ! data?.markers.length ? (
+        <p className= 'py-16 text-center text-slate-400'>
+          No markers found.
+        </p>
+      ) : (
+        <></>
+      ) }
     </div>
   );
 }
