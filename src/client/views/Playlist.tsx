@@ -23,6 +23,10 @@ const ACTION_BUTTON =
   'flex justify-center items-center gap-2 px-3.5 py-2.5 text-sm bg-slate-50/10 rounded ' +
   'transition-colors hover:bg-slate-50/20 disabled:opacity-40 disabled:pointer-events-none';
 
+const ITEM_BUTTON =
+  'p-2 text-slate-400 rounded transition-colors hover:bg-slate-50/10 ' +
+  'disabled:opacity-30 disabled:pointer-events-none';
+
 
 export function Playlist () {
   const { playlistId } = useParams();
@@ -280,6 +284,35 @@ export function Playlist () {
                       </span>
                     </div>
                   ) }
+
+                  <div className= 'flex items-center gap-1 shrink-0'>
+                    <button
+                      onClick= { () => moveItem( mediaId, i - 1 ) }
+                      disabled= { i === 0 || busy !== null }
+                      aria-label= 'Move up' title= 'Move up'
+                      className= { ITEM_BUTTON }
+                    >
+                      <ArrowUpIcon size= { 16 } />
+                    </button>
+
+                    <button
+                      onClick= { () => moveItem( mediaId, i + 1 ) }
+                      disabled= { i === items.length - 1 || busy !== null }
+                      aria-label= 'Move down' title= 'Move down'
+                      className= { ITEM_BUTTON }
+                    >
+                      <ArrowDownIcon size= { 16 } />
+                    </button>
+
+                    <button
+                      onClick= { () => removeItem( mediaId ) }
+                      disabled= { busy !== null }
+                      aria-label= 'Remove from playlist' title= 'Remove from playlist'
+                      className= { ITEM_BUTTON + ' hover:text-red-400' }
+                    >
+                      <Trash2Icon size= { 16 } />
+                    </button>
+                  </div>
                 </div>
               ) ) }
             </div>
