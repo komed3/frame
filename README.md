@@ -446,3 +446,22 @@ sudo systemctl restart frame
 ```
 
 With this setup, Frame starts automatically at boot. Every service start checks for updates, and a successful update is compiled before the server process starts.
+
+
+## Development
+
+To run Frame in development mode:
+
+```bash
+npm run dev
+```
+
+This starts the Express server with the Vite development middleware and React frontend.
+
+To build the production application:
+
+```bash
+npm run build
+```
+
+The build process compiles the server and maintenance CLI, then builds the frontend into `dist/client`.
