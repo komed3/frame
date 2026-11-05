@@ -195,6 +195,15 @@ export function Playlist () {
               <Trash2Icon size= { 16 } />
               <span>Delete playlist</span>
             </button>
+
+            <button
+              onClick= { () => firstMedia && navigate( `/watch/${ firstMedia.id }/${ playlistId }` ) }
+              disabled= { ! firstMedia }
+              className= { ACTION_BUTTON + ' col-span-2' }
+            >
+              <PlayIcon size= { 16 } />
+              <span>Play</span>
+            </button>
           </div>
         </div>
 
