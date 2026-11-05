@@ -3,11 +3,10 @@ import { MediaThumbnail } from '@/src/client/components/MediaThumbnail';
 import { useApi } from '@/src/client/context/ApiContext';
 import { useApiData } from '@/src/client/hooks/useApiData';
 import { usePageTitle } from '@/src/client/hooks/usePageTitle';
-import { formatBytes, formatDateTime, formatDuration, formatNumber } from '@/src/client/utils/format';
+import { formatBytes, formatDuration, formatNumber } from '@/src/client/utils/format';
 import type { MediaRecord, MediaStats, MediaType } from '@/src/shared/types/media';
-import type { HistoryRecord } from '@/src/shared/types/plays';
 import type { PlaylistRecord } from '@/src/shared/types/playlists';
-import type { ProgressRecord } from '@/src/shared/types/progress';
+import type { HistoryRecord } from '@/src/shared/types/plays';
 import { ArrowRightIcon, ListVideoIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import { MediaIcon } from '../components/MediaIcon';
@@ -15,7 +14,6 @@ import { MediaIcon } from '../components/MediaIcon';
 
 interface HomeMedia {
   media: MediaRecord;
-  subtitle?: string;
   progress?: number;
 }
 
@@ -61,6 +59,31 @@ function MediaShelf ( { title, to, items }: MediaShelfProps ) {
           <ArrowRightIcon size= { 18 } />
         </Link>
       </div>
+
+      <div className= 'grid grid-cols-3 gap-x-4 gap-y-8'>
+        { items.map( ( { media, progress } ) => (
+          <Link
+            key= { media.id }
+            to= { `/watch/${ media.id }` }
+            className= 'group min-w-0 space-y-2'
+          >
+            <MediaThumbnail media= { media } />
+
+            { progress !== undefined && (
+              <div className= 'h-1 overflow-hidden bg-slate-700 rounded-full'>
+                <div
+                  className= 'h-full bg-sky-500'
+                  style= { { width: `${ progress }%` } }
+                />
+              </div>
+            ) }
+
+            <p className= 'truncate text-sm font-medium transition-colors group-hover:text-sky-400'>
+              { media.title || media.fileName }
+            </p>
+          </Link>
+        ) ) }
+      </div>
     </div>
   );
 }
@@ -79,7 +102,7 @@ function PlaylistShelf ( { items }: PlaylistShelfProps ) {
         </Link>
       </div>
 
-      <div className= 'grid grid-cols-3 gap-4'>
+      <div className= 'grid grid-cols-3  gap-x-4 gap-y-8'>
         { items.map( ( { playlist, media } ) => (
           <Link
             key= { playlist.id }
@@ -151,9 +174,7 @@ export function Home () {
         return found ? [ { media: found, progress: found.durationMs ?
           Math.min( 100, positionMs / found.durationMs * 100 ) : 0 } ] : [];
       } ),
-      history: recentHistory.map( ( { media, startedAt } ) => ( {
-        media: media, subtitle: formatDateTime( startedAt )
-      } ) ),
+      history: recentHistory.map( ( { media } ) => ( { media: media } ) ),
       favorites: favoriteResult.items.map( media => ( { media } ) ),
       playlists: playlistPreviews.map( ( { playlist, mediaId } ) => ( {
         playlist: playlist, media: mediaId ? previewById.get( mediaId ) ?? null : null
