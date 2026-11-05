@@ -130,6 +130,12 @@ export function Home () {
 
 
   return (
-    <></>
+    <div className= 'mx-auto my-12 max-w-7xl px-6 space-y-12'>
+      <div className= 'space-y-5'>
+        <h1 className= 'text-2xl font-light tracking-wide'>
+          Overview
+        </h1>
+      </div>
+    </div>
   );
 }
