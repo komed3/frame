@@ -116,6 +116,18 @@ export function Playlist () {
   };
 
 
+  if ( error ) return (
+    <div className= 'mx-auto my-12 max-w-7xl px-6'>
+      <p role= 'alert' className= 'py-16 text-center text-red-400'>
+        { error }
+      </p>
+    </div>
+  );
+
+  if ( loading ) return <Loading className= 'min-h-[50vh]' />;
+  if ( ! data ) return <NotFound />;
+
+
   return (
     <></>
   );
