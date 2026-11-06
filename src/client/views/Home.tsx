@@ -218,12 +218,11 @@ export function Home () {
           Overview
         </h1>
 
-        <div className= 'grid grid-cols-4 gap-4'>
+        <div className= 'grid grid-cols-3 gap-4'>
           { [
             [ 'Media', formatNumber( stats.total ) ],
             [ 'Storage', formatBytes( stats.sizeBytes ) ],
-            [ 'Duration', formatDuration( stats.durationMs ) ],
-            [ 'Available', formatNumber( stats.available ) ]
+            [ 'Duration', formatDuration( stats.durationMs ) ]
           ].map( ( [ label, value ] ) => (
             <div key= { label } className= 'p-4 space-y-0.5 bg-slate-800 rounded shadow-lg'>
               <p className= 'text-xs uppercase tracking-wider text-slate-500'>
