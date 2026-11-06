@@ -112,7 +112,7 @@ const DIRECTION_OPTIONS: SelectOption[] = [
 
 
 export function Header () {
-  const { user, logout, tags, categories } = useApi();
+  const { user, logout, tags, categories, env } = useApi();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [ searchParams ] = useSearchParams();
@@ -190,7 +190,7 @@ export function Header () {
             <img
               src= { logo }
               className= 'size-9'
-              alt= 'Frame'
+              alt= { env?.appName ?? 'Frame' }
             />
           </Link>
         </div>
@@ -202,7 +202,7 @@ export function Header () {
                 type= 'text'
                 value= { query }
                 onChange= { e => setQuery( e.target.value ) }
-                placeholder= 'Search Frame …'
+                placeholder= { `Search ${ env?.appName ?? 'Frame' } …` }
                 className= {
                   'w-[30vw] h-10 pl-3 pr-13 text-sm font-light tracking-wide bg-slate-800 border ' +
                   'border-transparent rounded outline-none transition focus:border-slate-500'
