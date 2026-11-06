@@ -142,10 +142,12 @@ export function Admin () {
           disabled= { scanning || running }
           className= {
             'px-4 py-2 text-sm font-medium text-slate-900 bg-slate-200 rounded ' +
-            'hover:bg-white disabled:opacity-50'
+            'hover:bg-white disabled:opacity-50 disabled:pointer-events-none'
           }
         >
-          { running ? 'Working …' : scanning ? 'Starting scan …' : 'Scan all roots' }
+          { running ? (
+            <Loader2Icon size= { 20 } className= 'animate-spin' />
+          ) : scanning ? 'Starting scan …' : 'Scan all roots' }
         </button>
       </div>
 
