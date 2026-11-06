@@ -206,9 +206,9 @@ export function Admin () {
               <table className= 'w-full text-left text-sm whitespace-nowrap'>
                 <thead className= 'text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700'>
                   <tr className= '*:font-medium *:px-4 *:py-3'>
-                    <th>Kind</th>
+                    <th>Job</th>
                     <th>Status</th>
-                    <th>Created</th>
+                    <th>Date</th>
                     <th>Media ID</th>
                     <th>Details</th>
                   </tr>
