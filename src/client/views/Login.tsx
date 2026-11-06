@@ -5,7 +5,7 @@ import { type SubmitEvent, useState } from 'react';
 
 
 export function Login () {
-  const { login, loading, error, clearError } = useApi();
+  const { login, loading, error, clearError, env } = useApi();
   const [ username, setUsername ] = useState( '' );
   const [ password, setPassword ] = useState( '' );
 
@@ -23,11 +23,11 @@ export function Login () {
           <img
             src= { logo }
             className= 'size-12'
-            alt= 'Frame'
+            alt= { env?.appName ?? 'Frame' }
           />
 
           <span className= 'uppercase text-2xl font-extralight text-slate-400 tracking-widest'>
-            Frame Login
+            { ( env?.appName ?? 'Frame' ) } Login
           </span>
         </div>
 
