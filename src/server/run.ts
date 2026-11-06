@@ -46,9 +46,7 @@ async function run () : Promise< void > {
 
     app.use( ( req, res, next ) => {
       if ( req.method !== 'GET' && req.method !== 'HEAD' ) return next();
-      if ( req.path === '/' ) return res.sendFile( join( clientDist, 'index.html' ) );
-
-      res.redirect( 301, '/' );
+      res.sendFile( join( clientDist, 'index.html' ) );
     } );
   }
 
@@ -61,8 +59,8 @@ async function run () : Promise< void > {
   server = app.listen( port, host );
 
   await new Promise< void >( ( resolve, reject ) => {
-    server!.once( 'listening', resolve );
-    server!.once( 'error', reject );
+    server.once( 'listening', resolve );
+    server.once( 'error', reject );
   } );
 
   console.info( `[Frame] Server listening on ${ host }:${ port }` );
@@ -82,7 +80,7 @@ async function run () : Promise< void > {
       await worker.stop();
 
       if ( server?.listening ) await new Promise< void >( ( resolve, reject ) => {
-        server!.close( err => err ? reject( err ) : resolve() );
+        server.close( err => err ? reject( err ) : resolve() );
       } );
 
       await vite?.close();
