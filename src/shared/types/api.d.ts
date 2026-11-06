@@ -40,6 +40,7 @@ export interface ApiLoginResult {
 }
 
 export interface ApiEnv {
+  appName: string;
   passwordStrict: boolean;
   editorAdminOnly: boolean;
 }
