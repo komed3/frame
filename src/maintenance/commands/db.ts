@@ -46,6 +46,14 @@ export const registerDbCommands = ( program: Command ) : void => {
     } );
 
   dbCommand
+    .command( 'backup <destination>' )
+    .description( 'Create a database backup' )
+    .action( async ( destination: string ) => {
+      const pages = await db.backup( destination );
+      ui.success( `Database backup created: ${ destination } (${ pages.toLocaleString() } pages).` );
+    } );
+
+  dbCommand
     .command( 'reset' )
     .description( 'Delete the database and reapply migrations' )
     .option( '-y, --yes', 'Skip confirmation' )
