@@ -3,7 +3,7 @@ export function Footer () {
     <footer className= 'mx-auto max-w-7xl px-6 py-18'>
       <div className= 'flex justify-between items-center gap-12 pt-6 border-t border-slate-700/70'>
         <p className= 'text-sm text-slate-400'>
-          Copyright &copy; 2026 komed3. All rights reserved.
+          Copyright &copy; 2026 Frame. Build by komed3. All rights reserved.
         </p>
 
         <div className= 'flex items-center gap-3 text-sm'>
