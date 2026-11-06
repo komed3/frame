@@ -145,7 +145,7 @@ export function Admin () {
             'hover:bg-white disabled:opacity-50'
           }
         >
-          { running ? 'Active jobs …' : scanning ? 'Starting scan …' : 'Scan all roots' }
+          { running ? 'Working …' : scanning ? 'Starting scan …' : 'Scan all roots' }
         </button>
       </div>
 
