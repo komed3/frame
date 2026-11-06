@@ -11,6 +11,7 @@ if ( nodeEnv !== undefined ) process.env.NODE_ENV = nodeEnv;
 
 export class Config {
   public static readonly schema = {
+    APP_NAME: { type: 'string', desc: 'Platform name', default: 'Frame' },
     NODE_ENV: { type: 'enum', desc: 'Runtime environment', default: 'dev', values: [ 'dev', 'development', 'test', 'prod', 'production' ] },
     ID_LENGTH: { type: 'integer', desc: 'Length of generated IDs', default: 7, min: 5, max: 32 },
     HOST: { type: 'string', desc: 'HTTP bind address', default: '0.0.0.0' },
