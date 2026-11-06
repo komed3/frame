@@ -1,4 +1,5 @@
 export interface ConfigSchema {
+  APP_NAME: string;
   NODE_ENV: 'dev' | 'development' | 'test' | 'prod' | 'production';
   ID_LENGTH: number;
 
