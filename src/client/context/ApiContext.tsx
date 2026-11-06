@@ -137,7 +137,6 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
   useEffect( () => void refreshSession(), [ refreshSession ] );
 
   useEffect( () => {
-    if ( ! user ) { setEnv( null ); return }
     let active = true;
 
     request< ApiEnv >( '/auth/env' )
@@ -145,7 +144,7 @@ export function ApiProvider ( { children }: { children: ReactNode } ) {
       .catch( () => { if ( active ) setEnv( null ) } );
 
     return () => { active = false };
-  }, [ user, request ] );
+  }, [ request ] );
 
 
   const login = useCallback( async ( credentials: ApiLogin ) => {
