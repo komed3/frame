@@ -88,7 +88,7 @@ Playback compatibility: Frame streams original media files without transcoding. 
 
 - Linux or another supported Node.js environment
 - SQLite
-- Node.js 22.12.0 or newer
+- Node.js 22.16.0 or newer
 - npm
 - FFmpeg and FFprobe available in `PATH`
 - At least 2 GB RAM; 4 GB or more recommended
@@ -490,7 +490,7 @@ Make sure the database and asset directories are included in your backup strateg
 
 ## Current scope and limitations
 
-Frame 2.0.0 provides a complete and usable foundation for managing and playing personal media libraries.
+Frame V2 provides a complete and usable foundation for managing and playing personal media libraries.
 
 The following areas are intentionally not included in the current release:
 
