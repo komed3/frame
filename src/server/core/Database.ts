@@ -4,7 +4,7 @@ import type { AppliedMigration, DatabaseStats } from '@/src/shared/types/databas
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite';
 
 
 export class Database {
@@ -131,6 +131,17 @@ export class Database {
       pageSize: pageSize.page_size, freePages: freePages.freelist_count,
       integrityCheck: integrity.integrity_check
     };
+  }
+
+  public async backup ( destination: string ) : Promise<number> {
+    const source = Config.get( 'DB_PATH' ), path = resolve( destination );
+
+    if ( this.transactionActive ) throw new Error( 'Database cannot be backed up while a transaction is running' );
+    if ( source !== ':memory:' && path === resolve( source ) ) throw new Error( 'Backup destination must differ from the database path' );
+    if ( existsSync( path ) ) throw new Error( `Backup destination already exists: ${ path }` );
+
+    mkdirSync( dirname( path ), { recursive: true } );
+    return sqliteBackup( this.open().db, path );
   }
 
   public reset () : number {
