@@ -66,7 +66,7 @@ async function run () : Promise< void > {
   console.info( `[Frame] Server listening on ${ host }:${ port }` );
 
 
-  // --- Shutdown ---
+  // --- shutdown ---
 
   let shuttingDown = false;
 
